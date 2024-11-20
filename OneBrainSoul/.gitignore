@@ -2,17 +2,13 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-
-TheAlbianTimes/Assets/StreamingAssets/Json/Save
-
-OneBrainSoul/[Ll]ibrary/
-OneBrainSoul/[Tt]emp/
-OneBrainSoul/[Oo]bj/
-OneBrainSoul/[Bb]uild/
-OneBrainSoul/[Bb]uilds/
-OneBrainSoul/[Ll]ogs/
-OneBrainSoul/[Uu]ser[Ss]ettings/
-OneBrainSoul/[Aa]ssets/[Ss]treamingAssets/[Jj]son/[Mm]ail
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -74,5 +70,3 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
-
-TheAlbianTimes/Assets/StreamingAssets/Json/Mail/
