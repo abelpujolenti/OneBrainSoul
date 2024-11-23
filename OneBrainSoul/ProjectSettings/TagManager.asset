@@ -14,12 +14,12 @@ TagManager:
   - UI
   - Ground
   - Player
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ally
+  - Enemy
+  - Ally Trigger Detection
+  - Enemy Trigger Detection
+  - Rival Trigger Detection
+  - Enemy Attack Area
   - 
   - 
   - 
