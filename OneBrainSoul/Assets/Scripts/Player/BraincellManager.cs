@@ -6,7 +6,8 @@ using UnityEngine.Rendering.Universal;
 
 public class BraincellManager : MonoBehaviour
 {
-    [SerializeField] PlayerCharacterController[] playerControllers;
+    public PlayerCharacterController[] playerControllers;
+    [GradientUsage(true)]public Gradient allyIconGradient;
     [SerializeField] float transitionDuration = 0.2f;
     [SerializeField] AnimationCurve slowDownCurve;
     [SerializeField] AnimationCurve lensDistortionCurve;
@@ -15,6 +16,14 @@ public class BraincellManager : MonoBehaviour
 
     int currentCharacter = 0;
     float transitionTime = 0f;
+
+    private void Start()
+    {
+        for (int i = 0; i < playerControllers.Length; i++)
+        {
+            playerControllers[i].allyIcon.SetColor(allyIconGradient.Evaluate((float)i / playerControllers.Length));
+        }
+    }
 
     private void OnGUI()
     {
@@ -76,7 +85,7 @@ public class BraincellManager : MonoBehaviour
         }
     }
 
-    private void SwitchCommand(int id)
+    public void SwitchCommand(int id)
     {
         if (id < 0 || id >= playerControllers.Length) return;
         if (transitionTime > 0) return;
@@ -105,12 +114,14 @@ public class BraincellManager : MonoBehaviour
     {
         c.cam.gameObject.SetActive(true);
         c.display.SetActive(false);
+        c.allyIcon.gameObject.SetActive(false);
         c.braincell = true;
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
     {
         c.cam.gameObject.SetActive(false);
         c.display.SetActive(true);
+        c.allyIcon.gameObject.SetActive(true);
         c.braincell = false;
     } 
 }
