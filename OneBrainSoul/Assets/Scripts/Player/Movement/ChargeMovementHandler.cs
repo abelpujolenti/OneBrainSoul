@@ -65,13 +65,13 @@ public class ChargeMovementHandler : MovementHandler
             {
                 destructibleTerrain.Break(hit.point);
             }
-            EnemyTest enemy = hit.collider.GetComponent<EnemyTest>();
-            if (enemy != null)
+            DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
+            if (entity != null)
             {
-                enemy.Damage(player, hit.point);
+                entity.Damage(player, hit.point);
             }
 
-            bool damaged = hitTerrain || enemy != null;
+            bool damaged = hitTerrain || entity != null;
             Collide(player, hit.normal, damaged);
             //Exit(player);
             return;

@@ -36,7 +36,7 @@ public class WandProjectile : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (deathTime > 0f || landTime > 0f) return;
-        EnemyTest enemy = collision.collider.GetComponent<EnemyTest>();
+        DamageTakingEntity enemy = collision.collider.GetComponent<DamageTakingEntity>();
         if (enemy != null)
         {
             Land(enemy);
@@ -90,11 +90,11 @@ public class WandProjectile : MonoBehaviour
         lifeTime -= Time.deltaTime;
     }
 
-    private void Land(EnemyTest enemy)
+    private void Land(DamageTakingEntity entity)
     {
         landTime = landDuration;
-        enemy.Damage(player, transform.position, empowered ? 3 : 2);
-        List<EnemyTest> enemies = new List<EnemyTest> { enemy };
-        wand.ProjectileLanded(this, enemies);
+        entity.Damage(player, transform.position, empowered ? 3 : 2);
+        List<DamageTakingEntity> entities = new List<DamageTakingEntity> { entity };
+        wand.ProjectileLanded(this, entities);
     }
 }

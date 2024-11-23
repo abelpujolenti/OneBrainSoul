@@ -21,14 +21,14 @@ public class Wand : Weapon
         base.AttackCommand();
     }
 
-    protected override void AttackLand(List<EnemyTest> enemies)
+    protected override void AttackLand(List<DamageTakingEntity> entities)
     {
-        player.hitstop.Add(hitstop * (.8f + enemies.Count * .2f));
+        player.hitstop.Add(hitstop * (.8f + entities.Count * .2f));
     }
 
-    public void ProjectileLanded(WandProjectile wandProjectile, List<EnemyTest> enemies)
+    public void ProjectileLanded(WandProjectile wandProjectile, List<DamageTakingEntity> entities)
     {
-        AttackLand(enemies);
+        AttackLand(entities);
     }
 
     private void ShootProjectile()

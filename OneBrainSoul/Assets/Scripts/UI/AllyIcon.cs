@@ -10,7 +10,7 @@ public class AllyIcon : Billboard
     [SerializeField]float highlightIntensity = 2f;
     [SerializeField]float alpha = .3f;
 
-    private void Start()
+    private void OnEnable()
     {
         mainIcon = GetComponent<Image>();
         highlightIcon = transform.GetChild(0).GetChild(0).GetComponent<Image>();
