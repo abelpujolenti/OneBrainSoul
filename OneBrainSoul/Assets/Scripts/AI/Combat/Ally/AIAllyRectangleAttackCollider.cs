@@ -90,8 +90,6 @@ namespace AI.Combat.Ally
                 return;
             }
             
-            CombatManager.Instance.CheckEnemyThreatGroup(_allyID, targetEnemy.GetContext().GetCurrentGroup());
-            
             _combatAgentsTriggering.Add(targetEnemy);
         }
 

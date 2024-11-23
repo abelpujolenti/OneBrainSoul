@@ -7,8 +7,7 @@ using UnityEngine;
 namespace AI.Combat.ScriptableObjects
 {
     public class AIAllyContext : AICombatAgentContext, IAllyFollowPlayerUtility, IAllyChooseNewRivalUtility,
-        IAllyGetCloserToRivalUtility, IAllyAttackUtility, IAllyFleeUtility, IAllyDodgeAttackUtility, 
-        IAllyHelpAnotherMoralGroupUtility, IEnemyStunned
+        IAllyGetCloserToRivalUtility, IAllyAttackUtility, IAllyFleeUtility, IAllyDodgeAttackUtility, IEnemyStunned
     {
         private uint _oncomingAttackDamage;
         private uint _enemyHealth;
@@ -16,12 +15,9 @@ namespace AI.Combat.ScriptableObjects
         private float _remainingDistance;
         private float _stoppingDistance;
         private float _height;
-        private float _moralWeight;
         private float _threatSuffering;
-        private float _minimumPriorityToAttend;
         private float _alertRadius;
         private float _safetyRadius;
-        private float _threatWeightOfTarget = 0;
         private float _enemyMaximumStress;
         private float _enemyCurrentStress;
 
@@ -34,14 +30,13 @@ namespace AI.Combat.ScriptableObjects
         private bool _wasRetreatOrderUsed;
         private bool _wasAttackOrderUsed;
         private bool _wasFleeOrderUsed;
-
+        
         private List<float> _distancesToEnemiesThatThreatMe = new List<float>();
-        private Dictionary<uint, float> _groupsHelpPriority = new Dictionary<uint, float>();
 
-        public AIAllyContext(uint totalHealth, uint currentGroup, float radius, float sightMaximumDistance, 
-            float minimumRangeToAttack, float maximumRangeToAttack, Transform agentTransform, float stoppingDistance, 
-            float height, float moralWeight, float alertRadius, float safetyRadius) : base(totalHealth, 
-            currentGroup, radius, sightMaximumDistance, minimumRangeToAttack, maximumRangeToAttack, agentTransform)
+        public AIAllyContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
+            float maximumRangeToAttack, Transform agentTransform, float stoppingDistance, float height, float alertRadius, 
+            float safetyRadius) : base(totalHealth, radius, sightMaximumDistance, minimumRangeToAttack, 
+            maximumRangeToAttack, agentTransform)
         {
             _repeatableActions.Add((uint)AIAllyAction.CHOOSE_NEW_RIVAL);
             _repeatableActions.Add((uint)AIAllyAction.ROTATE);
@@ -50,7 +45,6 @@ namespace AI.Combat.ScriptableObjects
 
             _stoppingDistance = stoppingDistance;
             _height = height;
-            _moralWeight = moralWeight;
             _alertRadius = alertRadius;
             _safetyRadius = safetyRadius;
         }
@@ -90,16 +84,6 @@ namespace AI.Combat.ScriptableObjects
             return _height;
         }
 
-        public void SetMoralWeight(float moralWeight)
-        {
-            _moralWeight = moralWeight;
-        }
-
-        public float GetMoralWeight()
-        {
-            return _moralWeight;
-        }
-
         public void SetThreatSuffering(float threatSuffering)
         {
             _threatSuffering = threatSuffering;
@@ -110,29 +94,9 @@ namespace AI.Combat.ScriptableObjects
             return _threatSuffering;
         }
 
-        public void SetMinimumPriorityToAttend(float minimumPriorityToAttend)
-        {
-            _minimumPriorityToAttend = minimumPriorityToAttend;
-        }
-
-        public float GetMinimumPriorityToAttend()
-        {
-            return _minimumPriorityToAttend;
-        }
-
         public float GetAlertRadius()
         {
             return _alertRadius;
-        }
-
-        public void SetThreatWeightOfTarget(float threatWeightOfTarget)
-        {
-            _threatWeightOfTarget = threatWeightOfTarget;
-        }
-
-        public float GetThreatWeightOfTarget()
-        {
-            return _threatWeightOfTarget;
         }
 
         public void SetRivalMaximumStress(float rivalMaximumStress)
@@ -249,7 +213,7 @@ namespace AI.Combat.ScriptableObjects
         {
             return _wasFleeOrderUsed;
         }
-
+        
         public void SetDistancesToEnemiesThatThreatMe(List<float> distancesToThreatGroupsThatThreatMe)
         {
             _distancesToEnemiesThatThreatMe = distancesToThreatGroupsThatThreatMe;
@@ -258,31 +222,6 @@ namespace AI.Combat.ScriptableObjects
         public List<float> GetDistancesToEnemiesThatThreatMe()
         {
             return _distancesToEnemiesThatThreatMe;
-        }
-
-        public void AddGroupToHelp(uint groupID)
-        {
-            _groupsHelpPriority.Add(groupID, 0);
-        }
-
-        public void RemoveGroupToHelp(uint groupID)
-        {
-            _groupsHelpPriority.Remove(groupID);
-        }
-
-        public void SetGroupHelpPriority(uint groupID, float helpPriority)
-        {
-            _groupsHelpPriority[groupID] = helpPriority;
-        }
-
-        public Dictionary<uint, float> GetGroupsHelpPriority()
-        {
-            return _groupsHelpPriority;
-        }
-
-        public override float GetWeight()
-        {
-            return _moralWeight;
         }
     }
 }

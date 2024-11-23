@@ -20,16 +20,10 @@ namespace ECS.Entities.AI.Combat
 
         private List<uint> _enemiesThatTargetsMe = new List<uint>();
 
-        private List<uint> _threatGroupsThatThreatMe = new List<uint>();
-
         private List<AIEnemyAttackCollider> _oncomingEnemyAttacks = new List<AIEnemyAttackCollider>();
 
         private Dictionary<AllyAttackComponent, AIAttackCollider> _attacksColliders =
             new Dictionary<AllyAttackComponent, AIAttackCollider>();
-        
-        private uint[] _threatGroupsThatFightAllies = Array.Empty<uint>();
-        
-        private MoralComponent _moralComponent;
         
         private DieComponent _dieComponent;
 
@@ -38,19 +32,16 @@ namespace ECS.Entities.AI.Combat
         private void Start()
         {
             Setup();
-            SetupCombatComponents(_aiAllySpecs);
+            SetupCombatComponents();
             InstantiateAttackComponents(_aiAllySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
 
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             
-            _moralComponent = new MoralComponent(_aiAllySpecs.moralWeight);
-            _groupComponent = _moralComponent;
             _dieComponent = new DieComponent();
-            _context = new AIAllyContext(_aiAllySpecs.totalHealth, _moralComponent.GetCurrentGroup(), capsuleCollider.radius, 
-                _aiAllySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, 
-                transform, _navMeshAgent.stoppingDistance, capsuleCollider.height, _aiAllySpecs.moralWeight, 
-                _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
+            _context = new AIAllyContext(_aiAllySpecs.totalHealth, capsuleCollider.radius,
+                _aiAllySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
+                _navMeshAgent.stoppingDistance, capsuleCollider.height, _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
             
@@ -145,7 +136,7 @@ namespace ECS.Entities.AI.Combat
 
                 UpdateVectorToRival();
 
-                UpdateDistancesToThreatGroupsThatThreatMyMoralGroup();
+                UpdateDistancesToEnemiesThatTargetsMe();
 
                 if (_context.IsAttacking())
                 {
@@ -166,11 +157,6 @@ namespace ECS.Entities.AI.Combat
                 yield return null;
             }
         }
-
-        public ref MoralComponent GetMoralComponent()
-        {
-            return ref _moralComponent;
-        }
         
         public DieComponent GetDieComponent()
         {
@@ -185,23 +171,13 @@ namespace ECS.Entities.AI.Combat
 
             _context.SetIsSeeingARival(_visibleRivals.Count != 0);
 
-            if (_visibleRivals.Count == 0)
-            {
-                return;
-            }
-
             _enemiesThatTargetsMe = CombatManager.Instance.FilterEnemiesThatTargetsMe(GetCombatAgentInstance(), _visibleRivals);
-
-            _threatGroupsThatThreatMe = CombatManager.Instance.FilterThreatGroupsThatThreatMe(_moralComponent.GetWeight(), 
-                _enemiesThatTargetsMe);
-
-            _threatGroupsThatFightAllies = CombatManager.Instance.FilterPerThreatGroupAlliesFighting(this);
         }
 
-        private void UpdateDistancesToThreatGroupsThatThreatMyMoralGroup()
+        private void UpdateDistancesToEnemiesThatTargetsMe()
         {
             _context.SetDistancesToEnemiesThatThreatMe(
-                CombatManager.Instance.GetDistancesToGivenThreatGroups(transform.position, _threatGroupsThatThreatMe));
+                CombatManager.Instance.GetDistancesToGivenEnemies(transform.position, _enemiesThatTargetsMe));
         }
 
         protected override void CalculateBestAction()
@@ -368,25 +344,6 @@ namespace ECS.Entities.AI.Combat
             
         }
 
-        public List<Vector2> GetOncomingEnemiesAttacksCorners()
-        {
-            List<Vector2> originalPolygon = new List<Vector2>();
-            List<Vector2> newPolygon = new List<Vector2>();
-            
-            originalPolygon.AddRange(_oncomingEnemyAttacks[0].GetCornerPoints());
-
-            for (int i = 0; i < _oncomingEnemyAttacks.Count - 1; i++)
-            {
-                newPolygon.AddRange(_oncomingEnemyAttacks[i + 1].GetCornerPoints());
-
-                originalPolygon = PolygonUtilities.Union2Polygons(originalPolygon, newPolygon);
-                
-                newPolygon.Clear();
-            }
-
-            return originalPolygon;
-        }
-
         public void DodgeAttack(VectorComponent positionToDodge)
         {
             ContinueNavigation();
@@ -448,7 +405,7 @@ namespace ECS.Entities.AI.Combat
 
             if (_context.GetHealth() != 0)
             {
-                StartCoroutine(DamageFeedback());
+                //TODO FEEDBACK
                 return;
             }
             
@@ -481,17 +438,6 @@ namespace ECS.Entities.AI.Combat
             return _context;
         }
 
-        public override IStatWeight GetStatWeightComponent()
-        {
-            return _moralComponent;
-        }
-
-        public void SetCurrentMoralGroup(uint currentMoralGroup)
-        {
-            _moralComponent.currentGroup = currentMoralGroup;
-            _context.SetCurrentGroup(currentMoralGroup);
-        }
-
         public void SetOncomingAttackDamage(uint oncomingAttackDamage)
         {
             _context.SetOncomingAttackDamage(oncomingAttackDamage);
@@ -501,17 +447,6 @@ namespace ECS.Entities.AI.Combat
         {
             _context.SetRivalHealth(enemyHealth);
             CalculateIfCanDefeatEnemy();
-        }
-
-        public void SetMoralWeight(float moralWeight)
-        {
-            _moralComponent.SetMoralWeight(moralWeight);
-            _context.SetMoralWeight(moralWeight);
-        }
-
-        public void SetThreatWeightOfTarget(float threatWeightOfTarget)
-        {
-            _context.SetThreatWeightOfTarget(threatWeightOfTarget);
         }
 
         public void SetEnemyMaximumStress(float enemyMaximumStress)
@@ -547,34 +482,9 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsInFleeState(allyOrder == AIAllyOrders.FLEE);
         }
 
-        public void AddGroupToHelp(uint groupID)
-        {
-            _context.AddGroupToHelp(groupID);
-        }
-
-        public void RemoveGroupToHelp(uint groupID)
-        {
-            _context.RemoveGroupToHelp(groupID);
-        }
-
-        public void SetGroupHelpPriority(uint groupID, float helpPriority)
-        {
-            _context.SetGroupHelpPriority(groupID, helpPriority);
-        }
-
         public List<AllyAttackComponent> GetAllyAttackComponents()
         {
             return _attackComponents;
-        }
-
-        public List<uint> GetThreatGroupsThatThreatMe()
-        {
-            return _threatGroupsThatThreatMe;
-        }
-
-        public uint[] GetThreatGroupsThatFightAllies()
-        {
-            return _threatGroupsThatFightAllies;
         }
 
         public bool IsAI()

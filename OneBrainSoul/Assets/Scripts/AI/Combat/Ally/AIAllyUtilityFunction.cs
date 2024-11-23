@@ -19,8 +19,7 @@ namespace AI.Combat.Ally
                 new AICombatAgentAction<AIAllyAction>(AIAllyAction.ROTATE),
                 new AICombatAgentAction<AIAllyAction>(AIAllyAction.ATTACK),
                 new AICombatAgentAction<AIAllyAction>(AIAllyAction.FLEE),
-                new AICombatAgentAction<AIAllyAction>(AIAllyAction.DODGE_ATTACK),
-                new AICombatAgentAction<AIAllyAction>(AIAllyAction.HELP_ANOTHER_ALLY)
+                new AICombatAgentAction<AIAllyAction>(AIAllyAction.DODGE_ATTACK)
             };
 
             actions[0].utilityScore = CalculateFollowPlayerUtility(context);
@@ -30,7 +29,6 @@ namespace AI.Combat.Ally
             actions[4].utilityScore = CalculateAttackUtility(context);
             actions[5].utilityScore = CalculateFleeUtility(context);
             actions[6].utilityScore = CalculateDodgeAttackUtility(context);
-            actions[7].utilityScore = CalculateHelpAnotherAllyUtility(context);
 
             uint index = 0;
 
@@ -59,11 +57,6 @@ namespace AI.Combat.Ally
                 return 0.9f;
             }
             
-            if (allyChooseNewRivalUtility.GetMoralWeight() > allyChooseNewRivalUtility.GetThreatWeightOfTarget())
-            {
-                return 0;
-            }
-            
             if (allyChooseNewRivalUtility.IsSeeingARival())
             {
                 return 0.4f;
@@ -75,11 +68,6 @@ namespace AI.Combat.Ally
         private static float CalculateGetCloserToRivalUtility(IAllyGetCloserToRivalUtility allyGetCloserToRivalUtility)
         {
             if (!allyGetCloserToRivalUtility.HasATarget() || allyGetCloserToRivalUtility.IsAttacking())
-            {
-                return 0;
-            }
-
-            if (allyGetCloserToRivalUtility.GetMoralWeight() < allyGetCloserToRivalUtility.GetThreatWeightOfTarget())
             {
                 return 0;
             }
@@ -174,50 +162,6 @@ namespace AI.Combat.Ally
             }*/
 
             return 0.8f;
-        }
-        
-        private static float CalculateHelpAnotherAllyUtility(IAllyHelpAnotherMoralGroupUtility allyHelpAnotherMoralGroupUtility)
-        {
-            if (allyHelpAnotherMoralGroupUtility.HasATarget())
-            {
-                float distanceToRival = allyHelpAnotherMoralGroupUtility.GetDistanceToRival();
-
-                if (allyHelpAnotherMoralGroupUtility.GetMinimumRangeToAttack() < distanceToRival &&
-                    allyHelpAnotherMoralGroupUtility.GetMaximumRangeToAttack() > distanceToRival &&
-                    Vector3.Angle(allyHelpAnotherMoralGroupUtility.GetAgentTransform().forward, 
-                        allyHelpAnotherMoralGroupUtility.GetVectorToRival()) < 15f)
-                {
-                    return 0;
-                }
-            }
-
-            Dictionary<uint, float> groupsHelpPriority = allyHelpAnotherMoralGroupUtility.GetGroupsHelpPriority();
-
-            float maxPriority = 0;
-
-            foreach (var groupHelpPriority in groupsHelpPriority)
-            {
-                if (groupHelpPriority.Key == allyHelpAnotherMoralGroupUtility.GetCurrentGroup())
-                {
-                    continue;
-                }
-
-                float currentPriority = groupHelpPriority.Value;
-
-                if (currentPriority <= maxPriority)
-                {
-                    continue;
-                }
-
-                maxPriority = currentPriority;
-            }
-
-            if (maxPriority > allyHelpAnotherMoralGroupUtility.GetMinimumPriorityToAttend())
-            {
-                return 0.95f;
-            }
-            
-            return 0;
         }
     }
 }

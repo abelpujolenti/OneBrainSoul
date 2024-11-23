@@ -8,7 +8,6 @@ namespace AI.Combat.ScriptableObjects
     {
         public readonly AIAgentType aiAgentType = AIAgentType.ALLY;
         
-        public readonly float moralWeight = 3;
         public float alertRadius;
         public float safetyRadius;
 

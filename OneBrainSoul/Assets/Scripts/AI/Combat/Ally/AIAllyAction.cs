@@ -9,7 +9,6 @@
         ATTACK,
         FLEE,
         DODGE_ATTACK,
-        HELP_ANOTHER_ALLY,
         ENUM_SIZE
     }
 }

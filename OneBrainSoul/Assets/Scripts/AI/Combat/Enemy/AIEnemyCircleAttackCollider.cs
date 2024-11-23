@@ -79,7 +79,7 @@ namespace AI.Combat.Enemy
             ally.OnReceiveDamage(new DamageComponent(_circleAttackComponent.GetDamage()));
         }
 
-        public override Vector2[] GetCornerPoints()
+        protected override Vector2[] GetCornerPoints()
         {
             List<Vector2> corners = new List<Vector2>();
 
@@ -135,14 +135,6 @@ namespace AI.Combat.Enemy
             }
             
             _combatAgentsTriggering.Add(targetAlly);
-
-            if (_isSubscribed)
-            {
-                return;
-            }
-
-            _isSubscribed = true;
-            CombatManager.Instance.SubscribeToRebake(this);
         }
 
         private void OnTriggerExit(Collider other)

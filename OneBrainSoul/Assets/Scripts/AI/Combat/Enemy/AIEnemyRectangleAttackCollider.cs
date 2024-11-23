@@ -97,7 +97,7 @@ namespace AI.Combat.Enemy
             ally.OnReceiveDamage(new DamageComponent(_rectangleAttackComponent.GetDamage()));
         }
 
-        public override Vector2[] GetCornerPoints()
+        protected override Vector2[] GetCornerPoints()
         {
             Vector3 center = _boxCollider.center;
             
@@ -138,14 +138,6 @@ namespace AI.Combat.Enemy
             }
             
             _combatAgentsTriggering.Add(targetAlly);
-
-            if (_isSubscribed)
-            {
-                return;
-            }
-
-            _isSubscribed = true;
-            CombatManager.Instance.SubscribeToRebake(this);
         }
 
         private void OnTriggerExit(Collider other)

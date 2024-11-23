@@ -15,11 +15,7 @@ namespace AI.Combat
         
         protected List<AIAlly> _combatAgentsTriggering = new List<AIAlly>();
 
-        public abstract Vector2[] GetCornerPoints();
-
-        private uint _areaType = 0;
-
-        protected bool _isSubscribed;
+        protected abstract Vector2[] GetCornerPoints();
 
         public bool HasCombatAgentsTriggering()
         {
@@ -28,35 +24,7 @@ namespace AI.Combat
 
         protected override void OnDisable()
         {
-            SetWalkable();
             _combatAgentsTriggering.Clear();
-            _isSubscribed = false;
-        }
-
-        private void SetWalkable()
-        {
-            foreach (NavMeshModifierVolume navMeshModifierVolume in _navMeshModifierVolumes)
-            {
-                navMeshModifierVolume.area = 0;
-            }
-
-            _areaType = 0;
-        }
-
-        public bool IsWalkable()
-        {
-            return !Convert.ToBoolean(_areaType);
-        }
-
-        public void SetNotWalkable()
-        {
-            
-            foreach (NavMeshModifierVolume navMeshModifierVolume in _navMeshModifierVolumes)
-            {
-                navMeshModifierVolume.area = 1;
-            }
-
-            _areaType = 1;
         }
     }
 }

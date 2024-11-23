@@ -6,18 +6,16 @@ using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
 {
-    public abstract class AICombatAgentContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetCurrentGroup, IRivalIndex, 
+    public abstract class AICombatAgentContext : IGetTotalHealth, ILastActionIndex, IHealth, IRivalIndex, 
         IGetRadius, IRivalRadius, IGetSightMaximumDistance, IDistanceToRival, IMinimumRangeToAttack, IMaximumRangeToAttack, 
-        ISeeingARival, ITarget, IFighting, IAttacking, IVectorToRival, IRivalTransform, IGetAgentTransform, IStatWeight
+        ISeeingARival, ITarget, IFighting, IAttacking, IVectorToRival, IRivalTransform, IGetAgentTransform
     {
         protected List<uint> _repeatableActions = new List<uint>();
         private uint _lastActionIndex = 10;
 
         private uint _totalHealth;
         private uint _health;
-        private uint _currentGroup;
         private uint _rivalIndex;
-        private uint _rivalGroupIDOfTarget;
 
         private float _radius;
         private float _rivalRadius;
@@ -37,12 +35,11 @@ namespace AI.Combat.ScriptableObjects
         private Transform _agentTransform;
         private Transform _rivalTransform;
 
-        protected AICombatAgentContext(uint totalHealth, uint currentGroup, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
+        protected AICombatAgentContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
             float maximumRangeToAttack, Transform agentTransform)
         {
             _totalHealth = totalHealth;
             _health = totalHealth;
-            _currentGroup = currentGroup;
             _radius = radius;
             _sightMaximumDistance = sightMaximumDistance != 0 ? sightMaximumDistance : Mathf.Infinity; 
             _minimumRangeToAttack = minimumRangeToAttack;
@@ -63,16 +60,6 @@ namespace AI.Combat.ScriptableObjects
         public uint GetLastActionIndex()
         {
             return _lastActionIndex;
-        }
-
-        public void SetCurrentGroup(uint currentGroup)
-        {
-            _currentGroup = currentGroup;
-        }
-
-        public uint GetCurrentGroup()
-        {
-            return _currentGroup;
         }
 
         public uint GetTotalHealth()
@@ -98,16 +85,6 @@ namespace AI.Combat.ScriptableObjects
         public uint GetRivalID()
         {
             return _rivalIndex;
-        }
-
-        public void SetRivalGroupIDOfTarget(uint rivalGroupIDOfTarget)
-        {
-            _rivalGroupIDOfTarget = rivalGroupIDOfTarget;
-        }
-
-        public uint GetRivalGroupIDOfTarget()
-        {
-            return _rivalGroupIDOfTarget;
         }
 
         public float GetRadius()
@@ -236,7 +213,5 @@ namespace AI.Combat.ScriptableObjects
         {
             return _agentTransform;
         }
-
-        public abstract float GetWeight();
     }
 }

@@ -101,10 +101,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fda4f69eea2651141ba527f461fefedc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4271065732825353323}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fda4f69eea2651141ba527f461fefedc,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 294764915273015517}
   m_SourcePrefab: {fileID: 100100000, guid: fda4f69eea2651141ba527f461fefedc, type: 3}
 --- !u!1 &1431982829728524995 stripped
@@ -227,7 +223,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 7
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -235,19 +231,6 @@ NavMeshAgent:
   m_BaseOffset: 2.5683727
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 0
---- !u!114 &4271065732825353323
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1431982829728524995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d798df72ea61efa4d9832b32fee1ba96, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  color: {r: 0, g: 1, b: 0, a: 0}
 --- !u!114 &294764915273015517
 MonoBehaviour:
   m_ObjectHideFlags: 0

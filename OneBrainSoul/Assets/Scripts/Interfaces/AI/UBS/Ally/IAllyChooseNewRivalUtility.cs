@@ -2,7 +2,6 @@
 
 namespace Interfaces.AI.UBS.Ally
 {
-    public interface IAllyChooseNewRivalUtility : IHasATarget, IIsSeeingARival, IGetMoralWeight, IIsFighting, 
-        IGetThreatWeightOfTarget 
+    public interface IAllyChooseNewRivalUtility : IHasATarget, IIsSeeingARival, IIsFighting 
     {}
 }

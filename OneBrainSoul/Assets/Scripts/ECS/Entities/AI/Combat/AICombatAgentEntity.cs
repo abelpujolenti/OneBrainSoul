@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using AI;
 using AI.Combat.ScriptableObjects;
-using Demo;
 using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Navigation;
@@ -29,11 +28,7 @@ namespace ECS.Entities.AI.Combat
 
         protected List<uint> _visibleRivals = new List<uint>();
 
-        protected DamageFeedbackComponent _damageFeedbackComponent;
-
         protected DefeatComponent _defeatComponent;
-
-        protected IGroup _groupComponent;
 
         protected VectorComponent _lastDestination;
 
@@ -64,31 +59,9 @@ namespace ECS.Entities.AI.Combat
 
         protected abstract IEnumerator UpdateCoroutine();
 
-        protected void SetupCombatComponents(AICombatAgentSpecs aiCombatAgentSpecs)
+        protected void SetupCombatComponents()
         {
             _combatAgentInstanceID = (uint)gameObject.GetInstanceID();
-            
-            _damageFeedbackComponent = new DamageFeedbackComponent(GetComponent<MeshRenderer>(), 
-                aiCombatAgentSpecs.damageFeedbackFlashTime, aiCombatAgentSpecs.damageFeedbackFlashColor);
-        }
-
-        protected IEnumerator DamageFeedback()
-        {
-            float flashTime = _damageFeedbackComponent.GetFlashTime();
-            float currentTime = 0;
-
-            Color originalColor = GetComponent<ChangeColor>().color;
-
-            _damageFeedbackComponent.GetMeshRenderer().material.color = _damageFeedbackComponent.GetFlashColor();
-
-            while (currentTime < flashTime)
-            {
-                currentTime += Time.deltaTime;
-                
-                yield return null;
-            }
-
-            _damageFeedbackComponent.GetMeshRenderer().material.color = originalColor;
         }
 
         protected abstract void OnDefeated();
@@ -217,11 +190,6 @@ namespace ECS.Entities.AI.Combat
             _context.SetRivalIndex(rivalIndex);
         }
 
-        public void SetRivalGroupIDOfTarget(uint rivalGroupIDOfTarget)
-        {
-            _context.SetRivalGroupIDOfTarget(rivalGroupIDOfTarget);
-        }
-
         public void SetRivalRadius(float rivalRadius)
         {
             _context.SetRivalRadius(rivalRadius);
@@ -276,8 +244,6 @@ namespace ECS.Entities.AI.Combat
         
         public abstract TContext GetContext();
 
-        public abstract IStatWeight GetStatWeightComponent();
-
         public uint GetCombatAgentInstance()
         {
             return _combatAgentInstanceID;
@@ -286,11 +252,6 @@ namespace ECS.Entities.AI.Combat
         public List<uint> GetVisibleRivals()
         {
             return _visibleRivals;
-        }
-
-        public IGroup GetGroupComponent()
-        {
-            return _groupComponent;
         }
 
         public void SetDestination(TransformComponent transformComponent)

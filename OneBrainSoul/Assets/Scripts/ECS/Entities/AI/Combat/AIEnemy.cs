@@ -13,24 +13,17 @@ namespace ECS.Entities.AI.Combat
     public class AIEnemy : AICombatAgentEntity<AIEnemyContext, AttackComponent, AllyDamageComponent>
     {
         [SerializeField] private AIEnemySpecs _aiEnemySpecs;
-
-        [SerializeField] private SphereCollider _originalThreatGroupInfluenceCollider;
-
-        private ThreatComponent _threatComponent;
         
         private void Start()
         {
             Setup();
-            SetupCombatComponents(_aiEnemySpecs);
+            SetupCombatComponents();
             InstantiateAttackComponents(_aiEnemySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
             
-            _threatComponent = new ThreatComponent(_aiEnemySpecs.threatLevel);
-            _groupComponent = _threatComponent;
-            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, _threatComponent.GetCurrentGroup(), 
-                GetComponent<CapsuleCollider>().radius, _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, 
-                _maximumRangeToCastAnAttack, transform, _aiEnemySpecs.threatLevel, 
-                _originalThreatGroupInfluenceCollider.radius, _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
+            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, GetComponent<CapsuleCollider>().radius, 
+                _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
+                _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
             
             CombatManager.Instance.AddAIEnemy(this);
             
@@ -130,7 +123,7 @@ namespace ECS.Entities.AI.Combat
                 }
                 else
                 {
-                    StartCoroutine(DamageFeedback());
+                    //TODO FEEDBACK
                 }
                 
                 CombatManager.Instance.OnEnemyReceiveDamage(combatAgentInstanceID, health, _context.GetCurrentStress(), isStunned);
@@ -153,8 +146,6 @@ namespace ECS.Entities.AI.Combat
             float time = 0;
 
             GetNavMeshAgentComponent().GetNavMeshAgent().isStopped = true;
-
-            _damageFeedbackComponent.GetMeshRenderer().material.color = new Color(0.71f, 0, 0.63f);
             
             while (time < stunDuration)
             {
@@ -165,8 +156,6 @@ namespace ECS.Entities.AI.Combat
             GetNavMeshAgentComponent().GetNavMeshAgent().isStopped = false;
             
             GetContext().SetIsStunned(false);
-            
-            _damageFeedbackComponent.GetMeshRenderer().material.color = Color.red;
             
             RotateToNextPathCorner();
             CombatManager.Instance.OnEnemyStunEnds(GetCombatAgentInstance());
@@ -182,30 +171,14 @@ namespace ECS.Entities.AI.Combat
             return _context;
         }
 
-        public void SetCurrentThreatGroup(uint currentThreatGroup)
-        {
-            _threatComponent.currentGroup = currentThreatGroup;
-            _context.SetCurrentGroup(currentThreatGroup);
-        }
-
         public void SetCurrentStress(float currentStress)
         {
             _context.SetCurrentStress(currentStress);
         }
 
-        public override IStatWeight GetStatWeightComponent()
-        {
-            return _threatComponent;
-        }
-
         public List<AttackComponent> GetAttackComponents()
         {
             return _attackComponents;
-        }
-
-        public ThreatComponent GetThreatComponent()
-        {
-            return _threatComponent;
         }
     }
 }
