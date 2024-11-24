@@ -32,6 +32,7 @@ public class WandProjectile : MonoBehaviour
         {
             material.SetColor("_Color", new Color(0f, .7f, 1f));
         }
+        GetComponent<Rigidbody>().AddForce(direction * speed);
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -44,15 +45,6 @@ public class WandProjectile : MonoBehaviour
         else
         {
             deathTime = deathDuration;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (lifeTime > 0f && landTime == 0f && deathTime == 0f)
-        {
-            Vector3 movement = direction * speed * Time.fixedDeltaTime;
-            transform.position += movement;
         }
     }
 

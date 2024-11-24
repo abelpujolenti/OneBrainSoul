@@ -12,9 +12,9 @@ public class EnemyBase : DamageTakingEntity
     public float rotSpeed = 30f;
 
     Material mat;
-    Rigidbody rb;
-    PlayerCharacterController[] playerCharacters;
-    private void Start()
+    protected Rigidbody rb;
+    protected PlayerCharacterController[] playerCharacters;
+    protected override void Start()
     {
         mat = GetComponentInChildren<MeshRenderer>().material;
         rb = GetComponent<Rigidbody>();
@@ -53,31 +53,15 @@ public class EnemyBase : DamageTakingEntity
         base.Update();
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
-        PlayerCharacterController followedPlayer = null;
-        foreach (PlayerCharacterController player in playerCharacters)
-        {
-
-            float minD = float.PositiveInfinity;
-            float d = Vector3.Distance(player.transform.position, transform.position);
-            followedPlayer = d < minD && d < range ? player : followedPlayer;
-            minD = d < minD ? d : minD;
-        }
-        if (followedPlayer != null)
-        {
-            FollowUpdate(followedPlayer);
-        }
+        BehaviorUpdate();
     }
 
-    void FollowUpdate(PlayerCharacterController player)
+    protected virtual void BehaviorUpdate()
     {
-        Vector3 plVector = (player.transform.position - transform.position);
-        plVector.y = 0f;
-        if (plVector.magnitude > radius + 2f && damageCooldown <= 0)
-        {
-            transform.rotation = Quaternion.LookRotation(plVector.normalized);
-            rb.AddForce(plVector.normalized * speed, ForceMode.Acceleration);
-        }
+
     }
+
+
 }

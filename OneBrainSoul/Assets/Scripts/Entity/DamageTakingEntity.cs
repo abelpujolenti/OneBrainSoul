@@ -10,7 +10,7 @@ public class DamageTakingEntity : MonoBehaviour
     protected float damageCooldown = 0f;
     protected MeshCollider meshCollider;
 
-    private void Start()
+    protected virtual void Start()
     {
         meshCollider = GetComponent<MeshCollider>();
     }

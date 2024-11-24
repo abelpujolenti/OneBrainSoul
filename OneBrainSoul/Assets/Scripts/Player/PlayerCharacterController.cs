@@ -41,6 +41,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     public Rigidbody rb { get; private set; }
     public FirstPersonCamera cam { get; private set; }
+    public PlayerHealth health { get; private set; }
+    public Hitstop hitstop { get; private set; }
     public bool onGround { get; private set; }
     public float xInput { get; private set; }
     public float yInput { get; private set; }
@@ -61,9 +63,6 @@ public class PlayerCharacterController : MonoBehaviour
     public SwitchModeUI switchModeUI;
     public AllyIcon allyIcon;
 
-    public URPManager urpManager;
-    public Hitstop hitstop;
-    public BraincellManager braincellManager;
     public Camera switchModeCamera;
 
     public float airTime = 0f;
@@ -85,6 +84,7 @@ public class PlayerCharacterController : MonoBehaviour
         uiCanvas.gameObject.SetActive(true);
         crosshair = uiCanvas.GetComponentInChildren<TextMeshProUGUI>();
         hitstop = GetComponent<Hitstop>();
+        health = GetComponent<PlayerHealth>();
     }
 
     private void Update()
@@ -203,7 +203,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     public void SwitchModeUpdate()
     {
-        if (!switchModeInput || !braincell)
+        bool canSwitch = !switchModeInput || !braincell || BraincellManager.Instance.transitionTime > 0f;
+        if (canSwitch)
         {
             if (switchModeTime > 0)
             {
@@ -216,6 +217,7 @@ public class PlayerCharacterController : MonoBehaviour
                 switchModeCamera.tag = "Player";
                 switchModeUI.ReleaseSwitch(this);
                 switchModeCamera.gameObject.SetActive(false);
+                PostProcessingManager.Instance.DisableSwitchMode();
                 Time.timeScale = 1f;
             }
             switchModeTime = 0f;
@@ -231,6 +233,7 @@ public class PlayerCharacterController : MonoBehaviour
             switchModeCamera.transform.rotation = orientation.rotation;
             switchModeCamera.transform.position = cam.transform.position;
             display.SetActive(true);
+            PostProcessingManager.Instance.EnableSwitchMode(.45f, .1f);
         }
 
         float t = Mathf.Pow(switchModeTime, 1f / switchModeFalloffPower);
@@ -245,6 +248,7 @@ public class PlayerCharacterController : MonoBehaviour
         float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.25f;
         switchModeCamera.transform.rotation = Quaternion.Euler(rx, ry, rz);
         switchModeCamera.transform.localPosition = cam.transform.localPosition + (orientation.transform.forward + Vector3.down * switchModeYFactor).normalized * z;
+
         Time.timeScale = 1f / (1f + t * 10f);
 
         switchModeUI.SwitchModeUpdate(this);

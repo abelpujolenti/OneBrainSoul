@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class BraincellManager : MonoBehaviour
+public class BraincellManager : Singleton<BraincellManager>
 {
     public PlayerCharacterController[] playerControllers;
     [GradientUsage(true)]public Gradient allyIconGradient;
@@ -12,10 +12,10 @@ public class BraincellManager : MonoBehaviour
     [SerializeField] AnimationCurve slowDownCurve;
     [SerializeField] AnimationCurve lensDistortionCurve;
     [SerializeField] VolumeProfile volumeProfile;
-    [SerializeField] URPManager urpManager;
+    [SerializeField] PostProcessingManager urpManager;
 
     int currentCharacter = 0;
-    float transitionTime = 0f;
+    public float transitionTime = 0f;
 
     private void Start()
     {
