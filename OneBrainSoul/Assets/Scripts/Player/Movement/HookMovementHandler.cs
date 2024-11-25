@@ -34,6 +34,7 @@ public class HookMovementHandler : MovementHandler
         movementDirection = (endPos - startPos).normalized;
         line = player.GetComponent<LineRenderer>();
         line.enabled = true;
+        player.canSwitch = false;
     }
 
     public void Move(PlayerCharacterController player)
@@ -103,6 +104,7 @@ public class HookMovementHandler : MovementHandler
 
     private void Exit(PlayerCharacterController player)
     {
+        player.canSwitch = true;
         line.enabled = false;
         if (!player.onGround)
         {

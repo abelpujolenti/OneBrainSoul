@@ -21,6 +21,7 @@ public class ChargeMovementHandler : MovementHandler
         this.chargeDirection = chargeDirection;
         player.cam.FovWarp(1f, 2f);
         PostProcessingManager.Instance.ChargeRunEffect(duration);
+        player.canSwitch = false;
     }
 
     public void Move(PlayerCharacterController player)
@@ -88,13 +89,17 @@ public class ChargeMovementHandler : MovementHandler
         player.hitstop.AddAftershock(damaged ? .23f : .2f);
         player.rb.velocity = Vector3.zero;
         player.rb.AddForce((new Vector3(normal.x, Mathf.Max(0f, normal.y), normal.z).normalized + new Vector3(0f, bounceVerticalRatio * (damaged ? 1.2f : 1f), 0f)).normalized * bounceStrength * (damaged ? 1.4f : 1f) , ForceMode.Acceleration);
-        
+
+        player.canSwitch = true;
+
         player.movementHandler = new AirborneMovementHandler();
         (player.movementHandler as AirborneMovementHandler).horizontalDrag = 5f;
     }
 
     private void Exit(PlayerCharacterController player)
     {
+        player.canSwitch = true;
+
         if (!player.onGround)
         {
             player.movementHandler = new AirborneMovementHandler();

@@ -90,6 +90,7 @@ public class BraincellManager : Singleton<BraincellManager>
         if (id < 0 || id >= playerControllers.Length) return;
         if (transitionTime > 0) return;
         if (id == currentCharacter) return;
+        if (!playerControllers[currentCharacter].canSwitch) return;
         Switch(id);
     }
 

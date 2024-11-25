@@ -1,11 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 
 public class PlayerCharacterController : MonoBehaviour
 {
@@ -50,6 +45,7 @@ public class PlayerCharacterController : MonoBehaviour
     public bool ability1Input { get; private set; }
     public bool ability2Input { get; private set; }
     public bool switchModeInput { get; private set; }
+    public bool canSwitch { get; set; } = true;
 
     public float ability1Time = 0f;
     public float ability2Time = 0f;
@@ -203,8 +199,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     public void SwitchModeUpdate()
     {
-        bool canSwitch = !switchModeInput || !braincell || BraincellManager.Instance.transitionTime > 0f;
-        if (canSwitch)
+        bool cantSwitchMode = !switchModeInput || !canSwitch || !braincell || BraincellManager.Instance.transitionTime > 0f;
+        if (cantSwitchMode)
         {
             if (switchModeTime > 0)
             {
