@@ -1187,8 +1187,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 1
   radius: 1
-  explosionPower: 10000
-  explosionRadius: 9
+  explosionPower: 13000
+  explosionRadius: 10
   explosionFalloff: 2
 --- !u!23 &496196597926176971
 MeshRenderer:

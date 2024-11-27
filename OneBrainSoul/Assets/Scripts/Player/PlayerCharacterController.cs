@@ -67,6 +67,7 @@ public class PlayerCharacterController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<FirstPersonCamera>();
+        cam.Setup();
         if (braincell)
         {
             display.SetActive(false);

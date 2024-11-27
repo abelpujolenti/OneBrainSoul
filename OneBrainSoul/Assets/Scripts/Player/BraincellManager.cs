@@ -51,7 +51,7 @@ public class BraincellManager : Singleton<BraincellManager>
         else if (e.isScrollWheel)
         {
             int c = (currentCharacter - (int)Input.mouseScrollDelta.y + playerControllers.Length) % playerControllers.Length;
-            SwitchCommand(c);
+            //SwitchCommand(c);
         }
     }
 

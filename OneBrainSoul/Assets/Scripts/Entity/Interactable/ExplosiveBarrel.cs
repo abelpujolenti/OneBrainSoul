@@ -28,8 +28,15 @@ public class ExplosiveBarrel : DamageTakingEntity
 
     void ApplyExplosionForce(Rigidbody receiver)
     {
-        Vector3 d = (receiver.transform.position - transform.position);
+        Vector3 d = (receiver.transform.position - transform.position).normalized;
+        d = (d + new Vector3(0f, .3f, 0f)).normalized;
         float power = Mathf.Pow(Mathf.Clamp01(1f - (d.magnitude / (explosionRadius + radius))), 1f / explosionFalloff);
         receiver.AddForce(d.normalized * explosionPower * power, ForceMode.Acceleration);
+        
+        var player = receiver.GetComponent<PlayerCharacterController>();
+        if (player != null && player.movementHandler is GroundedMovementHandler)
+        {
+            player.movementHandler = new AirborneMovementHandler();
+        }
     }
 }

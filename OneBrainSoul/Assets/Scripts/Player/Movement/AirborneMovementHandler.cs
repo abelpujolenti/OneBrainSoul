@@ -40,7 +40,7 @@ public class AirborneMovementHandler : MovementHandler
         if (player.onGround)
         {
             groundedTimer += 0.1f;
-            if (player.rb.velocity.y < 0.01 || groundedTimer > 0.3f)
+            if (player.rb.velocity.y < -player.gravityStrength / 2f + 0.01f || groundedTimer > 0.1f && player.rb.velocity.y < 0.01f || groundedTimer > 0.3f)
             {
                 player.movementHandler = new GroundedMovementHandler();
             }            

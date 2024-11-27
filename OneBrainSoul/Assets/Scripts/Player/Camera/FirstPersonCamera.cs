@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class FirstPersonCamera : MonoBehaviour
 {
@@ -36,11 +37,13 @@ public class FirstPersonCamera : MonoBehaviour
     Vector3 shakeOffset = new Vector3();
     Vector3 startPos;
 
-    void Start()
+    public void Setup()
     {
         Cursor.lockState = CursorLockMode.Locked;
         cam = GetComponent<Camera>();
         startPos = transform.localPosition;
+        xRotation = orientation.rotation.eulerAngles.x;
+        yRotation = orientation.rotation.eulerAngles.y;
     }
 
     void Update()
