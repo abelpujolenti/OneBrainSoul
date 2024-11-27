@@ -193,9 +193,12 @@ MonoBehaviour:
   radius: 0.5
   damageParticlePrefab: {fileID: 3606423612210623298, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
     type: 3}
-  range: 25
-  speed: 30
+  damage: 1
+  range: 21
+  speed: 110
   rotSpeed: 30
+  attackCooldown: 3
+  attackRange: 5
 --- !u!135 &3709814095171347276
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -225,9 +228,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1431982829728524995}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 4
-  m_AngularDrag: 0.05
+  m_Mass: 5
+  m_Drag: 0
+  m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}

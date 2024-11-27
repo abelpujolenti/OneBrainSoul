@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class RangedEnemy : EnemyBase
 {
-    [SerializeField] float projectileSpeed = 2000f;
-    [SerializeField] float projectileCooldown = 5f;
-    [SerializeField] Transform projectile;
-    float shootTime = 0f;
+    [SerializeField] protected float projectileSpeed = 2000f;
+    [SerializeField] protected float projectileCooldown = 5f;
+    [SerializeField] protected Transform projectile;
+    protected float shootTime = 0f;
     protected override void Start()
     {
         base.Start();
@@ -41,6 +41,6 @@ public class RangedEnemy : EnemyBase
     {
         Vector3 dir = (player.transform.position - transform.position).normalized;
         TestEnemyProjectile proj = Instantiate(projectile, transform.position + new Vector3(dir.x, 0f, dir.z).normalized * 2.5f, Quaternion.identity).GetComponent<TestEnemyProjectile>();
-        proj.Init(2f, dir, projectileSpeed);
+        proj.Init(2f, dir, projectileSpeed, damage);
     }
 }

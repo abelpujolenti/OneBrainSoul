@@ -7,12 +7,14 @@ public class TestEnemyProjectile : MonoBehaviour
 {
     Vector3 direction;
     float speed;
+    int damage;
     float lifeTime = 0f;
-    public void Init(float lifeTime, Vector3 direction, float speed)
+    public void Init(float lifeTime, Vector3 direction, float speed, int damage)
     {
         this.lifeTime = lifeTime;
         this.direction = direction;
         this.speed = speed;
+        this.damage = damage;
         GetComponent<Rigidbody>().AddForce(direction * speed);
     }
 
@@ -21,7 +23,7 @@ public class TestEnemyProjectile : MonoBehaviour
         PlayerCharacterController player = collision.gameObject.GetComponent<PlayerCharacterController>();
         if (player != null)
         {
-            player.health.Damage(1, gameObject);
+            player.health.Damage(damage, gameObject);
         }
         Destroy(gameObject);
     }

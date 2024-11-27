@@ -7,9 +7,10 @@ public class EnemyBase : DamageTakingEntity
 {
     [SerializeField] Transform damageParticlePrefab;
     ParticleSystem damageParticle;
-    public float range = 12f;
-    public float speed = 1.5f;
-    public float rotSpeed = 30f;
+    [SerializeField] protected int damage = 1;
+    [SerializeField] protected float range = 12f;
+    [SerializeField] protected float speed = 1.5f;
+    [SerializeField] protected float rotSpeed = 30f;
 
     Material mat;
     protected Rigidbody rb;

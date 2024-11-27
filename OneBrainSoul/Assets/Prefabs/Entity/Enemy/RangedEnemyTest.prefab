@@ -15,6 +15,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1771247705790427257, guid: d2dce8c75928d7d4282ad03c3f90bcd6,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1771247705790427257, guid: d2dce8c75928d7d4282ad03c3f90bcd6,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1771247705790427257, guid: d2dce8c75928d7d4282ad03c3f90bcd6,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1771247705790427257, guid: d2dce8c75928d7d4282ad03c3f90bcd6,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: -76.260956
       objectReference: {fileID: 0}
@@ -96,8 +111,11 @@ MonoBehaviour:
   radius: 0.5
   damageParticlePrefab: {fileID: 3606423612210623298, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
     type: 3}
-  range: 80
+  damage: 1
+  range: 37
   speed: 1.5
   rotSpeed: 30
+  projectileSpeed: 2000
+  projectileCooldown: 6
   projectile: {fileID: 2096996376411321490, guid: aed9cb9cacacb13409214e2fc4552f2e,
     type: 3}
