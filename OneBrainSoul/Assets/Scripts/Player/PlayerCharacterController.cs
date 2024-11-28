@@ -241,11 +241,14 @@ public class PlayerCharacterController : MonoBehaviour
         float rx = Mathf.Pow(t, 0.5f) * switchModeRotationFactor;
         Vector3 forwardnoY = new Vector3(switchModeCamera.transform.forward.x, 0f, switchModeCamera.transform.forward.z).normalized;
         float ryfangle = Vector3.Angle(forwardnoY, orientation.forward);
-        float ryf = 7f / (7f + ryfangle);
-        ryf = Quaternion.FromToRotation(forwardnoY, orientation.forward).y * Input.GetAxis("Mouse X") < 0 ? ryf : 1f;
-        ryf = ryf < 0.1f ? 0f : ryf;
+        float ryf = 8f / (8f + ryfangle);
+        float dot = Vector3.Dot(forwardnoY, orientation.forward);
+        ryf = dot < -0.45f ? 0f : ryf;
+        ryf = Quaternion.FromToRotation(forwardnoY, orientation.forward).y * Input.GetAxis("Mouse X") <= 0 ? ryf : 1f;
+        Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
+        ryf = ryf > 0f && ryf < 0.3f ? 0.3f : ryf;
         float ry = switchModeCamera.transform.rotation.eulerAngles.y + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf;
-        float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.25f;
+        float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.1f;
         switchModeCamera.transform.rotation = Quaternion.Euler(rx, ry, rz);
         switchModeCamera.transform.localPosition = cam.transform.localPosition + (orientation.transform.forward + Vector3.down * switchModeYFactor).normalized * z;
 

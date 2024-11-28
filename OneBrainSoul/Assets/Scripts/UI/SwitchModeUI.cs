@@ -68,7 +68,9 @@ public class SwitchModeUI : MonoBehaviour
                 p++;
                 continue;
             }
-            Quaternion r = Quaternion.Inverse(player.orientation.rotation);
+
+            Vector3 forwardnoY = new Vector3(player.switchModeCamera.transform.forward.x, 0f, player.switchModeCamera.transform.forward.z).normalized;
+            Quaternion r = Quaternion.Inverse(Quaternion.LookRotation(forwardnoY, Vector3.up));
             Vector3 relativePos = r * (ally.transform.position - player.transform.position);
             Vector2 iconPos = new Vector2(relativePos.x, relativePos.z).normalized * (wheelRadius + allyIconRadius);
             allyIcons[i].transform.localPosition = iconPos;
