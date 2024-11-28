@@ -28,7 +28,7 @@ public class AirborneMovementHandler : MovementHandler
     {
         // Mid-air strafe, with less control than grounded movement
         Vector3 direction = (player.orientation.right * player.xInput + player.orientation.forward * player.yInput).normalized;
-        player.rb.AddForce(direction * strafeSpeed, ForceMode.Acceleration);
+        player.rb.AddForce(direction * strafeSpeed * player.moveSpeedMultiplier, ForceMode.Acceleration);
 
         // Lean in the direction we are moving
         Vector3 horizontalVelocity = player.rb.velocity;

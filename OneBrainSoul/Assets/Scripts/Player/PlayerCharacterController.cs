@@ -12,6 +12,9 @@ public class PlayerCharacterController : MonoBehaviour
     [Header("Properties")]
     [Range(1,3)]
     public int jumps = 1;
+    [Range(0,3)]
+    public float moveSpeedMultiplier = 1f;
+    public bool pressToHover = false;
 
     [Header("Cooldowns")]
     public float ability1Cooldown = 3f;
@@ -112,7 +115,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void ApplyGravity()
     {
-        float gravity = jumpInput && jumps > 1 && rb.velocity.y < -4f ? gravityStrength * 0.2f : gravityStrength;
+        float gravity = jumpInput && pressToHover && rb.velocity.y < -4f ? gravityStrength * 0.2f : gravityStrength;
         rb.AddForce(Vector3.down * gravity , ForceMode.Acceleration);
     }
 
