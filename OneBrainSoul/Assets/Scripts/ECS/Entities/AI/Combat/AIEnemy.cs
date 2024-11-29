@@ -1,10 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
 using AI.Combat;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
-using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
 
@@ -20,6 +20,9 @@ namespace ECS.Entities.AI.Combat
             SetupCombatComponents();
             InstantiateAttackComponents(_aiEnemySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
+
+            _raysTargetsLayerMask = (int)(Math.Pow(2, GameManager.Instance.GetEnemyLayer()) + 
+                                          Math.Pow(2, GameManager.Instance.GetGroundLayer()));
             
             _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, GetComponent<CapsuleCollider>().radius, 
                 _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
@@ -64,6 +67,8 @@ namespace ECS.Entities.AI.Combat
                     yield return null;
                     continue;
                 }
+                
+                SetRaysDirections();
             
                 CalculateBestAction();
 
@@ -179,6 +184,11 @@ namespace ECS.Entities.AI.Combat
         public List<AttackComponent> GetAttackComponents()
         {
             return _attackComponents;
+        }
+
+        private void OnDisable()
+        {
+            OnDefeated();
         }
     }
 }

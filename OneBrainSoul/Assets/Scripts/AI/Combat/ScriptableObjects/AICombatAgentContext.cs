@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Interfaces.AI.Combat;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.BaseInterfaces.Property;
 using UnityEngine;

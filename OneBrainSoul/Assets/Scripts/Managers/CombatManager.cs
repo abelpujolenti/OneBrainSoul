@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using AI;
 using AI.Combat;
 using AI.Combat.Ally;
@@ -10,12 +9,10 @@ using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Combat;
-using Interfaces.AI.Combat;
 using Interfaces.AI.Navigation;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Unity.AI.Navigation;
 using UnityEngine;
-using Utilities;
 
 namespace Managers
 {
@@ -25,11 +22,10 @@ namespace Managers
 
         public static CombatManager Instance => _instance;
 
-        [SerializeField] private NavMeshSurface _allyNavMeshSurface;
         [SerializeField] private GameObject _enemyRectangleAttackColliderPrefab;
         [SerializeField] private GameObject _enemyCircleAttackColliderPrefab;
 
-        private Dictionary<AIAgentType, Delegate> _returnTheSameAgentsType = new Dictionary<AIAgentType, Delegate>
+        private readonly Dictionary<AIAgentType, Delegate> _returnTheSameAgentsType = new Dictionary<AIAgentType, Delegate>
         {
             { AIAgentType.ALLY, new Func<List<AIAlly>>(() => 
                 _instance.ReturnAllDictionaryValuesInAList<AIAlly ,AIAllyContext, AllyAttackComponent, DamageComponent>(
@@ -43,13 +39,13 @@ namespace Managers
         private Dictionary<uint, AIAlly> _aiAllies = new Dictionary<uint, AIAlly>();
         private Dictionary<uint, AIEnemy> _aiEnemies = new Dictionary<uint, AIEnemy>();
 
-        private Dictionary<AIAgentType, int> _targetsLayerMask = new Dictionary<AIAgentType, int>
+        private readonly Dictionary<AIAgentType, int> _targetsLayerMask = new Dictionary<AIAgentType, int>
         {
             { AIAgentType.ALLY, (int)(Math.Pow(2, 7) + Math.Pow(2, 6)) },
             { AIAgentType.ENEMY, (int)(Math.Pow(2, 8) + Math.Pow(2, 6)) }
         };
 
-        private Dictionary<AIAllyAction, Action<AIAlly>> _aiAllyActions = new Dictionary<AIAllyAction, Action<AIAlly>>
+        private readonly Dictionary<AIAllyAction, Action<AIAlly>> _aiAllyActions = new Dictionary<AIAllyAction, Action<AIAlly>>
         {
             { AIAllyAction.FOLLOW_PLAYER , ally => Instance.AllyFollowPlayer(ally)},
             { AIAllyAction.CHOOSE_NEW_RIVAL , ally => Instance.AllyRequestRival(ally) },
@@ -60,7 +56,7 @@ namespace Managers
             { AIAllyAction.DODGE_ATTACK , ally => Instance.AllyDodge(ally)}
         };
         
-        private Dictionary<AIEnemyAction, Action<AIEnemy>> _aiEnemyActions = new Dictionary<AIEnemyAction, Action<AIEnemy>>
+        private readonly Dictionary<AIEnemyAction, Action<AIEnemy>> _aiEnemyActions = new Dictionary<AIEnemyAction, Action<AIEnemy>>
         {
             { AIEnemyAction.PATROL , enemy => Instance.EnemyPatrol(enemy)},
             { AIEnemyAction.CHOOSE_NEW_RIVAL , enemy => Instance.EnemyRequestRival(enemy)},
@@ -244,10 +240,10 @@ namespace Managers
 
         private void AllyRequestRival(AIAlly ally)
         {
-            List<uint> visibleRivals = ally.GetVisibleRivals();
-            
             ShowActionDebugLogs(ally.name + " Requesting Rival");
             //Debug.Log(ally.name + " Requesting Rival");
+            
+            List<uint> visibleRivals = ally.GetVisibleRivals();
             
             if (visibleRivals.Count == 0)
             {
@@ -315,8 +311,6 @@ namespace Managers
 
         private void AllyFlee(AIAlly ally)
         {
-            //TODO (REWORK) ALLY FLEE 
-            
             ShowActionDebugLogs(ally.name + " Fleeing");
             //Debug.Log(ally.name + " Fleeing");
             
@@ -348,17 +342,18 @@ namespace Managers
 
         private void EnemyPatrol(AIEnemy enemy)
         {
-            //TODO ENEMY PATROL
             ShowActionDebugLogs(enemy.name + " Patrolling");
             //Debug.Log(enemy.name + " Patrolling");
+            
+            //TODO ENEMY PATROL
         }
 
         private void EnemyRequestRival(AIEnemy enemy)
         {
-            List<uint> visibleRivals = enemy.GetVisibleRivals();
-            
             ShowActionDebugLogs(enemy.name + " Requesting Rival");
             //Debug.Log(enemy.name + " Requesting Rival");
+            
+            List<uint> visibleRivals = enemy.GetVisibleRivals();
 
             if (visibleRivals.Count == 0)
             {
@@ -412,12 +407,12 @@ namespace Managers
 
         private void EnemyFlee(AIEnemy enemy)
         {
+            ShowActionDebugLogs(enemy.name + " Fleeing");
+            //Debug.Log(enemy.name + " Fleeing");
+            
             //TODO ENEMY FLEE
             
             enemy.ContinueNavigation();
-            
-            ShowActionDebugLogs(enemy.name + " Fleeing");
-            //Debug.Log(enemy.name + " Fleeing");
         }
 
         #endregion

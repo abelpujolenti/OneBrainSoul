@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ECS.Entities.AI.Combat;
 using Unity.AI.Navigation;
 using UnityEngine;

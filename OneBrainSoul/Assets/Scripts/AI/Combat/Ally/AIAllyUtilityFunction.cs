@@ -57,11 +57,6 @@ namespace AI.Combat.Ally
                 return 0.9f;
             }
             
-            if (allyChooseNewRivalUtility.IsSeeingARival())
-            {
-                return 0.4f;
-            }
-            
             return 0;
         }
 
@@ -132,19 +127,28 @@ namespace AI.Combat.Ally
                 return 1;
             }
 
-            /*List<float> distancesToThreatGroups = allyFleeUtility.GetDistancesToThreatGroupsThatThreatMe();
+            List<float> distancesToEnemies = allyFleeUtility.GetDistancesToEnemiesThatThreatMe();
+            float alertRadius = allyFleeUtility.GetAlertRadius();
 
-            float radiusOfAlert = allyFleeUtility.GetAlertRadius();
+            uint minimumEnemiesAroundToFlee = allyFleeUtility.GetMinimumEnemiesAroundToFlee();
+            uint enemiesCounter = 0;
 
-            foreach (float distance in distancesToThreatGroups)
+            foreach (float distance in distancesToEnemies)
             {
-                if (distance > radiusOfAlert)
+                if (distance > alertRadius)
+                {
+                    continue;
+                }
+
+                enemiesCounter++;
+                
+                if (enemiesCounter < minimumEnemiesAroundToFlee)
                 {
                     continue;
                 }
 
                 return 0.8f;
-            }*/
+            }
             
             return 0;
         }
@@ -161,7 +165,8 @@ namespace AI.Combat.Ally
                 return 0.8f;
             }*/
 
-            return 0.8f;
+            //return 0.8f;
+            return 0f;
         }
     }
 }

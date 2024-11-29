@@ -11,6 +11,7 @@ namespace AI.Combat.ScriptableObjects
     {
         private uint _oncomingAttackDamage;
         private uint _enemyHealth;
+        private uint _minimumEnemiesInsideAlertRadiusToFlee;
 
         private float _remainingDistance;
         private float _stoppingDistance;
@@ -34,14 +35,16 @@ namespace AI.Combat.ScriptableObjects
         private List<float> _distancesToEnemiesThatThreatMe = new List<float>();
 
         public AIAllyContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
-            float maximumRangeToAttack, Transform agentTransform, float stoppingDistance, float height, float alertRadius, 
-            float safetyRadius) : base(totalHealth, radius, sightMaximumDistance, minimumRangeToAttack, 
-            maximumRangeToAttack, agentTransform)
+            float maximumRangeToAttack, Transform agentTransform, uint minimumEnemiesInsideAlertRadiusToFlee, float stoppingDistance, 
+            float height, float alertRadius, float safetyRadius) : base(totalHealth, radius, sightMaximumDistance, 
+            minimumRangeToAttack, maximumRangeToAttack, agentTransform)
         {
             _repeatableActions.Add((uint)AIAllyAction.CHOOSE_NEW_RIVAL);
             _repeatableActions.Add((uint)AIAllyAction.ROTATE);
             _repeatableActions.Add((uint)AIAllyAction.DODGE_ATTACK);
             _repeatableActions.Add((uint)AIAllyAction.ATTACK);
+
+            _minimumEnemiesInsideAlertRadiusToFlee = minimumEnemiesInsideAlertRadiusToFlee;
 
             _stoppingDistance = stoppingDistance;
             _height = height;
@@ -62,6 +65,11 @@ namespace AI.Combat.ScriptableObjects
         public void SetStoppingDistance(float stoppingDistance)
         {
             _stoppingDistance = stoppingDistance;
+        }
+
+        public uint GetMinimumEnemiesAroundToFlee()
+        {
+            return _minimumEnemiesInsideAlertRadiusToFlee;
         }
 
         public void SetRemainingDistance(float remainingDistance)

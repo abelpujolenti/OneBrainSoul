@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FirstPersonCamera : MonoBehaviour
@@ -60,7 +58,7 @@ public class FirstPersonCamera : MonoBehaviour
             float smoothCurve = Mathf.SmoothStep(0f, 1f, smoothRotationTimer);
             xRotation = Mathf.Lerp(xRotationFrom, xRotationDest, smoothCurve);
 
-            // LerpAngle ensures we handle wrapping around 360บ adequately
+            // LerpAngle ensures we handle wrapping around 360ยบ adequately
             yRotation = Mathf.LerpAngle(yRotationFrom, yRotationDest, smoothCurve);
 
             smoothRotationTimer += Time.unscaledDeltaTime * smoothRotationSpeed;

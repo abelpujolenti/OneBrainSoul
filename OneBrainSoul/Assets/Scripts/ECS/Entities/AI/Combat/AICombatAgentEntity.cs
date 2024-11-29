@@ -2,13 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
+using AI.Combat;
+using AI.Combat.CombatNavigation;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Navigation;
-using Interfaces.AI.Combat;
 using Managers;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
+using Utilities;
 using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
@@ -18,13 +22,17 @@ namespace ECS.Entities.AI.Combat
         where TAttackComponent : AttackComponent
         where TDamageComponent : DamageComponent
     {
+        [SerializeField] private NavMeshSurface _navMeshSurface;
+
+        private NavMeshGraph _navMeshGraph = new NavMeshGraph();
+
+        private AStarPathFindingAlgorithm _aStarPathFindingAlgorithm = new AStarPathFindingAlgorithm();
+        
         private uint _combatAgentInstanceID;
 
         protected TContext _context;
 
-        //BIG REFACTOR, I HATE DUPLICATE CLASSES
         protected List<TAttackComponent> _attackComponents = new List<TAttackComponent>();
-        //
 
         protected List<uint> _visibleRivals = new List<uint>();
 
@@ -36,7 +44,22 @@ namespace ECS.Entities.AI.Combat
 
         protected float _minimumRangeToCastAnAttack;
         protected float _maximumRangeToCastAnAttack;
+
+        protected DirectionWeights[] _raysDirectionAndWeights;
         
+        protected float _raysOpeningAngle = 90f;
+        protected float _raysDistance = 20f;
+        
+        protected uint _numberOfVicinityRays = 12;
+        protected uint _numberOfGroundRays = 12;
+
+        protected int _raysTargetsLayerMask;
+
+        private void Start()
+        {
+            _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation());
+        }
+
         protected virtual void StartUpdate()
         {
             if (_updateCoroutine != null)
@@ -52,19 +75,55 @@ namespace ECS.Entities.AI.Combat
             _updateCoroutine = null;
         }
 
+        protected abstract IEnumerator UpdateCoroutine();
+
         protected override IEnumerator RotateToGivenPositionCoroutine(Vector3 position)
         {
             yield return base.RotateToGivenPositionCoroutine(position);
         }
 
-        protected abstract IEnumerator UpdateCoroutine();
+        protected void SetRaysDirections()
+        {
+            _raysDirectionAndWeights = new DirectionWeights[_numberOfVicinityRays];
+            
+            float angle = -(_raysOpeningAngle / 2);
+            float angleStep = _raysOpeningAngle / _numberOfVicinityRays;
+
+            Transform ownTransform = transform;
+
+            for (int i = 0; i < _numberOfVicinityRays; i++)
+            {
+                Vector3 direction = Quaternion.Euler(0, angle, 0) * ownTransform.forward;
+                _raysDirectionAndWeights[i].direction = direction.normalized;
+                angle += angleStep;
+            }
+        }
+
+        protected void LaunchRaycasts()
+        {
+            SetRaysDirections();
+            
+            Vector3 position = transform.position;
+
+            RaycastHit hit;
+            
+            for (int i = 0; i < _numberOfVicinityRays; i++)
+            {
+                if (Physics.Raycast(position, _raysDirectionAndWeights[i].direction, out hit, _raysDistance, _raysTargetsLayerMask))
+                {
+                    _raysDirectionAndWeights[i].weight = MathUtil.Map(hit.distance, 0, 1, _raysDistance, 0);
+                    Debug.Log(hit.collider.name);
+                    continue;
+                }
+
+                _raysDirectionAndWeights[i].weight = 0;
+            }
+        }
 
         protected void SetupCombatComponents()
         {
             _combatAgentInstanceID = (uint)gameObject.GetInstanceID();
         }
-
-        protected abstract void OnDefeated();
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
         {
@@ -239,6 +298,7 @@ namespace ECS.Entities.AI.Combat
         protected abstract void CalculateBestAction();
 
         public abstract void OnReceiveDamage(TDamageComponent damageComponent);
+        protected abstract void OnDefeated();
 
         public abstract AIAgentType GetAIAgentType();
         
@@ -316,6 +376,18 @@ namespace ECS.Entities.AI.Combat
             }
             
             GetContext().SetMaximumRangeToAttack(newMaximumRange);
+        }
+
+        private void OnDrawGizmos()
+        {
+            Vector3 position = transform.position;
+            
+            Gizmos.color = Color.green;
+            
+            foreach (DirectionWeights directionAndWeight in _raysDirectionAndWeights)
+            {
+                Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
+            }
         }
     }
 }

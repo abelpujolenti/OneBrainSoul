@@ -7,10 +7,8 @@ using AI.Combat.Ally;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
-using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
-using Utilities;
 
 namespace ECS.Entities.AI.Combat
 {
@@ -36,12 +34,16 @@ namespace ECS.Entities.AI.Combat
             InstantiateAttackComponents(_aiAllySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
 
+            _raysTargetsLayerMask = ~(int)(Math.Pow(2, GameManager.Instance.GetAllyAttackZoneLayer()) + 
+                                                       Math.Pow(2, GameManager.Instance.GetGroundLayer()));
+
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             
             _dieComponent = new DieComponent();
             _context = new AIAllyContext(_aiAllySpecs.totalHealth, capsuleCollider.radius,
                 _aiAllySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
-                _navMeshAgent.stoppingDistance, capsuleCollider.height, _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
+                _aiAllySpecs.minimumEnemiesInsideAlertRadiusToFlee, _navMeshAgent.stoppingDistance, capsuleCollider.height, 
+                _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
             
@@ -150,6 +152,8 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
+                LaunchRaycasts();
+                
                 //TODO REMAINING DISTANCE IF HAS A DESTINATION
             
                 CalculateBestAction();
@@ -157,7 +161,7 @@ namespace ECS.Entities.AI.Combat
                 yield return null;
             }
         }
-        
+
         public DieComponent GetDieComponent()
         {
             return _dieComponent;
@@ -353,6 +357,8 @@ namespace ECS.Entities.AI.Combat
             navMeshAgentComponent.GetNavMeshAgent().stoppingDistance = 1;
             
             _context.SetStoppingDistance(1);
+
+            _raysOpeningAngle = 360f;
             
             ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(),positionToDodge);
         }

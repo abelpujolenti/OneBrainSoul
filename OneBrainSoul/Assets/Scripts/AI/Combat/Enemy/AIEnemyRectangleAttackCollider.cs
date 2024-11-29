@@ -1,7 +1,6 @@
 ﻿using System;
 using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
-using Managers;
 using Unity.AI.Navigation;
 using UnityEngine;
 
