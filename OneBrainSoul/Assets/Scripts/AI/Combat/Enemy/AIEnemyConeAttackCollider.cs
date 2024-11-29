@@ -1,5 +1,4 @@
-﻿using System;
-using ECS.Components.AI.Combat;
+﻿using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
 using UnityEngine;
 

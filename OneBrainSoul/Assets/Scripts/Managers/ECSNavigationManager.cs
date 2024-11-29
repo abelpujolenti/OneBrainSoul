@@ -3,6 +3,7 @@ using ECS.Components.AI.Navigation;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Managers
 {
@@ -22,6 +23,8 @@ namespace Managers
             if (_instance == null)
             {
                 _instance = this;
+                
+                _updateAgentDestinationSystem.navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation());;
                 
                 DontDestroyOnLoad(gameObject);
                 

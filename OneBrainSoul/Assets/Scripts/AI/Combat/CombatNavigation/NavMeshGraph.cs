@@ -16,47 +16,48 @@ namespace AI.Combat.CombatNavigation
                 {
                     continue;
                 }
-
-                nodes[vertex] = new Node
+                
+                Node newNode = new Node
                 {
                     position = vertex
                 };
+                
+                nodes.Add(vertex, newNode);
             }
 
             int indicesLength = navMeshTriangulation.indices.Length;
 
-            for (int i = 0; i < indicesLength; i++)
+            for (int i = 0; i < indicesLength; i += 3)
             {
-                Vector3 vector1 = navMeshTriangulation.vertices[navMeshTriangulation.indices[i]];
-                Vector3 vector2 = navMeshTriangulation.vertices[navMeshTriangulation.indices[i + 1]];
-                Vector3 vector3 = navMeshTriangulation.vertices[navMeshTriangulation.indices[i + 2]];
+                Node node1 = nodes[navMeshTriangulation.vertices[navMeshTriangulation.indices[i]]];
+                Node node2 = nodes[navMeshTriangulation.vertices[navMeshTriangulation.indices[i + 1]]];
+                Node node3 = nodes[navMeshTriangulation.vertices[navMeshTriangulation.indices[i + 2]]];
 
-                ConnectNodes(vector1, vector2);
-                ConnectNodes(vector2, vector3);
-                ConnectNodes(vector3, vector1);
+                ConnectNodes(node1, node2);
+                ConnectNodes(node2, node3);
+                ConnectNodes(node3, node1);
             }
         }
 
-        private void ConnectNodes(Vector3 fromVector, Vector3 toVector)
+        private void ConnectNodes(Node fromNode, Node toNode)
         {
-            if (!nodes.ContainsKey(fromVector) || !nodes.ContainsKey(toVector))
+            if (fromNode.edges.Exists(edge => edge.toNode == toNode))
             {
                 return;
             }
-
-            Node fromNode = nodes[fromVector];
-            Node toNode = nodes[toVector];
-
-            float cost = Vector3.Distance(fromVector, toVector);
             
-            fromNode.neighbors.Add(new Edge
+            float cost = Vector3.Distance(fromNode.position, toNode.position);
+            
+            fromNode.edges.Add(new Edge
             {
+                fromNode = fromNode,
                 toNode = toNode,
                 cost = cost
             });
             
-            toNode.neighbors.Add(new Edge
+            toNode.edges.Add(new Edge
             {
+                fromNode = toNode,
                 toNode = fromNode,
                 cost = cost
             });
@@ -66,7 +67,7 @@ namespace AI.Combat.CombatNavigation
         {
             foreach (Node node in nodes.Values)
             {
-                foreach (Edge edge in node.neighbors)
+                foreach (Edge edge in node.edges)
                 {
                     if (Vector3.Distance(edge.toNode.position, obstaclePosition) > radius)
                     {
@@ -82,7 +83,7 @@ namespace AI.Combat.CombatNavigation
         {
             foreach (Node node in nodes.Values)
             {
-                foreach (Edge edge in node.neighbors)
+                foreach (Edge edge in node.edges)
                 {
                     edge.cost = Vector3.Distance(node.position, edge.toNode.position);
                 }

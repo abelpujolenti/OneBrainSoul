@@ -11,7 +11,6 @@ using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Combat;
 using Interfaces.AI.Navigation;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
-using Unity.AI.Navigation;
 using UnityEngine;
 
 namespace Managers

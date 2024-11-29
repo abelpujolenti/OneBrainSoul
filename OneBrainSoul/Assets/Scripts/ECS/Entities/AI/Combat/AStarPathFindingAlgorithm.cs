@@ -1,29 +1,70 @@
 ﻿using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using UnityEngine;
+using Utilities;
+using Edge = AI.Combat.CombatNavigation.Edge;
 
 namespace ECS.Entities.AI.Combat
 {
     public class AStarPathFindingAlgorithm
     {
-        /*public List<Vector3> FindPath(NavMeshGraph navMeshGraph, Vector3 startPosition, Vector3 goalPosition)
+        public List<Vector3> FindPath(NavMeshGraph navMeshGraph, Vector3 startPosition, Vector3 goalPosition)
         {
-            Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
-            Dictionary<Node, float> gScore = new Dictionary<Node, float>();
-            Dictionary<Node, float> fScore = new Dictionary<Node, float>();
+            PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
 
             Node startNode = GetClosestNode(navMeshGraph, startPosition);
             Node goalNode = GetClosestNode(navMeshGraph, goalPosition);
 
-            foreach (Node node in navMeshGraph.nodes.Values)
+            startNode.gCost = 0;
+            startNode.hCost = Heuristic(startNode, goalNode);
+            
+            openSet.Enqueue(startNode, startNode.fCost);
+
+            while (openSet.Count > 0)
             {
-                gScore[node] = Mathf.Infinity;
-                fScore[node] = Mathf.Infinity;
+                Node currentNode = openSet.Dequeue();
+
+                if (currentNode == goalNode)
+                {
+                    List<Vector3> newPath = CalculateNewPath(goalNode);
+                    newPath.Add(goalPosition);
+                    return newPath;
+                }
+
+                closedSet.Add(currentNode);
+
+                foreach (Edge edge in currentNode.edges)
+                {
+                    Node neighbor = edge.toNode;
+
+                    if (closedSet.Contains(neighbor))
+                    {
+                        continue;
+                    }
+
+                    float tentativeGScore = currentNode.gCost + edge.cost;
+
+                    if (tentativeGScore >= neighbor.gCost)
+                    {
+                        continue;
+                    }
+                    
+                    neighbor.gCost = tentativeGScore;
+                    neighbor.hCost = Heuristic(neighbor, goalNode);
+                    neighbor.parent = currentNode;
+
+                    if (openSet.Contains(neighbor))
+                    {
+                        continue;
+                    }
+                        
+                    openSet.Enqueue(neighbor, neighbor.fCost);
+                }
             }
 
-            gScore[startNode] = 0;
-            fScore[startNode] = Heuristic(startNode.position, goalNode.position);
-        }*/
+            return new List<Vector3>();
+        }
 
         private Node GetClosestNode(NavMeshGraph navMeshGraph, Vector3 position)
         {
@@ -48,25 +89,26 @@ namespace ECS.Entities.AI.Combat
             return closestNode;
         }
 
-        private float Heuristic(Vector3 fromVector, Vector3 toVector)
+        private float Heuristic(Node fromNode, Node toNode)
         {
-            return Vector3.Distance(fromVector, toVector);
+            return Vector3.Distance(fromNode.position, toNode.position);
         }
 
-        private List<Vector3> CalculateNewPath(Dictionary<Node, Node> cameFrom, Node current)
+        private List<Vector3> CalculateNewPath(Node goalNode)
         {
-            List<Vector3> newPath = new List<Vector3>
-            {
-                current.position
-            };
+            List<Vector3> path = new List<Vector3>();
 
-            while (cameFrom.ContainsKey(current))
+            Node currentNode = goalNode;
+
+            while (currentNode != null)
             {
-                current = cameFrom[current];
-                newPath.Insert(0, current.position);
+                path.Add(currentNode.position);
+                currentNode = currentNode.parent;
             }
+            
+            path.Reverse();
 
-            return newPath;
+            return path;
         }
     }
 }

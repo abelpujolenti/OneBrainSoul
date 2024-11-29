@@ -2,6 +2,7 @@
 {
     public class Edge
     {
+        public Node fromNode;
         public Node toNode;
         public float cost;
     }
