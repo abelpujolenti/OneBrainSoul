@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AI.Combat.CombatNavigation;
 using ECS.Components.AI.Navigation;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
@@ -12,6 +13,8 @@ namespace Managers
         private static ECSNavigationManager _instance;
 
         public static ECSNavigationManager Instance => _instance;
+
+        [SerializeField] private float _scalingFactor;
         
         private Dictionary<NavMeshAgentComponent, IPosition> _navMeshAgentDestinations = 
             new Dictionary<NavMeshAgentComponent, IPosition>();
@@ -24,7 +27,7 @@ namespace Managers
             {
                 _instance = this;
                 
-                _updateAgentDestinationSystem.navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation());;
+                _updateAgentDestinationSystem.navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _scalingFactor);
                 
                 DontDestroyOnLoad(gameObject);
                 
@@ -72,6 +75,21 @@ namespace Managers
             TransformComponent transformComponent)
         {
             _navMeshAgentDestinations[navMeshAgentComponent] = transformComponent;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+
+            foreach (Node node in _updateAgentDestinationSystem.navMeshGraph.nodes.Values)
+            {
+                Gizmos.DrawSphere(node.position, 0.2f);
+
+                foreach (Edge edge in node.edges)
+                {
+                    Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
+                }
+            }
         }
     }
 }

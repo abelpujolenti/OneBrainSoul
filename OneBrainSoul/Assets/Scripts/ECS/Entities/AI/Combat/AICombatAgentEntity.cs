@@ -11,9 +11,7 @@ using ECS.Entities.AI.Navigation;
 using Managers;
 using Unity.AI.Navigation;
 using UnityEngine;
-using UnityEngine.AI;
 using Utilities;
-using Edge = AI.Combat.CombatNavigation.Edge;
 using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
@@ -24,10 +22,6 @@ namespace ECS.Entities.AI.Combat
         where TDamageComponent : DamageComponent
     {
         [SerializeField] private NavMeshSurface _navMeshSurface;
-
-        private NavMeshGraph _navMeshGraph = new NavMeshGraph();
-
-        private AStarPathFindingAlgorithm _aStarPathFindingAlgorithm = new AStarPathFindingAlgorithm();
 
         private List<Node> TESTpath;
         
@@ -121,9 +115,7 @@ namespace ECS.Entities.AI.Combat
         {
             _combatAgentInstanceID = (uint)gameObject.GetInstanceID();
             
-            _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation());
-            
-            ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(), new VectorComponent(new Vector3(-23.4599991f,2.01999998f,-8.51000023f)));
+            //ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(), new VectorComponent(new Vector3(-23.4599991f,2.01999998f,-8.51000023f)));
         }
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
@@ -381,18 +373,6 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.red;
-
-            foreach (Node node in _navMeshGraph.nodes.Values)
-            {
-                Gizmos.DrawSphere(node.position, 0.2f);
-
-                foreach (Edge edge in node.edges)
-                {
-                    Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
-                }
-            }
-            
             Gizmos.color = Color.green;
 
             Vector3[] corners = _navMeshAgent.path.corners;

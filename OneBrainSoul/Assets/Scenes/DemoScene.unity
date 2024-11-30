@@ -800,6 +800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e778b990df445f142943062fcf237030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _scalingFactor: 0.1
 --- !u!4 &873943535
 Transform:
   m_ObjectHideFlags: 0
