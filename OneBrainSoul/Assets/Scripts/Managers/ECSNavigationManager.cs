@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
@@ -10,6 +11,7 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -26,19 +28,21 @@ namespace Managers
         private Dictionary<NavMeshAgentComponent, AStarPath> _navMeshAgentDestinations = 
             new Dictionary<NavMeshAgentComponent, AStarPath>();
 
-        private List<Thread> _pathfindingThreads = new List<Thread>();
-
         private MainThreadQueue _mainThreadQueue = new MainThreadQueue();
 
         private UpdateAgentDestinationSystem _updateAgentDestinationSystem = new UpdateAgentDestinationSystem();
 
         private NavMeshGraph _navMeshGraph = new NavMeshGraph();
 
+        private bool _active = true;
+
         private void Awake()
         {
             if (_instance == null)
             {
                 _instance = this;
+
+                _timeToCalculatePath *= 1000;
 
                 _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _scalingFactor);
                 
@@ -57,26 +61,22 @@ namespace Managers
 
         private void UpdatePathfinding(NavMeshAgentComponent navMeshAgentComponent)
         {
-            float currentTimeToCalculatePath = _timeToCalculatePath;
+            Stopwatch counter = new Stopwatch();
             
-            DateTime start = DateTime.Now;
+            counter.Start();
 
             ThreadResult<Vector3> threadOrigin = new ThreadResult<Vector3>();
             ThreadResult<Vector3> threadDestination = new ThreadResult<Vector3>();
 
-            while (true)
+            while (_active)
             {
-                DateTime end = DateTime.Now;
-                
-                currentTimeToCalculatePath += end.Millisecond - start.Millisecond;
-                
-                if (currentTimeToCalculatePath < _timeToCalculatePath)
+                if (counter.ElapsedMilliseconds < _timeToCalculatePath)
                 {
-                    Debug.Log(currentTimeToCalculatePath);
                     continue;
                 }
-
-                currentTimeToCalculatePath = 0;
+                
+                counter.Reset();
+                counter.Start();
 
                 if (_navMeshAgentDestinations[navMeshAgentComponent] == null)
                 {
@@ -90,8 +90,6 @@ namespace Managers
 
                 _mainThreadQueue.SetAction(_updateAgentDestinationSystem.UpdateAgentDestination(navMeshAgentComponent, threadOrigin.GetValue(), 
                     threadDestination.GetValue(), aStarPath));
-                
-                start = DateTime.Now;
             }
         }
 
@@ -106,7 +104,6 @@ namespace Managers
             {
                 UpdatePathfinding(navMeshAgentComponent);
             });
-            _pathfindingThreads.Add(pathfindingThread);
             
             pathfindingThread.Start();
         }
@@ -150,10 +147,7 @@ namespace Managers
 
         private void OnDestroy()
         {
-            for (int i = 0; i < _pathfindingThreads.Count; i++)
-            {
-                _pathfindingThreads[i].Abort();
-            }
+            _active = false;
         }
     }
 }
