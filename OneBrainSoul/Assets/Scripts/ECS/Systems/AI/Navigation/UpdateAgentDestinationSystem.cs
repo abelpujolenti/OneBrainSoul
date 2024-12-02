@@ -22,11 +22,8 @@ namespace ECS.Systems.AI.Navigation
             {
                 if (customPath.Count == 0)
                 {
-                    Debug.Log("Return");
                     return;
                 }
-                
-                Debug.Log("Continue");
 
                 NavMeshPath navMeshPath = new NavMeshPath();
 

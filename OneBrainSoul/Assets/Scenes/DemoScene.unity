@@ -164,7 +164,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 19.15}
+  m_Extents: {x: 11.47, y: 0.5, z: 19.15}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -800,7 +800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e778b990df445f142943062fcf237030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scalingFactor: 0.02
+  _triangleArea: 2
   _timeToCalculatePath: 0.25
 --- !u!4 &873943535
 Transform:
@@ -1503,7 +1503,7 @@ Transform:
   m_GameObject: {fileID: 1813277428}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -28.72, y: 0, z: -12.12}
+  m_LocalPosition: {x: -28.6, y: 0, z: -18.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1557,7 +1557,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 11}
+  m_Extents: {x: 15.035, y: 0.5, z: 11}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -1635,7 +1635,7 @@ PrefabInstance:
     - target: {fileID: 1771247705790427257, guid: fd5bec4e68764994a93e08b8381e6464,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.78
+      value: 9.6
       objectReference: {fileID: 0}
     - target: {fileID: 1771247705790427257, guid: fd5bec4e68764994a93e08b8381e6464,
         type: 3}

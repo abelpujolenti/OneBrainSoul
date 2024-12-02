@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using Serialize.NavMeshGraph;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,107 +10,116 @@ namespace AI.Combat.CombatNavigation
     {
         public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
 
-        public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float scalingFactor)
+        public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float triangleArea)
         {
-            Dictionary<Vector3, Node> nodesIndex = new Dictionary<Vector3, Node>();
+            LoadGraph();
             
-            int indicesLength = navMeshTriangulation.indices.Length;
+            /*Vector3[] vertices = navMeshTriangulation.vertices;
+            int[] indices = navMeshTriangulation.indices;
 
-            for (int i = 0; i < indicesLength; i += 3)
+            Mesh mesh = new Mesh
             {
-                Vector3 vertex1 = navMeshTriangulation.vertices[navMeshTriangulation.indices[i]];
-                Vector3 vertex2 = navMeshTriangulation.vertices[navMeshTriangulation.indices[i + 1]];
-                Vector3 vertex3 = navMeshTriangulation.vertices[navMeshTriangulation.indices[i + 2]];
+                vertices = vertices,
+                triangles = indices
+            };
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
 
-                float area = CalculateTriangleArea(vertex1, vertex2, vertex3);
+            Bounds bounds = mesh.bounds;
+            float minWidth = bounds.min.x;
+            float maxWidth = bounds.max.x;
+            float minDepth = bounds.min.z;
+            float maxDepth = bounds.max.z;
 
-                int subdivisions = Mathf.CeilToInt(area * scalingFactor);
+            List<Vector3> planeVertices = new List<Vector3>();
 
-                List<Vector3> subdividedVertices = new List<Vector3>();
-                List<(int, int, int)> subdividedTriangles = new List<(int, int, int)>();
-                
-                SubdivideTriangle(vertex1, vertex2, vertex3, subdivisions, subdividedVertices, subdividedTriangles);
-                
-                foreach (Vector3 vertex in subdividedVertices)
+            for (float x = bounds.min.x; x < bounds.max.x; x += triangleArea)
+            {
+                for (float z = bounds.min.z; z < bounds.max.z; z += triangleArea)
                 {
-                    if (nodesIndex.ContainsKey(vertex))
-                    {
-                        continue;
-                    }
-
-                    uint index = (uint)nodes.Count;
-                
-                    Node newNode = new Node
-                    {
-                        index = index,
-                        position = vertex
-                    };
-                
-                    nodesIndex.Add(vertex, newNode);
-                    nodes.Add(index, newNode);
-                }
-                
-                foreach ((int index1, int index2, int index3) in subdividedTriangles)
-                {
-                    Node node1 = nodesIndex[subdividedVertices[index1]];
-                    Node node2 = nodesIndex[subdividedVertices[index2]];
-                    Node node3 = nodesIndex[subdividedVertices[index3]];
-
-                    ConnectTriangleNodes(node1, node2, node3);
+                    planeVertices.Add(new Vector3(x, 0, z));
                 }
             }
-            
-            Debug.Log(nodesIndex.Count);
-        }
 
-        private float CalculateTriangleArea(Vector3 node1Position, Vector3 node2Position, Vector3 node3Position)
-        {
-            return 0.5f * Vector3.Cross(node2Position - node1Position, node3Position - node1Position).magnitude;
-        }
+            List<int> planeTriangles = new List<int>();
+            int rows = Mathf.CeilToInt((maxDepth - minDepth) / triangleArea) + 1;
+            int columns = Mathf.CeilToInt((maxWidth - minWidth) / triangleArea) + 1;
 
-        private void SubdivideTriangle(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3, int subdivisions, 
-            List<Vector3> subdividedVertices, List<(int, int, int)> subdividedTriangles)
-        {
-            Vector3[,] grid = new Vector3[subdivisions + 1,subdivisions + 1];
-
-            for (int i = 0; i <= subdivisions; i++)
+            for (int z = 0; z < rows - 1; z++)
             {
-                for (int j = 0; j <= i; j++)
+                for (int x = 0; x < columns - 1; x++)
                 {
-                    float u = (float)(i - j) / subdivisions;
-                    float v = (float)j / subdivisions;
-                    float w = 1 - u - v;
-
-                    grid[i, j] = u * vertex1 + v * vertex2 + w * vertex3;
-
-                    if (subdividedVertices.Contains(grid[i, j]))
-                    {
-                        continue;
-                    }
+                    int topLeft = z * columns + x;
+                    int topRight = topLeft + 1;
+                    int bottomLeft = topLeft + columns;
+                    int bottomRight = bottomLeft + 1;
                     
-                    subdividedVertices.Add(grid[i, j]);
+                    planeTriangles.Add(topLeft);
+                    planeTriangles.Add(bottomLeft);
+                    planeTriangles.Add(topRight);
+                    
+                    planeTriangles.Add(topRight);
+                    planeTriangles.Add(bottomLeft);
+                    planeTriangles.Add(bottomRight);
                 }
             }
             
-            for (int i = 0; i < subdivisions; i++)
+            foreach (Vector3 vertex in planeVertices)
             {
-                for (int j = 0; j <= i; j++)
+                NavMeshHit hit;
+                if (!NavMesh.SamplePosition(vertex, out hit, Mathf.Infinity, NavMesh.AllAreas))
                 {
-                    int current = subdividedVertices.IndexOf(grid[i, j]);
-                    int below = subdividedVertices.IndexOf(grid[i + 1, j]);
-                    int belowRight = subdividedVertices.IndexOf(grid[i + 1, j + 1]);
-                    int right = j < i ? subdividedVertices.IndexOf(grid[i, j + 1]) : -1;
+                    continue;
+                }
 
-                    subdividedTriangles.Add((current, below, belowRight));
+                if ((1 << hit.mask & NavMesh.GetAreaFromName("Walkable")) != 0)
+                {
+                    continue;
+                }
 
-                    if (right == -1)
-                    {
-                        continue;
-                    }
+                uint index = (uint)nodes.Count;
+
+                Node newNode = new Node
+                {
+                    index = index,
+                    position = hit.position
+                };
                     
-                    subdividedTriangles.Add((current, belowRight, right));
+                nodes.Add(index, newNode);
+            }
+
+            for (int i = 0; i < planeTriangles.Count; i += 3)
+            {
+                int v1 = planeTriangles[i];
+                int v2 = planeTriangles[i + 1];
+                int v3 = planeTriangles[i + 2];
+
+                if (v1 < nodes.Count && v2 < nodes.Count)
+                {
+                    Node node1 =  nodes[(uint)planeTriangles[i]];
+                    Node node2 =  nodes[(uint)planeTriangles[i + 1]];
+                    
+                    ConnectNodes(node1, node2);
+                }
+
+                if (v2 < nodes.Count && v3 < nodes.Count)
+                {
+                    Node node2 =  nodes[(uint)planeTriangles[i + 1]];
+                    Node node3 =  nodes[(uint)planeTriangles[i + 2]];
+                    
+                    ConnectNodes(node2, node3);
+                }
+
+                if (v3 < nodes.Count && v1 < nodes.Count)
+                {
+                    Node node3 =  nodes[(uint)planeTriangles[i + 2]];
+                    Node node1 =  nodes[(uint)planeTriangles[i]];
+                    
+                    ConnectNodes(node3, node1);
                 }
             }
+            
+            SaveGraph();*/
         }
 
         private void ConnectTriangleNodes(Node node1, Node node2, Node node3)
@@ -181,6 +192,81 @@ namespace AI.Combat.CombatNavigation
         public NavMeshGraph Copy()
         {
             return new NavMeshGraph { nodes = nodes };
+        }
+
+        private void SaveGraph()
+        {
+            SerializableGraph serializableGraph = new SerializableGraph();
+
+            foreach (var nodesIndex in nodes)
+            {
+                Node node = nodesIndex.Value;
+                SerializableNode serializableNode = new SerializableNode
+                {
+                    index = node.index,
+                    position = node.position
+                };
+
+                foreach (Edge edge in node.edges)
+                {
+                    serializableNode.edges.Add(new SerializableEdge
+                    {
+                        toNodeIndex = edge.toNode.index,
+                        cost = edge.cost
+                    });
+                }
+                
+                serializableGraph.nodes.Add(serializableNode);
+            }
+
+            string json = JsonUtility.ToJson(serializableGraph, true);
+            File.WriteAllText(GetFilePath(), json);
+            Debug.Log("Graph saved to " + GetFilePath());
+        }
+
+        private void LoadGraph()
+        {
+            string json = File.ReadAllText(GetFilePath());
+
+            SerializableGraph serializableGraph = JsonUtility.FromJson<SerializableGraph>(json);
+
+            Dictionary<uint, Node> nodesByIndex = new Dictionary<uint, Node>();
+
+            foreach (SerializableNode serializableNode in serializableGraph.nodes)
+            {
+                uint index = serializableNode.index;
+                
+                Node node = new Node
+                {
+                    index = index,
+                    position = serializableNode.position
+                };
+                
+                nodes.Add(index, node);
+                nodesByIndex.Add(index, node);
+            }
+
+            foreach (SerializableNode serializableNode in serializableGraph.nodes)
+            {
+                Node node = nodes[serializableNode.index];
+
+                foreach (SerializableEdge serializableEdge in serializableNode.edges)
+                {
+                    Node toNode = nodes[serializableEdge.toNodeIndex];
+                    
+                    node.edges.Add(new Edge
+                    {
+                        fromNode = node,
+                        toNode = toNode,
+                        cost = serializableEdge.cost
+                    });
+                }
+            }
+        }
+
+        private string GetFilePath()
+        {
+            return Path.Combine(Application.streamingAssetsPath, "NavMeshGraph.json");
         }
     }
 }

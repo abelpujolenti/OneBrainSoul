@@ -11,7 +11,7 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
-using Debug = UnityEngine.Debug;
+using UnityEngine.Serialization;
 
 namespace Managers
 {
@@ -21,7 +21,7 @@ namespace Managers
 
         public static ECSNavigationManager Instance => _instance;
 
-        [SerializeField] private float _scalingFactor;
+        [SerializeField] private float _triangleArea;
 
         [SerializeField] private float _timeToCalculatePath;
         
@@ -44,7 +44,7 @@ namespace Managers
 
                 _timeToCalculatePath *= 1000;
 
-                _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _scalingFactor);
+                _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _triangleArea);
                 
                 DontDestroyOnLoad(gameObject);
                 
@@ -128,21 +128,6 @@ namespace Managers
             TransformComponent transformComponent)
         {
             _navMeshAgentDestinations[navMeshAgentComponent].position = transformComponent;
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-
-            foreach (Node node in _navMeshGraph.nodes.Values)
-            {
-                Gizmos.DrawSphere(node.position, 0.2f);
-
-                foreach (Edge edge in node.edges)
-                {
-                    Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
-                }
-            }
         }
 
         private void OnDestroy()
