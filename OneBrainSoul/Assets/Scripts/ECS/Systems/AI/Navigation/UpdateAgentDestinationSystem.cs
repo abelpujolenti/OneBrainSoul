@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
+using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Combat;
-using Interfaces.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,30 +11,29 @@ namespace ECS.Systems.AI.Navigation
 {
     public class UpdateAgentDestinationSystem
     {
-        private AStarPathFindingAlgorithm _aStarPathFindingAlgorithm = new AStarPathFindingAlgorithm();
-
-        public NavMeshGraph navMeshGraph = new NavMeshGraph();
-
-        public void UpdateAgentDestination(NavMeshAgentComponent navMeshAgentComponent, IPosition positionComponent)
+        public Action UpdateAgentDestination(NavMeshAgentComponent navMeshAgentComponent, Vector3 origin, Vector3 destination, 
+            AStarPath aStarPath)
         {
-            Vector3 destination = positionComponent.GetPosition();
+            List<Node> customPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, origin, destination);
             
-            List<Vector3> customPath = _aStarPathFindingAlgorithm.FindPath(navMeshGraph, 
-                navMeshAgentComponent.GetTransformComponent().GetPosition(), destination);
+            aStarPath.navMeshGraph.ResetNodesImportantInfo();
 
-            NavMeshPath navMeshPath = new NavMeshPath();
-
-            if (customPath.Count == 0)
+            return () =>
             {
-                return;
-            }
+                if (customPath.Count == 0)
+                {
+                    return;
+                }
 
-            for (int i = 0; i < customPath.Count; i++)
-            {
-                navMeshAgentComponent.GetNavMeshAgent().CalculatePath(customPath[i], navMeshPath);
-            }
+                NavMeshPath navMeshPath = new NavMeshPath();
 
-            navMeshAgentComponent.GetNavMeshAgent().SetPath(navMeshPath);
+                for (int i = 0; i < customPath.Count; i++)
+                {
+                    navMeshAgentComponent.GetNavMeshAgent().CalculatePath(customPath[i].position, navMeshPath);
+                }
+
+                navMeshAgentComponent.GetNavMeshAgent().SetPath(navMeshPath);
+            };
         }
     }
 }

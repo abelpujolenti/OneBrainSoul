@@ -5,6 +5,7 @@ namespace AI.Combat.CombatNavigation
 {
     public class Node
     {
+        public uint index;
         public Vector3 position;
         public List<Edge> edges = new List<Edge>();
         public float gCost = Mathf.Infinity;

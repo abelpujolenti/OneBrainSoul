@@ -1,0 +1,155 @@
+#pragma kernel AStarAlgorithm
+
+struct Node
+{
+    uint index;
+    float3 position;
+    uint edgesCount;
+    uint edges[8];
+    float gCost;
+    float hCost;
+    uint parentNodeIndex;
+};
+
+struct Edge
+{
+    uint fromNodeIndex;
+    uint toNodeIndex;
+    float cost;
+};
+
+StructuredBuffer<Node> nodes;
+StructuredBuffer<Edge> edges;
+RWStructuredBuffer<uint> _Parents;
+RWStructuredBuffer<float> _GCosts;
+RWStructuredBuffer<uint> _OpenSet;
+RWStructuredBuffer<uint> _ClosedSet;
+
+uint _NodeCount;
+uint _StartIndex;
+uint _GoalIndex;
+
+[numthreads(8, 8, 8)]
+void AStarAlgorithm(uint3 dispatchThreadID : SV_DispatchThreadID)
+{
+    uint gridSizeY = 8 * 8;
+    uint gridSizeZ = 8 * 8;
+
+    uint globalThreadIndex = dispatchThreadID.x * gridSizeY * gridSizeZ +
+        dispatchThreadID.y * gridSizeZ + dispatchThreadID.z;
+    
+    if (globalThreadIndex >= _NodeCount)
+    {
+        return;
+    }
+
+    uint edgesSize;
+    uint openSetSize;
+    uint closedSetSize;
+    uint stride;
+
+    edges.GetDimensions(edgesSize, stride);
+    _OpenSet.GetDimensions(openSetSize, stride);
+    _ClosedSet.GetDimensions(closedSetSize, stride);
+
+    uint openSetCount = openSetSize;
+    uint closedSetCount = closedSetSize;
+
+    uint currentNodeIndex = 0;
+    Node currentNode = nodes[_OpenSet[0]];
+
+    for (uint i = 1; i < openSetCount; i++)
+    {
+        Node node = nodes[_OpenSet[i]];
+
+        float nodeFCost = node.gCost + node.hCost;
+        float currentNodeFCost = node.gCost + node.hCost;
+
+        if (nodeFCost < currentNodeFCost || (nodeFCost == currentNodeFCost && node.hCost < currentNode.hCost))
+        {
+            currentNode = node;
+            currentNodeIndex = i;
+        }
+    }
+
+    for (uint i = currentNodeIndex; i < openSetCount; i++)
+    {
+        _OpenSet[i] = _OpenSet[i + 1];
+    }
+
+    openSetCount--;
+
+    if (currentNode.index == nodes[_GoalIndex].index)
+    {
+        //path
+    }
+
+    _ClosedSet[closedSetCount++] = currentNode.index;
+
+    for (int i = 0; i < closedSetSize; ++i)
+    {
+        if (_ClosedSet[i] == globalThreadIndex)
+        {
+            return;
+        }
+    }
+
+
+    for (int edgeIndex = 0; edgeIndex < edgesSize; ++edgeIndex)
+    {
+        if (edges[edgeIndex].fromNodeIndex != globalThreadIndex)
+        {
+            continue;
+        }
+
+        int neighbor = edges[edgeIndex].toNodeIndex;
+        float edgeCost = edges[edgeIndex].cost;
+
+        float tentativeCost = _GCosts[globalThreadIndex] + edgeCost;
+
+        if (tentativeCost >= _GCosts[neighbor])
+        {
+            continue;
+        }
+
+        _GCosts[neighbor] = tentativeCost;
+        _Parents[neighbor] = globalThreadIndex;
+
+        bool inOpenSet = false;
+
+        for (int i = 0; i < openSetSize; ++i)
+        {
+            if (_OpenSet[i] != neighbor)
+            {
+                continue;
+            }
+            inOpenSet = true;
+            break;
+        }
+
+        if (inOpenSet)
+        {
+            continue;
+        }
+
+        int openSetIndex = -1;
+
+        for (int i = 0; i < openSetSize; ++i)
+        {
+            if (_OpenSet[i] != -1)
+            {
+                continue;
+            }
+
+            openSetIndex = i;
+            break;
+        }
+
+        if (openSetIndex == -1)
+        {
+            continue;
+        }
+
+        _OpenSet[openSetIndex] = neighbor;
+    }
+}

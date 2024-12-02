@@ -55,6 +55,28 @@ namespace Utilities
             return heap[0].item;
         }
 
+        public void UpdatePriority(T item, float newPriority)
+        {
+            int index = heap.FindIndex(x => x.item.Equals(item));
+
+            if (index == -1)
+            {
+                throw new InvalidOperationException("The queue is empty.");
+            }
+
+            float oldPriority = heap[index].priority;
+
+            heap[index] = (item, newPriority);
+
+            if (newPriority < oldPriority)
+            {
+                HeapifyUp(index);
+                return;
+            }
+            
+            HeapifyDown(index);
+        }
+
         private void HeapifyUp(int index)
         {
             while (index > 0)

@@ -6,25 +6,12 @@ namespace AI.Combat.CombatNavigation
 {
     public class NavMeshGraph
     {
-        public Dictionary<Vector3, Node> nodes = new Dictionary<Vector3, Node>();
+        public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
 
         public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float scalingFactor)
         {
-            foreach (Vector3 vertex in navMeshTriangulation.vertices)
-            {
-                if (nodes.ContainsKey(vertex))
-                {
-                    continue;
-                }
-                
-                Node newNode = new Node
-                {
-                    position = vertex
-                };
-                
-                nodes.Add(vertex, newNode);
-            }
-
+            Dictionary<Vector3, Node> nodesIndex = new Dictionary<Vector3, Node>();
+            
             int indicesLength = navMeshTriangulation.indices.Length;
 
             for (int i = 0; i < indicesLength; i += 3)
@@ -44,28 +31,34 @@ namespace AI.Combat.CombatNavigation
                 
                 foreach (Vector3 vertex in subdividedVertices)
                 {
-                    if (nodes.ContainsKey(vertex))
+                    if (nodesIndex.ContainsKey(vertex))
                     {
                         continue;
                     }
+
+                    uint index = (uint)nodes.Count;
                 
                     Node newNode = new Node
                     {
+                        index = index,
                         position = vertex
                     };
                 
-                    nodes.Add(vertex, newNode);
+                    nodesIndex.Add(vertex, newNode);
+                    nodes.Add(index, newNode);
                 }
                 
                 foreach ((int index1, int index2, int index3) in subdividedTriangles)
                 {
-                    Node node1 = nodes[subdividedVertices[index1]];
-                    Node node2 = nodes[subdividedVertices[index2]];
-                    Node node3 = nodes[subdividedVertices[index3]];
+                    Node node1 = nodesIndex[subdividedVertices[index1]];
+                    Node node2 = nodesIndex[subdividedVertices[index2]];
+                    Node node3 = nodesIndex[subdividedVertices[index3]];
 
                     ConnectTriangleNodes(node1, node2, node3);
                 }
             }
+            
+            Debug.Log(nodesIndex.Count);
         }
 
         private float CalculateTriangleArea(Vector3 node1Position, Vector3 node2Position, Vector3 node3Position)
@@ -165,7 +158,16 @@ namespace AI.Combat.CombatNavigation
             }
         }
 
-        public void ResetEdgeWeights()
+        public void ResetNodesImportantInfo()
+        {
+            foreach (Node node in nodes.Values)
+            {
+                node.gCost = Mathf.Infinity;
+                node.parent = null;
+            }
+        }
+
+        public void ResetEdgesCost()
         {
             foreach (Node node in nodes.Values)
             {
@@ -174,6 +176,11 @@ namespace AI.Combat.CombatNavigation
                     edge.cost = Vector3.Distance(node.position, edge.toNode.position);
                 }
             }
+        }
+
+        public NavMeshGraph Copy()
+        {
+            return new NavMeshGraph { nodes = nodes };
         }
     }
 }

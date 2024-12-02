@@ -6,9 +6,9 @@ using Edge = AI.Combat.CombatNavigation.Edge;
 
 namespace ECS.Entities.AI.Combat
 {
-    public class AStarPathFindingAlgorithm
+    public static class AStarPathFindingAlgorithm
     {
-        public List<Vector3> FindPath(NavMeshGraph navMeshGraph, Vector3 startPosition, Vector3 goalPosition)
+        public static List<Node> FindPath(NavMeshGraph navMeshGraph, Vector3 startPosition, Vector3 goalPosition)
         {
             PriorityQueue<Node> openSet = new PriorityQueue<Node>();
             HashSet<Node> closedSet = new HashSet<Node>();
@@ -18,7 +18,7 @@ namespace ECS.Entities.AI.Combat
 
             startNode.gCost = 0;
             startNode.hCost = Heuristic(startNode, goalNode);
-            
+        
             openSet.Enqueue(startNode, startNode.fCost);
 
             while (openSet.Count > 0)
@@ -27,9 +27,7 @@ namespace ECS.Entities.AI.Combat
 
                 if (currentNode == goalNode)
                 {
-                    List<Vector3> newPath = CalculateNewPath(goalNode);
-                    newPath.Add(goalPosition);
-                    return newPath;
+                    return CalculateNewPath(goalNode, goalPosition);;
                 }
 
                 closedSet.Add(currentNode);
@@ -43,30 +41,53 @@ namespace ECS.Entities.AI.Combat
                         continue;
                     }
 
-                    float tentativeGScore = currentNode.gCost + edge.cost;
-
-                    if (tentativeGScore >= neighbor.gCost)
+                    if (CheckRecursion(currentNode, neighbor))
                     {
                         continue;
                     }
                     
+                    float tentativeGScore = currentNode.gCost + edge.cost;
+
+                    if (tentativeGScore > neighbor.gCost)
+                    {
+                        continue;
+                    }
+                
                     neighbor.gCost = tentativeGScore;
                     neighbor.hCost = Heuristic(neighbor, goalNode);
                     neighbor.parent = currentNode;
 
-                    if (openSet.Contains(neighbor))
+                    if (!openSet.Contains(neighbor))
                     {
+                        openSet.Enqueue(neighbor, neighbor.fCost);
                         continue;
                     }
-                        
-                    openSet.Enqueue(neighbor, neighbor.fCost);
+                    
+                    openSet.UpdatePriority(neighbor, neighbor.fCost);
                 }
             }
 
-            return new List<Vector3>();
+            return new List<Node>();
         }
 
-        private Node GetClosestNode(NavMeshGraph navMeshGraph, Vector3 position)
+        private static bool CheckRecursion(Node currentNode, Node neighbor)
+        {
+            Node tempNode = currentNode;
+            
+            while (tempNode != null)
+            {
+                if (tempNode.parent != null && tempNode.parent.index == neighbor.index)
+                {
+                    return true;
+                }
+
+                tempNode = tempNode.parent;
+            }
+
+            return false;
+        }
+
+        private static Node GetClosestNode(NavMeshGraph navMeshGraph, Vector3 position)
         {
             Node closestNode = null;
 
@@ -89,24 +110,32 @@ namespace ECS.Entities.AI.Combat
             return closestNode;
         }
 
-        private float Heuristic(Node fromNode, Node toNode)
+        private static float Heuristic(Node fromNode, Node toNode)
         {
             return Vector3.Distance(fromNode.position, toNode.position);
         }
 
-        private List<Vector3> CalculateNewPath(Node goalNode)
+        private static List<Node> CalculateNewPath(Node goalNode, Vector3 goalPosition)
         {
-            List<Vector3> path = new List<Vector3>();
+            List<Node> path = new List<Node>();
 
             Node currentNode = goalNode;
 
             while (currentNode != null)
             {
-                path.Add(currentNode.position);
+                path.Add(currentNode);
                 currentNode = currentNode.parent;
             }
             
             path.Reverse();
+            
+            Node lastNode = new Node
+            {
+                position = goalPosition,
+                gCost = path[^1].fCost,
+                parent = path[^1]
+            };
+            path.Add(lastNode);
 
             return path;
         }

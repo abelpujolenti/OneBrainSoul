@@ -27,6 +27,8 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private bool _isAI;
 
+        [SerializeField] private Transform _TESTTransform;
+
         private void Start()
         {
             Setup();
@@ -46,6 +48,8 @@ namespace ECS.Entities.AI.Combat
                 _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
+            
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), new TransformComponent(_TESTTransform));
             
             InstantiateAttacksColliders();
 
@@ -360,7 +364,7 @@ namespace ECS.Entities.AI.Combat
 
             _raysOpeningAngle = 360f;
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(),positionToDodge);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(),positionToDodge);
         }
 
         public void WarnOncomingDamage(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
@@ -397,11 +401,11 @@ namespace ECS.Entities.AI.Combat
 
             if (_lastDestination != null)
             {
-                ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(), _lastDestination);
+                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), _lastDestination);
                 return;
             }
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentTransformDestination(GetNavMeshAgentComponent(), 
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), 
                 new TransformComponent(GetContext().GetRivalTransform()));
         }
 

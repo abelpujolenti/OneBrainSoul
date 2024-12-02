@@ -423,6 +423,8 @@ namespace Managers
         public void AddAIAlly(AIAlly aiAlly)
         {
             _aiAllies.Add(aiAlly.GetCombatAgentInstance(), aiAlly);
+            
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(aiAlly.GetNavMeshAgentComponent());
         }
 
         public void AddAIEnemy(AIEnemy aiEnemy)
@@ -430,6 +432,8 @@ namespace Managers
             _aiEnemies.Add(aiEnemy.GetCombatAgentInstance(), aiEnemy);
             
             AddEnemyAttack(aiEnemy.GetAttackComponents(), GameManager.Instance.GetAllyLayer());
+            
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(aiEnemy.GetNavMeshAgentComponent());
         }
 
         private void AddEnemyAttack(List<AttackComponent> attackComponents, int layerTarget)
@@ -597,7 +601,7 @@ namespace Managers
                 }
                 
                 agent.GetContext().SetHasATarget(false);
-                ECSNavigationManager.Instance.UpdateNavMeshAgentTransformDestination(agent.GetNavMeshAgentComponent(), null);
+                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(agent.GetNavMeshAgentComponent(), (TransformComponent)null);
             }
         }
 

@@ -103,7 +103,7 @@ namespace ECS.Entities.AI.Combat
                 if (Physics.Raycast(position, _raysDirectionAndWeights[i].direction, out hit, _raysDistance, _raysTargetsLayerMask))
                 {
                     _raysDirectionAndWeights[i].weight = MathUtil.Map(hit.distance, 0, 1, _raysDistance, 0);
-                    Debug.Log(hit.collider.name);
+                    //Debug.Log(hit.collider.name);
                     continue;
                 }
 
@@ -114,8 +114,6 @@ namespace ECS.Entities.AI.Combat
         protected void SetupCombatComponents()
         {
             _combatAgentInstanceID = (uint)gameObject.GetInstanceID();
-            
-            //ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(), new VectorComponent(new Vector3(-23.4599991f,2.01999998f,-8.51000023f)));
         }
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
@@ -310,13 +308,13 @@ namespace ECS.Entities.AI.Combat
         public void SetDestination(TransformComponent transformComponent)
         {
             _lastDestination = null;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentTransformDestination(GetNavMeshAgentComponent(), transformComponent);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), transformComponent);
         }
 
         public void SetDestination(VectorComponent vectorComponent)
         {
             _lastDestination = vectorComponent;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(), _lastDestination);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), _lastDestination);
         }
 
         protected void UpdateVectorToRival()
@@ -373,9 +371,14 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.green;
+            Gizmos.color = Color.blue;
 
             Vector3[] corners = _navMeshAgent.path.corners;
+
+            if (corners.Length == 0)
+            {
+                return;
+            }
 
             for (int i = 0; i < corners.Length - 1; i++)
             {
@@ -386,19 +389,19 @@ namespace ECS.Entities.AI.Combat
             
             Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
             
-            Vector3 position = transform.position;
+            /*Vector3 position = transform.position;
             
             Gizmos.color = Color.green;
             
             foreach (DirectionWeights directionAndWeight in _raysDirectionAndWeights)
             {
                 Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
-            }
+            }*/
         }
 
         private Vector3 Up(Vector3 position)
         {
-            return new Vector3(position.x, position.y + 2, position.z);
+            return new Vector3(position.x, position.y + 0, position.z);
         }
     }
 }
