@@ -14,24 +14,29 @@ public class HookMovementHandler : MovementHandler
     public static float speedFalloff = 77.5f;
     public static float speedFalloffPower = 3f;
     public static float bobbingStrength = .6f;
+    public static float snapDownwardsStrength = 6f;
 
     public static float delay = 0.18f;
     public static float delayHitImpact = 0.025f;
 
     public Vector3 startPos;
     public Vector3 endPos;
+    public Vector3 endVisualPos;
+    bool snap;
     float hookDistance;
     float delayTime = 0f;
     float bobbingCycle = 0f;
     public Vector3 movementDirection = Vector3.zero;
     LineRenderer line;
 
-    public HookMovementHandler(PlayerCharacterController player, Vector3 startPos, Vector3 endPos)
+    public HookMovementHandler(PlayerCharacterController player, Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap)
     {
         this.startPos = startPos;
         this.endPos = endPos;
-        hookDistance = Vector3.Distance(endPos, startPos);
-        movementDirection = (endPos - startPos).normalized;
+        this.endVisualPos = endVisualPos;
+        this.snap = snap;
+        hookDistance = Vector3.Distance(this.endPos, this.startPos);
+        movementDirection = (this.endPos - this.startPos).normalized;
         line = player.GetComponent<LineRenderer>();
         line.enabled = true;
         player.canSwitch = false;
@@ -48,7 +53,7 @@ public class HookMovementHandler : MovementHandler
             player.rb.velocity = Vector3.zero;
             if (delayTime < delay)
             {
-                line.SetPosition(1, lineStartPos + (endPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
+                line.SetPosition(1, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
                 line.SetPosition(0, lineStartPos);
 
                 if (delayTime + Time.fixedDeltaTime >= delay)
@@ -106,6 +111,16 @@ public class HookMovementHandler : MovementHandler
     {
         player.canSwitch = true;
         line.enabled = false;
+
+        if (snap)
+        {
+            Vector3 dir = (endPos - startPos).normalized;
+            dir.y *= -1f;
+            Vector3 snapDir = (Vector3.down + dir.normalized).normalized;
+            Vector3 snapForce = snapDir * snapDownwardsStrength * player.rb.velocity.magnitude * Mathf.Max(0f,Vector3.Dot(player.rb.velocity, Vector3.up));
+            player.rb.AddForce(snapForce);
+        }
+
         if (!player.onGround)
         {
             player.movementHandler = new AirborneMovementHandler();
