@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -30,8 +31,9 @@ public class HookAbility : MonoBehaviour
         if (!player.braincell) return;
 
         Vector3 startPos, endPos;
+        Vector3 dir = player.cam.transform.forward;
         startPos = player.transform.position + new Vector3(0f, .5f, 0f);
-        bool landed = Physics.SphereCast(startPos, radius, player.cam.transform.forward, out hit, range, 127, QueryTriggerInteraction.Ignore);
+        bool landed = Physics.SphereCast(startPos + dir * 2f, radius, dir, out hit, range, 127, QueryTriggerInteraction.Ignore);
 
         if (landed)
         {
@@ -52,18 +54,21 @@ public class HookAbility : MonoBehaviour
 
         if (player.ability1Input && player.ability1Time == 0f && landed)
         {
-            RaycastHit hit2;
+
+            RaycastHit ledgeHit;
             ledgeSnapLeniency = 4f;
-            bool ledgeFound = Physics.SphereCast(hit.point + ledgeSnapLeniency * Vector3.up, .1f, Vector3.down, out hit2, ledgeSnapLeniency, 127, QueryTriggerInteraction.Ignore);
-            ledgeFound &= hit2.point != Vector3.zero;
-            ledgeFound &= Vector3.Dot(Vector3.up, hit2.normal) > ledgeSnapNormalThreshold;
+            Vector3 dirNoY = new Vector3(dir.x, 0f, dir.z).normalized; 
+            bool ledgeFound = Physics.SphereCast(hit.point + dirNoY * .15f + ledgeSnapLeniency * Vector3.up, .5f, Vector3.down, out ledgeHit, ledgeSnapLeniency, 127, QueryTriggerInteraction.Ignore);
+            ledgeFound &= ledgeHit.point != Vector3.zero;
+            ledgeFound &= Vector3.Dot(Vector3.up, ledgeHit.normal) > ledgeSnapNormalThreshold;
+            ledgeFound &= Mathf.Abs(Vector3.Dot(hit.normal, ledgeHit.normal)) < 0.3f;
             endPos = hit.point;
             if (ledgeFound) {
-                Vector3 dir = (hit2.point - startPos).normalized;
-                endPos = hit2.point + new Vector3(0f, .6f, 0f) + (dir + hit2.normal).normalized * ledgeSnapDistance;
+                Vector3 ledgeHitDir = (ledgeHit.point - startPos).normalized;
+                endPos = ledgeHit.point + new Vector3(0f, .6f, 0f) + (ledgeHitDir + ledgeHit.normal).normalized * ledgeSnapDistance;
             }
 
-            player.movementHandler = new HookMovementHandler(player, startPos, endPos, ledgeFound ? hit2.point: hit.point, ledgeFound);
+            player.movementHandler = new HookMovementHandler(player, startPos, endPos, ledgeFound ? ledgeHit.point: hit.point, ledgeFound);
             player.ability1Time = player.ability1Cooldown;
         }
     }
