@@ -16,9 +16,9 @@ public class Whip : Weapon
         if (!attackLanded && animationTimer <= 1 - activeStart && animationTimer >= 1 - activeEnd)
         {
             List<DamageTakingEntity> affectedEntities = new List<DamageTakingEntity>();
-            for (int i = 0; i < activeDamageTakingEntityManager.damageTakingEntities.Count; i++)
+            for (int i = 0; i < ActiveDamageTakingEntityManager.Instance.damageTakingEntities.Count; i++)
             {
-                DamageTakingEntity entity = activeDamageTakingEntityManager.damageTakingEntities[i];
+                DamageTakingEntity entity = ActiveDamageTakingEntityManager.Instance.damageTakingEntities[i];
                 Vector3 enemyPos = entity.transform.position;
                 Vector3 enemyPosOuter = entity.transform.position + (player.transform.position - entity.transform.position).normalized * entity.radius;
                 float distance = Vector3.Distance(player.transform.position, enemyPosOuter);

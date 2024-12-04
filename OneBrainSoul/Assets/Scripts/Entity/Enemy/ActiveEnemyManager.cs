@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ActiveDamageTakingEntityManager : MonoBehaviour
+public class ActiveDamageTakingEntityManager : Singleton<ActiveDamageTakingEntityManager>
 {
     public List<DamageTakingEntity> damageTakingEntities;
 

@@ -69,7 +69,6 @@ public class HookMovementHandler : MovementHandler
 
         line.SetPosition(0, lineStartPos);
 
-        // Grind dat beam
         float progress = 1f - Mathf.Min(1f, distanceToTarget / hookDistance);
         float speedWithFalloff = speed - Mathf.Pow(progress, 1f / speedFalloffPower) * speedFalloff;
         player.rb.velocity = movementDirection * speedWithFalloff;
@@ -82,6 +81,15 @@ public class HookMovementHandler : MovementHandler
         //End
         if (distanceToTarget < endDistance || distanceToTarget > hookDistance * 1.1f)
         {
+            if (snap)
+            {
+                Vector3 dir = (endPos - startPos).normalized;
+                dir.y *= -1f;
+                Vector3 snapDir = (Vector3.down + dir.normalized).normalized;
+                Vector3 snapForce = snapDir * snapDownwardsStrength * player.rb.velocity.magnitude * Mathf.Max(0f, Vector3.Dot(player.rb.velocity, Vector3.up));
+                player.rb.AddForce(snapForce);
+            }
+
             Exit(player);
         }
 
@@ -111,15 +119,6 @@ public class HookMovementHandler : MovementHandler
     {
         player.canSwitch = true;
         line.enabled = false;
-
-        if (snap)
-        {
-            Vector3 dir = (endPos - startPos).normalized;
-            dir.y *= -1f;
-            Vector3 snapDir = (Vector3.down + dir.normalized).normalized;
-            Vector3 snapForce = snapDir * snapDownwardsStrength * player.rb.velocity.magnitude * Mathf.Max(0f,Vector3.Dot(player.rb.velocity, Vector3.up));
-            player.rb.AddForce(snapForce);
-        }
 
         if (!player.onGround)
         {

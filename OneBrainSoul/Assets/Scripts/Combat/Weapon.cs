@@ -24,7 +24,6 @@ public class Weapon : MonoBehaviour
     [SerializeField] protected Transform parent;
     [SerializeField] protected PlayerCharacterController player;
     [SerializeField] private AnimationCurve animationCurve;
-    [SerializeField] protected ActiveDamageTakingEntityManager activeDamageTakingEntityManager;
     public float animationTimer { get; private set; }
     public float animationSpeed { get; private set; }
     private Vector3 targetPos;

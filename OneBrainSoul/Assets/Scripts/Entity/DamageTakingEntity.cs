@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DamageTakingEntity : MonoBehaviour
 {
-    public int hp = 1;
+    public int health = 1;
     public float radius = 1f;
     protected float damageCooldown = 0f;
     protected MeshCollider meshCollider;
@@ -19,8 +19,8 @@ public class DamageTakingEntity : MonoBehaviour
     {
         if (damageCooldown > 0) return;
         damageCooldown = .2f;
-        hp -= amount;
-        if (hp <= 0)
+        health -= amount;
+        if (health <= 0)
         {
             Die(player, hitPos);
             return;
