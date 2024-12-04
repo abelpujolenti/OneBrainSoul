@@ -143,6 +143,8 @@ namespace ECS.Entities.AI.Combat
                 UpdateVectorToRival();
 
                 UpdateDistancesToEnemiesThatTargetsMe();
+                
+                //ECSNavigationManager.Instance.UpdateNavMeshAgentPosition(GetNavMeshAgentComponent(), _context.GetRadius());
 
                 if (_context.IsAttacking())
                 {
@@ -160,7 +162,7 @@ namespace ECS.Entities.AI.Combat
                 
                 //TODO REMAINING DISTANCE IF HAS A DESTINATION
             
-                CalculateBestAction();
+                //CalculateBestAction();
 
                 yield return null;
             }

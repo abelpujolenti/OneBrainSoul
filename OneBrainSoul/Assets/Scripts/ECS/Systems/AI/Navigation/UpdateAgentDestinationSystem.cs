@@ -30,6 +30,8 @@ namespace ECS.Systems.AI.Navigation
                 for (int i = 0; i < customPath.Count; i++)
                 {
                     navMeshAgentComponent.GetNavMeshAgent().CalculatePath(customPath[i].position, navMeshPath);
+                    GameObject obj = new GameObject(customPath[i].index.ToString());
+                    obj.transform.position = customPath[i].position;
                 }
 
                 navMeshAgentComponent.GetNavMeshAgent().SetPath(navMeshPath);

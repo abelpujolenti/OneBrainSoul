@@ -27,7 +27,7 @@ namespace ECS.Entities.AI.Combat
 
                 if (currentNode == goalNode)
                 {
-                    return CalculateNewPath(goalNode, goalPosition);;
+                    return CalculateNewPath(goalNode, goalPosition);
                 }
 
                 closedSet.Add(currentNode);

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -11,7 +9,7 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
+using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -43,8 +41,8 @@ namespace Managers
                 _instance = this;
 
                 _timeToCalculatePath *= 1000;
-
-                _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _triangleArea);
+                
+                _navMeshGraph.LoadGraph();
                 
                 DontDestroyOnLoad(gameObject);
                 
@@ -52,6 +50,17 @@ namespace Managers
             }
             
             Destroy(gameObject);
+        }
+
+        public void BakeGraph()
+        {
+            _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _triangleArea);
+        }
+
+        public void EraseGraph()
+        {
+            _navMeshGraph.EraseGraphFile();
+            _navMeshGraph = new NavMeshGraph();
         }
 
         private void Update()
@@ -93,12 +102,20 @@ namespace Managers
             }
         }
 
+        public static int counter = 0;
+
         public void AddNavMeshAgentEntity(NavMeshAgentComponent navMeshAgentComponent)
         {
-            AStarPath aStarPath = new AStarPath(_navMeshGraph.Copy(), 
-                new VectorComponent(navMeshAgentComponent.GetNavMeshAgent().destination));
+            AStarPath aStarPath = new AStarPath(new VectorComponent(navMeshAgentComponent.GetNavMeshAgent().destination));
             
             _navMeshAgentDestinations.Add(navMeshAgentComponent, aStarPath);
+            
+            if (counter > 0)
+            {
+                return;
+            }
+
+            counter++;
 
             Thread pathfindingThread = new Thread(() =>
             {
@@ -128,6 +145,38 @@ namespace Managers
             TransformComponent transformComponent)
         {
             _navMeshAgentDestinations[navMeshAgentComponent].position = transformComponent;
+        }
+
+        private void OnDrawGizmos()
+        {
+            foreach (Node node in _navMeshGraph.nodes.Values)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(node.position, 0.2f);
+
+                foreach (Edge edge in node.edges)
+                {
+                    Gizmos.color = new Color(1, edge.cost / 1000, edge.cost / 1000);
+                    Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
+                }
+            }
+        }
+
+        public void UpdateNavMeshAgentPosition(NavMeshAgentComponent navMeshAgentComponent, float radius)
+        {
+            foreach (NavMeshAgentComponent navMeshAgent in _navMeshAgentDestinations.Keys)
+            {
+                if (navMeshAgent == navMeshAgentComponent)
+                {
+                    continue;
+                }
+                _navMeshGraph.ResetEdgesCost();
+                _navMeshGraph.UpdateEdgeWeights(
+                    navMeshAgentComponent.GetTransformComponent().GetPosition(), radius, 100000000000);
+                _navMeshAgentDestinations[navMeshAgent].navMeshGraph.ResetEdgesCost();
+                _navMeshAgentDestinations[navMeshAgent].navMeshGraph.UpdateEdgeWeights(
+                    navMeshAgentComponent.GetTransformComponent().GetPosition(), radius, 100000000000);
+            }
         }
 
         private void OnDestroy()

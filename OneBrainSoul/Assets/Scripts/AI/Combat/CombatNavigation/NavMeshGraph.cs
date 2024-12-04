@@ -12,9 +12,12 @@ namespace AI.Combat.CombatNavigation
 
         public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float triangleArea)
         {
-            LoadGraph();
+            if (File.Exists(GetFilePath()))
+            {
+                return;
+            }
             
-            /*Vector3[] vertices = navMeshTriangulation.vertices;
+            Vector3[] vertices = navMeshTriangulation.vertices;
             int[] indices = navMeshTriangulation.indices;
 
             Mesh mesh = new Mesh
@@ -26,10 +29,6 @@ namespace AI.Combat.CombatNavigation
             mesh.RecalculateBounds();
 
             Bounds bounds = mesh.bounds;
-            float minWidth = bounds.min.x;
-            float maxWidth = bounds.max.x;
-            float minDepth = bounds.min.z;
-            float maxDepth = bounds.max.z;
 
             List<Vector3> planeVertices = new List<Vector3>();
 
@@ -40,39 +39,13 @@ namespace AI.Combat.CombatNavigation
                     planeVertices.Add(new Vector3(x, 0, z));
                 }
             }
-
-            List<int> planeTriangles = new List<int>();
-            int rows = Mathf.CeilToInt((maxDepth - minDepth) / triangleArea) + 1;
-            int columns = Mathf.CeilToInt((maxWidth - minWidth) / triangleArea) + 1;
-
-            for (int z = 0; z < rows - 1; z++)
-            {
-                for (int x = 0; x < columns - 1; x++)
-                {
-                    int topLeft = z * columns + x;
-                    int topRight = topLeft + 1;
-                    int bottomLeft = topLeft + columns;
-                    int bottomRight = bottomLeft + 1;
-                    
-                    planeTriangles.Add(topLeft);
-                    planeTriangles.Add(bottomLeft);
-                    planeTriangles.Add(topRight);
-                    
-                    planeTriangles.Add(topRight);
-                    planeTriangles.Add(bottomLeft);
-                    planeTriangles.Add(bottomRight);
-                }
-            }
+            
+            NavMeshHit hit;
             
             foreach (Vector3 vertex in planeVertices)
             {
-                NavMeshHit hit;
+                
                 if (!NavMesh.SamplePosition(vertex, out hit, Mathf.Infinity, NavMesh.AllAreas))
-                {
-                    continue;
-                }
-
-                if ((1 << hit.mask & NavMesh.GetAreaFromName("Walkable")) != 0)
                 {
                     continue;
                 }
@@ -88,38 +61,30 @@ namespace AI.Combat.CombatNavigation
                 nodes.Add(index, newNode);
             }
 
-            for (int i = 0; i < planeTriangles.Count; i += 3)
+            foreach (Node firstNode in nodes.Values)
             {
-                int v1 = planeTriangles[i];
-                int v2 = planeTriangles[i + 1];
-                int v3 = planeTriangles[i + 2];
-
-                if (v1 < nodes.Count && v2 < nodes.Count)
+                foreach (Node secondNode in nodes.Values)
                 {
-                    Node node1 =  nodes[(uint)planeTriangles[i]];
-                    Node node2 =  nodes[(uint)planeTriangles[i + 1]];
-                    
-                    ConnectNodes(node1, node2);
-                }
+                    if (firstNode == secondNode)
+                    {
+                        continue;
+                    }
 
-                if (v2 < nodes.Count && v3 < nodes.Count)
-                {
-                    Node node2 =  nodes[(uint)planeTriangles[i + 1]];
-                    Node node3 =  nodes[(uint)planeTriangles[i + 2]];
+                    if (Vector3.Distance(firstNode.position, secondNode.position) >= triangleArea * 1.5f)
+                    {
+                        continue;
+                    }
+                
+                    if (NavMesh.Raycast(firstNode.position, secondNode.position, out hit, NavMesh.AllAreas))
+                    {
+                        continue;
+                    }
                     
-                    ConnectNodes(node2, node3);
-                }
-
-                if (v3 < nodes.Count && v1 < nodes.Count)
-                {
-                    Node node3 =  nodes[(uint)planeTriangles[i + 2]];
-                    Node node1 =  nodes[(uint)planeTriangles[i]];
-                    
-                    ConnectNodes(node3, node1);
+                    ConnectNodes(firstNode, secondNode);
                 }
             }
             
-            SaveGraph();*/
+            SaveGraphFile();
         }
 
         private void ConnectTriangleNodes(Node node1, Node node2, Node node3)
@@ -189,12 +154,7 @@ namespace AI.Combat.CombatNavigation
             }
         }
 
-        public NavMeshGraph Copy()
-        {
-            return new NavMeshGraph { nodes = nodes };
-        }
-
-        private void SaveGraph()
+        private void SaveGraphFile()
         {
             SerializableGraph serializableGraph = new SerializableGraph();
 
@@ -221,11 +181,26 @@ namespace AI.Combat.CombatNavigation
 
             string json = JsonUtility.ToJson(serializableGraph, true);
             File.WriteAllText(GetFilePath(), json);
-            Debug.Log("Graph saved to " + GetFilePath());
         }
 
-        private void LoadGraph()
+        public void EraseGraphFile()
         {
+            if (!File.Exists(GetFilePath()))
+            {
+                return;
+            }
+            
+            File.Delete(GetFilePath());
+        }
+
+        public void LoadGraph()
+        {
+            if (!File.Exists(GetFilePath()))
+            {
+                Debug.LogError("Missing Graph File");
+                return;
+            }
+            
             string json = File.ReadAllText(GetFilePath());
 
             SerializableGraph serializableGraph = JsonUtility.FromJson<SerializableGraph>(json);

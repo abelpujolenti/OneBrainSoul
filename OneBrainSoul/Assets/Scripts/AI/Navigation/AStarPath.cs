@@ -12,9 +12,10 @@ namespace AI.Navigation
         public Node goalNode;
         public List<Node> previousPathGCosts;
 
-        public AStarPath(NavMeshGraph navMeshGraph, IPosition position)
+        public AStarPath(IPosition position)
         {
-            this.navMeshGraph = navMeshGraph;
+            navMeshGraph = new NavMeshGraph();
+            navMeshGraph.LoadGraph();
             this.position = position;
         }
 

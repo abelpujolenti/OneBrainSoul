@@ -61,6 +61,8 @@ namespace ECS.Entities.AI.Combat
                 UpdateVisibleRivals();
 
                 UpdateVectorToRival();
+                
+                ECSNavigationManager.Instance.UpdateNavMeshAgentPosition(GetNavMeshAgentComponent(), _context.GetRadius() * 20);
 
                 if (_context.IsAttacking())
                 {
@@ -68,9 +70,9 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                SetRaysDirections();
+                /*SetRaysDirections();
             
-                CalculateBestAction();
+                CalculateBestAction();*/
 
                 yield return null;
             }

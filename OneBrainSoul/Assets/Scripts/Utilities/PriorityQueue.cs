@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Utilities
 {
-    public class PriorityQueue<T>
+    /*public class PriorityQueue<T>
     {
         private List<(T item, float priority)> heap = new List<(T item, float priority)>();
 
@@ -120,6 +121,85 @@ namespace Utilities
 
                 index = smallestIndex;
             }
+        }
+    }*/
+    
+    public class PriorityQueue<T>
+    {
+        private class PriorityComparer : IComparer<(T item, float priority)>
+        {
+            public int Compare((T item, float priority) x, (T item, float priority) y)
+            {
+                return x.priority.CompareTo(y.priority);
+            }
+        }
+        
+        private List<(T item, float priority)> heap = new List<(T item, float priority)>();
+
+        public int Count => heap.Count;
+
+        public void Enqueue(T item, float priority)
+        {
+            int index = heap.BinarySearch((item, priority), new PriorityComparer());
+
+            if (index < 0)
+            {
+                index = ~index;
+            }
+            
+            heap.Insert(index, (item, priority));
+        }
+
+        public T Dequeue()
+        {
+            if (heap.Count == 0)
+            {
+                throw new InvalidOperationException("The queue is empty.");
+            }
+
+            T item = heap[0].item;
+            heap.RemoveAt(0);
+
+            return item;
+        }
+
+        public bool Contains(T item)
+        {
+            for (int i = 0; i < heap.Count; i++)
+            {
+                if (!heap[i].item.Equals(item))
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public T Peek()
+        {
+            if (heap.Count == 0)
+            {
+                throw new InvalidOperationException("The queue is empty.");
+            }
+
+            return heap[0].item;
+        }
+
+        public void UpdatePriority(T item, float newPriority)
+        {
+            int index = heap.FindIndex(x => x.item.Equals(item));
+
+            if (index == -1)
+            {
+                throw new InvalidOperationException("The queue is empty.");
+            }
+            
+            heap.RemoveAt(index);
+            
+            Enqueue(item, newPriority);
         }
     }
 }

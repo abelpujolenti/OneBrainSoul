@@ -1,6 +1,8 @@
-﻿namespace Serialize.NavMeshGraph
+﻿using System;
+
+namespace Serialize.NavMeshGraph
 {
-    [System.Serializable]
+    [Serializable]
     public class SerializableEdge
     {
         public uint toNodeIndex;
