@@ -138,7 +138,7 @@ namespace Managers
                     continue;
                 }
 
-                visibleRivals.Add(rival.GetCombatAgentInstance());
+                visibleRivals.Add(rival.GetAgentID());
             }
 
             return visibleRivals;
@@ -277,7 +277,7 @@ namespace Managers
         {
             AIEnemyContext targetEnemyContext = targetEnemy.GetContext();
 
-            uint enemyID = targetEnemy.GetCombatAgentInstance();
+            uint enemyID = targetEnemy.GetAgentID();
             
             ally.SetRivalIndex(enemyID);
             ally.SetRivalRadius(targetEnemyContext.GetRadius());
@@ -377,7 +377,7 @@ namespace Managers
 
             AIAllyContext targetAllyContext = targetAlly.GetContext();
             
-            enemy.SetRivalIndex(targetAlly.GetCombatAgentInstance());
+            enemy.SetRivalIndex(targetAlly.GetAgentID());
             enemy.SetHasATarget(true);
             enemy.SetRivalTransform(targetAllyContext.GetAgentTransform());
         }
@@ -422,18 +422,18 @@ namespace Managers
 
         public void AddAIAlly(AIAlly aiAlly)
         {
-            _aiAllies.Add(aiAlly.GetCombatAgentInstance(), aiAlly);
+            uint agentID = aiAlly.GetAgentID();
             
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(aiAlly.GetNavMeshAgentComponent());
+            _aiAllies.Add(agentID, aiAlly);
         }
 
         public void AddAIEnemy(AIEnemy aiEnemy)
         {
-            _aiEnemies.Add(aiEnemy.GetCombatAgentInstance(), aiEnemy);
+            uint agentID = aiEnemy.GetAgentID();
+            
+            _aiEnemies.Add(agentID, aiEnemy);
             
             AddEnemyAttack(aiEnemy.GetAttackComponents(), GameManager.Instance.GetAllyLayer());
-            
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(aiEnemy.GetNavMeshAgentComponent());
         }
 
         private void AddEnemyAttack(List<AttackComponent> attackComponents, int layerTarget)
@@ -527,7 +527,7 @@ namespace Managers
                     continue;
                 }
 
-                targetID = currentTarget.GetCombatAgentInstance();
+                targetID = currentTarget.GetAgentID();
                 targetDistance = currentTargetDistance;
             }
 
@@ -572,9 +572,7 @@ namespace Managers
 
         public void OnEnemyDefeated(AIEnemy aiEnemy)
         {
-            uint combatAgentInstance = aiEnemy.GetCombatAgentInstance();
-
-            _aiEnemies.Remove(combatAgentInstance);
+            _aiEnemies.Remove(aiEnemy.GetAgentID());
             
             OnAgentDefeated<AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent, 
                 AIEnemyContext, AttackComponent, AllyDamageComponent>(aiEnemy, ref _aiAllies);
@@ -595,13 +593,13 @@ namespace Managers
         {
             foreach (TAgent agent in agents.Values)
             {
-                if (agent.GetContext().GetRivalID() != aiCombatAgentDefeated.GetCombatAgentInstance())
+                if (agent.GetContext().GetRivalID() != aiCombatAgentDefeated.GetAgentID())
                 {
                     continue;
                 }
                 
                 agent.GetContext().SetHasATarget(false);
-                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(agent.GetNavMeshAgentComponent(), (TransformComponent)null);
+                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(agent.GetAgentID(), (TransformComponent)null);
             }
         }
 

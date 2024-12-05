@@ -15,6 +15,8 @@ namespace ECS.Entities.AI.Navigation
 
         [SerializeField] protected NavMeshAgent _navMeshAgent;
 
+        private uint _agentId;
+
         private NavMeshAgentComponent _navMeshAgentComponent;
 
         private IPosition _positionComponent;
@@ -27,11 +29,12 @@ namespace ECS.Entities.AI.Navigation
 
         protected void Setup()
         {
+            _agentId = (uint)gameObject.GetInstanceID();
             Transform ownTransform = transform;
             _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, ownTransform);
             _positionComponent = new VectorComponent(ownTransform.position);
             _rotationSpeed = _navMeshAgentSpecs.rotationSpeed;
-            //ECSNavigationManager.Instance.AddNavMeshAgentEntity(_navMeshAgentComponent);
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(_agentId, _navMeshAgentComponent, _navMeshAgentSpecs.radius);
         }
 
         public void ContinueNavigation()
@@ -53,7 +56,7 @@ namespace ECS.Entities.AI.Navigation
 
             NavMeshAgent navMeshAgent = GetNavMeshAgentComponent().GetNavMeshAgent();
 
-            Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(navMeshAgentComponent)
+            Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(_agentId)
                 .GetPosition();
 
             Transform ownTransform = transform;
@@ -130,6 +133,11 @@ namespace ECS.Entities.AI.Navigation
             _isRotating = false;
             
             ContinueNavigation();
+        }
+
+        public uint GetAgentID()
+        {
+            return _agentId;
         }
 
         public NavMeshAgentComponent GetNavMeshAgentComponent()

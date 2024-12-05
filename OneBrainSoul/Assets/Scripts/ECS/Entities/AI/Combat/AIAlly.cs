@@ -32,7 +32,6 @@ namespace ECS.Entities.AI.Combat
         private void Start()
         {
             Setup();
-            SetupCombatComponents();
             InstantiateAttackComponents(_aiAllySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
 
@@ -49,7 +48,7 @@ namespace ECS.Entities.AI.Combat
             
             CombatManager.Instance.AddAIAlly(this);
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), new TransformComponent(_TESTTransform));
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), new TransformComponent(_TESTTransform));
             
             InstantiateAttacksColliders();
 
@@ -68,15 +67,15 @@ namespace ECS.Entities.AI.Combat
                 switch (aiAllyAttack.aiAttackAoEType)
                 {
                     case AIAttackAoEType.RECTANGLE_AREA:
-                        _attackComponents.Add(new AllyRectangleAttackComponent(GetCombatAgentInstance(), aiAllyAttack));
+                        _attackComponents.Add(new AllyRectangleAttackComponent(GetAgentID(), aiAllyAttack));
                         break;
                     
                     case AIAttackAoEType.CIRCLE_AREA:
-                        _attackComponents.Add(new AllyCircleAttackComponent(GetCombatAgentInstance(), aiAllyAttack));
+                        _attackComponents.Add(new AllyCircleAttackComponent(GetAgentID(), aiAllyAttack));
                         break;
                     
                     case AIAttackAoEType.CONE_AREA:
-                        _attackComponents.Add(new AllyConeAttackComponent(GetCombatAgentInstance(), aiAllyAttack));
+                        _attackComponents.Add(new AllyConeAttackComponent(GetAgentID(), aiAllyAttack));
                         break;
                 }
             }
@@ -181,7 +180,7 @@ namespace ECS.Entities.AI.Combat
 
             _context.SetIsSeeingARival(_visibleRivals.Count != 0);
 
-            _enemiesThatTargetsMe = CombatManager.Instance.FilterEnemiesThatTargetsMe(GetCombatAgentInstance(), _visibleRivals);
+            _enemiesThatTargetsMe = CombatManager.Instance.FilterEnemiesThatTargetsMe(GetAgentID(), _visibleRivals);
         }
 
         private void UpdateDistancesToEnemiesThatTargetsMe()
@@ -366,7 +365,7 @@ namespace ECS.Entities.AI.Combat
 
             _raysOpeningAngle = 360f;
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(),positionToDodge);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(),positionToDodge);
         }
 
         public void WarnOncomingDamage(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
@@ -403,11 +402,11 @@ namespace ECS.Entities.AI.Combat
 
             if (_lastDestination != null)
             {
-                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), _lastDestination);
+                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
                 return;
             }
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), 
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(),
                 new TransformComponent(GetContext().GetRivalTransform()));
         }
 
@@ -431,7 +430,7 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDie()
         {
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetNavMeshAgentComponent());
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
             Destroy(gameObject);
         }
 

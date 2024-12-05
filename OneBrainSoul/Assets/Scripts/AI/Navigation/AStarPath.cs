@@ -8,19 +8,19 @@ namespace AI.Navigation
     public class AStarPath : IPosition
     {
         public NavMeshGraph navMeshGraph;
-        public IPosition position;
+        public IPosition destinationPosition;
         public List<Node> path = new List<Node>();
 
-        public AStarPath(IPosition position)
+        public AStarPath(IPosition destinationPosition)
         {
             navMeshGraph = new NavMeshGraph();
             navMeshGraph.LoadGraph();
-            this.position = position;
+            this.destinationPosition = destinationPosition;
         }
 
         public Vector3 GetPosition()
         {
-            return position.GetPosition();
+            return destinationPosition.GetPosition();
         }
     }
 }

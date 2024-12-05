@@ -7,5 +7,6 @@ namespace Serialize.NavMeshGraph
     {
         public uint toNodeIndex;
         public float cost;
+        public float baseCostMultiplier;
     }
 }

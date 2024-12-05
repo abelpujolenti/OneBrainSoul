@@ -17,7 +17,6 @@ namespace ECS.Entities.AI.Combat
         private void Start()
         {
             Setup();
-            SetupCombatComponents();
             InstantiateAttackComponents(_aiEnemySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
 
@@ -61,8 +60,6 @@ namespace ECS.Entities.AI.Combat
                 UpdateVisibleRivals();
 
                 UpdateVectorToRival();
-                
-                ECSNavigationManager.Instance.UpdateNavMeshAgentPosition(GetNavMeshAgentComponent(), _context.GetRadius() * 20);
 
                 if (_context.IsAttacking())
                 {
@@ -70,9 +67,9 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                /*SetRaysDirections();
+                SetRaysDirections();
             
-                CalculateBestAction();*/
+                CalculateBestAction();
 
                 yield return null;
             }
@@ -107,8 +104,6 @@ namespace ECS.Entities.AI.Combat
         {
             _context.SetHealth(_context.GetHealth() - damageComponent.GetDamage());
 
-            uint combatAgentInstanceID = GetCombatAgentInstance();
-
             uint health = _context.GetHealth();
 
             if (health == 0)
@@ -116,6 +111,8 @@ namespace ECS.Entities.AI.Combat
                 OnDefeated();
                 return;
             }
+
+            uint combatAgentInstanceID = GetAgentID();
             
             bool isStunned = _context.IsStunned();
 
@@ -143,7 +140,7 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnEnemyDefeated(this);
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetNavMeshAgentComponent());
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
             Destroy(gameObject);
         }
 
@@ -165,7 +162,7 @@ namespace ECS.Entities.AI.Combat
             GetContext().SetIsStunned(false);
             
             RotateToNextPathCorner();
-            CombatManager.Instance.OnEnemyStunEnds(GetCombatAgentInstance());
+            CombatManager.Instance.OnEnemyStunEnds(GetAgentID());
         }
 
         public override AIAgentType GetAIAgentType()

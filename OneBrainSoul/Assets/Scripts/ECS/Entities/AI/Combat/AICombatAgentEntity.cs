@@ -21,8 +21,6 @@ namespace ECS.Entities.AI.Combat
         where TDamageComponent : DamageComponent
     {
         private List<Node> TESTpath;
-        
-        private uint _combatAgentInstanceID;
 
         protected TContext _context;
 
@@ -106,11 +104,6 @@ namespace ECS.Entities.AI.Combat
 
                 _raysDirectionAndWeights[i].weight = 0;
             }
-        }
-
-        protected void SetupCombatComponents()
-        {
-            _combatAgentInstanceID = (uint)gameObject.GetInstanceID();
         }
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
@@ -292,11 +285,6 @@ namespace ECS.Entities.AI.Combat
         
         public abstract TContext GetContext();
 
-        public uint GetCombatAgentInstance()
-        {
-            return _combatAgentInstanceID;
-        }
-
         public List<uint> GetVisibleRivals()
         {
             return _visibleRivals;
@@ -305,13 +293,13 @@ namespace ECS.Entities.AI.Combat
         public void SetDestination(TransformComponent transformComponent)
         {
             _lastDestination = null;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), transformComponent);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), transformComponent);
         }
 
         public void SetDestination(VectorComponent vectorComponent)
         {
             _lastDestination = vectorComponent;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetNavMeshAgentComponent(), _lastDestination);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
         }
 
         protected void UpdateVectorToRival()

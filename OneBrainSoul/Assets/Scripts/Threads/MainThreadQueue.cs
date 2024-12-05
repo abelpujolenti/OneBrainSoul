@@ -9,8 +9,11 @@ namespace Threads
 {
     public class MainThreadQueue
     {
+        private Dictionary<CommandReturnType, Action<BaseCommand>> _commands;
+        
         private Stack<ActionCommand> _actionPool;
         private Stack<GetPositionCommand> _getPositionPool;
+        private Stack<GetPositionsCommand> _getPositionsPool;
 
         private Queue<BaseCommand> _commandQueue;
 
@@ -20,8 +23,16 @@ namespace Threads
         {
             _actionPool = new Stack<ActionCommand>(); 
             _getPositionPool = new Stack<GetPositionCommand>();
+            _getPositionsPool = new Stack<GetPositionsCommand>();
             _commandQueue = new Queue<BaseCommand>();
             _executeLimitStopwatch = new Stopwatch();
+
+            _commands = new Dictionary<CommandReturnType, Action<BaseCommand>>
+            {
+                { CommandReturnType.ACTION , ProcessAction },
+                { CommandReturnType.POSITION , ProcessPosition },
+                { CommandReturnType.POSITIONS , ProcessPositions }
+            };
         }
 
         public void SetAction(Action action)
@@ -31,6 +42,16 @@ namespace Threads
             QueueCommand(command);
         }
 
+        private void ProcessAction(BaseCommand baseCommand)
+        {
+            ActionCommand actionCommand = (ActionCommand)baseCommand;
+            Action action = actionCommand.action;
+                        
+            ReturnToPool(_actionPool, actionCommand);
+
+            action();
+        }
+
         public void GetPosition(IPosition iPosition, ThreadResult<Vector3> result)
         {
             result.Reset();
@@ -38,6 +59,46 @@ namespace Threads
             command.iPosition = iPosition;
             command.result = result;
             QueueCommand(command);
+        }
+
+        private void ProcessPosition(BaseCommand baseCommand)
+        {
+            GetPositionCommand getPositionCommand = (GetPositionCommand)baseCommand;
+            IPosition iPosition = getPositionCommand.iPosition;
+            ThreadResult<Vector3> result = getPositionCommand.result;
+                        
+            ReturnToPool(_getPositionPool, getPositionCommand);
+
+            Vector3 position = iPosition.GetPosition();
+                        
+            result.Ready(position);
+        }
+
+        public void GetPositions(List<IPosition> iPositions, ThreadResult<List<Vector3>> result)
+        {
+            result.Reset();
+            GetPositionsCommand command = GetFromPool(_getPositionsPool);
+            command.iPositions = iPositions;
+            command.result = result;
+            QueueCommand(command);
+        }
+
+        private void ProcessPositions(BaseCommand baseCommand)
+        {
+            GetPositionsCommand getPositionsCommand = (GetPositionsCommand)baseCommand;
+            List<IPosition> iPositions = getPositionsCommand.iPositions;
+            ThreadResult<List<Vector3>> result = getPositionsCommand.result;
+                        
+            ReturnToPool(_getPositionsPool, getPositionsCommand);
+
+            List<Vector3> positions = new List<Vector3>();
+
+            foreach (IPosition iPosition in iPositions)
+            {
+                positions.Add(iPosition.GetPosition());
+            }
+                        
+            result.Ready(positions);
         }
 
         public void Execute(int maximumMilliseconds = int.MaxValue)
@@ -61,31 +122,7 @@ namespace Threads
                     baseCommand = _commandQueue.Dequeue();
                 }
 
-                switch (baseCommand.type)
-                {
-                    case CommandReturnType.POSITION:
-
-                        GetPositionCommand getPositionCommand = (GetPositionCommand)baseCommand;
-                        IPosition iPosition = getPositionCommand.iPosition;
-                        ThreadResult<Vector3> result = getPositionCommand.result;
-                        
-                        ReturnToPool(_getPositionPool, getPositionCommand);
-
-                        Vector3 position = iPosition.GetPosition();
-                        
-                        result.Ready(position);
-                        break;
-                    
-                    case CommandReturnType.ACTION:
-
-                        ActionCommand actionCommand = (ActionCommand)baseCommand;
-                        Action action = actionCommand.action;
-                        
-                        ReturnToPool(_actionPool, actionCommand);
-
-                        action();
-                        break;
-                }
+                _commands[baseCommand.type](baseCommand);
             }
         }
 

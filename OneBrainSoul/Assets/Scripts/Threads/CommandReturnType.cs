@@ -3,6 +3,7 @@
     public enum CommandReturnType
     {
         ACTION,
-        POSITION
+        POSITION,
+        POSITIONS
     }
 }

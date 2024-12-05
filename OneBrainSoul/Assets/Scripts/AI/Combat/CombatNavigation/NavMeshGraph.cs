@@ -80,21 +80,14 @@ namespace AI.Combat.CombatNavigation
                         continue;
                     }
                     
-                    ConnectNodes(firstNode, secondNode);
+                    ConnectNodes(firstNode, secondNode, triangleSideLength);
                 }
             }
             
             SaveGraphFile();
         }
 
-        private void ConnectTriangleNodes(Node node1, Node node2, Node node3)
-        {
-            ConnectNodes(node1, node2);
-            ConnectNodes(node2, node3);
-            ConnectNodes(node3, node1);
-        }
-
-        private void ConnectNodes(Node fromNode, Node toNode)
+        private void ConnectNodes(Node fromNode, Node toNode, float triangleSideLength)
         {
             if (fromNode.edges.Exists(edge => edge.toNode == toNode))
             {
@@ -102,20 +95,39 @@ namespace AI.Combat.CombatNavigation
             }
             
             float cost = Vector3.Distance(fromNode.position, toNode.position);
+            float baseCostMultiplier = cost / triangleSideLength;
             
             fromNode.edges.Add(new Edge
             {
                 fromNode = fromNode,
                 toNode = toNode,
-                cost = cost
+                cost = cost,
+                baseCostMultiplier = baseCostMultiplier
             });
             
             toNode.edges.Add(new Edge
             {
                 fromNode = toNode,
                 toNode = fromNode,
-                cost = cost
+                cost = cost,
+                baseCostMultiplier = baseCostMultiplier
             });
+        }
+
+        public void UpdateEdgeWeights(uint obstacleID, Vector3 obstaclePosition, float radius, float weightMultiplier)
+        {
+            foreach (Node node in nodes.Values)
+            {
+                foreach (Edge edge in node.edges)
+                {
+                    if (Vector3.Distance(edge.toNode.position, obstaclePosition) > radius)
+                    {
+                        continue;
+                    }
+                    
+                    edge.MultiplyDefaultCost(weightMultiplier);
+                }
+            }
         }
 
         public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
@@ -128,8 +140,19 @@ namespace AI.Combat.CombatNavigation
                     {
                         continue;
                     }
+                    
+                    edge.MultiplyCost(weightMultiplier);
+                }
+            }
+        }
 
-                    edge.cost *= weightMultiplier;
+        public void ResetEdgesCost()
+        {
+            foreach (Node node in nodes.Values)
+            {
+                foreach (Edge edge in node.edges)
+                {
+                    edge.ResetCost();
                 }
             }
         }
@@ -140,17 +163,6 @@ namespace AI.Combat.CombatNavigation
             {
                 node.gCost = Mathf.Infinity;
                 node.parent = null;
-            }
-        }
-
-        public void ResetEdgesCost()
-        {
-            foreach (Node node in nodes.Values)
-            {
-                foreach (Edge edge in node.edges)
-                {
-                    edge.cost = Vector3.Distance(node.position, edge.toNode.position);
-                }
             }
         }
 
@@ -172,7 +184,8 @@ namespace AI.Combat.CombatNavigation
                     serializableNode.edges.Add(new SerializableEdge
                     {
                         toNodeIndex = edge.toNode.index,
-                        cost = edge.cost
+                        cost = edge.cost,
+                        baseCostMultiplier = edge.baseCostMultiplier
                     });
                 }
                 
@@ -233,7 +246,9 @@ namespace AI.Combat.CombatNavigation
                     {
                         fromNode = node,
                         toNode = toNode,
-                        cost = serializableEdge.cost
+                        cost = serializableEdge.cost,
+                        defaultCost = serializableEdge.cost,
+                        baseCostMultiplier = 1
                     });
                 }
             }
