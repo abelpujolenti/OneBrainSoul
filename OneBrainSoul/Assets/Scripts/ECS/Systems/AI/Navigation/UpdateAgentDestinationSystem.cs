@@ -1,41 +1,34 @@
-using System;
 using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
-using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Combat;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace ECS.Systems.AI.Navigation
 {
     public class UpdateAgentDestinationSystem
     {
-        public Action UpdateAgentDestination(NavMeshAgentComponent navMeshAgentComponent, Vector3 origin, Vector3 destination, 
-            AStarPath aStarPath)
+        public void UpdateAgentDestination(Vector3 origin, Vector3 destination, AStarPath aStarPath)
         {
-            List<Node> customPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, origin, destination);
+            List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, origin, destination);
             
             aStarPath.navMeshGraph.ResetNodesImportantInfo();
 
-            return () =>
+            aStarPath.path = newPath;
+            
+            aStarPath.path.RemoveAt(0);
+
+            if (aStarPath.path.Count < 2)
             {
-                if (customPath.Count == 0)
-                {
-                    return;
-                }
+                return;
+            }
+            aStarPath.path.RemoveAt(aStarPath.path.Count - 2);
 
-                NavMeshPath navMeshPath = new NavMeshPath();
-
-                for (int i = 0; i < customPath.Count; i++)
-                {
-                    navMeshAgentComponent.GetNavMeshAgent().CalculatePath(customPath[i].position, navMeshPath);
-                    GameObject obj = new GameObject(customPath[i].index.ToString());
-                    obj.transform.position = customPath[i].position;
-                }
-
-                navMeshAgentComponent.GetNavMeshAgent().SetPath(navMeshPath);
-            };
+            if (aStarPath.path.Count < 2)
+            {
+                return;
+            }
+            aStarPath.path.RemoveAt(aStarPath.path.Count - 2);
         }
     }
 }

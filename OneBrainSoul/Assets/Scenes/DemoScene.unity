@@ -800,7 +800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e778b990df445f142943062fcf237030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _triangleArea: 2
+  _triangleSideLength: 3
   _timeToCalculatePath: 0.25
 --- !u!4 &873943535
 Transform:
@@ -1611,11 +1611,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AngularSpeed
       value: 5000
-      objectReference: {fileID: 0}
-    - target: {fileID: 956940607707248733, guid: fd5bec4e68764994a93e08b8381e6464,
-        type: 3}
-      propertyPath: m_StoppingDistance
-      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1431982829728524995, guid: fd5bec4e68764994a93e08b8381e6464,
         type: 3}

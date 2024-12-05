@@ -248,3 +248,4 @@ MonoBehaviour:
   _navMeshSurface: {fileID: 0}
   _aiAllySpecs: {fileID: 11400000, guid: cdcc068a4bf0d56478a8c8c170002181, type: 2}
   _isAI: 1
+  _TESTTransform: {fileID: 0}

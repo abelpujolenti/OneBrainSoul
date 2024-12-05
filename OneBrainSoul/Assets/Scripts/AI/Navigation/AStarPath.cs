@@ -9,8 +9,7 @@ namespace AI.Navigation
     {
         public NavMeshGraph navMeshGraph;
         public IPosition position;
-        public Node goalNode;
-        public List<Node> previousPathGCosts;
+        public List<Node> path = new List<Node>();
 
         public AStarPath(IPosition position)
         {

@@ -10,7 +10,7 @@ namespace AI.Combat.CombatNavigation
     {
         public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
 
-        public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float triangleArea)
+        public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float triangleSideLength)
         {
             if (File.Exists(GetFilePath()))
             {
@@ -32,9 +32,9 @@ namespace AI.Combat.CombatNavigation
 
             List<Vector3> planeVertices = new List<Vector3>();
 
-            for (float x = bounds.min.x; x < bounds.max.x; x += triangleArea)
+            for (float x = bounds.min.x; x < bounds.max.x; x += triangleSideLength)
             {
-                for (float z = bounds.min.z; z < bounds.max.z; z += triangleArea)
+                for (float z = bounds.min.z; z < bounds.max.z; z += triangleSideLength)
                 {
                     planeVertices.Add(new Vector3(x, 0, z));
                 }
@@ -70,7 +70,7 @@ namespace AI.Combat.CombatNavigation
                         continue;
                     }
 
-                    if (Vector3.Distance(firstNode.position, secondNode.position) >= triangleArea * 1.5f)
+                    if (Vector3.Distance(firstNode.position, secondNode.position) >= triangleSideLength * 1.5f)
                     {
                         continue;
                     }

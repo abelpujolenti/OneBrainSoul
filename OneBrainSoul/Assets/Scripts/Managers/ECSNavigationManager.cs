@@ -9,6 +9,7 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug;
 
 namespace Managers
@@ -19,7 +20,7 @@ namespace Managers
 
         public static ECSNavigationManager Instance => _instance;
 
-        [SerializeField] private float _triangleArea;
+        [SerializeField] private float _triangleSideLength;
 
         [SerializeField] private float _timeToCalculatePath;
         
@@ -54,7 +55,7 @@ namespace Managers
 
         public void BakeGraph()
         {
-            _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _triangleArea);
+            _navMeshGraph.BuildGraph(NavMesh.CalculateTriangulation(), _triangleSideLength);
         }
 
         public void EraseGraph()
@@ -65,6 +66,29 @@ namespace Managers
 
         private void Update()
         {
+            foreach (var navMeshAgentDestination in _navMeshAgentDestinations)
+            {
+                List<Node> path = navMeshAgentDestination.Value.path;
+                
+                if (path.Count == 0)
+                {
+                    continue;
+                }
+
+                Vector3 position = path[0].position;
+
+                navMeshAgentDestination.Key.GetNavMeshAgent().SetDestination(position);
+
+                if (Vector3.Distance(navMeshAgentDestination.Key.GetTransformComponent().GetPosition(), position) > 3f)
+                {
+                    continue;
+                }
+
+                path[^1].gCost -= path[0].gCost;
+                
+                path.RemoveAt(0);
+            }
+            
             _mainThreadQueue.Execute(5);
         }
 
@@ -97,8 +121,8 @@ namespace Managers
                 _mainThreadQueue.GetPosition(navMeshAgentComponent.GetTransformComponent(), threadOrigin);
                 _mainThreadQueue.GetPosition(aStarPath.position, threadDestination);
 
-                _mainThreadQueue.SetAction(_updateAgentDestinationSystem.UpdateAgentDestination(navMeshAgentComponent, threadOrigin.GetValue(), 
-                    threadDestination.GetValue(), aStarPath));
+                _updateAgentDestinationSystem.UpdateAgentDestination(threadOrigin.GetValue(), threadDestination.GetValue(), 
+                    aStarPath);
             }
         }
 
@@ -147,7 +171,7 @@ namespace Managers
             _navMeshAgentDestinations[navMeshAgentComponent].position = transformComponent;
         }
 
-        private void OnDrawGizmos()
+        /*private void OnDrawGizmos()
         {
             foreach (Node node in _navMeshGraph.nodes.Values)
             {
@@ -160,7 +184,17 @@ namespace Managers
                     Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
                 }
             }
-        }
+
+            foreach (AStarPath aStarPath in _navMeshAgentDestinations.Values)
+            {
+                Gizmos.color = Color.blue;
+
+                for (int i = 0; i < aStarPath.path.Count - 1; i++)
+                {
+                    Gizmos.DrawLine(aStarPath.path[i].position, aStarPath.path[i + 1].position);
+                }
+            }
+        }*/
 
         public void UpdateNavMeshAgentPosition(NavMeshAgentComponent navMeshAgentComponent, float radius)
         {

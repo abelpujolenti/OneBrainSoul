@@ -9,7 +9,6 @@ using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Navigation;
 using Managers;
-using Unity.AI.Navigation;
 using UnityEngine;
 using Utilities;
 using Random = UnityEngine.Random;
@@ -21,8 +20,6 @@ namespace ECS.Entities.AI.Combat
         where TAttackComponent : AttackComponent
         where TDamageComponent : DamageComponent
     {
-        [SerializeField] private NavMeshSurface _navMeshSurface;
-
         private List<Node> TESTpath;
         
         private uint _combatAgentInstanceID;
@@ -371,7 +368,7 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.blue;
+            /*Gizmos.color = Color.blue;
 
             Vector3[] corners = _navMeshAgent.path.corners;
 
@@ -389,7 +386,7 @@ namespace ECS.Entities.AI.Combat
             
             Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
             
-            /*Vector3 position = transform.position;
+            Vector3 position = transform.position;
             
             Gizmos.color = Color.green;
             
