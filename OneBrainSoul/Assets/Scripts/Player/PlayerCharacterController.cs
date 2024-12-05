@@ -38,6 +38,7 @@ public class PlayerCharacterController : MonoBehaviour
     public float switchModeMouseSpeed = .4f;
 
     public Rigidbody rb { get; private set; }
+    public CapsuleCollider capsuleCollider { get; private set; }
     public FirstPersonCamera cam { get; private set; }
     public PlayerHealth health { get; private set; }
     public Hitstop hitstop { get; private set; }
@@ -69,6 +70,7 @@ public class PlayerCharacterController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        capsuleCollider = GetComponent<CapsuleCollider>();
         cam = GetComponentInChildren<FirstPersonCamera>();
         cam.Setup();
         if (braincell)
