@@ -167,7 +167,8 @@ public class PlayerCharacterController : MonoBehaviour
         xInput = Input.GetAxis("Horizontal");
         yInput = Input.GetAxis("Vertical");
         jumpInput = Input.GetButton("Jump");
-        ability1Input = Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Return);
+        ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.Return);
+        ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightCurlyBracket);
 
         switchModeInput = Input.GetMouseButton(1);
     }
