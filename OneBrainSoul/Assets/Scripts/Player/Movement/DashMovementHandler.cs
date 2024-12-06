@@ -46,19 +46,13 @@ public class DashMovementHandler : MovementHandler
         RaycastHit hit;
         if (Physics.Raycast(player.transform.position, dashDirection, out hit, player.rb.velocity.magnitude * 0.04f, 127, QueryTriggerInteraction.Ignore))
         {
-            DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
-            bool hitTerrain = destructibleTerrain != null;
-            if (hitTerrain)
-            {
-                destructibleTerrain.Break(hit.point);
-            }
             DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
             if (entity != null)
             {
-                entity.Damage(player, hit.point);
+                entity.Damage(player, hit.point, 1);
             }
 
-            bool damaged = hitTerrain || entity != null;
+            bool damaged = entity != null;
             Exit(player);
             return;
         }
