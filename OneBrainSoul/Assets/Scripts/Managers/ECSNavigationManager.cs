@@ -148,7 +148,7 @@ namespace Managers
                             continue;
                         }
                         aStarPath.navMeshGraph.UpdateEdgeWeights(threadDynamicObstacles.GetValue()[i], 
-                            _dynamicObstacles[i].radius, 100000000000);
+                            _dynamicObstacles[i].radius, 1000);
                     }
 
                     _updateAgentDestinationSystem.UpdateAgentDestination(threadOrigin.GetValue(), threadDestination.GetValue(), 

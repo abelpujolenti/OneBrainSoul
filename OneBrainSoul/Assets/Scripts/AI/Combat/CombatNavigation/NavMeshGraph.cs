@@ -130,18 +130,55 @@ namespace AI.Combat.CombatNavigation
             }
         }
 
+        private Node GetClosestNode(Vector3 position)
+        {
+            Node closestNode = null;
+            
+            float minimumDistance = Mathf.Infinity;
+            float distance;
+
+            foreach (Node node in nodes.Values)
+            {
+                distance = Vector3.Distance(node.position, position);
+
+                if (distance >= minimumDistance)
+                {
+                    continue;
+                }
+
+                minimumDistance = distance;
+                closestNode = node;
+            }
+
+            return closestNode;
+        }
+
         public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
         {
+            Vector3 closestNodePosition = GetClosestNode(obstaclePosition).position;
+            
             foreach (Node node in nodes.Values)
             {
                 foreach (Edge edge in node.edges)
                 {
-                    if (Vector3.Distance(edge.toNode.position, obstaclePosition) > radius)
+                    Node toNode = edge.toNode;
+                    
+                    if (Vector3.Distance(toNode.position, closestNodePosition) > radius)
                     {
                         continue;
                     }
                     
                     edge.MultiplyCost(weightMultiplier);
+
+                    foreach (Edge toNodeEdge in toNode.edges)
+                    {
+                        if (toNodeEdge.toNode.index != node.index)
+                        {
+                            continue;
+                        }
+                        
+                        toNodeEdge.MultiplyCost(weightMultiplier);
+                    }
                 }
             }
         }
