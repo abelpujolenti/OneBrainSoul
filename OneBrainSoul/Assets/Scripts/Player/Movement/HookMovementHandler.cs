@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 public class HookMovementHandler : MovementHandler
 {
-    public static float speed = 110f;
+    public static float speed = 120f;
     public static float jumpStrength = 14f;
     public static float endDistance = 1.5f;
     public static float speedFalloff = 77.5f;
@@ -16,17 +16,20 @@ public class HookMovementHandler : MovementHandler
     public static float bobbingStrength = .6f;
     public static float snapDownwardsStrength = 6f;
 
-    public static float delay = 0.18f;
+    public static float delay = 1f;
     public static float delayHitImpact = 0.025f;
 
-    public Vector3 startPos;
-    public Vector3 endPos;
-    public Vector3 endVisualPos;
+    public static int lineVertices = 10;
+
+    Vector3 startPos;
+    Vector3 endPos;
+    Vector3 endVisualPos;
+    Vector3 lineStartPos;
     bool snap;
     float hookDistance;
     float delayTime = 0f;
     float bobbingCycle = 0f;
-    public Vector3 movementDirection = Vector3.zero;
+    Vector3 movementDirection = Vector3.zero;
     LineRenderer line;
 
     public HookMovementHandler(PlayerCharacterController player, Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap)
@@ -36,30 +39,63 @@ public class HookMovementHandler : MovementHandler
         this.endVisualPos = endVisualPos;
         this.snap = snap;
         hookDistance = Vector3.Distance(this.endPos, this.startPos);
-        movementDirection = (this.endPos - this.startPos).normalized;
         line = player.GetComponent<LineRenderer>();
         line.enabled = true;
+        line.positionCount = lineVertices;
         player.canSwitch = false;
+    }
+
+    public void VisualUpdate(PlayerCharacterController player)
+    {
+        lineStartPos = player.transform.position + new Vector3(0f, 1f, 0f) + player.orientation.right * 2f;
+        if (delayTime < delay + delayHitImpact)
+        {
+            if (delayTime < delay)
+            {
+                line.SetPosition(0, lineStartPos);
+                for (int i = 1; i < line.positionCount; i++)
+                {
+                    float lp = ((float)i / line.positionCount);
+                    line.SetPosition(i, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f) * lp);
+                }
+            }
+        }
     }
 
     public void Move(PlayerCharacterController player)
     {
         float distanceToTarget = Vector3.Distance(endPos, player.transform.position);
 
-        Vector3 lineStartPos = player.transform.position + new Vector3(0f, 1f, 0f) + player.orientation.right * 2f;
+        Vector3 prevLineStartPos = lineStartPos;
+        lineStartPos = player.transform.position + new Vector3(0f, 1f, 0f) + player.orientation.right * 2f;
         //Throw hook
         if (delayTime < delay + delayHitImpact)
         {
-            player.rb.velocity = Vector3.zero;
             if (delayTime < delay)
             {
-                line.SetPosition(1, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
                 line.SetPosition(0, lineStartPos);
+                for (int i = 1; i < line.positionCount; i++)
+                {
+                    float lp = ((float)i / line.positionCount);
+                    Vector3 lineStartPosInterpolated = Vector3.Lerp(lineStartPos, prevLineStartPos, lp);
+                    line.SetPosition(i, lineStartPosInterpolated + (endVisualPos - lineStartPosInterpolated) * Mathf.Pow(delayTime / delay, 2f) * lp);
+                }
+                //line.SetPosition(1, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
 
                 if (delayTime + Time.fixedDeltaTime >= delay)
                 {
-                    player.cam.FovWarp(2f * 60f / distanceToTarget , 2.5f);
                     //sound
+                }
+            }
+            else
+            {
+                if (delayTime + Time.fixedDeltaTime >= delay + delayHitImpact)
+                {
+                    startPos = player.transform.position;
+                    movementDirection = (endPos - startPos).normalized;
+                    hookDistance = Vector3.Distance(endPos, startPos);
+                    player.cam.FovWarp(2f * 60f / distanceToTarget, 2.5f);
+                    player.rb.AddForce(Mathf.Max(0f, -player.rb.velocity.y) * Vector3.up, ForceMode.VelocityChange);
                 }
             }
 
@@ -68,6 +104,10 @@ public class HookMovementHandler : MovementHandler
         }
 
         line.SetPosition(0, lineStartPos);
+        for (int i = 1; i < line.positionCount; i++)
+        {
+            line.SetPosition(i, endVisualPos + (lineStartPos - endVisualPos) * ((float)i / line.positionCount));
+        }
 
         float progress = 1f - Mathf.Min(1f, distanceToTarget / hookDistance);
         float speedWithFalloff = speed - Mathf.Pow(progress, 1f / speedFalloffPower) * speedFalloff;
@@ -79,7 +119,7 @@ public class HookMovementHandler : MovementHandler
         //player.rb.AddTorque(movementDirection * sidewaysBobbingMagnitude, ForceMode.Acceleration);
 
         //End
-        if (distanceToTarget < endDistance || distanceToTarget > hookDistance * 1.1f)
+        if (distanceToTarget < endDistance || distanceToTarget > hookDistance * 2f)
         {
             if (snap)
             {
@@ -132,7 +172,7 @@ public class HookMovementHandler : MovementHandler
 
     public bool ShouldGravityApply(PlayerCharacterController player)
     {
-        return false;
+        return delayTime < delay;
     }
 
     public bool ShouldHoverApply(PlayerCharacterController player)

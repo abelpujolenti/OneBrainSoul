@@ -65,7 +65,7 @@ public class HookAbility : MonoBehaviour
             endPos = hit.point;
             if (ledgeFound) {
                 Vector3 ledgeHitDir = (ledgeHit.point - startPos).normalized;
-                endPos = ledgeHit.point + new Vector3(0f, .6f, 0f) + (ledgeHitDir + ledgeHit.normal).normalized * ledgeSnapDistance;
+                endPos = ledgeHit.point + new Vector3(0f, .65f, 0f) + (ledgeHitDir + ledgeHit.normal).normalized * ledgeSnapDistance;
             }
 
             player.movementHandler = new HookMovementHandler(player, startPos, endPos, ledgeFound ? ledgeHit.point: hit.point, ledgeFound);
