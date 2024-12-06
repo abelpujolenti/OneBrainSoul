@@ -232,26 +232,35 @@ public class PlayerCharacterController : MonoBehaviour
             switchModeCamera.gameObject.SetActive(true);
             cam.tag = "Player";
             switchModeCamera.tag = "MainCamera";
-            switchModeCamera.transform.rotation = orientation.rotation;
-            switchModeCamera.transform.position = cam.transform.position;
+            //switchModeCamera.transform.rotation = orientation.rotation;
+            //switchModeCamera.transform.position = cam.transform.position;
             display.SetActive(true);
             PostProcessingManager.Instance.EnableSwitchMode(.45f, .1f);
         }
 
         float t = Mathf.Pow(switchModeTime, 1f / switchModeFalloffPower);
         float z = -t * switchModeSpeed;
-        float rx = Mathf.Pow(t, 0.5f) * switchModeRotationFactor;
+
+        //hector no likey the math i spent a whole day on
+        /*float rx = Mathf.Pow(t, 0.5f) * switchModeRotationFactor;
         Vector3 forwardnoY = new Vector3(switchModeCamera.transform.forward.x, 0f, switchModeCamera.transform.forward.z).normalized;
         float ryfangle = Vector3.Angle(forwardnoY, orientation.forward);
         float ryf = 8f / (8f + ryfangle);
         float dot = Vector3.Dot(forwardnoY, orientation.forward);
         ryf = dot < -0.45f ? 0f : ryf;
         ryf = Quaternion.FromToRotation(forwardnoY, orientation.forward).y * Input.GetAxis("Mouse X") <= 0 ? ryf : 1f;
-        Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
         ryf = ryf > 0f && ryf < 0.3f ? 0.3f : ryf;
         float ry = switchModeCamera.transform.rotation.eulerAngles.y + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf;
         float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.1f;
-        switchModeCamera.transform.rotation = Quaternion.Euler(rx, ry, rz);
+        switchModeCamera.transform.rotation = Quaternion.Euler(rx, ry, rz);*/
+
+        /*float mouseX = Input.GetAxis("Mouse X") * switchModeMouseSpeed * Time.unscaledDeltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * switchModeMouseSpeed * Time.unscaledDeltaTime;
+        float yRotation = switchModeCamera.transform.rotation.eulerAngles.y + mouseX;
+        float xRotation = switchModeCamera.transform.rotation.eulerAngles.x - mouseY;
+        yRotation = Mathf.Clamp(yRotation, -90f, 90f);
+        switchModeCamera.transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);*/
+
         switchModeCamera.transform.localPosition = cam.transform.localPosition + (orientation.transform.forward + Vector3.down * switchModeYFactor).normalized * z;
 
         Time.timeScale = 1f / (1f + t * 10f);
