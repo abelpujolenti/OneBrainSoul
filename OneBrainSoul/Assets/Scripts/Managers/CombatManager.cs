@@ -265,7 +265,7 @@ namespace Managers
             }
             else
             {
-                targetID = GetClosestRival<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent>(
+                targetID = GetClosestRivalID<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent>(
                         ally.GetNavMeshAgentComponent().GetTransformComponent(), _aiEnemies, visibleRivals);
             }
             
@@ -315,8 +315,6 @@ namespace Managers
             //Debug.Log(ally.name + " Fleeing");
             
             ally.ContinueNavigation();
-            
-            ally.RequestHelp();
             
             //TODO USE STEERING BEHAVIORS
             
@@ -370,7 +368,7 @@ namespace Managers
             }
             else
             {
-                targetId = GetClosestRival<AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent>(
+                targetId = GetClosestRivalID<AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent>(
                     navMeshAgentComponent.GetTransformComponent(), _aiAllies, visibleRivals);
             }
 
@@ -503,7 +501,7 @@ namespace Managers
             return visibleRivals.Count == 0 ? auxVisibleRivals : visibleRivals;
         }
 
-        private uint GetClosestRival<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent>(
+        private uint GetClosestRivalID<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent>(
             IPosition positionComponent, Dictionary<uint, TRivalAgent> rivalsDictionary, List<uint> possibleTargetsAICombatAgentIDs)
         
             where TRivalAgent : AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent>
@@ -856,6 +854,16 @@ namespace Managers
         #endregion
         
         #endregion
+
+        public AIAlly RequestAlly(uint agentID)
+        {
+            return _aiAllies[agentID];
+        }
+
+        public AIEnemy RequestEnemy(uint agentID)
+        {
+            return _aiEnemies[agentID];
+        }
 
         private List<TAgent> ReturnAllDictionaryValuesInAList<TAgent, TOwnContext, TOwnAttackComponent, TOwnDamageComponent>(
             Dictionary<uint, TAgent> agentsDictionary)

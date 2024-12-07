@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0011da166c275db42a47811fe2a2381e, type: 3}
   m_Name: Test NavMesh Agent
   m_EditorClassIdentifier: 
-  radius: 3
+  radius: 1.089506
   height: 50
   stepHeight: 10
   maxSlope: 30

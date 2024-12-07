@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AI;
 using AI.Combat;
+using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
 using Managers;
@@ -22,8 +23,14 @@ namespace ECS.Entities.AI.Combat
 
             _raysTargetsLayerMask = (int)(Math.Pow(2, GameManager.Instance.GetEnemyLayer()) + 
                                           Math.Pow(2, GameManager.Instance.GetGroundLayer()));
+
+            CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
+
+            float radius = capsuleCollider.radius;
+
+            _surroundingSlots = new SurroundingSlots(radius);
             
-            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, GetComponent<CapsuleCollider>().radius, 
+            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, radius, 
                 _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
                 _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
             
@@ -67,9 +74,27 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                SetRaysDirections();
+                /*SetRaysDirections();
             
                 CalculateBestAction();
+
+                if (!_context.HasATarget())
+                {
+                    yield return null;
+                    continue;
+                }
+                
+                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestEnemy(_context.GetRivalID())
+                    .GetRivalSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
+
+                if (rivalSlotPosition == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                _rivalSlot = rivalSlotPosition.rivalSlot;
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);*/
 
                 yield return null;
             }

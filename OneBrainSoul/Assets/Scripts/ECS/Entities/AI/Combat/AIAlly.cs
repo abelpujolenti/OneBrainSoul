@@ -5,6 +5,7 @@ using AI;
 using AI.Combat;
 using AI.Combat.Ally;
 using AI.Combat.AttackColliders;
+using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
@@ -28,8 +29,6 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private bool _isAI;
 
-        [SerializeField] private Transform _TESTTransform;
-
         private void Start()
         {
             Setup();
@@ -40,16 +39,19 @@ namespace ECS.Entities.AI.Combat
                                                        Math.Pow(2, GameManager.Instance.GetGroundLayer()));
 
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
+
+            float radius = capsuleCollider.radius;
+
+            _surroundingSlots = new SurroundingSlots(radius);
             
             _dieComponent = new DieComponent();
-            _context = new AIAllyContext(_aiAllySpecs.totalHealth, capsuleCollider.radius,
+            _context = new AIAllyContext(_aiAllySpecs.totalHealth, radius,
                 _aiAllySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
                 _aiAllySpecs.minimumEnemiesInsideAlertRadiusToFlee, _navMeshAgent.stoppingDistance, capsuleCollider.height, 
                 _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
-            
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), new TransformComponent(_TESTTransform));
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), _navMeshAgentSpecs.radius);
             
             InstantiateAttacksColliders();
 
@@ -143,8 +145,6 @@ namespace ECS.Entities.AI.Combat
                 UpdateVectorToRival();
 
                 UpdateDistancesToEnemiesThatTargetsMe();
-                
-                //ECSNavigationManager.Instance.UpdateNavMeshAgentPosition(GetNavMeshAgentComponent(), _context.GetRadius());
 
                 if (_context.IsAttacking())
                 {
@@ -159,10 +159,26 @@ namespace ECS.Entities.AI.Combat
                 }
                 
                 LaunchRaycasts();
-                
-                //TODO REMAINING DISTANCE IF HAS A DESTINATION
             
-                //CalculateBestAction();
+                CalculateBestAction();
+
+                if (!_context.HasATarget())
+                {
+                    yield return null;
+                    continue;
+                }
+                
+                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestEnemy(_context.GetRivalID())
+                    .GetRivalSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
+
+                if (rivalSlotPosition == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                _rivalSlot = rivalSlotPosition.rivalSlot;
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);
 
                 yield return null;
             }
@@ -349,11 +365,6 @@ namespace ECS.Entities.AI.Combat
             OnAttackAvailableAgain(allyAttackComponent);
         }
 
-        public void RequestHelp()
-        {
-            
-        }
-
         public void DodgeAttack(VectorComponent positionToDodge)
         {
             ContinueNavigation();
@@ -376,7 +387,6 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsUnderAttack(true);
             _context.SetOncomingAttackDamage(_context.GetOncomingAttackDamage() + attackComponent.GetDamage());
         }
-        
         
         public void FreeOfWarnArea(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
         {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AI;
 using AI.Combat.CombatNavigation;
+using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using AI.Combat.Steering;
 using ECS.Components.AI.Combat;
@@ -45,6 +46,9 @@ namespace ECS.Entities.AI.Combat
         protected uint _numberOfVicinityRays = 12;
 
         protected int _raysTargetsLayerMask;
+
+        protected SurroundingSlots _surroundingSlots;
+        protected RivalSlot _rivalSlot;
 
         protected virtual void StartUpdate()
         {
@@ -104,6 +108,11 @@ namespace ECS.Entities.AI.Combat
 
                 _raysDirectionAndWeights[i].weight = 0;
             }
+        }
+
+        public RivalSlotPosition GetRivalSlotPosition(Vector3 direction, float radius)
+        {
+            return _surroundingSlots.ReserveSubtendedAngle(GetAgentID(), direction, radius);
         }
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
@@ -356,9 +365,9 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDrawGizmos()
         {
-            /*Gizmos.color = Color.blue;
+            Gizmos.color = Color.blue;
 
-            Vector3[] corners = _navMeshAgent.path.corners;
+            Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
 
             if (corners.Length == 0)
             {
@@ -374,7 +383,7 @@ namespace ECS.Entities.AI.Combat
             
             Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
             
-            Vector3 position = transform.position;
+            /*Vector3 position = transform.position;
             
             Gizmos.color = Color.green;
             

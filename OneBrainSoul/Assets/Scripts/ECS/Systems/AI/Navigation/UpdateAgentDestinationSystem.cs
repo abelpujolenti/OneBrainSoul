@@ -2,17 +2,19 @@ using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using ECS.Entities.AI.Combat;
-using UnityEngine;
 
 namespace ECS.Systems.AI.Navigation
 {
     public class UpdateAgentDestinationSystem
     {
-        public void UpdateAgentDestination(Vector3 origin, Vector3 destination, AStarPath aStarPath)
+        public void UpdateAgentDestination(AStarPath aStarPath)
         {
-            List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, origin, destination);
+            List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.GetNavMeshGraph(), aStarPath.origin, 
+                aStarPath.destination);
+
+            aStarPath.lastGoal = aStarPath.destination;
             
-            aStarPath.navMeshGraph.ResetNodesImportantInfo();
+            aStarPath.GetNavMeshGraph().ResetNodesImportantInfo();
 
             aStarPath.path = newPath;
             

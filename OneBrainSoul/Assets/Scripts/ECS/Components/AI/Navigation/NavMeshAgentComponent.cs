@@ -9,9 +9,7 @@ namespace ECS.Components.AI.Navigation
     public class NavMeshAgentComponent
     {
         private NavMeshAgentSpecs _navMeshAgentSpecs;
-        
         private TransformComponent _transformComponent;
-        
         private NavMeshAgent _agent;
 
         public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, Transform transform)
