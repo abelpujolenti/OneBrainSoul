@@ -308,7 +308,7 @@ MonoBehaviour:
     type: 3}
   _enemyCircleAttackColliderPrefab: {fileID: 1018056785021335438, guid: 4a3e967c27daceb4ca195ed7d56c1311,
     type: 3}
-  _showActionsDebugLogs: 1
+  _showActionsDebugLogs: 0
   FLEE_POINTS:
   - {fileID: 1800132391}
   - {fileID: 1299678416}
@@ -698,7 +698,7 @@ PrefabInstance:
     - target: {fileID: 956940607707248733, guid: 72a9fbec98cacae4e8138e005ee5328d,
         type: 3}
       propertyPath: m_Speed
-      value: 0
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1431982829728524995, guid: 72a9fbec98cacae4e8138e005ee5328d,
         type: 3}
@@ -1504,7 +1504,7 @@ Transform:
   m_GameObject: {fileID: 1813277428}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.7, y: 0, z: -47.2}
+  m_LocalPosition: {x: -55.5, y: 0, z: -85.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

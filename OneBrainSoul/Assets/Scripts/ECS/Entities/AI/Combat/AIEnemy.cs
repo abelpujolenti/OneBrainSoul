@@ -74,7 +74,7 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                /*SetRaysDirections();
+                SetRaysDirections();
             
                 CalculateBestAction();
 
@@ -94,7 +94,7 @@ namespace ECS.Entities.AI.Combat
                 }
 
                 _rivalSlot = rivalSlotPosition.rivalSlot;
-                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);*/
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);
 
                 yield return null;
             }

@@ -86,6 +86,8 @@ namespace Managers
                 {
                     continue;
                 }
+                
+                CleanPreviousWayPoints(aiAgentPath.aStarPath.origin, path);
 
                 Vector3 firstPathPosition = path[0].position;
 
@@ -128,6 +130,34 @@ namespace Managers
             {
                 aStarPath.dynamicObstaclesPositions.Add(dynamicObstacle.iPosition.GetPosition());
             }
+        }
+
+        private void CleanPreviousWayPoints(Vector3 origin, List<Node> nodes)
+        {
+            if (nodes.Count < 2)
+            {
+                return;
+            }
+
+            float shortestDistance = Mathf.Infinity;
+            float distanceToNode;
+
+            int closestNodeIndex = 0;
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                distanceToNode = Vector3.Distance(nodes[i].position, origin);
+
+                if (shortestDistance < distanceToNode)
+                {
+                    continue;
+                }
+
+                shortestDistance = distanceToNode;
+                closestNodeIndex = i;
+            }
+            
+            nodes.RemoveRange(0, closestNodeIndex);
         }
 
         private void UpdatePathfinding(int threadNum)

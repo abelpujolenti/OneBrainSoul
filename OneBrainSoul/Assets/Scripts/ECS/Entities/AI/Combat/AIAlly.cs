@@ -51,7 +51,7 @@ namespace ECS.Entities.AI.Combat
                 _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), _navMeshAgentSpecs.radius);
+            //ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), _navMeshAgentSpecs.radius);
             
             InstantiateAttacksColliders();
 
