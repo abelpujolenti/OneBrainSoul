@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ECS.Entities.AI.Combat;
 
-namespace AI.Combat
+namespace AI.Combat.AttackColliders
 {
     public abstract class AIAllyAttackCollider : AIAttackCollider
     {

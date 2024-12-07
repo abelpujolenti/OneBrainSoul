@@ -1,4 +1,5 @@
-﻿using ECS.Components.AI.Combat;
+﻿using AI.Combat.AttackColliders;
+using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
 using UnityEngine;
 

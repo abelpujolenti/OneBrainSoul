@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MessagePack;
 
 namespace Serialize.NavMeshGraph
 {
-    [Serializable]
+    [MessagePackObject]
     public class SerializableGraph
     {
+        [Key(0)]
         public List<SerializableNode> nodes = new List<SerializableNode>();
     }
 }

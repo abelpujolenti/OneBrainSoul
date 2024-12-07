@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AI;
 using AI.Combat;
 using AI.Combat.Ally;
+using AI.Combat.AttackColliders;
 using AI.Combat.Enemy;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;

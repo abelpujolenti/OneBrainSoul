@@ -11,10 +11,10 @@ namespace AI.Navigation
         public IPosition destinationPosition;
         public List<Node> path = new List<Node>();
 
-        public AStarPath(IPosition destinationPosition)
+        public AStarPath(IPosition destinationPosition, NavMeshGraph navMeshGraph)
         {
-            navMeshGraph = new NavMeshGraph();
-            navMeshGraph.LoadGraph();
+            this.navMeshGraph = new NavMeshGraph();
+            this.navMeshGraph.LoadGraph();
             this.destinationPosition = destinationPosition;
         }
 

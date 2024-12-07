@@ -34,7 +34,7 @@ namespace ECS.Entities.AI.Combat
 
                 foreach (Edge edge in currentNode.edges)
                 {
-                    Node neighbor = edge.toNode;
+                    Node neighbor = navMeshGraph.nodes[edge.toNodeIndex];
 
                     if (closedSet.Contains(neighbor))
                     {

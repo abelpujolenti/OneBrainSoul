@@ -148,7 +148,7 @@ namespace Managers
                             continue;
                         }
                         aStarPath.navMeshGraph.UpdateEdgeWeights(threadDynamicObstacles.GetValue()[i], 
-                            _dynamicObstacles[i].radius, 1000);
+                            _dynamicObstacles[i].radius, 100);
                     }
 
                     _updateAgentDestinationSystem.UpdateAgentDestination(threadOrigin.GetValue(), threadDestination.GetValue(), 
@@ -165,12 +165,13 @@ namespace Managers
             {
                 agentId = agentID,
                 iPosition = navMeshAgentComponent.GetTransformComponent(),
-                radius = radius + 10
+                radius = radius + 4
             };
             
             _dynamicObstacles.Add(dynamicObstacle);
             
-            AStarPath aStarPath = new AStarPath(new VectorComponent(navMeshAgentComponent.GetNavMeshAgent().destination));
+            AStarPath aStarPath = new AStarPath(new VectorComponent(navMeshAgentComponent.GetNavMeshAgent().destination),
+                _navMeshGraph);
             
             _navMeshAgentDestinations.Add(agentID, new AIAgentPath
             {
@@ -216,7 +217,7 @@ namespace Managers
             _navMeshAgentDestinations[combatAgentID].aStarPath.destinationPosition = transformComponent;
         }
 
-        private void OnDrawGizmos()
+        /*private void OnDrawGizmos()
         {
             foreach (Node node in _navMeshGraph.nodes.Values)
             {
@@ -241,7 +242,7 @@ namespace Managers
                     Gizmos.DrawLine(aStarPath.path[i].position, aStarPath.path[i + 1].position);
                 }
             }
-        }
+        }*/
 
         private void OnDestroy()
         {

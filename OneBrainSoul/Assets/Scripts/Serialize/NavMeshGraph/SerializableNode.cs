@@ -1,14 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MessagePack;
 using UnityEngine;
 
 namespace Serialize.NavMeshGraph
 {
-    [Serializable]
+    [MessagePackObject]
     public class SerializableNode
     {
+        [Key(0)]
         public uint index;
+        
+        [Key(1)]
         public Vector3 position;
+        
+        [Key(2)]
         public List<SerializableEdge> edges = new List<SerializableEdge>();
     }
 }

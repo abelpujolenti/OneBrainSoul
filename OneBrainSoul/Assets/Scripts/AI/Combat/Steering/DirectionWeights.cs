@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace AI.Combat
+namespace AI.Combat.Steering
 {
     public struct DirectionWeights
     {

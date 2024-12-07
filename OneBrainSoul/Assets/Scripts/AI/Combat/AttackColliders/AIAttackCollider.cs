@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace AI.Combat
+namespace AI.Combat.AttackColliders
 {
     public abstract class AIAttackCollider : MonoBehaviour
     {

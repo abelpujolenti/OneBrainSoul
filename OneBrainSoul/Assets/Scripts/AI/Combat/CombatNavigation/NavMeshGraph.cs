@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Interfaces.AI.Navigation;
+using MessagePack;
 using Serialize.NavMeshGraph;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace AI.Combat.CombatNavigation
 {
-    public class NavMeshGraph
+    public class NavMeshGraph : ICopy<NavMeshGraph>
     {
         public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
 
@@ -89,7 +91,7 @@ namespace AI.Combat.CombatNavigation
 
         private void ConnectNodes(Node fromNode, Node toNode, float triangleSideLength)
         {
-            if (fromNode.edges.Exists(edge => edge.toNode == toNode))
+            if (fromNode.edges.Exists(edge => edge.toNodeIndex == toNode.index))
             {
                 return;
             }
@@ -99,16 +101,16 @@ namespace AI.Combat.CombatNavigation
             
             fromNode.edges.Add(new Edge
             {
-                fromNode = fromNode,
-                toNode = toNode,
+                fromNodeIndex = fromNode.index,
+                toNodeIndex = toNode.index,
                 cost = cost,
                 baseCostMultiplier = baseCostMultiplier
             });
             
             toNode.edges.Add(new Edge
             {
-                fromNode = toNode,
-                toNode = fromNode,
+                fromNodeIndex = toNode.index,
+                toNodeIndex = fromNode.index,
                 cost = cost,
                 baseCostMultiplier = baseCostMultiplier
             });
@@ -120,7 +122,7 @@ namespace AI.Combat.CombatNavigation
             {
                 foreach (Edge edge in node.edges)
                 {
-                    if (Vector3.Distance(edge.toNode.position, obstaclePosition) > radius)
+                    if (Vector3.Distance(nodes[edge.toNodeIndex].position, obstaclePosition) > radius)
                     {
                         continue;
                     }
@@ -161,7 +163,7 @@ namespace AI.Combat.CombatNavigation
             {
                 foreach (Edge edge in node.edges)
                 {
-                    Node toNode = edge.toNode;
+                    Node toNode = nodes[edge.toNodeIndex];
                     
                     if (Vector3.Distance(toNode.position, closestNodePosition) > radius)
                     {
@@ -172,9 +174,14 @@ namespace AI.Combat.CombatNavigation
 
                     foreach (Edge toNodeEdge in toNode.edges)
                     {
-                        if (toNodeEdge.toNode.index != node.index)
+                        if (toNodeEdge.toNodeIndex != node.index)
                         {
                             continue;
+                        }
+
+                        if (Vector3.Distance(nodes[toNodeEdge.toNodeIndex].position, closestNodePosition) < radius)
+                        {
+                            break;
                         }
                         
                         toNodeEdge.MultiplyCost(weightMultiplier);
@@ -220,7 +227,7 @@ namespace AI.Combat.CombatNavigation
                 {
                     serializableNode.edges.Add(new SerializableEdge
                     {
-                        toNodeIndex = edge.toNode.index,
+                        toNodeIndex = edge.toNodeIndex,
                         cost = edge.cost,
                         baseCostMultiplier = edge.baseCostMultiplier
                     });
@@ -229,8 +236,8 @@ namespace AI.Combat.CombatNavigation
                 serializableGraph.nodes.Add(serializableNode);
             }
 
-            string json = JsonUtility.ToJson(serializableGraph, true);
-            File.WriteAllText(GetFilePath(), json);
+            byte[] data = MessagePackSerializer.Serialize(serializableGraph);
+            File.WriteAllBytes(GetFilePath(), data);
         }
 
         public void EraseGraphFile()
@@ -250,12 +257,10 @@ namespace AI.Combat.CombatNavigation
                 Debug.LogError("Missing Graph File");
                 return;
             }
-            
-            string json = File.ReadAllText(GetFilePath());
 
-            SerializableGraph serializableGraph = JsonUtility.FromJson<SerializableGraph>(json);
+            byte[] data = File.ReadAllBytes(GetFilePath());
 
-            Dictionary<uint, Node> nodesByIndex = new Dictionary<uint, Node>();
+            SerializableGraph serializableGraph = MessagePackSerializer.Deserialize<SerializableGraph>(data);
 
             foreach (SerializableNode serializableNode in serializableGraph.nodes)
             {
@@ -268,7 +273,6 @@ namespace AI.Combat.CombatNavigation
                 };
                 
                 nodes.Add(index, node);
-                nodesByIndex.Add(index, node);
             }
 
             foreach (SerializableNode serializableNode in serializableGraph.nodes)
@@ -281,11 +285,12 @@ namespace AI.Combat.CombatNavigation
                     
                     node.edges.Add(new Edge
                     {
-                        fromNode = node,
-                        toNode = toNode,
+                        fromNodeIndex = node.index,
+                        toNodeIndex = toNode.index,
+                        distance = Vector3.Distance(nodes[node.index].position, nodes[toNode.index].position),
                         cost = serializableEdge.cost,
                         defaultCost = serializableEdge.cost,
-                        baseCostMultiplier = 1
+                        baseCostMultiplier = serializableEdge.baseCostMultiplier
                     });
                 }
             }
@@ -294,6 +299,21 @@ namespace AI.Combat.CombatNavigation
         private string GetFilePath()
         {
             return Path.Combine(Application.streamingAssetsPath, "NavMeshGraph.json");
+        }
+
+        public NavMeshGraph Copy()
+        {
+            Dictionary<uint, Node> copyNodes = new Dictionary<uint, Node>();
+            
+            foreach (Node node in nodes.Values)
+            {
+                copyNodes.Add(node.index, node);
+            }
+
+            return new NavMeshGraph
+            {
+                nodes = copyNodes
+            };
         }
     }
 }

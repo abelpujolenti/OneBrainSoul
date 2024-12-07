@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AI.Combat.AttackColliders;
 using ECS.Entities.AI.Combat;
 using Unity.AI.Navigation;
 using UnityEngine;

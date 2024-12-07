@@ -1,6 +1,4 @@
 using System;
-using Interfaces.AI.Navigation;
-using UnityEngine;
 
 namespace Managers
 {
