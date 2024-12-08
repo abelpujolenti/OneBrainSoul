@@ -97,10 +97,6 @@ public class PlayerCharacterController : MonoBehaviour
         CalculateAirTime();
         CalculateCooldowns();
         SwitchModeUpdate();
-        if (movementHandler is HookMovementHandler)
-        {
-            (movementHandler as HookMovementHandler).VisualUpdate(this);
-        }
     }
     
     private void FixedUpdate()

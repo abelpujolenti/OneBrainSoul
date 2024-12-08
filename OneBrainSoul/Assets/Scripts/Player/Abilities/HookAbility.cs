@@ -28,6 +28,11 @@ public class HookAbility : MonoBehaviour
 
     private void Update()
     {
+        if (player.movementHandler is HookMovementHandler)
+        {
+            (player.movementHandler as HookMovementHandler).VisualUpdate(player);
+        }
+
         if (!player.braincell) return;
 
         Vector3 startPos, endPos;

@@ -16,10 +16,10 @@ public class HookMovementHandler : MovementHandler
     public static float bobbingStrength = .6f;
     public static float snapDownwardsStrength = 6f;
 
-    public static float delay = 1f;
+    public static float delay = 0.2f;
     public static float delayHitImpact = 0.025f;
 
-    public static int lineVertices = 10;
+    public static int lineVertices = 2;
 
     Vector3 startPos;
     Vector3 endPos;
@@ -48,17 +48,10 @@ public class HookMovementHandler : MovementHandler
     public void VisualUpdate(PlayerCharacterController player)
     {
         lineStartPos = player.transform.position + new Vector3(0f, 1f, 0f) + player.orientation.right * 2f;
-        if (delayTime < delay + delayHitImpact)
+        line.SetPosition(0, lineStartPos);
+        if (delayTime < delay)
         {
-            if (delayTime < delay)
-            {
-                line.SetPosition(0, lineStartPos);
-                for (int i = 1; i < line.positionCount; i++)
-                {
-                    float lp = ((float)i / line.positionCount);
-                    line.SetPosition(i, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f) * lp);
-                }
-            }
+            line.SetPosition(1, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
         }
     }
 
@@ -73,14 +66,6 @@ public class HookMovementHandler : MovementHandler
         {
             if (delayTime < delay)
             {
-                line.SetPosition(0, lineStartPos);
-                for (int i = 1; i < line.positionCount; i++)
-                {
-                    float lp = ((float)i / line.positionCount);
-                    Vector3 lineStartPosInterpolated = Vector3.Lerp(lineStartPos, prevLineStartPos, lp);
-                    line.SetPosition(i, lineStartPosInterpolated + (endVisualPos - lineStartPosInterpolated) * Mathf.Pow(delayTime / delay, 2f) * lp);
-                }
-                //line.SetPosition(1, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
 
                 if (delayTime + Time.fixedDeltaTime >= delay)
                 {
@@ -101,12 +86,6 @@ public class HookMovementHandler : MovementHandler
 
             delayTime += Time.fixedDeltaTime;
             return;
-        }
-
-        line.SetPosition(0, lineStartPos);
-        for (int i = 1; i < line.positionCount; i++)
-        {
-            line.SetPosition(i, endVisualPos + (lineStartPos - endVisualPos) * ((float)i / line.positionCount));
         }
 
         float progress = 1f - Mathf.Min(1f, distanceToTarget / hookDistance);
@@ -143,7 +122,7 @@ public class HookMovementHandler : MovementHandler
         }
 
         // Jump and switch state to airborne
-        if (player.jumpInput)
+        if (distanceToTarget < hookDistance * .6 && player.jumpInput)
         {
             Vector3 velocity = player.rb.velocity;
             velocity.y = jumpStrength;
@@ -177,6 +156,6 @@ public class HookMovementHandler : MovementHandler
 
     public bool ShouldHoverApply(PlayerCharacterController player)
     {
-        return false;
+        return delayTime < delay;
     }
 }
