@@ -56,11 +56,13 @@ namespace ECS.Entities.AI.Combat
             {
                 return;
             }
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), _navMeshAgentSpecs.radius, true);
             _updateCoroutine = StartCoroutine(UpdateCoroutine());
         }
 
         protected virtual void StopUpdate()
         {
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), false);
             StopCoroutine(_updateCoroutine);
             _updateCoroutine = null;
         }

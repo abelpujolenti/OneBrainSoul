@@ -39,7 +39,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _EdgeWeight: 0.49
-    - _Fade: 1.2
+    - _Fade: 0
     - _Power: 2.46
     - _Progress: 0.9999999
     - _Speed: 0.4

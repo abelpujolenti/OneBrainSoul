@@ -34,7 +34,6 @@ namespace ECS.Entities.AI.Navigation
             _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, ownTransform);
             _positionComponent = new VectorComponent(ownTransform.position);
             _rotationSpeed = _navMeshAgentSpecs.rotationSpeed;
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(_agentId, _navMeshAgentComponent, _navMeshAgentSpecs.radius, true);
         }
 
         public void ContinueNavigation()

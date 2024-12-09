@@ -117,9 +117,7 @@ public class BraincellManager : Singleton<BraincellManager>
         c.display.SetActive(false);
         c.allyIcon.gameObject.SetActive(false);
         c.braincell = true;
-        AIAlly aiComponent = c.GetComponent<AIAlly>();
-        aiComponent.SetAI(false);
-        ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(aiComponent.GetAgentID(), false);
+        c.GetComponent<AIAlly>().SetAI(false);
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
     {

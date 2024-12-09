@@ -8,7 +8,7 @@ namespace Managers
 
         public static GameManager Instance => _instance;
 
-        private int TERRAIN_LAYER = 6;
+        private int GROUND_LAYER = 6;
         private int ALLY_LAYER = 8;
         private int ENEMY_LAYER = 9;
         private int ALLY_ATTACK_ZONE = 10;
@@ -40,7 +40,7 @@ namespace Managers
 
         public int GetGroundLayer()
         {
-            return TERRAIN_LAYER;
+            return GROUND_LAYER;
         }
 
         public int GetAllyAttackZoneLayer()

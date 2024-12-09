@@ -9,6 +9,7 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -74,6 +75,8 @@ namespace Managers
 
         private void Update()
         {
+            int counter = 0;
+            
             foreach (AIAgentPath aiAgentPath in _navMeshAgentDestinations.Values)
             {
                 UpdateOwnPosition(aiAgentPath);
@@ -216,7 +219,8 @@ namespace Managers
             }
         }
 
-        public void AddNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent, float radius, bool addObstacle)
+        public void AddNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent, float radius, 
+            bool addObstacle)
         {
             DynamicObstacle dynamicObstacle = new DynamicObstacle
             {

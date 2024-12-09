@@ -137,7 +137,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override IEnumerator UpdateCoroutine()
         {
-            while (true)
+            while (_isAI)
             {
                 UpdateVisibleRivals();
 

@@ -67,7 +67,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     public float airTime = 0f;
     public float switchModeTime = 0f;
-    void Start()
+    
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         capsuleCollider = GetComponent<CapsuleCollider>();
@@ -101,6 +102,11 @@ public class PlayerCharacterController : MonoBehaviour
     
     private void FixedUpdate()
     {
+        if (!braincell)
+        {
+            return;
+        }
+        
         if (movementHandler.ShouldGravityApply(this))
         {
             ApplyGravity();
@@ -204,7 +210,7 @@ public class PlayerCharacterController : MonoBehaviour
         crosshair.color = color;
     }
 
-    public void SwitchModeUpdate()
+    private void SwitchModeUpdate()
     {
         bool cantSwitchMode = !switchModeInput || !canSwitch || !braincell || BraincellManager.Instance.transitionTime > 0f;
         if (cantSwitchMode)

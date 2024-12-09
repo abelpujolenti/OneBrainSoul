@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7644145240796908984}
   - component: {fileID: 6350386376657103053}
   - component: {fileID: 5104957741736639978}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: MainCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 887
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -192,7 +192,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 301469152948751642}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: HandPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -228,7 +228,7 @@ GameObject:
   - component: {fileID: 8275365412269149692}
   - component: {fileID: 195006541717640613}
   - component: {fileID: 3285412609865432510}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Prism
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -639,7 +639,7 @@ GameObject:
   - component: {fileID: 4267798134730583719}
   - component: {fileID: 4320312562640258992}
   - component: {fileID: 6312260743759310385}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Ally2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,7 +719,7 @@ GameObject:
   - component: {fileID: -2555739445945369257}
   - component: {fileID: 7776869638404985418}
   - component: {fileID: 5856710922157649806}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -792,7 +792,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
 --- !u!114 &7820339696052967221
@@ -914,7 +914,7 @@ GameObject:
   - component: {fileID: 2671953530919789390}
   - component: {fileID: 436881422192152795}
   - component: {fileID: 4238837327426350416}
-  m_Layer: 28
+  m_Layer: 26
   m_Name: AllyIcon (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -990,7 +990,7 @@ GameObject:
   - component: {fileID: 8659892158976705853}
   - component: {fileID: 5728119426100460355}
   - component: {fileID: 8029337504561334678}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: SwitchModeCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1129,7 +1129,7 @@ GameObject:
   - component: {fileID: 7170584298990829900}
   - component: {fileID: 6204130812804119031}
   - component: {fileID: 1010239381884222000}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Ally1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1202,7 +1202,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8380892262115305480}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1234,7 +1234,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3847149850536155639}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: WeaponRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1268,7 +1268,7 @@ GameObject:
   - component: {fileID: 3507793948814777749}
   - component: {fileID: 4207550723984864711}
   - component: {fileID: 315589887326659704}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1403,7 +1403,7 @@ GameObject:
   - component: {fileID: 6219713404791631710}
   - component: {fileID: 7530126606493837279}
   - component: {fileID: 5020109240226740469}
-  m_Layer: 27
+  m_Layer: 25
   m_Name: AllyIconCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1502,7 +1502,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7876644653598473924}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Orientation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1537,7 +1537,7 @@ GameObject:
   - component: {fileID: 736003032451647815}
   - component: {fileID: 4409742307645895032}
   - component: {fileID: 8385362624982230559}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: OverlayCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1680,7 +1680,7 @@ GameObject:
   - component: {fileID: 7771235344176104380}
   - component: {fileID: 4957578056679314656}
   - component: {fileID: 5375709618186088358}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Prism
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2092,7 +2092,7 @@ GameObject:
   - component: {fileID: 5055274806261368462}
   - component: {fileID: 254329688868165490}
   - component: {fileID: 3112405844205883011}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: SwitchModeOverlayCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2153,7 +2153,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 402653184
+    m_Bits: 0
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2234,7 +2234,7 @@ GameObject:
   - component: {fileID: 6518029982840348272}
   - component: {fileID: 5013835759179681323}
   - component: {fileID: 254727464900120472}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2335,7 +2335,7 @@ GameObject:
   - component: {fileID: 6885802238494448433}
   - component: {fileID: 8911190619241111182}
   - component: {fileID: 4343571673907734342}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2411,7 +2411,7 @@ GameObject:
   - component: {fileID: 1733957334044902545}
   - component: {fileID: 5740067241382577104}
   - component: {fileID: 8607864521931395038}
-  m_Layer: 28
+  m_Layer: 26
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2510,7 +2510,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 571497645259441326}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: HandAnim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2545,7 +2545,7 @@ GameObject:
   - component: {fileID: 1830322163880379303}
   - component: {fileID: 90294645647083035}
   - component: {fileID: 5122525329779642324}
-  m_Layer: 27
+  m_Layer: 25
   m_Name: AllyIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2637,7 +2637,7 @@ GameObject:
   - component: {fileID: 7927389895038908694}
   - component: {fileID: 8717914475790281853}
   - component: {fileID: 4917832900053020527}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2739,7 +2739,7 @@ GameObject:
   - component: {fileID: 5721293560174527988}
   - component: {fileID: 6146867450392710301}
   - component: {fileID: 1259152054302789281}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: SwichModeUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2866,7 +2866,7 @@ GameObject:
   - component: {fileID: 2009339665420481395}
   - component: {fileID: 6260910306295680330}
   - component: {fileID: 8567426508853251648}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2975,7 +2975,7 @@ GameObject:
   - component: {fileID: 7338558189138718659}
   - component: {fileID: 2665514588454964944}
   - component: {fileID: 5748685934486888504}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: SpeedLinesVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3247,7 +3247,7 @@ PrefabInstance:
     - target: {fileID: 2029293622190952914, guid: 00ddc2be3251afc4ca3a5869efe83160,
         type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3772582932084825477, guid: 00ddc2be3251afc4ca3a5869efe83160,
         type: 3}
