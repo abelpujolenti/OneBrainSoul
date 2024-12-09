@@ -11,6 +11,7 @@ using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
 using Managers;
 using UnityEngine;
+using Utilities;
 
 namespace ECS.Entities.AI.Combat
 {
@@ -142,7 +143,7 @@ namespace ECS.Entities.AI.Combat
 
                 UpdateVectorToRival();
 
-                UpdateDistancesToEnemiesThatTargetsMe();
+                UpdateVectorsToEnemiesThatTargetsMe();
 
                 if (_context.IsAttacking())
                 {
@@ -193,10 +194,13 @@ namespace ECS.Entities.AI.Combat
             _enemiesThatTargetsMe = CombatManager.Instance.FilterEnemiesThatTargetsMe(GetAgentID(), _visibleRivals);
         }
 
-        private void UpdateDistancesToEnemiesThatTargetsMe()
+        private void UpdateVectorsToEnemiesThatTargetsMe()
         {
-            _context.SetDistancesToEnemiesThatThreatMe(
-                CombatManager.Instance.GetDistancesToGivenEnemies(transform.position, _enemiesThatTargetsMe));
+            (List<Vector3>, List<float>) vectorsAndDistancesToEnemies =
+                CombatManager.Instance.GetVectorsAndDistancesToGivenEnemies(transform.position, _enemiesThatTargetsMe);
+            
+            _context.SetVectorsToEnemiesThatTargetsMe(vectorsAndDistancesToEnemies.Item1);
+            _context.SetDistancesToEnemiesThatTargetsMe(vectorsAndDistancesToEnemies.Item2);
         }
 
         #endregion
@@ -227,14 +231,74 @@ namespace ECS.Entities.AI.Combat
         {
             ContinueNavigation();
 
+            _numberOfVicinityRays *= 2;
+
             _raysOpeningAngle = 360f;
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(),positionToDodge);
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), positionToDodge);
         }
 
         public void Flee()
         {
+            //Debug.Log("Fleeing");
+            
             ContinueNavigation();
+
+            List<float> angles = new List<float>();
+
+            foreach (Vector3 vector in _context.GetVectorsToEnemiesThatTargetsMe())
+            {
+                angles.Add(MathUtil.VectorToAngle(-vector));   
+            }
+            
+            angles.Sort();
+
+            float shortestDistanceToNextAngle = Mathf.Infinity;
+
+            int chosenAngleIndex = 0;
+            
+            float currentAngle;
+            float nextAngle;
+            float currentDistanceToNextAngle;
+
+            int anglesCount = angles.Count;
+
+            for (int i = 0; i < anglesCount; i++)
+            {
+                currentAngle = angles[i];
+                nextAngle = angles[(i + 1) % (anglesCount - 1)];
+
+                if (currentAngle > nextAngle)
+                {
+                    currentDistanceToNextAngle = Math.Abs(currentAngle + (360 - nextAngle));
+                }
+                else
+                {
+                    currentDistanceToNextAngle = nextAngle - currentAngle;
+                }
+
+                if (shortestDistanceToNextAngle > currentDistanceToNextAngle)
+                {
+                    continue;
+                }
+
+                chosenAngleIndex = i;
+            }
+
+            if (chosenAngleIndex == anglesCount - 1)
+            {
+                shortestDistanceToNextAngle = Math.Abs(angles[chosenAngleIndex] + (360 - angles[0]));
+            }
+            else
+            {
+                shortestDistanceToNextAngle = angles[chosenAngleIndex + 1] - angles[chosenAngleIndex];
+            }
+
+            Vector3 position = MathUtil.AngleToVector(angles[chosenAngleIndex] + shortestDistanceToNextAngle / 2);
+
+            position *= _context.GetSafetyRadius() * 2;
+            
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), new VectorComponent(position));
         }
 
         #endregion

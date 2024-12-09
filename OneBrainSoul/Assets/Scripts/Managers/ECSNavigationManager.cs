@@ -105,7 +105,7 @@ namespace Managers
                 path.RemoveAt(0);
             }
             
-            _mainThreadQueue.Execute(5);
+            //_mainThreadQueue.Execute(5);
         }
 
         private void UpdateOwnPosition(AIAgentPath aiAgentPath)
@@ -292,8 +292,10 @@ namespace Managers
             }
         }
 
-        private void RemoveDynamicObstacle(DynamicObstacle dynamicObstacle)
+        private void RemoveDynamicObstacle(uint obstacleID)
         {
+            DynamicObstacle dynamicObstacle = _dynamicObstaclesID[obstacleID];
+            
             foreach (AIAgentPath aiAgentPath in _navMeshAgentDestinations.Values)
             {
                 aiAgentPath.aStarPath.dynamicObstacles.Remove(dynamicObstacle);
@@ -303,6 +305,7 @@ namespace Managers
         public void RemoveNavMeshAgentEntity(uint agentID)
         {
             _navMeshAgentDestinations.Remove(agentID);
+            RemoveDynamicObstacle(agentID);
         }
 
         public IPosition GetNavMeshAgentDestination(uint agentID)

@@ -26,7 +26,7 @@ namespace AI.Combat.Position
                 };
             }
             
-            float angle = CalculateAngle(-direction);
+            float angle = MathUtil.VectorToAngle(-direction);
             float subtendedAngle = CalculateSubtendedAngle(radius) + 10;
 
             PriorityQueue<float> angles = new PriorityQueue<float>();
@@ -207,7 +207,7 @@ namespace AI.Combat.Position
 
         private Vector3 CalculateDeviationVector(float angle, float radius)
         {
-            float radians = AngleToRadians(angle);
+            float radians = MathUtil.AngleToRadians(angle);
 
             Vector3 deviationVector = new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians)).normalized;
 
@@ -219,25 +219,11 @@ namespace AI.Combat.Position
             _rivalSlots.Remove(agentID);
         }
 
-        private float CalculateAngle(Vector3 position)
-        {
-            float radians = Mathf.Atan2(position.z, position.x);
-            
-            float angle = RadiansToAngle(radians) % 360;
-
-            if (angle < 0)
-            {
-                angle += 360;
-            }
-
-            return angle;
-        }
-
         private float CalculateSubtendedAngle(float radius)
         {
             float radians = 2 * Mathf.Asin(radius / _radiusFromAgent);
 
-            return RadiansToAngle(radians);
+            return MathUtil.RadiansToAngle(radians);
         }
 
         private bool CheckIfAngleIsBetweenRange(float angleToCheck, float minimumAngeRange, float maximumAngleRange,
@@ -246,16 +232,6 @@ namespace AI.Combat.Position
             return wraps0 
                 ? angleToCheck > minimumAngeRange ^ angleToCheck < maximumAngleRange
                 : angleToCheck > minimumAngeRange && angleToCheck < maximumAngleRange;
-        }
-
-        private float AngleToRadians(float angle)
-        {
-            return angle * (Mathf.PI / 180);
-        }
-
-        private float RadiansToAngle(float radians)
-        {
-            return radians * (180 / Mathf.PI);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using AI;
+using AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 

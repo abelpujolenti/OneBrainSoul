@@ -137,18 +137,23 @@ namespace Managers
             return visibleRivals;
         }
 
-        public List<float> GetDistancesToGivenEnemies(Vector3 position, List<uint> enemies)
+        public (List<Vector3>, List<float>) GetVectorsAndDistancesToGivenEnemies(Vector3 position, List<uint> enemies)
         {
+            List<Vector3> vectorsToEnemies = new List<Vector3>();
             List<float> distancesToEnemies = new List<float>();
 
             foreach (uint enemyID in enemies)
             {
                 AIEnemy enemy = _aiEnemies[enemyID];
+
+                Vector3 vector = enemy.transform.position - position;
                 
-                distancesToEnemies.Add((enemy.transform.position - position).magnitude - enemy.GetContext().GetRadius());
+                vectorsToEnemies.Add(vector);
+                
+                distancesToEnemies.Add(vector.magnitude - enemy.GetContext().GetRadius());
             }
 
-            return distancesToEnemies;
+            return (vectorsToEnemies, distancesToEnemies);
         }
 
         public void CalculateBestAction(AIAlly ally)

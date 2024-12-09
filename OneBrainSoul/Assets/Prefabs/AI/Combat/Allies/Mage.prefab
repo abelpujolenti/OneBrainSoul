@@ -66,12 +66,12 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: fda4f69eea2651141ba527f461fefedc,
         type: 3}
       propertyPath: m_Name
-      value: Melee Enemy
+      value: Mage
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fda4f69eea2651141ba527f461fefedc,
         type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -101,7 +101,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fda4f69eea2651141ba527f461fefedc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3452899564632521680}
+      addedObject: {fileID: 294764915273015517}
   m_SourcePrefab: {fileID: 100100000, guid: fda4f69eea2651141ba527f461fefedc, type: 3}
 --- !u!1 &1431982829728524995 stripped
 GameObject:
@@ -217,10 +217,10 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1431982829728524995}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 1.154049
   m_Speed: 7
-  m_Acceleration: 8
+  m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 1000
   m_StoppingDistance: 0.1
@@ -231,7 +231,7 @@ NavMeshAgent:
   m_BaseOffset: 2.5683727
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 0
---- !u!114 &3452899564632521680
+--- !u!114 &294764915273015517
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -240,9 +240,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1431982829728524995}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 086047b1b0635654383c5220bfa52146, type: 3}
+  m_Script: {fileID: 11500000, guid: 94a9a2c11ba7ee846b7619a8edc78f9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _navMeshAgentSpecs: {fileID: 11400000, guid: fbd6b8ac878a9194fb62cdbd901148af, type: 2}
+  _navMeshAgentSpecs: {fileID: 11400000, guid: ca6bb8101158fda45ab9f01231c0c88a, type: 2}
   _navMeshAgent: {fileID: 956940607707248733}
-  _aiEnemySpecs: {fileID: 11400000, guid: 076492a5609594c47abb6f1e66f6fc3a, type: 2}
+  _aiAllySpecs: {fileID: 11400000, guid: d7d6f11852eb02948abdf45086dc75f8, type: 2}
+  _isAI: 1

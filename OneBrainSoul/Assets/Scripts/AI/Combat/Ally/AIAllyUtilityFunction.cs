@@ -71,19 +71,8 @@ namespace AI.Combat.Ally
             {
                 return 0;
             }
-
-            /*if (allyGetCloserToRivalUtility.GetStoppingDistance() > allyGetCloserToRivalUtility.GetRemainingDistance())
-            {
-                Debug.Log(allyGetCloserToRivalUtility.GetStoppingDistance() + " " + allyGetCloserToRivalUtility.GetRemainingDistance());
-                return 0;
-            }*/
-
-            if (allyGetCloserToRivalUtility.IsUnderAttack())
-            {
-                return 0.3f;
-            }
             
-            return 0.9f;
+            return 0.7f;
         }
 
         private static float CalculateAttackUtility(IAllyAttackUtility allyAttackUtility)
@@ -127,15 +116,16 @@ namespace AI.Combat.Ally
                 return 1;
             }
 
-            List<float> distancesToEnemies = allyFleeUtility.GetDistancesToEnemiesThatThreatMe();
-            float alertRadius = allyFleeUtility.GetAlertRadius();
+            List<float> distancesToEnemies = allyFleeUtility.GetDistancesToEnemiesThatTargetsMe();
+
+            float radius = allyFleeUtility.IsFleeing() ? allyFleeUtility.GetAlertRadius() : allyFleeUtility.GetSafetyRadius();
 
             uint minimumEnemiesAroundToFlee = allyFleeUtility.GetMinimumEnemiesAroundToFlee();
             uint enemiesCounter = 0;
 
             foreach (float distance in distancesToEnemies)
             {
-                if (distance > alertRadius)
+                if (distance > radius)
                 {
                     continue;
                 }

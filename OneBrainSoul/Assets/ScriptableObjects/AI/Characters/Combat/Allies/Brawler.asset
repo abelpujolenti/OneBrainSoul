@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c205ed4a8dc4f22b59005f924dd887b, type: 3}
-  m_Name: Test AI Ally
+  m_Name: Brawler
   m_EditorClassIdentifier: 
   totalHealth: 10
   rivalsPositionRadius: 4

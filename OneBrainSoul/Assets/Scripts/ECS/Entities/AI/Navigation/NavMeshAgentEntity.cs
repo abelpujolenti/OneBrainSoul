@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using AI;
+using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using Interfaces.AI.Navigation;
 using Managers;
@@ -29,6 +30,7 @@ namespace ECS.Entities.AI.Navigation
         {
             _agentId = (uint)gameObject.GetInstanceID();
             Transform ownTransform = transform;
+            _navMeshAgent.speed = _navMeshAgentSpecs.speed;
             _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, ownTransform);
             _positionComponent = new VectorComponent(ownTransform.position);
             _rotationSpeed = _navMeshAgentSpecs.rotationSpeed;
