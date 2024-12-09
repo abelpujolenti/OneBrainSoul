@@ -5,6 +5,7 @@ using AI;
 using AI.Combat;
 using AI.Combat.Ally;
 using AI.Combat.AttackColliders;
+using AI.Combat.Enemy;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
@@ -15,9 +16,11 @@ using Utilities;
 
 namespace ECS.Entities.AI.Combat
 {
-    public class AIAlly : AICombatAgentEntity<AIAllyContext, AllyAttackComponent, DamageComponent>
+    public class AIAlly : AICombatAgentEntity<AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>
     {
         [SerializeField] private AIAllySpecs _aiAllySpecs;
+
+        private AIAllyUtilityFunction _aiAllyUtilityFunction = new AIAllyUtilityFunction();
 
         private List<uint> _enemiesThatTargetsMe = new List<uint>();
 
@@ -30,6 +33,8 @@ namespace ECS.Entities.AI.Combat
 
         private void Start()
         {
+            _utilityFunction = new AIAllyUtilityFunction();
+            InitiateDictionaries();
             Setup();
             InstantiateAttackComponents(_aiAllySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
@@ -60,6 +65,20 @@ namespace ECS.Entities.AI.Combat
             }
             
             base.StartUpdate();
+        }
+
+        protected override void InitiateDictionaries()
+        {
+            _actions = new Dictionary<AIAllyAction, Action>
+            {
+                { AIAllyAction.FOLLOW_PLAYER , FollowPlayer},
+                { AIAllyAction.CHOOSE_NEW_RIVAL , RequestRival },
+                { AIAllyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival},
+                { AIAllyAction.ROTATE , Rotate},
+                { AIAllyAction.ATTACK , Attack},
+                { AIAllyAction.FLEE , Flee},
+                { AIAllyAction.DODGE_ATTACK , Dodge}
+            };
         }
 
         private void InstantiateAttackComponents(List<AIAllyAttack> attacks)
@@ -201,9 +220,8 @@ namespace ECS.Entities.AI.Combat
 
         protected override void UpdateVisibleRivals()
         {
-            _visibleRivals = CombatManager.Instance.GetVisibleRivals
-                <AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent, 
-                    AIAllyContext, AllyAttackComponent, DamageComponent>(this);
+            _visibleRivals = CombatManager.Instance.GetVisibleRivals<AIEnemy, AIEnemyContext, AttackComponent, 
+                AllyDamageComponent, AIEnemyAction, AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>(this);
 
             _context.SetIsSeeingARival(_visibleRivals.Count != 0);
 
@@ -221,21 +239,75 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        #region UBS
-
-        
-
-        #endregion
-
         #region FSM
 
-        protected override void CalculateBestAction()
+        private void FollowPlayer()
         {
-            CombatManager.Instance.CalculateBestAction(this);
+            ShowActionDebugLogs(name + " Following Player");
         }
 
-        public void Attack()
+        private void RequestRival()
         {
+            ShowActionDebugLogs(name + " Requesting Rival");
+
+            if (_visibleRivals.Count == 0)
+            {
+                return;
+            }
+
+            List<uint> possibleRivals = CombatManager.Instance.GetPossibleRivals(_visibleRivals);
+
+            if (possibleRivals.Count == 0)
+            {
+                return;
+            }
+
+            uint targetID = ObtainTargetID(possibleRivals);
+            
+            OnTargetAcquired(targetID, CombatManager.Instance.RequestEnemy(targetID).GetContext());
+        }
+
+        private uint ObtainTargetID(List<uint> possibleRivals)
+        {
+            uint targetID;
+
+            if (possibleRivals.Count == 1)
+            {
+                targetID = possibleRivals[0];
+            }
+            else
+            {
+                targetID = CombatManager.Instance.GetClosestRivalID<AIEnemy, AIEnemyContext, AttackComponent,
+                    AllyDamageComponent, AIEnemyAction>(GetNavMeshAgentComponent().GetTransformComponent(),
+                    possibleRivals, AIAgentType.ENEMY);
+            }
+
+            return targetID;
+        }
+
+        private void OnTargetAcquired(uint enemyID, AIEnemyContext enemyContext)
+        {
+            SetRivalIndex(enemyID);
+            SetRivalRadius(enemyContext.GetRadius());
+            SetHasATarget(true);
+            SetEnemyHealth(enemyContext.GetHealth());
+            SetEnemyMaximumStress(enemyContext.GetMaximumStress());
+            SetEnemyCurrentStress(enemyContext.GetCurrentStress());
+            SetRivalTransform(enemyContext.GetAgentTransform());
+        }
+
+        private void GetCloserToRival()
+        {
+            ShowActionDebugLogs(name + " Getting Closer To Rival");
+            
+            SetDestination(CombatManager.Instance.RequestEnemy(_context.GetRivalID())
+                .GetNavMeshAgentComponent().GetTransformComponent());
+        }
+
+        private void Attack()
+        {
+            ShowActionDebugLogs(name + " Attacking");
+            
             AllyAttackComponent attackComponent = ReturnNextAttack();
             
             Attacking();
@@ -243,20 +315,9 @@ namespace ECS.Entities.AI.Combat
             StartCastingAnAttack(attackComponent);
         }
 
-        public void DodgeAttack(VectorComponent positionToDodge)
+        private void Flee()
         {
-            ContinueNavigation();
-
-            _numberOfVicinityRays *= 2;
-
-            _raysOpeningAngle = 360f;
-            
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), positionToDodge);
-        }
-
-        public void Flee()
-        {
-            //Debug.Log("Fleeing");
+            ShowActionDebugLogs(name + " Fleeing");
             
             ContinueNavigation();
 
@@ -269,6 +330,17 @@ namespace ECS.Entities.AI.Combat
             
             angles.Sort();
 
+            (int, float) widerSubtendedAngle = GetWiderSubtendedAngle(angles);
+
+            Vector3 position = MathUtil.AngleToVector(angles[widerSubtendedAngle.Item1] + widerSubtendedAngle.Item2 / 2);
+
+            position *= _context.GetSafetyRadius() * 2;
+            
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), new VectorComponent(position));
+        }
+
+        private (int, float) GetWiderSubtendedAngle(List<float> angles)
+        {
             float shortestDistanceToNextAngle = Mathf.Infinity;
 
             int chosenAngleIndex = 0;
@@ -298,23 +370,27 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
 
+                shortestDistanceToNextAngle = currentDistanceToNextAngle;
                 chosenAngleIndex = i;
             }
 
-            if (chosenAngleIndex == anglesCount - 1)
-            {
-                shortestDistanceToNextAngle = Math.Abs(angles[chosenAngleIndex] + (360 - angles[0]));
-            }
-            else
-            {
-                shortestDistanceToNextAngle = angles[chosenAngleIndex + 1] - angles[chosenAngleIndex];
-            }
+            return (chosenAngleIndex, shortestDistanceToNextAngle);
+        }
 
-            Vector3 position = MathUtil.AngleToVector(angles[chosenAngleIndex] + shortestDistanceToNextAngle / 2);
-
-            position *= _context.GetSafetyRadius() * 2;
+        private void Dodge()
+        {
+            return;
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), new VectorComponent(position));
+            ContinueNavigation();
+
+            //TODO
+            VectorComponent positionToDodge = new VectorComponent(new Vector3());
+
+            _numberOfVicinityRays *= 2;
+
+            _raysOpeningAngle = 360f;
+            
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), positionToDodge);
         }
 
         #endregion
@@ -437,9 +513,15 @@ namespace ECS.Entities.AI.Combat
                 yield break;
             }
             
-            RotateToNextPathCorner();
             PutAttackOnCooldown(allyAttackComponent);
             attackCollider.Deactivate();
+
+            if (!_isAI)
+            {
+                yield break;
+            }
+            
+            RotateToNextPathCorner();   
         }
 
         private IEnumerator StartDamageOverTime(AllyAttackComponent allyAttackComponent, 
@@ -450,10 +532,16 @@ namespace ECS.Entities.AI.Combat
                 allyAttackComponent.DecreaseRemainingTimeDealingDamage();
                 yield return null;
             }
-           
-            RotateToNextPathCorner();
+            
             PutAttackOnCooldown(allyAttackComponent);
             attackCollider.Deactivate();
+
+            if (!_isAI)
+            {
+                yield break;
+            }
+            
+            RotateToNextPathCorner();    
         }
 
         private IEnumerator StartCooldownCoroutine(AllyAttackComponent allyAttackComponent)
@@ -557,7 +645,7 @@ namespace ECS.Entities.AI.Combat
             CalculateIfCanDefeatEnemy();
         }
 
-        public void SetEnemyMaximumStress(float enemyMaximumStress)
+        private void SetEnemyMaximumStress(float enemyMaximumStress)
         {
             _context.SetRivalMaximumStress(enemyMaximumStress);
         }
