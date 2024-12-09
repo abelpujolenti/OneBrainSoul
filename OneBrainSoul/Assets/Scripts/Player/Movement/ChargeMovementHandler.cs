@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 
 public class ChargeMovementHandler : MovementHandler
@@ -58,7 +59,7 @@ public class ChargeMovementHandler : MovementHandler
         player.rb.AddForce(-horizontalVelocity * horizontalDrag, ForceMode.Acceleration);
 
         RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, chargeDirection, out hit, player.rb.velocity.magnitude * 0.04f, 127, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(player.transform.position, chargeDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
         {
             DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
             bool hitTerrain = destructibleTerrain != null;

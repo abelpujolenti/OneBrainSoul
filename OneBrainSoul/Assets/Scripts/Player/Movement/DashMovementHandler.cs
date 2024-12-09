@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 
 public class DashMovementHandler : MovementHandler
@@ -44,7 +45,7 @@ public class DashMovementHandler : MovementHandler
         player.rb.AddForce(-horizontalVelocity * (player.onGround ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
 
         RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, dashDirection, out hit, player.rb.velocity.magnitude * 0.04f, 127, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(player.transform.position, dashDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
         {
             DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
             if (entity != null)

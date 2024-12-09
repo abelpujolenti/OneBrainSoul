@@ -118,6 +118,7 @@ public class BraincellManager : Singleton<BraincellManager>
         c.allyIcon.gameObject.SetActive(false);
         c.braincell = true;
         c.GetComponent<AIAlly>().SetAI(false);
+        c.rb.interpolation = RigidbodyInterpolation.Interpolate;
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
     {
@@ -126,5 +127,6 @@ public class BraincellManager : Singleton<BraincellManager>
         c.allyIcon.gameObject.SetActive(true);
         c.braincell = false;
         c.GetComponent<AIAlly>().SetAI(true);
+        c.rb.interpolation = RigidbodyInterpolation.None;
     }
 }

@@ -1,3 +1,4 @@
+using Managers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -38,7 +39,7 @@ public class HookAbility : MonoBehaviour
         Vector3 startPos, endPos;
         Vector3 dir = player.cam.transform.forward;
         startPos = player.transform.position + new Vector3(0f, .5f, 0f);
-        bool landed = Physics.SphereCast(startPos + dir * 2f, radius, dir, out hit, range, 127, QueryTriggerInteraction.Ignore);
+        bool landed = Physics.SphereCast(startPos + dir * 2f, radius, dir, out hit, range, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore);
 
         if (landed)
         {
@@ -63,7 +64,7 @@ public class HookAbility : MonoBehaviour
             RaycastHit ledgeHit;
             ledgeSnapLeniency = 4f;
             Vector3 dirNoY = new Vector3(dir.x, 0f, dir.z).normalized; 
-            bool ledgeFound = Physics.SphereCast(hit.point + dirNoY * .15f + ledgeSnapLeniency * Vector3.up, .5f, Vector3.down, out ledgeHit, ledgeSnapLeniency, 127, QueryTriggerInteraction.Ignore);
+            bool ledgeFound = Physics.SphereCast(hit.point + dirNoY * .15f + ledgeSnapLeniency * Vector3.up, .5f, Vector3.down, out ledgeHit, ledgeSnapLeniency, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore);
             ledgeFound &= ledgeHit.point != Vector3.zero;
             ledgeFound &= Vector3.Dot(Vector3.up, ledgeHit.normal) > ledgeSnapNormalThreshold;
             ledgeFound &= Mathf.Abs(Vector3.Dot(hit.normal, ledgeHit.normal)) < 0.3f;

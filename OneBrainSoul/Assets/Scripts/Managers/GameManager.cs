@@ -9,6 +9,7 @@ namespace Managers
         public static GameManager Instance => _instance;
 
         private int GROUND_LAYER = 6;
+        private int INTERACTABLE_LAYER = 7;
         private int ALLY_LAYER = 8;
         private int ENEMY_LAYER = 9;
         private int ALLY_ATTACK_ZONE = 10;
@@ -26,6 +27,11 @@ namespace Managers
             }
             
             Destroy(gameObject);
+        }
+
+        public int GetInteractableLayer()
+        {
+            return INTERACTABLE_LAYER;
         }
 
         public int GetAllyLayer()
@@ -51,6 +57,11 @@ namespace Managers
         public int GetEnemyAttackZoneLayer()
         {
             return ENEMY_ATTACK_ZONE;
+        }
+
+        public int GetRaycastLayers()
+        {
+            return GetInteractableLayer() | GetAllyLayer() | GetGroundLayer() | GetEnemyLayer() | 1;
         }
     }
 }

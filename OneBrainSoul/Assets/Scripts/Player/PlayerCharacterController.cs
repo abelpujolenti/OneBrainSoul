@@ -78,10 +78,12 @@ public class PlayerCharacterController : MonoBehaviour
         {
             display.SetActive(false);
             allyIcon.gameObject.SetActive(false);
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
         else
         {
             cam.gameObject.SetActive(false);
+            rb.interpolation = RigidbodyInterpolation.None;
         }
         movementHandler = new GroundedMovementHandler();
         uiCanvas.gameObject.SetActive(true);
