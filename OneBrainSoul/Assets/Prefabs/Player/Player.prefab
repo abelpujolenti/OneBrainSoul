@@ -717,6 +717,8 @@ GameObject:
   - component: {fileID: 7820339696052967221}
   - component: {fileID: 5004512723018151163}
   - component: {fileID: -2555739445945369257}
+  - component: {fileID: 7776869638404985418}
+  - component: {fileID: 5856710922157649806}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -811,6 +813,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   jumps: 1
+  moveSpeedMultiplier: 1
+  pressToHover: 0
   ability1Cooldown: 3
   ability2Cooldown: 5
   gravityStrength: 32
@@ -861,6 +865,44 @@ MonoBehaviour:
   maxHealth: 999999
   damageCooldown: 0.4
   damageEffectDuration: 0.35
+--- !u!195 &7776869638404985418
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2647467613226330651}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 20
+  avoidancePriority: 50
+  m_AngularSpeed: 1000
+  m_StoppingDistance: 0.1
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2.5
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 0
+--- !u!114 &5856710922157649806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2647467613226330651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a9a2c11ba7ee846b7619a8edc78f9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _navMeshAgentSpecs: {fileID: 0}
+  _navMeshAgent: {fileID: 7776869638404985418}
+  _aiAllySpecs: {fileID: 0}
+  _isAI: 0
 --- !u!1 &2866942340978029141
 GameObject:
   m_ObjectHideFlags: 0

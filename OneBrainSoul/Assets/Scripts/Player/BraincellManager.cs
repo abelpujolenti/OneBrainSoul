@@ -1,3 +1,5 @@
+using ECS.Entities.AI.Combat;
+using Managers;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -115,6 +117,9 @@ public class BraincellManager : Singleton<BraincellManager>
         c.display.SetActive(false);
         c.allyIcon.gameObject.SetActive(false);
         c.braincell = true;
+        AIAlly aiComponent = c.GetComponent<AIAlly>();
+        aiComponent.SetAI(false);
+        ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(aiComponent.GetAgentID(), false);
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
     {
@@ -122,5 +127,6 @@ public class BraincellManager : Singleton<BraincellManager>
         c.display.SetActive(true);
         c.allyIcon.gameObject.SetActive(true);
         c.braincell = false;
-    } 
+        c.GetComponent<AIAlly>().SetAI(true);
+    }
 }

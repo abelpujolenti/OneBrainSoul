@@ -585,5 +585,11 @@ namespace ECS.Entities.AI.Combat
         {
             return _isAI;
         }
+
+        public void SetAI(bool isAI)
+        {
+
+            _isAI = isAI;
+        }
     }
 }

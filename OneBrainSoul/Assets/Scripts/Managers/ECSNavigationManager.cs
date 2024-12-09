@@ -216,29 +216,32 @@ namespace Managers
             }
         }
 
-        public void AddNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent, float radius)
+        public void AddNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent, float radius, bool addObstacle)
         {
             DynamicObstacle dynamicObstacle = new DynamicObstacle
             {
                 iPosition = navMeshAgentComponent.GetTransformComponent(),
                 radius = radius + 4
             };
-            
+
             AStarPath aStarPath = new AStarPath(new VectorComponent(navMeshAgentComponent.GetNavMeshAgent().destination),
                 _navMeshGraph);
-            
+
             AIAgentPath aiAgentPath = new AIAgentPath
             {
                 navMeshAgentComponent = navMeshAgentComponent,
                 aStarPath = aStarPath
             };
 
-            AddDynamicObstacle(dynamicObstacle);
-            
-            LoadDynamicObstacles(aiAgentPath);
-            
-            _dynamicObstaclesID.Add(agentID, dynamicObstacle);
-            
+            if (addObstacle)
+            {
+                AddDynamicObstacle(dynamicObstacle);
+
+                LoadDynamicObstacles(aiAgentPath);
+
+                _dynamicObstaclesID.Add(agentID, dynamicObstacle);
+            }
+
             _navMeshAgentDestinations.Add(agentID, aiAgentPath);
 
             ElapsedTimePerAgent elapsedTimePerAgent = new ElapsedTimePerAgent
@@ -247,11 +250,11 @@ namespace Managers
             };
 
             Stopwatch stopwatch = new Stopwatch();
-            
+
             stopwatch.Start();
-            
+
             _stopwatches.Add(agentID, stopwatch);
-            
+
             if (_agentsCounter > _maxThreads)
             {
                 int index = (int)(_agentsCounter % (_maxThreads + 1));
@@ -259,23 +262,23 @@ namespace Managers
                 Mutex mutex = mutexes[index];
 
                 mutex.WaitOne();
-                
+
                 _agentsPerThread[(int)(_agentsCounter % (_maxThreads + 1))].Enqueue(elapsedTimePerAgent);
                 _agentsCounter++;
-                
+
                 mutex.ReleaseMutex();
                 return;
             }
 
-            _agentsPerThread.Add(new Queue<ElapsedTimePerAgent>(new[] {elapsedTimePerAgent}));
-            
+            _agentsPerThread.Add(new Queue<ElapsedTimePerAgent>(new[] { elapsedTimePerAgent }));
+
             mutexes.Add(new Mutex());
 
             Thread pathfindingThread = new Thread(() =>
             {
                 UpdatePathfinding(_agentsCounter);
             });
-            
+
             pathfindingThread.Start();
         }
 
@@ -302,9 +305,13 @@ namespace Managers
             }
         }
 
-        public void RemoveNavMeshAgentEntity(uint agentID)
+        public void RemoveNavMeshAgentEntity(uint agentID, bool removeObstacle)
         {
             _navMeshAgentDestinations.Remove(agentID);
+            if (!removeObstacle)
+            {
+                return;
+            }
             RemoveDynamicObstacle(agentID);
         }
 
@@ -339,7 +346,7 @@ namespace Managers
                 foreach (Edge edge in node.edges)
                 {
                     Gizmos.color = new Color(1, edge.cost / 1000, edge.cost / 1000);
-                    Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
+                    Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
                 }
             }
 

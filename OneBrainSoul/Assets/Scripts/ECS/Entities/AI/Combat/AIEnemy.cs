@@ -184,7 +184,7 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnEnemyDefeated(this);
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
             Destroy(gameObject);
         }
 
