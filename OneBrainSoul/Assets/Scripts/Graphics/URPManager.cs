@@ -4,19 +4,29 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-public class URPManager : MonoBehaviour
+public class PostProcessingManager : Singleton<PostProcessingManager>
 {
     public Dictionary<string, FullScreenPassRendererFeature> fullscreenPasses = new Dictionary<string, FullScreenPassRendererFeature>();
 
     [SerializeField] AnimationCurve braincellSwitchCurve;
     [SerializeField] AnimationCurve chargeRunCurve;
     [SerializeField] AnimationCurve chargeBounceCurve;
+    [SerializeField] AnimationCurve switchModeCurve;
+    [SerializeField] AnimationCurve switchModeOutCurve;
+    [SerializeField] AnimationCurve damageCurve;
 
     Coroutine chargeRunCoroutine;
+    bool switchMode = false;
 
     private void Start()
     {
         GetFullscreenPasses();
+    }
+
+    public void DamageEffect(float t)
+    {
+        var pass = fullscreenPasses["Damage"];
+        StartCoroutine(EffectCoroutine(pass, t, damageCurve));
     }
 
     public void ChargeRunEffect(float t)
@@ -47,13 +57,64 @@ public class URPManager : MonoBehaviour
             pass.passMaterial.SetColor("_CellColor", new Color(Mathf.Lerp(intenseCellColor.r, cellColor.r, p), Mathf.Lerp(intenseCellColor.g, cellColor.g, p), Mathf.Lerp(intenseCellColor.b, cellColor.b, p), 1f));
             pass.passMaterial.SetFloat("_Fade", Mathf.Lerp(intenseFade, fade, p));
             yield return new WaitForFixedUpdate();
-            t += Time.fixedDeltaTime;
+            t += Time.fixedUnscaledDeltaTime;
         }
         pass.passMaterial.SetFloat("_Fade", fade);
         pass.passMaterial.SetColor("_CellColor", cellColor);
 
         pass.SetActive(false);
     }
+
+    public void EnableSwitchMode(float duration, float outDuration)
+    {
+        switchMode = true;
+        StartCoroutine(SwitchModeCoroutine(switchModeCurve, switchModeOutCurve, duration, outDuration));
+    }
+
+    public void DisableSwitchMode()
+    {
+        switchMode = false;
+    }
+
+    private IEnumerator SwitchModeCoroutine(AnimationCurve inCurve, AnimationCurve outCurve, float duration, float outDuration)
+    {
+        var bPass = fullscreenPasses["BraincellSwitch"];
+        bPass.SetActive(true);
+        var sPass = fullscreenPasses["SwitchMode"];
+        sPass.SetActive(true);
+        float bFade = bPass.passMaterial.GetFloat("_Fade");
+        float sFade = sPass.passMaterial.GetFloat("_Fade");
+
+        float t = 0f;
+        while (t < duration && switchMode)
+        {
+            bPass.SetActive(true);
+            float c = inCurve.Evaluate(t / duration);
+            bPass.passMaterial.SetFloat("_Progress", c);
+            bPass.passMaterial.SetFloat("_Fade", Mathf.Lerp(bFade, 0f, c));
+            sPass.passMaterial.SetFloat("_Progress", c);
+            sPass.passMaterial.SetFloat("_Fade", Mathf.Lerp(sFade, 0f, c));
+            yield return new WaitForSecondsRealtime(0.02f);
+            t += 0.02f;
+        }
+        yield return new WaitUntil(() => !switchMode);
+
+        bPass.passMaterial.SetFloat("_Fade", bFade);
+        sPass.passMaterial.SetFloat("_Fade", sFade);
+        bPass.SetActive(false);
+        t = 0f;
+        while (t < outDuration && !switchMode)
+        {
+            float c = outCurve.Evaluate(t / outDuration);
+            sPass.passMaterial.SetFloat("_Progress", c);
+            yield return new WaitForFixedUpdate();
+            t += Time.fixedDeltaTime;
+        }
+        if (t >= outDuration) {
+            sPass.SetActive(false);
+        }
+    }
+
 
     public void BraincellSwitchTransition(float t)
     {

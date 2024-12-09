@@ -1,7 +1,11 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class FirstPersonCamera : MonoBehaviour
 {
+    [Header("FOV")]
+    public float fov = 100f;
+
     [Header("Sensitivity")]
     public float verticalSensitivity = 400f;
     public float horizontalSensitivity = 400f;
@@ -31,11 +35,13 @@ public class FirstPersonCamera : MonoBehaviour
     Vector3 shakeOffset = new Vector3();
     Vector3 startPos;
 
-    void Start()
+    public void Setup()
     {
         Cursor.lockState = CursorLockMode.Locked;
         cam = GetComponent<Camera>();
         startPos = transform.localPosition;
+        xRotation = orientation.rotation.eulerAngles.x;
+        yRotation = orientation.rotation.eulerAngles.y;
     }
 
     void Update()
@@ -76,12 +82,12 @@ public class FirstPersonCamera : MonoBehaviour
         {
             // Multiply by scale the difference from full scale in the curve
             float distortionAmt = (fovAnimationCurve.Evaluate(fovAnimationTimer) - 1f) * fovAnimationScale + 1f;
-            cam.fieldOfView = 100f * distortionAmt;
+            cam.fieldOfView = fov * distortionAmt;
             fovAnimationTimer += Time.unscaledDeltaTime * fovAnimationSpeed;
         }
         else
         {
-            cam.fieldOfView = 100f;
+            cam.fieldOfView = fov;
         }
 
         ShakeUpdate();

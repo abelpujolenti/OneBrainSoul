@@ -14,12 +14,12 @@ public class Whip : Weapon
 
         if (!attackLanded && animationTimer <= 1 - activeStart && animationTimer >= 1 - activeEnd)
         {
-            List<EnemyTest> affectedEnemies = new List<EnemyTest>();
-            for (int i = 0; i < activeEnemyManager.activeEnemies.Count; i++)
+            List<DamageTakingEntity> affectedEntities = new List<DamageTakingEntity>();
+            for (int i = 0; i < ActiveDamageTakingEntityManager.Instance.damageTakingEntities.Count; i++)
             {
-                EnemyTest enemy = activeEnemyManager.activeEnemies[i];
-                Vector3 enemyPos = enemy.transform.position;
-                Vector3 enemyPosOuter = enemy.transform.position + (player.transform.position - enemy.transform.position).normalized * enemy.radius;
+                DamageTakingEntity entity = ActiveDamageTakingEntityManager.Instance.damageTakingEntities[i];
+                Vector3 enemyPos = entity.transform.position;
+                Vector3 enemyPosOuter = entity.transform.position + (player.transform.position - entity.transform.position).normalized * entity.radius;
                 float distance = Vector3.Distance(player.transform.position, enemyPosOuter);
                 float dotInnerNormalized = Vector3.Dot(player.orientation.forward, (enemyPos - player.transform.position).normalized);
                 float dotOuterNormalized = Vector3.Dot(player.orientation.forward, (enemyPosOuter - player.transform.position).normalized);
@@ -31,18 +31,18 @@ public class Whip : Weapon
                         (dotInnerNormalized > 0.2f && distance < innerRange)
                         )
                     {
-                        affectedEnemies.Add(enemy);
+                        affectedEntities.Add(entity);
                     }
                 }
             }
-            if (affectedEnemies.Count > 0)
+            if (affectedEntities.Count > 0)
             {
-                AttackLand(affectedEnemies);
+                AttackLand(affectedEntities);
             }
         }
     }
 
-    protected override void AttackLand(List<EnemyTest> enemies)
+    protected override void AttackLand(List<DamageTakingEntity> enemies)
     {
         base.AttackLand(enemies);
 
