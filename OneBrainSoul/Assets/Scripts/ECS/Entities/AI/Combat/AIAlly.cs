@@ -49,15 +49,17 @@ namespace ECS.Entities.AI.Combat
                 _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
             
             InstantiateAttacksColliders();
 
             if (!_isAI)
             {
+                ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), false);
                 return;
             }
             
-            StartUpdate();
+            base.StartUpdate();
         }
 
         private void InstantiateAttackComponents(List<AIAllyAttack> attacks)
@@ -123,16 +125,30 @@ namespace ECS.Entities.AI.Combat
 
         #region AI Loop
 
+        public void CallStartUpdate()
+        {
+            StartUpdate();
+        }
+
         protected override void StartUpdate()
         {
-            base.StartUpdate();
             _isAI = true;
+            _navMeshAgent.enabled = true;
+            ECSNavigationManager.Instance.ReturnNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent());
+            base.StartUpdate();
+        }
+
+        public void CallStopUpdate()
+        {
+            StopUpdate();
         }
 
         protected override void StopUpdate()
         {
-            base.StopUpdate();
+            _navMeshAgent.enabled = false;
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), false);
             _isAI = false;
+            base.StopUpdate();
         }
 
         protected override IEnumerator UpdateCoroutine()
@@ -584,12 +600,6 @@ namespace ECS.Entities.AI.Combat
         public bool IsAI()
         {
             return _isAI;
-        }
-
-        public void SetAI(bool isAI)
-        {
-
-            _isAI = isAI;
         }
     }
 }

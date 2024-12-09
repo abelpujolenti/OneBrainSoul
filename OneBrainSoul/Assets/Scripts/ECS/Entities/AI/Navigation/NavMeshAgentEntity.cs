@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using AI;
 using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using Interfaces.AI.Navigation;

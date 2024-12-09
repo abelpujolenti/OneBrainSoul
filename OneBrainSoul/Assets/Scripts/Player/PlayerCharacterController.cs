@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 
@@ -256,7 +255,7 @@ public class PlayerCharacterController : MonoBehaviour
         float dot = Vector3.Dot(forwardnoY, orientation.forward);
         ryf = dot < -0.45f ? 0f : ryf;
         ryf = Quaternion.FromToRotation(forwardnoY, orientation.forward).y * Input.GetAxis("Mouse X") <= 0 ? ryf : 1f;
-        Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
+        //Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
         ryf = ryf > 0f && ryf < 0.3f ? 0.3f : ryf;
         float ry = switchModeCamera.transform.rotation.eulerAngles.y + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf;
         float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.1f;

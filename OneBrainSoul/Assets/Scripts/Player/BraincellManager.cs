@@ -1,5 +1,4 @@
 using ECS.Entities.AI.Combat;
-using Managers;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -96,19 +95,13 @@ public class BraincellManager : Singleton<BraincellManager>
 
     private void Switch(int id)
     {
-        currentCharacter = id;
         transitionTime = transitionDuration;
         urpManager.BraincellSwitchTransition(transitionDuration * 1.3f);
-
-        for (int i = 0; i < playerControllers.Length; i++)
-        {
-            if (i == id)
-            {
-                ActivatePlayerController(playerControllers[i]);
-                continue;
-            }
-            DeactivatePlayerController(playerControllers[i]);
-        }
+        
+        ActivatePlayerController(playerControllers[id]);
+        DeactivatePlayerController(playerControllers[currentCharacter]);
+        
+        currentCharacter = id;
     }
 
     private void ActivatePlayerController(PlayerCharacterController c)
@@ -117,7 +110,7 @@ public class BraincellManager : Singleton<BraincellManager>
         c.display.SetActive(false);
         c.allyIcon.gameObject.SetActive(false);
         c.braincell = true;
-        c.GetComponent<AIAlly>().SetAI(false);
+        c.GetComponent<AIAlly>().CallStopUpdate();
         c.rb.interpolation = RigidbodyInterpolation.Interpolate;
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
@@ -126,7 +119,7 @@ public class BraincellManager : Singleton<BraincellManager>
         c.display.SetActive(true);
         c.allyIcon.gameObject.SetActive(true);
         c.braincell = false;
-        c.GetComponent<AIAlly>().SetAI(true);
+        c.GetComponent<AIAlly>().CallStartUpdate();
         c.rb.interpolation = RigidbodyInterpolation.None;
     }
 }
