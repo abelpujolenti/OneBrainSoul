@@ -20,7 +20,7 @@ namespace Utilities
         {
             float radians = Mathf.Atan2(position.z, position.x);
             
-            float angle = MathUtil.RadiansToAngle(radians) % 360;
+            float angle = RadiansToAngle(radians) % 360;
 
             if (angle < 0)
             {

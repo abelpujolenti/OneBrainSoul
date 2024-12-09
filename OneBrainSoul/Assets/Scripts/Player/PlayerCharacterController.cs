@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 
@@ -67,7 +66,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     public float airTime = 0f;
     public float switchModeTime = 0f;
-    void Start()
+    
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         capsuleCollider = GetComponent<CapsuleCollider>();
@@ -77,10 +77,12 @@ public class PlayerCharacterController : MonoBehaviour
         {
             display.SetActive(false);
             allyIcon.gameObject.SetActive(false);
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
         else
         {
             cam.gameObject.SetActive(false);
+            rb.interpolation = RigidbodyInterpolation.None;
         }
         movementHandler = new GroundedMovementHandler();
         uiCanvas.gameObject.SetActive(true);
@@ -101,6 +103,11 @@ public class PlayerCharacterController : MonoBehaviour
     
     private void FixedUpdate()
     {
+        if (!braincell)
+        {
+            return;
+        }
+        
         if (movementHandler.ShouldGravityApply(this))
         {
             ApplyGravity();
@@ -204,7 +211,7 @@ public class PlayerCharacterController : MonoBehaviour
         crosshair.color = color;
     }
 
-    public void SwitchModeUpdate()
+    private void SwitchModeUpdate()
     {
         bool cantSwitchMode = !switchModeInput || !canSwitch || !braincell || BraincellManager.Instance.transitionTime > 0f;
         if (cantSwitchMode)
@@ -248,7 +255,7 @@ public class PlayerCharacterController : MonoBehaviour
         float dot = Vector3.Dot(forwardnoY, orientation.forward);
         ryf = dot < -0.45f ? 0f : ryf;
         ryf = Quaternion.FromToRotation(forwardnoY, orientation.forward).y * Input.GetAxis("Mouse X") <= 0 ? ryf : 1f;
-        Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
+        //Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
         ryf = ryf > 0f && ryf < 0.3f ? 0.3f : ryf;
         float ry = switchModeCamera.transform.rotation.eulerAngles.y + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf;
         float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.1f;

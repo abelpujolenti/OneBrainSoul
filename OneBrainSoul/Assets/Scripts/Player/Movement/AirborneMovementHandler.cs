@@ -1,6 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Managers;
 using UnityEngine;
 
 public class AirborneMovementHandler : MovementHandler
@@ -32,7 +30,7 @@ public class AirborneMovementHandler : MovementHandler
         var playerCollider = player.capsuleCollider;
         Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * -playerCollider.height * 0.5f;
         Vector3 p2 = p1 + Vector3.up * playerCollider.height;
-        if (Physics.CheckCapsule(p1, p2, playerCollider.radius + 0.075f, 127, QueryTriggerInteraction.Ignore) && Physics.CapsuleCast(p1, p2, playerCollider.radius, direction, out hit, playerCollider.radius + 1f, 127, QueryTriggerInteraction.Ignore))
+        if (Physics.CheckCapsule(p1, p2, playerCollider.radius + 0.075f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore) && Physics.CapsuleCast(p1, p2, playerCollider.radius, direction, out hit, playerCollider.radius + 1f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
         {
             Vector3 newDir = (direction + new Vector3(hit.normal.x, 0f, hit.normal.z)).normalized;
             newDir *= Vector3.Dot(direction, newDir);

@@ -39,7 +39,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Cells: 1
-    - _Fade: 0.67999995
+    - _Fade: 0
     - _Power: 7.9
     - _Progress: 0.8168706
     - _Size: 0.05

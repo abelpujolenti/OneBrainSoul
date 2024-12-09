@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 496196597926176971}
   - component: {fileID: 4892289626774116780}
   - component: {fileID: 3314823013232810764}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ExplosiveBarrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1185,7 +1185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 115552f9bbc28bf4193647665c056941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 1
+  health: 1
   radius: 1
   explosionPower: 13000
   explosionRadius: 10

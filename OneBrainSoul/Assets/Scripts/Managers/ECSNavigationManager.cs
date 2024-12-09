@@ -9,6 +9,7 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -22,13 +23,13 @@ namespace Managers
 
         [SerializeField] private float _timeToCalculatePath;
         
-        private Dictionary<uint, AIAgentPath> _navMeshAgentDestinations = 
-            new Dictionary<uint, AIAgentPath>();
+        private Dictionary<uint, NavMeshAgentComponent> _navMeshAgentDestinations = 
+            new Dictionary<uint, NavMeshAgentComponent>();
 
         private MainThreadQueue _mainThreadQueue = new MainThreadQueue();
 
         private Dictionary<uint, Stopwatch> _stopwatches = new Dictionary<uint, Stopwatch>();
-        private List<Queue<ElapsedTimePerAgent>> _agentsPerThread = new List<Queue<ElapsedTimePerAgent>>();
+        private List<List<uint>> _agentsPerThread = new List<List<uint>>();
 
         private UpdateAgentDestinationSystem _updateAgentDestinationSystem = new UpdateAgentDestinationSystem();
 
@@ -38,10 +39,9 @@ namespace Managers
 
         private bool _active = true;
 
-        private List<Mutex> mutexes = new List<Mutex>();
+        private List<Mutex> _mutexes = new List<Mutex>();
         
         [SerializeField]private uint _maxThreads = 3;
-        private int _agentsCounter = 0;
 
         private void Awake()
         {
@@ -52,6 +52,11 @@ namespace Managers
                 _timeToCalculatePath *= 1000;
                 
                 _navMeshGraph.LoadGraph();
+
+                for (int i = 0; i < _maxThreads; i++)
+                {
+                    CreatePathfindingThead(i);
+                }
                 
                 DontDestroyOnLoad(gameObject);
                 
@@ -74,28 +79,28 @@ namespace Managers
 
         private void Update()
         {
-            foreach (AIAgentPath aiAgentPath in _navMeshAgentDestinations.Values)
+            foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                UpdateOwnPosition(aiAgentPath);
+                UpdateOwnPosition(navMeshAgentComponent);
                 
-                UpdateDestinationPosition(aiAgentPath);
+                UpdateDestinationPosition(navMeshAgentComponent.GetAStarPath());
                 
-                UpdateDynamicObstaclesPositions(aiAgentPath.aStarPath);
+                UpdateDynamicObstaclesPositions(navMeshAgentComponent.GetAStarPath());
                 
-                List<Node> path = aiAgentPath.aStarPath.path;
+                List<Node> path = navMeshAgentComponent.GetAStarPath().path;
                 
                 if (path.Count == 0)
                 {
                     continue;
                 }
                 
-                CleanPreviousWayPoints(aiAgentPath.aStarPath.origin, path);
+                CleanPreviousWayPoints(navMeshAgentComponent.GetAStarPath().origin, path);
 
                 Vector3 firstPathPosition = path[0].position;
 
-                aiAgentPath.navMeshAgentComponent.GetNavMeshAgent().SetDestination(firstPathPosition);
+                navMeshAgentComponent.GetNavMeshAgent().SetDestination(firstPathPosition);
 
-                if (Vector3.Distance(aiAgentPath.navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition) > 4f)
+                if (Vector3.Distance(navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition) > 4f)
                 {
                     continue;
                 }
@@ -108,20 +113,20 @@ namespace Managers
             //_mainThreadQueue.Execute(5);
         }
 
-        private void UpdateOwnPosition(AIAgentPath aiAgentPath)
+        private void UpdateOwnPosition(NavMeshAgentComponent navMeshAgentComponent)
         {
-            Vector3 position = aiAgentPath.navMeshAgentComponent.GetTransformComponent().GetPosition();
+            Vector3 position = navMeshAgentComponent.GetTransformComponent().GetPosition();
 
-            aiAgentPath.aStarPath.origin = position;
+            navMeshAgentComponent.GetAStarPath().origin = position;
         }
 
-        private void UpdateDestinationPosition(AIAgentPath aiAgentPath)
+        private void UpdateDestinationPosition(AStarPath aStarPath)
         {
-            Vector3 destinationPosition = aiAgentPath.aStarPath.destinationPosition.GetPosition();
+            Vector3 destinationPosition = aStarPath.destinationPosition.GetPosition();
 
-            destinationPosition += aiAgentPath.aStarPath.deviationVector;
+            destinationPosition += aStarPath.deviationVector;
 
-            aiAgentPath.aStarPath.destination = destinationPosition;
+            aStarPath.destination = destinationPosition;
         }
 
         private void UpdateDynamicObstaclesPositions(AStarPath aStarPath)
@@ -164,30 +169,30 @@ namespace Managers
 
         private void UpdatePathfinding(int threadNum)
         {
-            _agentsCounter++;
-
-            Mutex mutex = mutexes[threadNum];
+            Mutex mutex = _mutexes[threadNum];
 
             while (_active)
             {
-                uint agentID = 0;
+                uint selectedAgentID = 0;
                 
                 do
                 {
                     mutex.WaitOne();
                     
-                    foreach (ElapsedTimePerAgent elapsedTimePerAgent in _agentsPerThread[threadNum])
+                    foreach (uint agentID in _agentsPerThread[threadNum])
                     {
-                        Stopwatch stopwatch = _stopwatches[elapsedTimePerAgent.agentID];
+                        Stopwatch stopwatch = _stopwatches[agentID];
                     
                         if (stopwatch.ElapsedMilliseconds < _timeToCalculatePath)
                         {
                             continue;
                         }
 
-                        agentID = elapsedTimePerAgent.agentID;
+                        selectedAgentID = agentID;
+
+                        _agentsPerThread[threadNum].Remove(selectedAgentID);
                         
-                        _agentsPerThread[threadNum].Enqueue(_agentsPerThread[threadNum].Dequeue());
+                        _agentsPerThread[threadNum].Add(selectedAgentID);
                     
                         stopwatch.Reset();
                         stopwatch.Start();
@@ -197,11 +202,9 @@ namespace Managers
                     
                     mutex.ReleaseMutex();
                     
-                } while (agentID == 0 && _active);
-                
-                AIAgentPath aiAgentPath = _navMeshAgentDestinations[agentID];
+                } while (selectedAgentID == 0 && _active);
                     
-                AStarPath aStarPath = aiAgentPath.aStarPath;
+                AStarPath aStarPath =  _navMeshAgentDestinations[selectedAgentID].GetAStarPath();
 
                 if (aStarPath == null)
                 {
@@ -218,115 +221,163 @@ namespace Managers
 
         public void AddNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent, float radius)
         {
+            AddDynamicObstacle(navMeshAgentComponent, radius, navMeshAgentComponent.GetAStarPath(), agentID);
+
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            _stopwatches.Add(agentID, stopwatch);
+            
+            ReturnNavMeshAgentEntity(agentID, navMeshAgentComponent);
+        }
+
+        public void ReturnNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent)
+        {
+            _navMeshAgentDestinations.Add(agentID, navMeshAgentComponent);
+            
+            AddAgentToThread(agentID, navMeshAgentComponent);
+        }
+
+        private void AddDynamicObstacle(NavMeshAgentComponent navMeshAgentComponent, float radius, AStarPath aStarPath,
+            uint agentID)
+        {
             DynamicObstacle dynamicObstacle = new DynamicObstacle
             {
                 iPosition = navMeshAgentComponent.GetTransformComponent(),
                 radius = radius + 4
             };
-            
-            AStarPath aStarPath = new AStarPath(new VectorComponent(navMeshAgentComponent.GetNavMeshAgent().destination),
-                _navMeshGraph);
-            
-            AIAgentPath aiAgentPath = new AIAgentPath
-            {
-                navMeshAgentComponent = navMeshAgentComponent,
-                aStarPath = aStarPath
-            };
+                
+            NotifyNewDynamicObstacle(dynamicObstacle);
 
-            AddDynamicObstacle(dynamicObstacle);
-            
-            LoadDynamicObstacles(aiAgentPath);
-            
+            LoadDynamicObstacles(aStarPath);
+
             _dynamicObstaclesID.Add(agentID, dynamicObstacle);
-            
-            _navMeshAgentDestinations.Add(agentID, aiAgentPath);
+        }
 
-            ElapsedTimePerAgent elapsedTimePerAgent = new ElapsedTimePerAgent
+        private void NotifyNewDynamicObstacle(DynamicObstacle dynamicObstacle)
+        {
+            foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                agentID = agentID
-            };
-
-            Stopwatch stopwatch = new Stopwatch();
-            
-            stopwatch.Start();
-            
-            _stopwatches.Add(agentID, stopwatch);
-            
-            if (_agentsCounter > _maxThreads)
-            {
-                int index = (int)(_agentsCounter % (_maxThreads + 1));
-
-                Mutex mutex = mutexes[index];
-
-                mutex.WaitOne();
-                
-                _agentsPerThread[(int)(_agentsCounter % (_maxThreads + 1))].Enqueue(elapsedTimePerAgent);
-                _agentsCounter++;
-                
-                mutex.ReleaseMutex();
-                return;
+                navMeshAgentComponent.GetAStarPath().dynamicObstacles.Add(dynamicObstacle);
             }
+        }
 
-            _agentsPerThread.Add(new Queue<ElapsedTimePerAgent>(new[] {elapsedTimePerAgent}));
-            
-            mutexes.Add(new Mutex());
+        private void LoadDynamicObstacles(AStarPath aStarPath)
+        {
+            aStarPath.dynamicObstacles.AddRange(_dynamicObstaclesID.Values);
+        }
+
+        private void CreatePathfindingThead(int threadNum)
+        {
+            _agentsPerThread.Add(new List<uint>());
+
+            _mutexes.Add(new Mutex());
 
             Thread pathfindingThread = new Thread(() =>
             {
-                UpdatePathfinding(_agentsCounter);
+                UpdatePathfinding(threadNum);
             });
-            
+
             pathfindingThread.Start();
         }
 
-        private void LoadDynamicObstacles(AIAgentPath aiAgentPath)
+        private void AddAgentToThread(uint agentID, NavMeshAgentComponent navMeshAgentComponent)
         {
-            aiAgentPath.aStarPath.dynamicObstacles.AddRange(_dynamicObstaclesID.Values);
+            int index = 0;
+            int lowestAgentsPerThread = _agentsPerThread[0].Count;
+            int agentsInThread;
+            
+            for (int i = 1; i < _agentsPerThread.Count; i++)
+            {
+                agentsInThread = _agentsPerThread[i].Count;
+                
+                if (lowestAgentsPerThread <= agentsInThread)
+                {
+                    continue;
+                }
+
+                lowestAgentsPerThread = agentsInThread;
+                index = i;
+            }
+
+            _mutexes[index].WaitOne();
+
+            _agentsPerThread[index].Add(agentID);
+
+            _mutexes[index].ReleaseMutex();
         }
 
-        private void AddDynamicObstacle(DynamicObstacle dynamicObstacle)
+        public void RemoveNavMeshAgentEntity(uint agentID, bool removeObstacle)
         {
-            foreach (AIAgentPath aiAgentPath in _navMeshAgentDestinations.Values)
+            _navMeshAgentDestinations.Remove(agentID);
+
+            int index = 0;
+
+            for (int i = 0; i < _agentsPerThread.Count; i++)
             {
-                aiAgentPath.aStarPath.dynamicObstacles.Add(dynamicObstacle);
+                if (!_agentsPerThread[i].Contains(agentID))
+                {
+                    continue;
+                }
+
+                index = i;
+                break;
             }
+
+            _mutexes[index].WaitOne();
+
+            foreach (List<uint> agentsList in _agentsPerThread)
+            {
+                if (!agentsList.Contains(agentID))
+                {
+                    continue;
+                }
+
+                agentsList.Remove(agentID);
+                
+                break;
+            }
+
+            _mutexes[index].ReleaseMutex();
+            
+            if (!removeObstacle)
+            {
+                return;
+            }
+            
+            RemoveDynamicObstacle(agentID);
         }
 
         private void RemoveDynamicObstacle(uint obstacleID)
         {
             DynamicObstacle dynamicObstacle = _dynamicObstaclesID[obstacleID];
             
-            foreach (AIAgentPath aiAgentPath in _navMeshAgentDestinations.Values)
+            foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                aiAgentPath.aStarPath.dynamicObstacles.Remove(dynamicObstacle);
+                navMeshAgentComponent.GetAStarPath().dynamicObstacles.Remove(dynamicObstacle);
             }
-        }
-
-        public void RemoveNavMeshAgentEntity(uint agentID)
-        {
-            _navMeshAgentDestinations.Remove(agentID);
-            RemoveDynamicObstacle(agentID);
         }
 
         public IPosition GetNavMeshAgentDestination(uint agentID)
         {
-            return _navMeshAgentDestinations[agentID].aStarPath;
+            return _navMeshAgentDestinations[agentID].GetAStarPath();
         }
 
         public void UpdateNavMeshAgentDestination(uint agentID, VectorComponent vectorComponent)
         {
-            _navMeshAgentDestinations[agentID].aStarPath.destinationPosition = vectorComponent;
-            _navMeshAgentDestinations[agentID].aStarPath.deviationVector = Vector3.zero;
+            _navMeshAgentDestinations[agentID].GetAStarPath().destinationPosition = vectorComponent;
+            _navMeshAgentDestinations[agentID].GetAStarPath().deviationVector = Vector3.zero;
         }
 
         public void UpdateNavMeshAgentDestination(uint agentID, TransformComponent transformComponent)
         {
-            _navMeshAgentDestinations[agentID].aStarPath.destinationPosition = transformComponent;
+            _navMeshAgentDestinations[agentID].GetAStarPath().destinationPosition = transformComponent;
         }
 
         public void UpdateAStarDeviationVector(uint agentID, Vector3 deviationVector)
         {
-            _navMeshAgentDestinations[agentID].aStarPath.deviationVector = deviationVector;
+            _navMeshAgentDestinations[agentID].GetAStarPath().deviationVector = deviationVector;
         }
 
         /*private void OnDrawGizmos()
@@ -339,7 +390,7 @@ namespace Managers
                 foreach (Edge edge in node.edges)
                 {
                     Gizmos.color = new Color(1, edge.cost / 1000, edge.cost / 1000);
-                    Gizmos.DrawLine(edge.fromNode.position, edge.toNode.position);
+                    Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
                 }
             }
 
@@ -358,7 +409,12 @@ namespace Managers
 
         public List<Vector3> GetPath(uint agentID)
         {
-            List<Node> nodes = _navMeshAgentDestinations[agentID].aStarPath.path;
+            if (!_navMeshAgentDestinations.ContainsKey(agentID))
+            {
+                return new List<Vector3>();
+            }
+            
+            List<Node> nodes = _navMeshAgentDestinations[agentID].GetAStarPath().path;
 
             List<Vector3> points = new List<Vector3>();
 

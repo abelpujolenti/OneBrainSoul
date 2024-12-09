@@ -61,6 +61,10 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void StopUpdate()
         {
+            if (_updateCoroutine == null)
+            {
+                return;
+            }
             StopCoroutine(_updateCoroutine);
             _updateCoroutine = null;
         }
@@ -375,20 +379,19 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDrawGizmos()
         {
-
             if (ECSNavigationManager.Instance == null)
             {
                 return;
             }
             
-            Vector3 position = transform.position;
+            /*Vector3 position = transform.position;
             
             Gizmos.color = Color.green;
             
             foreach (DirectionWeights directionAndWeight in _raysDirectionAndWeights)
             {
                 Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
-            }
+            }*/
 
             Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
 

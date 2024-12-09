@@ -123,10 +123,24 @@ namespace Managers
 
             float sightMaximumDistance = aiCombatAgent.GetContext().GetSightMaximumDistance();
 
+            Vector3 position;
+            Vector3 vectorToEnemy;
+
+            float distanceToEnemy;
+
             foreach (AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent> rival in rivals)
             {
-                if (Physics.Raycast(aiCombatAgent.transform.position, rival.transform.position,
-                        sightMaximumDistance, _targetsLayerMask[ownAgentType]))
+                position = aiCombatAgent.transform.position;
+                vectorToEnemy = (rival.transform.position - position).normalized;
+
+                distanceToEnemy = vectorToEnemy.magnitude;
+
+                if (distanceToEnemy > sightMaximumDistance)
+                {
+                    continue;
+                }
+                
+                if (Physics.Raycast(position, vectorToEnemy, distanceToEnemy, _targetsLayerMask[ownAgentType]))
                 {
                     continue;
                 }
@@ -256,14 +270,14 @@ namespace Managers
 
             uint targetID;
 
-            if (visibleRivals.Count == 1)
+            if (possibleRivals.Count == 1)
             {
                 targetID = possibleRivals[0];
             }
             else
             {
                 targetID = GetClosestRivalID<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent>(
-                        ally.GetNavMeshAgentComponent().GetTransformComponent(), _aiEnemies, visibleRivals);
+                        ally.GetNavMeshAgentComponent().GetTransformComponent(), _aiEnemies, possibleRivals);
             }
             
             AIEnemy targetEnemy = _aiEnemies[targetID];

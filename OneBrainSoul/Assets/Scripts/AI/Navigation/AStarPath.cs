@@ -17,7 +17,7 @@ namespace AI.Navigation
         public Vector3 destination;
         public List<Vector3> dynamicObstaclesPositions = new List<Vector3>();
 
-        public AStarPath(IPosition destinationPosition, NavMeshGraph navMeshGraph)
+        public AStarPath(IPosition destinationPosition)
         {
             _navMeshGraph = new NavMeshGraph();
             _navMeshGraph.LoadGraph();

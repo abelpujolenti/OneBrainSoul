@@ -35,6 +35,7 @@ namespace ECS.Entities.AI.Combat
                 _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
             
             CombatManager.Instance.AddAIEnemy(this);
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
             
             StartUpdate();
         }
@@ -184,7 +185,7 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnEnemyDefeated(this);
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
             Destroy(gameObject);
         }
 
@@ -227,12 +228,6 @@ namespace ECS.Entities.AI.Combat
         public List<AttackComponent> GetAttackComponents()
         {
             return _attackComponents;
-        }
-
-        //TEST
-        private void OnDisable()
-        {
-            OnDefeated();
         }
     }
 }

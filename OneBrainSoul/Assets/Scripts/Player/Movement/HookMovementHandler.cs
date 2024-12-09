@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 
 public class HookMovementHandler : MovementHandler
@@ -110,7 +111,7 @@ public class HookMovementHandler : MovementHandler
         var playerCollider = player.capsuleCollider;
         Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * -playerCollider.height * 0.5f;
         Vector3 p2 = p1 + Vector3.up * playerCollider.height;
-        if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.rb.velocity.normalized, out hit, player.rb.velocity.magnitude * 0.04f, 127, QueryTriggerInteraction.Ignore))
+        if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.rb.velocity.normalized, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
         {
             Exit(player);
         }
