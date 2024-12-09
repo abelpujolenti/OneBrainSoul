@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using AI;
 using AI.Combat;
+using AI.Combat.Ally;
+using AI.Combat.Enemy;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
@@ -11,12 +13,14 @@ using UnityEngine;
 
 namespace ECS.Entities.AI.Combat
 {
-    public class AIEnemy : AICombatAgentEntity<AIEnemyContext, AttackComponent, AllyDamageComponent>
+    public class AIEnemy : AICombatAgentEntity<AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>
     {
         [SerializeField] private AIEnemySpecs _aiEnemySpecs;
         
         private void Start()
         {
+            _utilityFunction = new AIEnemyUtilityFunction();
+            InitiateDictionaries();
             Setup();
             InstantiateAttackComponents(_aiEnemySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
@@ -38,6 +42,19 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
             
             StartUpdate();
+        }
+
+        protected override void InitiateDictionaries()
+        {
+            _actions = new Dictionary<AIEnemyAction, Action>
+            {
+                { AIEnemyAction.PATROL , Patrol},
+                { AIEnemyAction.CHOOSE_NEW_RIVAL , RequestRival},
+                { AIEnemyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival},
+                { AIEnemyAction.ROTATE , Rotate},
+                { AIEnemyAction.ATTACK , Attack},
+                { AIEnemyAction.FLEE , Flee}
+            };
         }
 
         private void InstantiateAttackComponents(List<AIAttack> attacks)
@@ -105,42 +122,86 @@ namespace ECS.Entities.AI.Combat
 
         protected override void UpdateVisibleRivals()
         {
-            _visibleRivals = CombatManager.Instance.GetVisibleRivals
-                <AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent, 
-                    AIEnemyContext, AttackComponent, AllyDamageComponent>(this);
+            _visibleRivals = CombatManager.Instance.GetVisibleRivals<AIAlly, AIAllyContext, AllyAttackComponent, 
+                DamageComponent, AIAllyAction, AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>(this);
 
             _context.SetIsSeeingARival(_visibleRivals.Count != 0);
         }
 
         #endregion
 
-        #region UBS
-
-        
-
-        #endregion
-
         #region FSM
 
-        protected override void CalculateBestAction()
+        private void Patrol()
         {
-            CombatManager.Instance.CalculateBestAction(this);
-        }
-
-        public void Patrol()
-        {
+            ShowActionDebugLogs(name + " Patrolling");
             //TODO
         }
 
-        public AttackComponent Attack()
+        private void RequestRival()
+        {
+            ShowActionDebugLogs(name + " Requesting Rival");
+            
+            if (_visibleRivals.Count == 0)
+            {
+                return;
+            }
+
+            uint targetID = ObtainTargetID(_visibleRivals);
+            
+            OnTargetAcquired(targetID, CombatManager.Instance.RequestAlly(targetID).GetContext());
+        }
+
+        private uint ObtainTargetID(List<uint> possibleRivals)
+        {
+            uint targetID;
+
+            if (possibleRivals.Count == 1)
+            {
+                targetID = possibleRivals[0];
+            }
+            else
+            {
+                targetID = CombatManager.Instance.GetClosestRivalID<AIAlly, AIAllyContext, AllyAttackComponent,
+                    DamageComponent, AIAllyAction>(GetNavMeshAgentComponent().GetTransformComponent(),
+                    possibleRivals, AIAgentType.ALLY);
+            }
+
+            return targetID;
+        }
+
+        private void OnTargetAcquired(uint enemyID, AIAllyContext allyContext)
+        {
+            SetRivalIndex(enemyID);
+            SetRivalRadius(allyContext.GetRadius());
+            SetHasATarget(true);
+            SetRivalTransform(allyContext.GetAgentTransform());
+        }
+
+        private void GetCloserToRival()
+        {
+            ShowActionDebugLogs(name + " Getting Closer To Rival");
+            
+            ContinueNavigation();
+            
+            SetDestination(CombatManager.Instance.RequestAlly(_context.GetRivalID())
+                .GetNavMeshAgentComponent().GetTransformComponent());
+        }
+
+        private void Attack()
         {
             StopNavigation();
 
             AttackComponent attackComponent = ReturnNextAttack();
             
             Attacking();
+            
+            CombatManager.Instance.EnemyStartCastingAnAttack(transform, attackComponent, this);
+        }
 
-            return attackComponent;
+        private void Flee()
+        {
+            ContinueNavigation();
         }
 
         #endregion
