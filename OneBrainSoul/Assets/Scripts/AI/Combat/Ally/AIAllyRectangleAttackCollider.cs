@@ -1,7 +1,7 @@
 ﻿using System;
+using AI.Combat.AttackColliders;
 using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
-using Managers;
 using UnityEngine;
 
 namespace AI.Combat.Ally
@@ -122,7 +122,8 @@ namespace AI.Combat.Ally
             for (int i = 0; i < corners.Length; i++)
             {
                 Gizmos.DrawSphere(new Vector3(corners[i].x, 0, corners[i].y), 0.1f);
-                Gizmos.DrawLine(new Vector3(corners[i].x, 0, corners[i].y), new Vector3(corners[(i + 1) % corners.Length].x, 0, corners[(i + 1) % corners.Length].y));
+                Gizmos.DrawLine(new Vector3(corners[i].x, 0, corners[i].y), 
+                    new Vector3(corners[(i + 1) % corners.Length].x, 0, corners[(i + 1) % corners.Length].y));
             }
         }
     }

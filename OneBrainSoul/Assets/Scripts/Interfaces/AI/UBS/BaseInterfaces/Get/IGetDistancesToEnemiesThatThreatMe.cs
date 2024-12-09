@@ -2,8 +2,8 @@
 
 namespace Interfaces.AI.UBS.BaseInterfaces.Get
 {
-    public interface IGetDistancesToEnemiesThatThreatMe
+    public interface IGetDistancesToEnemiesThatTargetsMe
     {
-        public List<float> GetDistancesToEnemiesThatThreatMe();
+        public List<float> GetDistancesToEnemiesThatTargetsMe();
     }
 }

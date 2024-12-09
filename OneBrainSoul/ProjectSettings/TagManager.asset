@@ -16,9 +16,7 @@ TagManager:
   - Player
   - Ally
   - Enemy
-  - Ally Trigger Detection
-  - Enemy Trigger Detection
-  - Rival Trigger Detection
+  - Ally Attack Area
   - Enemy Attack Area
   - 
   - 
@@ -35,6 +33,8 @@ TagManager:
   - 
   - OverlayCamera
   - OverlayCamera2
+  - 
+  - 
   - 
   - 
   - 

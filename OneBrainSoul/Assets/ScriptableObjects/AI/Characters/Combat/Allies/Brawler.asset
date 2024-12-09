@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c205ed4a8dc4f22b59005f924dd887b, type: 3}
+  m_Name: Brawler
+  m_EditorClassIdentifier: 
+  totalHealth: 10
+  rivalsPositionRadius: 4
+  sightMaximumDistance: 0
+  alertRadius: 20
+  safetyRadius: 30
+  minimumEnemiesInsideAlertRadiusToFlee: 2
+  aiAttacks:
+  - {fileID: 11400000, guid: 00baaff0f6219f344acb4e0a2ac7b72e, type: 2}

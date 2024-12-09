@@ -1,6 +1,5 @@
 ﻿using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
-using Managers;
 using UnityEngine;
 
 namespace AI.Combat.Enemy
@@ -77,7 +76,7 @@ namespace AI.Combat.Enemy
 
         protected override Vector2[] GetCornerPoints()
         {
-            throw new System.NotImplementedException();
+            return new Vector2[2];
         }
 
         private void OnTriggerEnter(Collider other)

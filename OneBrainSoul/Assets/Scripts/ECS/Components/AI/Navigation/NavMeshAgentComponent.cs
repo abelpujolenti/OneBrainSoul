@@ -1,5 +1,6 @@
 using System;
 using AI;
+using AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,9 +10,7 @@ namespace ECS.Components.AI.Navigation
     public class NavMeshAgentComponent
     {
         private NavMeshAgentSpecs _navMeshAgentSpecs;
-        
         private TransformComponent _transformComponent;
-        
         private NavMeshAgent _agent;
 
         public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, Transform transform)

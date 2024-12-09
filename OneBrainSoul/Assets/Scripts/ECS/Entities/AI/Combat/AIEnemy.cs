@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
 using AI.Combat;
+using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
-using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
 
@@ -17,11 +18,19 @@ namespace ECS.Entities.AI.Combat
         private void Start()
         {
             Setup();
-            SetupCombatComponents();
             InstantiateAttackComponents(_aiEnemySpecs.aiAttacks);
             CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
+
+            _raysTargetsLayerMask = (int)(Math.Pow(2, GameManager.Instance.GetEnemyLayer()) + 
+                                          Math.Pow(2, GameManager.Instance.GetGroundLayer()));
+
+            CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
+
+            float radius = capsuleCollider.radius;
+
+            _surroundingSlots = new SurroundingSlots(radius + _aiEnemySpecs.rivalsPositionRadius);
             
-            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, GetComponent<CapsuleCollider>().radius, 
+            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, radius, 
                 _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
                 _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
             
@@ -51,6 +60,8 @@ namespace ECS.Entities.AI.Combat
             }
         }
 
+        #region AI Loop
+
         protected override IEnumerator UpdateCoroutine()
         {
             while (true)
@@ -64,8 +75,28 @@ namespace ECS.Entities.AI.Combat
                     yield return null;
                     continue;
                 }
+                
+                LaunchRaycasts();
             
                 CalculateBestAction();
+
+                if (!_context.HasATarget())
+                {
+                    yield return null;
+                    continue;
+                }
+                
+                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestAlly(_context.GetRivalID())
+                    .GetRivalSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
+
+                if (rivalSlotPosition == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                _rivalSlot = rivalSlotPosition.rivalSlot;
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);
 
                 yield return null;
             }
@@ -80,9 +111,24 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsSeeingARival(_visibleRivals.Count != 0);
         }
 
+        #endregion
+
+        #region UBS
+
+        
+
+        #endregion
+
+        #region FSM
+
         protected override void CalculateBestAction()
         {
             CombatManager.Instance.CalculateBestAction(this);
+        }
+
+        public void Patrol()
+        {
+            //TODO
         }
 
         public AttackComponent Attack()
@@ -96,11 +142,11 @@ namespace ECS.Entities.AI.Combat
             return attackComponent;
         }
 
+        #endregion
+
         public override void OnReceiveDamage(AllyDamageComponent damageComponent)
         {
             _context.SetHealth(_context.GetHealth() - damageComponent.GetDamage());
-
-            uint combatAgentInstanceID = GetCombatAgentInstance();
 
             uint health = _context.GetHealth();
 
@@ -109,6 +155,8 @@ namespace ECS.Entities.AI.Combat
                 OnDefeated();
                 return;
             }
+
+            uint combatAgentInstanceID = GetAgentID();
             
             bool isStunned = _context.IsStunned();
 
@@ -136,7 +184,7 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnEnemyDefeated(this);
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetNavMeshAgentComponent());
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
             Destroy(gameObject);
         }
 
@@ -158,7 +206,7 @@ namespace ECS.Entities.AI.Combat
             GetContext().SetIsStunned(false);
             
             RotateToNextPathCorner();
-            CombatManager.Instance.OnEnemyStunEnds(GetCombatAgentInstance());
+            CombatManager.Instance.OnEnemyStunEnds(GetAgentID());
         }
 
         public override AIAgentType GetAIAgentType()
@@ -179,6 +227,12 @@ namespace ECS.Entities.AI.Combat
         public List<AttackComponent> GetAttackComponents()
         {
             return _attackComponents;
+        }
+
+        //TEST
+        private void OnDisable()
+        {
+            OnDefeated();
         }
     }
 }
