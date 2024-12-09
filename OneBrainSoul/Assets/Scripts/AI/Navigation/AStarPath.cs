@@ -41,7 +41,5 @@ namespace AI.Navigation
         {
             return _navMeshGraph;
         }
-
-        public Vector3 lastGoal;
     }
 }

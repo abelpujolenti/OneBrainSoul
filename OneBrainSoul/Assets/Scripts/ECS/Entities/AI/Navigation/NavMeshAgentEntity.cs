@@ -21,8 +21,6 @@ namespace ECS.Entities.AI.Navigation
 
         private IPosition _positionComponent;
 
-        protected float _stoppingDistance = 7;
-
         protected float _rotationSpeed;
 
         protected bool _isRotating;
@@ -49,28 +47,22 @@ namespace ECS.Entities.AI.Navigation
 
         public void Rotate()
         {
-            NavMeshAgentComponent navMeshAgentComponent = GetNavMeshAgentComponent();
+            Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(_agentId).GetPosition();
             
-            float angleToDestination = Vector3.Angle(transform.forward,
-                navMeshAgentComponent.GetNavMeshAgent().destination - transform.position);
-
-            NavMeshAgent navMeshAgent = GetNavMeshAgentComponent().GetNavMeshAgent();
-
-            Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(_agentId)
-                .GetPosition();
-
             Transform ownTransform = transform;
-
+            
             Vector3 position = ownTransform.position;
+            
+            float angleToDestination = Vector3.Angle(ownTransform.forward, destination - position);
                     
-            if (Vector3.Distance(position, destination) < _stoppingDistance && angleToDestination > 15f)
+            if (angleToDestination > 15f)
             {
                 RotateToGivenPosition(destination);
                 return;
             }
 
             StartCoroutine(EnsureAPathExists(() =>
-                Vector3.Angle(ownTransform.forward, navMeshAgent.path.corners[1] - position) > 120f));
+                Vector3.Angle(ownTransform.forward, _navMeshAgent.path.corners[0] - position) > 120f));
         }
 
         private void RotateToGivenPosition(Vector3 position)
@@ -113,7 +105,7 @@ namespace ECS.Entities.AI.Navigation
                 yield break;
             }
 
-            StartCoroutine(RotateToGivenPositionCoroutine(_navMeshAgent.path.corners[1]));
+            StartCoroutine(RotateToGivenPositionCoroutine(_navMeshAgent.path.corners[0]));
         }
 
         protected virtual IEnumerator RotateToGivenPositionCoroutine(Vector3 position)

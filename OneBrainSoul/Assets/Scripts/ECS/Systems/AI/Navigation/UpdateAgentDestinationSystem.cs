@@ -11,8 +11,6 @@ namespace ECS.Systems.AI.Navigation
         {
             List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.GetNavMeshGraph(), aStarPath.origin, 
                 aStarPath.destination);
-
-            aStarPath.lastGoal = aStarPath.destination;
             
             aStarPath.GetNavMeshGraph().ResetNodesImportantInfo();
 
@@ -37,6 +35,7 @@ namespace ECS.Systems.AI.Navigation
 
         private List<Node> SmoothPath(List<Node> originalPath)
         {
+            //TODO
             List<Node> smoothedPath = new List<Node>();
 
             return smoothedPath;

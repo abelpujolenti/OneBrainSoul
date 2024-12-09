@@ -24,8 +24,6 @@ namespace ECS.Entities.AI.Combat
 
         private Dictionary<AllyAttackComponent, AIAttackCollider> _attacksColliders =
             new Dictionary<AllyAttackComponent, AIAttackCollider>();
-        
-        private DieComponent _dieComponent;
 
         [SerializeField] private bool _isAI;
 
@@ -42,16 +40,14 @@ namespace ECS.Entities.AI.Combat
 
             float radius = capsuleCollider.radius;
 
-            _surroundingSlots = new SurroundingSlots(radius);
+            _surroundingSlots = new SurroundingSlots(radius + _aiAllySpecs.rivalsPositionRadius);
             
-            _dieComponent = new DieComponent();
             _context = new AIAllyContext(_aiAllySpecs.totalHealth, radius,
                 _aiAllySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
-                _aiAllySpecs.minimumEnemiesInsideAlertRadiusToFlee, _navMeshAgent.stoppingDistance, capsuleCollider.height, 
+                _aiAllySpecs.minimumEnemiesInsideAlertRadiusToFlee, capsuleCollider.height, 
                 _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
-            //ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), _navMeshAgentSpecs.radius);
             
             InstantiateAttacksColliders();
 
@@ -124,6 +120,8 @@ namespace ECS.Entities.AI.Combat
             }
         }
 
+        #region AI Loop
+
         protected override void StartUpdate()
         {
             base.StartUpdate();
@@ -151,14 +149,14 @@ namespace ECS.Entities.AI.Combat
                     yield return null;
                     continue;
                 }
+                
+                LaunchRaycasts();
 
                 if (_isRotating)
                 {
                     yield return null;
                     continue;
                 }
-                
-                LaunchRaycasts();
             
                 CalculateBestAction();
 
@@ -184,11 +182,6 @@ namespace ECS.Entities.AI.Combat
             }
         }
 
-        public DieComponent GetDieComponent()
-        {
-            return _dieComponent;
-        }
-
         protected override void UpdateVisibleRivals()
         {
             _visibleRivals = CombatManager.Instance.GetVisibleRivals
@@ -206,10 +199,49 @@ namespace ECS.Entities.AI.Combat
                 CombatManager.Instance.GetDistancesToGivenEnemies(transform.position, _enemiesThatTargetsMe));
         }
 
+        #endregion
+
+        #region UBS
+
+        
+
+        #endregion
+
+        #region FSM
+
         protected override void CalculateBestAction()
         {
             CombatManager.Instance.CalculateBestAction(this);
         }
+
+        public void Attack()
+        {
+            AllyAttackComponent attackComponent = ReturnNextAttack();
+            
+            Attacking();
+
+            StartCastingAnAttack(attackComponent);
+        }
+
+        public void DodgeAttack(VectorComponent positionToDodge)
+        {
+            ContinueNavigation();
+
+            _raysOpeningAngle = 360f;
+            
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(),positionToDodge);
+        }
+
+        public void Flee()
+        {
+            ContinueNavigation();
+        }
+
+        #endregion
+
+        #region Attacks Managing
+
+        #region Own Attacks
 
         public override void OnAttackAvailableAgain(AllyAttackComponent attackComponent)
         {
@@ -278,15 +310,6 @@ namespace ECS.Entities.AI.Combat
         {
             return !(allyAttackComponent.GetStressDamage() + _context.GetRivalCurrentStress() < 
                      _context.GetRivalMaximumStress());
-        }
-
-        public void Attack()
-        {
-            AllyAttackComponent attackComponent = ReturnNextAttack();
-            
-            Attacking();
-
-            StartCastingAnAttack(attackComponent);
         }
 
         private void StartCastingAnAttack(AllyAttackComponent allyAttackComponent)
@@ -365,20 +388,9 @@ namespace ECS.Entities.AI.Combat
             OnAttackAvailableAgain(allyAttackComponent);
         }
 
-        public void DodgeAttack(VectorComponent positionToDodge)
-        {
-            ContinueNavigation();
+        #endregion
 
-            NavMeshAgentComponent navMeshAgentComponent = GetNavMeshAgentComponent();
-
-            navMeshAgentComponent.GetNavMeshAgent().stoppingDistance = 1;
-            
-            _context.SetStoppingDistance(1);
-
-            _raysOpeningAngle = 360f;
-            
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(),positionToDodge);
-        }
+        #region Enemy Attacks
 
         public void WarnOncomingDamage(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
         {
@@ -405,12 +417,6 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
-            NavMeshAgentComponent navMeshAgentComponent = GetNavMeshAgentComponent();
-
-            navMeshAgentComponent.GetNavMeshAgent().stoppingDistance = 7;
-            
-            _context.SetStoppingDistance(7);
-
             if (_lastDestination != null)
             {
                 ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
@@ -434,15 +440,13 @@ namespace ECS.Entities.AI.Combat
             OnDefeated();
         }
 
+        #endregion
+
+        #endregion
+
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnAllyDefeated(this);
-        }
-
-        private void OnDie()
-        {
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
-            Destroy(gameObject);
         }
 
         private void OnBeingRescued()
@@ -454,6 +458,8 @@ namespace ECS.Entities.AI.Combat
         {
             return _aiAllySpecs.aiAgentType;
         }
+
+        #region Context
 
         public override AIAllyContext GetContext()
         {
@@ -503,6 +509,8 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsInAttackState(allyOrder == AIAllyOrders.ATTACK);
             _context.SetIsInFleeState(allyOrder == AIAllyOrders.FLEE);
         }
+
+        #endregion
 
         public List<AllyAttackComponent> GetAllyAttackComponents()
         {

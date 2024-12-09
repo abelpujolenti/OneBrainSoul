@@ -74,9 +74,6 @@ namespace Managers
         
         //ERASE!!!
         [SerializeField] private bool _showActionsDebugLogs;
-        [SerializeField] private List<GameObject> FLEE_POINTS;
-        private List<Vector3> TERRAIN_POSITIONS;
-        private Dictionary<AIAlly, int> FLEE_POINTS_RECORD = new Dictionary<AIAlly, int>(); 
 
         private void ShowActionDebugLogs(string message)
         {
@@ -96,11 +93,6 @@ namespace Managers
                 _instance = this;
 
                 DontDestroyOnLoad(gameObject);
-                
-                //ERASE!!!
-                TERRAIN_POSITIONS = GetTerrainPositions(FLEE_POINTS);
-                StartCoroutine(UpdateFleeMovement());
-                //
 
                 return;
             }
@@ -318,7 +310,7 @@ namespace Managers
             
             //TODO USE STEERING BEHAVIORS
             
-            EvaluateClosestPoint(ally);
+            ally.Flee();
         }
 
         private void AllyDodge(AIAlly ally)
@@ -343,7 +335,7 @@ namespace Managers
             ShowActionDebugLogs(enemy.name + " Patrolling");
             //Debug.Log(enemy.name + " Patrolling");
             
-            //TODO ENEMY PATROL
+            enemy.Patrol();
         }
 
         private void EnemyRequestRival(AIEnemy enemy)
@@ -377,6 +369,7 @@ namespace Managers
             AIAllyContext targetAllyContext = targetAlly.GetContext();
             
             enemy.SetRivalIndex(targetAlly.GetAgentID());
+            enemy.SetRivalRadius(targetAllyContext.GetRadius());
             enemy.SetHasATarget(true);
             enemy.SetRivalTransform(targetAllyContext.GetAgentTransform());
         }
@@ -652,7 +645,6 @@ namespace Managers
             Vector3 vectorToRival = combatAgent.GetContext().GetRivalTransform().position - combatAgent.transform.position;
             
             combatAgent.SetVectorToRival(vectorToRival);
-            combatAgent.SetDistanceToRival(vectorToRival.magnitude);
         }
 
         #endregion
@@ -715,93 +707,6 @@ namespace Managers
         #endregion
         
         #region Flee System
-        
-        //ERASE!!!!
-        private List<Vector3> GetTerrainPositions(List<GameObject> FLEE_POINTS)
-        {
-            List<Vector3> points = new List<Vector3>();
-            
-            RaycastHit hit;
-
-            foreach (GameObject gameObject in FLEE_POINTS)
-            {
-                Ray ray = new Ray(gameObject.transform.position, Vector3.down);
-                if (Physics.Raycast(ray, out hit))
-                {
-                    points.Add(hit.point);
-                }
-            }
-
-            return points;
-        }
-        
-        private void EvaluateClosestPoint(AIAlly combatAgentNeedsToFlee)
-        {
-            if (FLEE_POINTS_RECORD.ContainsKey(combatAgentNeedsToFlee))
-            {
-                return;
-            }
-            
-            Vector3 agentPosition = combatAgentNeedsToFlee.transform.position;
-         
-            Vector3 destination = TERRAIN_POSITIONS[0];            
-            float closestDistance = (destination - agentPosition).magnitude;
-
-            int index = 0;
-
-            for (int i = 0; i < TERRAIN_POSITIONS.Count; i++)
-            {
-                Vector3 currentPosition = TERRAIN_POSITIONS[i];
-                
-                float currentDistance = (agentPosition - currentPosition).magnitude;
-                if (currentDistance > closestDistance)
-                {
-                    continue;
-                }
-
-                closestDistance = currentDistance;
-                destination = currentPosition;
-                index = i;
-            }
-            
-            FLEE_POINTS_RECORD.Add(combatAgentNeedsToFlee, index);
-            
-            combatAgentNeedsToFlee.SetDestination(new VectorComponent(destination));
-        } 
-
-        private IEnumerator UpdateFleeMovement()
-        {
-            while (true)
-            {
-                Dictionary<AIAlly, int> newIndexes = new Dictionary<AIAlly, int>(); 
-                
-                foreach (var combatAgentFleeing in FLEE_POINTS_RECORD)
-                {
-                    AIAlly combatAgent = combatAgentFleeing.Key;
-                    int index = combatAgentFleeing.Value;
-
-                    if ((combatAgent.transform.position - TERRAIN_POSITIONS[index]).magnitude < 8)
-                    {
-                        int newIndex = (combatAgentFleeing.Value + 1) % TERRAIN_POSITIONS.Count;
-                        
-                        newIndexes.Add(combatAgent, newIndex);
-                    }
-                }
-
-                foreach (var VARIABLE in newIndexes)
-                {
-                    AIAlly combatAgent = VARIABLE.Key;
-                    int newIndex = VARIABLE.Value;
-
-                    FLEE_POINTS_RECORD[combatAgent] = newIndex;
-                    
-                    combatAgent.SetDestination(new VectorComponent(TERRAIN_POSITIONS[newIndex]));
-                }
-
-                yield return null;
-            }
-        }
-        //
 
         #endregion
 

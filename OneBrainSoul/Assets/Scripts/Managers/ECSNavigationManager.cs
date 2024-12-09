@@ -9,7 +9,6 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
-using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -28,7 +27,8 @@ namespace Managers
 
         private MainThreadQueue _mainThreadQueue = new MainThreadQueue();
 
-        private List<List<uint>> _agentsPerThread = new List<List<uint>>();
+        private Dictionary<uint, Stopwatch> _stopwatches = new Dictionary<uint, Stopwatch>();
+        private List<Queue<ElapsedTimePerAgent>> _agentsPerThread = new List<Queue<ElapsedTimePerAgent>>();
 
         private UpdateAgentDestinationSystem _updateAgentDestinationSystem = new UpdateAgentDestinationSystem();
 
@@ -38,8 +38,10 @@ namespace Managers
 
         private bool _active = true;
 
+        private List<Mutex> mutexes = new List<Mutex>();
+        
         [SerializeField]private uint _maxThreads = 3;
-        private int _threadsCounter = 0;
+        private int _agentsCounter = 0;
 
         private void Awake()
         {
@@ -93,7 +95,7 @@ namespace Managers
 
                 aiAgentPath.navMeshAgentComponent.GetNavMeshAgent().SetDestination(firstPathPosition);
 
-                if (Vector3.Distance(aiAgentPath.navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition) > 3f)
+                if (Vector3.Distance(aiAgentPath.navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition) > 4f)
                 {
                     continue;
                 }
@@ -162,39 +164,55 @@ namespace Managers
 
         private void UpdatePathfinding(int threadNum)
         {
-            _threadsCounter++;
-            
-            Stopwatch counter = new Stopwatch();
-            
-            counter.Start();
+            _agentsCounter++;
+
+            Mutex mutex = mutexes[threadNum];
 
             while (_active)
             {
-                if (counter.ElapsedMilliseconds < _timeToCalculatePath)
+                uint agentID = 0;
+                
+                do
+                {
+                    mutex.WaitOne();
+                    
+                    foreach (ElapsedTimePerAgent elapsedTimePerAgent in _agentsPerThread[threadNum])
+                    {
+                        Stopwatch stopwatch = _stopwatches[elapsedTimePerAgent.agentID];
+                    
+                        if (stopwatch.ElapsedMilliseconds < _timeToCalculatePath)
+                        {
+                            continue;
+                        }
+
+                        agentID = elapsedTimePerAgent.agentID;
+                        
+                        _agentsPerThread[threadNum].Enqueue(_agentsPerThread[threadNum].Dequeue());
+                    
+                        stopwatch.Reset();
+                        stopwatch.Start();
+                        
+                        break;
+                    }
+                    
+                    mutex.ReleaseMutex();
+                    
+                } while (agentID == 0 && _active);
+                
+                AIAgentPath aiAgentPath = _navMeshAgentDestinations[agentID];
+                    
+                AStarPath aStarPath = aiAgentPath.aStarPath;
+
+                if (aStarPath == null)
                 {
                     continue;
                 }
-                
-                counter.Reset();
-                counter.Start();
-
-                foreach (uint agentID in _agentsPerThread[threadNum])
-                {
-                    AIAgentPath aiAgentPath = _navMeshAgentDestinations[agentID];
                     
-                    AStarPath aStarPath = aiAgentPath.aStarPath;
+                aStarPath.UpdateNavMeshGraphObstacles();
 
-                    if (aStarPath == null)
-                    {
-                        continue;
-                    }
+                _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath);
                     
-                    aStarPath.UpdateNavMeshGraphObstacles();
-
-                    _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath);
-                    
-                    aStarPath.GetNavMeshGraph().ResetEdgesCost();
-                }
+                aStarPath.GetNavMeshGraph().ResetEdgesCost();
             }
         }
 
@@ -222,20 +240,40 @@ namespace Managers
             _dynamicObstaclesID.Add(agentID, dynamicObstacle);
             
             _navMeshAgentDestinations.Add(agentID, aiAgentPath);
-            
-            if (_threadsCounter > _maxThreads)
+
+            ElapsedTimePerAgent elapsedTimePerAgent = new ElapsedTimePerAgent
             {
+                agentID = agentID
+            };
+
+            Stopwatch stopwatch = new Stopwatch();
+            
+            stopwatch.Start();
+            
+            _stopwatches.Add(agentID, stopwatch);
+            
+            if (_agentsCounter > _maxThreads)
+            {
+                int index = (int)(_agentsCounter % (_maxThreads + 1));
+
+                Mutex mutex = mutexes[index];
+
+                mutex.WaitOne();
+                
+                _agentsPerThread[(int)(_agentsCounter % (_maxThreads + 1))].Enqueue(elapsedTimePerAgent);
+                _agentsCounter++;
+                
+                mutex.ReleaseMutex();
                 return;
             }
+
+            _agentsPerThread.Add(new Queue<ElapsedTimePerAgent>(new[] {elapsedTimePerAgent}));
             
-            _agentsPerThread.Add(new List<uint>
-            {
-                agentID
-            });
+            mutexes.Add(new Mutex());
 
             Thread pathfindingThread = new Thread(() =>
             {
-                UpdatePathfinding(_threadsCounter);
+                UpdatePathfinding(_agentsCounter);
             });
             
             pathfindingThread.Start();

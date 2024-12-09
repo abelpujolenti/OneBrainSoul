@@ -219,11 +219,11 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -1372625422
   m_Radius: 1.154049
-  m_Speed: 3.5
+  m_Speed: 7
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 1000
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -245,5 +245,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _navMeshAgentSpecs: {fileID: 11400000, guid: fbd6b8ac878a9194fb62cdbd901148af, type: 2}
   _navMeshAgent: {fileID: 956940607707248733}
-  _navMeshSurface: {fileID: 0}
   _aiEnemySpecs: {fileID: 11400000, guid: 076492a5609594c47abb6f1e66f6fc3a, type: 2}

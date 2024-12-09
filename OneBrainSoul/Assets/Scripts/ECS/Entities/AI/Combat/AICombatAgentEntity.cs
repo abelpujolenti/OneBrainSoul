@@ -72,6 +72,8 @@ namespace ECS.Entities.AI.Combat
             yield return base.RotateToGivenPositionCoroutine(position);
         }
 
+        #region Steering
+
         protected void SetRaysDirections()
         {
             _raysDirectionAndWeights = new DirectionWeights[_numberOfVicinityRays];
@@ -110,10 +112,14 @@ namespace ECS.Entities.AI.Combat
             }
         }
 
+        #endregion
+
         public RivalSlotPosition GetRivalSlotPosition(Vector3 direction, float radius)
         {
             return _surroundingSlots.ReserveSubtendedAngle(GetAgentID(), direction, radius);
         }
+
+        #region Attacks
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
         {
@@ -194,35 +200,11 @@ namespace ECS.Entities.AI.Combat
             return selectedAttackComponent;
         }
 
-        protected void Attacking()
-        {
-            _context.SetIsAttacking(true);
-            _navMeshAgent.isStopped = true;
-        }
+        #endregion
 
-        public void NotAttacking()
-        {
-            _context.SetIsAttacking(false);
-            _navMeshAgent.isStopped = false;
-        }
-
-        public virtual void OnAttackAvailableAgain(TAttackComponent attackComponent)
-        {
-            float attackMinimumRangeToCast = attackComponent.GetMinimumRangeCast();
-            float attackMaximumRangeToCast = attackComponent.GetMaximumRangeCast();
-
-            if (_context.GetMinimumRangeToAttack() > attackMinimumRangeToCast)
-            {
-                _context.SetMinimumRangeToAttack(attackMinimumRangeToCast);
-            }
-
-            if (_context.GetMaximumRangeToAttack() > attackMaximumRangeToCast)
-            {
-                return;
-            }
-            
-            _context.SetMaximumRangeToAttack(attackMaximumRangeToCast);
-        }
+        #region Context
+        
+        public abstract TContext GetContext();
 
         public void SetLastActionIndex(uint lastActionIndex)
         {
@@ -284,45 +266,46 @@ namespace ECS.Entities.AI.Combat
             _context.SetRivalTransform(rivalTransform);
         }
 
-        protected abstract void UpdateVisibleRivals();
-        protected abstract void CalculateBestAction();
-
-        public abstract void OnReceiveDamage(TDamageComponent damageComponent);
-        protected abstract void OnDefeated();
-
-        public abstract AIAgentType GetAIAgentType();
-        
-        public abstract TContext GetContext();
-
-        public List<uint> GetVisibleRivals()
+        protected void Attacking()
         {
-            return _visibleRivals;
+            _context.SetIsAttacking(true);
+            _navMeshAgent.isStopped = true;
         }
 
-        public void SetDestination(TransformComponent transformComponent)
+        public void NotAttacking()
         {
-            _lastDestination = null;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), transformComponent);
+            _context.SetIsAttacking(false);
+            _navMeshAgent.isStopped = false;
         }
 
-        public void SetDestination(VectorComponent vectorComponent)
+        public virtual void OnAttackAvailableAgain(TAttackComponent attackComponent)
         {
-            _lastDestination = vectorComponent;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
+            float attackMinimumRangeToCast = attackComponent.GetMinimumRangeCast();
+            float attackMaximumRangeToCast = attackComponent.GetMaximumRangeCast();
+
+            if (_context.GetMinimumRangeToAttack() > attackMinimumRangeToCast)
+            {
+                _context.SetMinimumRangeToAttack(attackMinimumRangeToCast);
+            }
+
+            if (_context.GetMaximumRangeToAttack() > attackMaximumRangeToCast)
+            {
+                return;
+            }
+            
+            _context.SetMaximumRangeToAttack(attackMaximumRangeToCast);
         }
 
         protected void UpdateVectorToRival()
         {
-            TContext context = GetContext();
-
-            if (!context.HasATarget())
+            if (!_context.HasATarget())
             {
                 return;
             }
 
-            Vector3 rivalPosition = context.GetRivalTransform().position;
+            Vector3 rivalPosition = _context.GetRivalTransform().position;
             
-            context.SetVectorToRival(rivalPosition - transform.position);
+            _context.SetVectorToRival(rivalPosition - transform.position);
         }
 
         private void UpdateMinimumRangeToCast(List<float> minimumRangesInsideCurrentRange)
@@ -341,7 +324,7 @@ namespace ECS.Entities.AI.Combat
                 newMinimumRange = currentMinimumRange;
             }
             
-            GetContext().SetMinimumRangeToAttack(newMinimumRange);
+            _context.SetMinimumRangeToAttack(newMinimumRange);
         }
 
         private void UpdateMaximumRangeToCast(List<float> maximumRangesInsideCurrentRange)
@@ -360,12 +343,44 @@ namespace ECS.Entities.AI.Combat
                 newMaximumRange = currentMaximumRange;
             }
             
-            GetContext().SetMaximumRangeToAttack(newMaximumRange);
+            _context.SetMaximumRangeToAttack(newMaximumRange);
+        }
+
+        #endregion
+
+        protected abstract void UpdateVisibleRivals();
+        protected abstract void CalculateBestAction();
+
+        public abstract void OnReceiveDamage(TDamageComponent damageComponent);
+        protected abstract void OnDefeated();
+
+        public abstract AIAgentType GetAIAgentType();
+
+        public List<uint> GetVisibleRivals()
+        {
+            return _visibleRivals;
+        }
+
+        public void SetDestination(TransformComponent transformComponent)
+        {
+            _lastDestination = null;
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), transformComponent);
+        }
+
+        public void SetDestination(VectorComponent vectorComponent)
+        {
+            _lastDestination = vectorComponent;
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
         }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
+
+            if (ECSNavigationManager.Instance == null)
+            {
+                return;
+            }
 
             Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
 

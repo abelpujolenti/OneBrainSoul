@@ -28,7 +28,7 @@ namespace ECS.Entities.AI.Combat
 
             float radius = capsuleCollider.radius;
 
-            _surroundingSlots = new SurroundingSlots(radius);
+            _surroundingSlots = new SurroundingSlots(radius + _aiEnemySpecs.rivalsPositionRadius);
             
             _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, radius, 
                 _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
@@ -60,6 +60,8 @@ namespace ECS.Entities.AI.Combat
             }
         }
 
+        #region AI Loop
+
         protected override IEnumerator UpdateCoroutine()
         {
             while (true)
@@ -74,7 +76,7 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                SetRaysDirections();
+                LaunchRaycasts();
             
                 CalculateBestAction();
 
@@ -84,7 +86,7 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestEnemy(_context.GetRivalID())
+                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestAlly(_context.GetRivalID())
                     .GetRivalSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
 
                 if (rivalSlotPosition == null)
@@ -109,9 +111,24 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsSeeingARival(_visibleRivals.Count != 0);
         }
 
+        #endregion
+
+        #region UBS
+
+        
+
+        #endregion
+
+        #region FSM
+
         protected override void CalculateBestAction()
         {
             CombatManager.Instance.CalculateBestAction(this);
+        }
+
+        public void Patrol()
+        {
+            //TODO
         }
 
         public AttackComponent Attack()
@@ -124,6 +141,8 @@ namespace ECS.Entities.AI.Combat
 
             return attackComponent;
         }
+
+        #endregion
 
         public override void OnReceiveDamage(AllyDamageComponent damageComponent)
         {
@@ -210,6 +229,7 @@ namespace ECS.Entities.AI.Combat
             return _attackComponents;
         }
 
+        //TEST
         private void OnDisable()
         {
             OnDefeated();

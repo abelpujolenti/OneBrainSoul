@@ -12,11 +12,20 @@ namespace AI.Combat.Position
 
         public SurroundingSlots(float radiusFromAgent)
         {
-            _radiusFromAgent = radiusFromAgent + 5;
+            _radiusFromAgent = radiusFromAgent;
         }
 
         public RivalSlotPosition ReserveSubtendedAngle(uint agentID, Vector3 direction, float radius)
         {
+            if (direction.magnitude < _radiusFromAgent)
+            {
+                return new RivalSlotPosition
+                {
+                    deviationVector = -direction,
+                    rivalSlot = _rivalSlots[agentID]
+                };
+            }
+            
             float angle = CalculateAngle(-direction);
             float subtendedAngle = CalculateSubtendedAngle(radius) + 10;
 
@@ -213,8 +222,15 @@ namespace AI.Combat.Position
         private float CalculateAngle(Vector3 position)
         {
             float radians = Mathf.Atan2(position.z, position.x);
+            
+            float angle = RadiansToAngle(radians) % 360;
 
-            return RadiansToAngle(radians);
+            if (angle < 0)
+            {
+                angle += 360;
+            }
+
+            return angle;
         }
 
         private float CalculateSubtendedAngle(float radius)
@@ -227,12 +243,9 @@ namespace AI.Combat.Position
         private bool CheckIfAngleIsBetweenRange(float angleToCheck, float minimumAngeRange, float maximumAngleRange,
             bool wraps0)
         {
-            if (wraps0)
-            {
-                return angleToCheck > minimumAngeRange ^ angleToCheck < maximumAngleRange;
-            }
-
-            return angleToCheck > minimumAngeRange && angleToCheck < maximumAngleRange;
+            return wraps0 
+                ? angleToCheck > minimumAngeRange ^ angleToCheck < maximumAngleRange
+                : angleToCheck > minimumAngeRange && angleToCheck < maximumAngleRange;
         }
 
         private float AngleToRadians(float angle)
