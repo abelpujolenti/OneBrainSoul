@@ -47,6 +47,11 @@ namespace AI.Combat.Ally
 
         private static float CalculateFollowPlayerUtility(IAllyFollowPlayerUtility allyFollowPlayerUtility)
         {
+            if (allyFollowPlayerUtility.IsFollowingAlly())
+            {
+                return allyFollowPlayerUtility.DoesBrainCellSwitched() ? 1 : 0;
+            }
+            
             return Convert.ToUInt16(allyFollowPlayerUtility.IsInRetreatState() || !allyFollowPlayerUtility.IsSeeingARival());
         }
         

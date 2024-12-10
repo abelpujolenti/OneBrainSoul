@@ -61,7 +61,7 @@ namespace ECS.Entities.AI.Combat
         protected int _raysTargetsLayerMask;
 
         protected SurroundingSlots _surroundingSlots;
-        protected RivalSlot _rivalSlot;
+        protected AgentSlot _agentSlot;
         
         //TEST
         [SerializeField] protected bool _showActionsDebugLogs;
@@ -145,9 +145,14 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        public RivalSlotPosition GetRivalSlotPosition(Vector3 direction, float radius)
+        public AgentSlotPosition GetAgentSlotPosition(Vector3 direction, float radius)
         {
             return _surroundingSlots.ReserveSubtendedAngle(GetAgentID(), direction, radius);
+        }
+
+        public void ReleaseAgentSlot(uint agentID)
+        {
+            _surroundingSlots.FreeSubtendedAngle(agentID);
         }
 
         #region Attacks
@@ -308,13 +313,13 @@ namespace ECS.Entities.AI.Combat
             _navMeshAgent.isStopped = true;
         }
 
-        public void NotAttacking()
+        protected void NotAttacking()
         {
             _context.SetIsAttacking(false);
             _navMeshAgent.isStopped = false;
         }
 
-        public virtual void OnAttackAvailableAgain(TAttackComponent attackComponent)
+        protected virtual void OnAttackAvailableAgain(TAttackComponent attackComponent)
         {
             float attackMinimumRangeToCast = attackComponent.GetMinimumRangeCast();
             float attackMaximumRangeToCast = attackComponent.GetMaximumRangeCast();

@@ -393,11 +393,21 @@ namespace Managers
 
         public AIAlly RequestAlly(uint agentID)
         {
+            if (!_aiAllies.ContainsKey(agentID))
+            {
+                return null;
+            }
+            
             return _aiAllies[agentID];
         }
 
         public AIEnemy RequestEnemy(uint agentID)
         {
+            if (!_aiEnemies.ContainsKey(agentID))
+            {
+                return null;
+            }
+            
             return _aiEnemies[agentID];
         }
 

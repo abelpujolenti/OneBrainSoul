@@ -98,8 +98,8 @@ public class BraincellManager : Singleton<BraincellManager>
         transitionTime = transitionDuration;
         urpManager.BraincellSwitchTransition(transitionDuration * 1.3f);
         
-        ActivatePlayerController(playerControllers[id]);
         DeactivatePlayerController(playerControllers[currentCharacter]);
+        ActivatePlayerController(playerControllers[id]);
         
         currentCharacter = id;
     }

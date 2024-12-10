@@ -22,6 +22,8 @@ namespace AI.Combat.ScriptableObjects
         private float _timeToNextEnemyMeleeAttack;
         private float _distanceToCloserEnemyProjectile;
 
+        private bool _isFollowingAlly;
+        private bool _doesBrainCellSwitched;
         private bool _canDefeatEnemy;
         private bool _canStunEnemy;
         private bool _isEnemyStunned;
@@ -135,6 +137,26 @@ namespace AI.Combat.ScriptableObjects
         public float GetDistanceToCloserEnemyProjectile()
         {
             return _distanceToCloserEnemyProjectile;
+        }
+
+        public void SetIsFollowingAlly(bool isFollowingAlly)
+        {
+            _isFollowingAlly = isFollowingAlly;
+        }
+
+        public bool IsFollowingAlly()
+        {
+            return _isFollowingAlly;
+        }
+
+        public void SetDoesBrainCellSwitched(bool doesBrainCellSwitched)
+        {
+            _doesBrainCellSwitched = doesBrainCellSwitched;
+        }
+
+        public bool DoesBrainCellSwitched()
+        {
+            return _doesBrainCellSwitched;
         }
 
         public void SetCanDefeatEnemy(bool canDefeatEnemy)

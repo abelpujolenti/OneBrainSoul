@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using ECS.Entities.AI.Combat;
 
 namespace AI.Combat.AttackColliders
 {
@@ -12,7 +11,7 @@ namespace AI.Combat.AttackColliders
         
         protected List<uint> _combatAgentsIDsTriggering = new List<uint>();
 
-        protected Stopwatch _stopwatch;
+        protected Stopwatch _stopwatch = new Stopwatch();
 
         public void SetOwner(uint ownerID)
         {

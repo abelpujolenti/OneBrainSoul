@@ -17,6 +17,6 @@ MonoBehaviour:
   sightMaximumDistance: 0
   alertRadius: 20
   safetyRadius: 30
-  minimumEnemiesInsideAlertRadiusToFlee: 2
+  minimumEnemiesInsideAlertRadiusToFlee: 4
   aiAttacks:
   - {fileID: 11400000, guid: 00baaff0f6219f344acb4e0a2ac7b72e, type: 2}
