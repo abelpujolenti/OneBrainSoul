@@ -18,6 +18,25 @@ namespace AI.Combat.AttackColliders
             _ownerContext = ownerContext;
         }
 
+        protected override void RemoveAgentID(uint agentID)
+        {
+            if (_ownerID == agentID)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
+            for (int i = 0; i < _combatAgentsTriggering.Count; i++)
+            {
+                if (_combatAgentsTriggering[i].GetAgentID() != agentID)
+                {
+                    continue;
+                }
+                
+                _combatAgentsTriggering.RemoveAt(i);
+            }
+        }
+
         protected override void OnDisable()
         {
             _combatAgentsTriggering.Clear();

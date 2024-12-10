@@ -24,7 +24,7 @@ namespace ECS.Entities.AI.Combat
 
         private List<uint> _enemiesThatTargetsMe = new List<uint>();
 
-        private List<AIEnemyAttackCollider> _oncomingEnemyAttacks = new List<AIEnemyAttackCollider>();
+        private List<AttackColliderCountdown> _oncomingEnemyAttacks = new List<AttackColliderCountdown>();
 
         [SerializeField] private bool _isAI;
 
@@ -54,6 +54,8 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
             
             InstantiateAttacksColliders();
+
+            StartCoroutine(UpdateCountdowns());
 
             if (!_isAI)
             {
@@ -566,9 +568,14 @@ namespace ECS.Entities.AI.Combat
 
         #region Rival Attacks
 
-        public void WarnOncomingDamage(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
+        public void WarnOncomingDamage(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider, 
+            float timeRemaining)
         {
-            _oncomingEnemyAttacks.Add(enemyAttackCollider);
+            _oncomingEnemyAttacks.Add(new AttackColliderCountdown
+            {
+                aiEnemyAttackCollider = enemyAttackCollider,
+                timeRemaining = timeRemaining
+            });
             
             _context.SetIsUnderAttack(true);
             _context.SetOncomingAttackDamage(_context.GetOncomingAttackDamage() + attackComponent.GetDamage());
@@ -576,7 +583,17 @@ namespace ECS.Entities.AI.Combat
         
         public void FreeOfWarnArea(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
         {
-            _oncomingEnemyAttacks.Remove(enemyAttackCollider);
+            for (int i = 0; i < _oncomingEnemyAttacks.Count; i++)
+            {
+                if (_oncomingEnemyAttacks[i].aiEnemyAttackCollider != enemyAttackCollider)
+                {
+                    return;
+                }   
+                
+                _oncomingEnemyAttacks.RemoveAt(i);
+                
+                break;
+            }
             
             _context.SetOncomingAttackDamage(_context.GetOncomingAttackDamage() - attackComponent.GetDamage());
             CheckIfOutOfDanger();
@@ -584,9 +601,16 @@ namespace ECS.Entities.AI.Combat
 
         private void CheckIfOutOfDanger()
         {
-            _context.SetIsUnderAttack(_oncomingEnemyAttacks.Count != 0);
+            bool isInDanger = _oncomingEnemyAttacks.Count != 0;
+            
+            _context.SetIsUnderAttack(isInDanger);
 
-            if (_oncomingEnemyAttacks.Count != 0)
+            if (isInDanger)
+            {
+                return;
+            }
+
+            if (!_isAI)
             {
                 return;
             }
@@ -616,7 +640,14 @@ namespace ECS.Entities.AI.Combat
 
         protected override void OnDefeated()
         {
+            Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            EventsManager.OnAgentDefeated(GetAgentID());
             CombatManager.Instance.OnAllyDefeated(this);
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
         }
 
         #endregion
@@ -694,6 +725,30 @@ namespace ECS.Entities.AI.Combat
         public bool IsAI()
         {
             return _isAI;
+        }
+
+        private IEnumerator UpdateCountdowns()
+        {
+            float lowestCooldown;
+            
+            while (true)
+            {
+                lowestCooldown = Mathf.Infinity;
+                
+                foreach (AttackColliderCountdown attackColliderCountdown in _oncomingEnemyAttacks)
+                {
+                    attackColliderCountdown.timeRemaining -= Time.deltaTime;
+
+                    if (attackColliderCountdown.timeRemaining > lowestCooldown)
+                    {
+                        continue;
+                    }
+                    
+                    _context.SetTimeToNextEnemyMeleeAttack(attackColliderCountdown.timeRemaining);
+                }
+                
+                yield return null;
+            }
         }
     }
 }

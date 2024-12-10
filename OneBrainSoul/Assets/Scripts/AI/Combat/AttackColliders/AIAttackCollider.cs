@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Managers;
+using UnityEngine;
 
 namespace AI.Combat.AttackColliders
 {
@@ -11,6 +13,18 @@ namespace AI.Combat.AttackColliders
 
         protected abstract void OnEnable();
         protected abstract void OnDisable();
+
+        private void Start()
+        {
+            EventsManager.OnAgentDefeated += RemoveAgentID;
+        }
+
+        private void OnDestroy()
+        {
+            EventsManager.OnAgentDefeated -= RemoveAgentID;
+        }
+
+        protected abstract void RemoveAgentID(uint agentID);
 
         public void SetParent(Transform parentTransform)
         {

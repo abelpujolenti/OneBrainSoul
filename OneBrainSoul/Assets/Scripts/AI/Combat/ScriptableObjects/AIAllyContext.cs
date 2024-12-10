@@ -19,6 +19,8 @@ namespace AI.Combat.ScriptableObjects
         private float _safetyRadius;
         private float _enemyMaximumStress;
         private float _enemyCurrentStress;
+        private float _timeToNextEnemyMeleeAttack;
+        private float _distanceToCloserEnemyProjectile;
 
         private bool _canDefeatEnemy;
         private bool _canStunEnemy;
@@ -113,6 +115,26 @@ namespace AI.Combat.ScriptableObjects
         public float GetRivalCurrentStress()
         {
             return _enemyCurrentStress;
+        }
+
+        public void SetTimeToNextEnemyMeleeAttack(float timeToNextEnemyMeleeAttack)
+        {
+            _timeToNextEnemyMeleeAttack = timeToNextEnemyMeleeAttack;
+        }
+
+        public float GetTimeToNextEnemyMeleeAttack()
+        {
+            return _timeToNextEnemyMeleeAttack;
+        }
+
+        public void SetDistanceToCloserEnemyProjectile(float distanceToCloserEnemyProjectile)
+        {
+            _distanceToCloserEnemyProjectile = distanceToCloserEnemyProjectile;
+        }
+
+        public float GetDistanceToCloserEnemyProjectile()
+        {
+            return _distanceToCloserEnemyProjectile;
         }
 
         public void SetCanDefeatEnemy(bool canDefeatEnemy)

@@ -132,10 +132,14 @@ namespace Managers
         {
             aStarPath.dynamicObstaclesPositions.Clear();
             
+            aStarPath.LockMutex();
+            
             foreach (DynamicObstacle dynamicObstacle in aStarPath.dynamicObstacles)
             {
                 aStarPath.dynamicObstaclesPositions.Add(dynamicObstacle.iPosition.GetPosition());
             }
+            
+            aStarPath.ReleaseMutex();
         }
 
         private void CleanPreviousWayPoints(Vector3 origin, List<Node> nodes)
@@ -322,6 +326,11 @@ namespace Managers
 
         public void RemoveNavMeshAgentEntity(uint agentID, bool removeObstacle)
         {
+            if (!_navMeshAgentDestinations.ContainsKey(agentID))
+            {
+                return;
+            }
+            
             _navMeshAgentDestinations.Remove(agentID);
 
             int index = 0;

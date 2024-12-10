@@ -1,6 +1,8 @@
-﻿using AI.Combat.AttackColliders;
+﻿using System.Collections.Generic;
+using AI.Combat.AttackColliders;
 using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
+using Managers;
 using UnityEngine;
 
 namespace AI.Combat.Enemy
@@ -18,6 +20,9 @@ namespace AI.Combat.Enemy
                 return;
             }
             
+            _stopwatch.Reset();
+            _stopwatch.Start();
+            
             MoveToPosition(_coneAttackComponent.GetRelativePosition());
             Rotate();
 
@@ -31,7 +36,14 @@ namespace AI.Combat.Enemy
 
         protected override void OnDisable()
         {
-            foreach (AIAlly ally in _combatAgentsTriggering)
+            List<AIAlly> combatAgentsIDsTriggering = new List<AIAlly>();
+
+            foreach (uint agentID in _combatAgentsIDsTriggering)
+            {
+                combatAgentsIDsTriggering.Add(CombatManager.Instance.RequestAlly(agentID));
+            }
+            
+            foreach (AIAlly ally in combatAgentsIDsTriggering)
             {
                 ally.FreeOfWarnArea(_coneAttackComponent, this);
             }
@@ -64,7 +76,14 @@ namespace AI.Combat.Enemy
         {
             _isWarning = false;
 
-            foreach (AIAlly ally in _combatAgentsTriggering)
+            List<AIAlly> combatAgentsIDsTriggering = new List<AIAlly>();
+
+            foreach (uint agentID in _combatAgentsIDsTriggering)
+            {
+                combatAgentsIDsTriggering.Add(CombatManager.Instance.RequestAlly(agentID));
+            }
+
+            foreach (AIAlly ally in combatAgentsIDsTriggering)
             {
                 InflictDamageToAlly(ally);
             }
@@ -81,14 +100,14 @@ namespace AI.Combat.Enemy
 
             if (_isWarning)
             {
-                targetAlly.WarnOncomingDamage(_coneAttackComponent, this);    
+                targetAlly.WarnOncomingDamage(_coneAttackComponent, this, _stopwatch.ElapsedMilliseconds / 1000);    
             }
             else
             {
                 InflictDamageToAlly(targetAlly);   
             }
             
-            _combatAgentsTriggering.Add(targetAlly);
+            _combatAgentsIDsTriggering.Add(targetAlly.GetAgentID());
         }
 
         private void OnTriggerExit(Collider other)
@@ -101,7 +120,7 @@ namespace AI.Combat.Enemy
             }
             
             targetAlly.FreeOfWarnArea(_coneAttackComponent, this);    
-            _combatAgentsTriggering.Remove(targetAlly);
+            _combatAgentsIDsTriggering.Remove(targetAlly.GetAgentID());
         }
     }
 }

@@ -10,7 +10,7 @@ namespace AI.Combat.Ally
     {
         [SerializeField] private BoxCollider _boxCollider;
         
-        private AllyRectangleAttackComponent _rectangleAttackComponent; 
+        private AllyRectangleAttackComponent _rectangleAttackComponent;
 
         protected override void OnEnable()
         {
