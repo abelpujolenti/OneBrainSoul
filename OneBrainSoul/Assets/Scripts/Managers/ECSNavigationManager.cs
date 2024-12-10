@@ -409,7 +409,7 @@ namespace Managers
             _navMeshAgentDestinations[agentID].GetAStarPath().deviationVector = deviationVector;
         }
 
-        private void OnDrawGizmos()
+        /*private void OnDrawGizmos()
         {
             foreach (Node node in _navMeshGraph.nodes.Values)
             {
@@ -434,7 +434,7 @@ namespace Managers
                     Gizmos.DrawLine(aStarPath.path[i].position, aStarPath.path[i + 1].position);
                 }
             }
-        }
+        }*/
 
         public List<Vector3> GetPath(uint agentID)
         {

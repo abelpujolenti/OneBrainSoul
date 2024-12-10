@@ -42,7 +42,9 @@ namespace AI.Combat.ScriptableObjects
             float alertRadius, float safetyRadius) : base(totalHealth, radius, height, sightMaximumDistance, 
             minimumRangeToAttack, maximumRangeToAttack, agentTransform)
         {
+            _repeatableActions.Add((uint)AIAllyAction.FOLLOW_PLAYER);
             _repeatableActions.Add((uint)AIAllyAction.CHOOSE_NEW_RIVAL);
+            _repeatableActions.Add((uint)AIAllyAction.GET_CLOSER_TO_RIVAL);
             _repeatableActions.Add((uint)AIAllyAction.ROTATE);
             _repeatableActions.Add((uint)AIAllyAction.ATTACK);
             _repeatableActions.Add((uint)AIAllyAction.FLEE);
