@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AI.Combat.AttackColliders;
 using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
 using Unity.AI.Navigation;
@@ -10,9 +11,9 @@ namespace AI.Combat.Enemy
 {
     public class AIEnemyCircleAttackCollider : AIEnemyAttackCollider
     {
+        [SerializeField] private SphereCollider _sphereCollider;
+        
         private CircleAttackComponent _circleAttackComponent;
-
-        private SphereCollider _sphereCollider; 
 
         protected override void OnEnable()
         {
@@ -48,19 +49,11 @@ namespace AI.Combat.Enemy
 
         public void SetCircleAttackComponent(CircleAttackComponent circleAttackComponent)
         {
-            _sphereCollider = gameObject.AddComponent<SphereCollider>();
-            _sphereCollider.isTrigger = true;
-            
             _circleAttackComponent = circleAttackComponent;
             float radius = _circleAttackComponent.GetRadius();
             float height = _circleAttackComponent.GetHeight();
             
             _sphereCollider.radius = radius;
-
-            foreach (NavMeshModifierVolume navMeshModifierVolume in _navMeshModifierVolumes)
-            {
-                navMeshModifierVolume.size = new Vector3(radius, height, 4);
-            }
         }
 
         public override void StartInflictingDamage()
@@ -69,11 +62,11 @@ namespace AI.Combat.Enemy
 
             foreach (AIAlly ally in _combatAgentsTriggering)
             {
-                InflictDamageToAnAlly(ally);
+                InflictDamageToAlly(ally);
             }
         }
 
-        private void InflictDamageToAnAlly(AIAlly ally)
+        private void InflictDamageToAlly(AIAlly ally)
         {
             ally.OnReceiveDamage(new DamageComponent(_circleAttackComponent.GetDamage()));
         }
@@ -82,7 +75,7 @@ namespace AI.Combat.Enemy
         {
             List<Vector2> corners = new List<Vector2>();
 
-            for (int i = 0; i < _navMeshModifierVolumes.Count; i++)
+            /*for (int i = 0; i < _navMeshModifierVolumes.Count; i++)
             {
                 Vector2[] currentCorners = GetGivenVolumeCornerPoints(_navMeshModifierVolumes[i]);
 
@@ -90,7 +83,7 @@ namespace AI.Combat.Enemy
                 {
                     corners.Add(currentCorners[j]);
                 }
-            }
+            }*/
 
             return PolygonUtilities.OrderVerticesCounterClockwise(corners).ToArray();
         }
@@ -130,7 +123,7 @@ namespace AI.Combat.Enemy
             }
             else
             {
-                InflictDamageToAnAlly(targetAlly);   
+                InflictDamageToAlly(targetAlly);   
             }
             
             _combatAgentsTriggering.Add(targetAlly);

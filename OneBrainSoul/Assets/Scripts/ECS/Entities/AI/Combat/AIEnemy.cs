@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AI;
 using AI.Combat;
 using AI.Combat.Ally;
+using AI.Combat.AttackColliders;
 using AI.Combat.Enemy;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
@@ -16,6 +17,8 @@ namespace ECS.Entities.AI.Combat
     public class AIEnemy : AICombatAgentEntity<AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>
     {
         [SerializeField] private AIEnemySpecs _aiEnemySpecs;
+
+        private bool _alive = true;
         
         private void Start()
         {
@@ -34,12 +37,14 @@ namespace ECS.Entities.AI.Combat
 
             _surroundingSlots = new SurroundingSlots(radius + _aiEnemySpecs.rivalsPositionRadius);
             
-            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, radius, 
+            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, radius, capsuleCollider.height, 
                 _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
                 _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
             
             CombatManager.Instance.AddAIEnemy(this);
             ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
+
+            InstantiateAttacksColliders();
             
             StartUpdate();
         }
@@ -77,12 +82,52 @@ namespace ECS.Entities.AI.Combat
                 }
             }
         }
+        
+        private void InstantiateAttacksColliders()
+        {
+            int layerTarget = GameManager.Instance.GetAllyLayer();
+            
+            foreach (AttackComponent attackComponent in _attackComponents)
+            {
+                GameObject colliderObject = null;
+
+                switch (attackComponent.GetAIAttackAoEType())
+                {
+                    case AIAttackAoEType.RECTANGLE_AREA:
+                        colliderObject = Instantiate(_rectangleAttackColliderPrefab);
+                        AIEnemyRectangleAttackCollider enemyRectangleAttackCollider = 
+                            colliderObject.GetComponent<AIEnemyRectangleAttackCollider>();
+                        
+                        enemyRectangleAttackCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
+                        enemyRectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, enemyRectangleAttackCollider);
+                        break;
+
+                    case AIAttackAoEType.CIRCLE_AREA:
+                        colliderObject = Instantiate(_circleAttackColliderPrefab);
+                        AIEnemyCircleAttackCollider enemyCircleAttackCollider = colliderObject.GetComponent<AIEnemyCircleAttackCollider>();
+                        enemyCircleAttackCollider.SetCircleAttackComponent((CircleAttackComponent)attackComponent);
+                        enemyCircleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, enemyCircleAttackCollider);
+                        break;
+
+                    case AIAttackAoEType.CONE_AREA:
+                        AIEnemyConeAttackCollider enemyConeAttackCollider = colliderObject.GetComponent<AIEnemyConeAttackCollider>();
+                        enemyConeAttackCollider.SetConeAttackComponent((ConeAttackComponent)attackComponent);
+                        enemyConeAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, enemyConeAttackCollider);
+                        break;
+                }
+
+                colliderObject.SetActive(false);
+            }
+        }
 
         #region AI Loop
 
         protected override IEnumerator UpdateCoroutine()
         {
-            while (true)
+            while (_alive)
             {
                 UpdateVisibleRivals();
 
@@ -125,7 +170,7 @@ namespace ECS.Entities.AI.Combat
             _visibleRivals = CombatManager.Instance.GetVisibleRivals<AIAlly, AIAllyContext, AllyAttackComponent, 
                 DamageComponent, AIAllyAction, AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>(this);
 
-            _context.SetIsSeeingARival(_visibleRivals.Count != 0);
+            SetIsSeeingARival(_visibleRivals.Count != 0);
         }
 
         #endregion
@@ -138,7 +183,7 @@ namespace ECS.Entities.AI.Combat
             //TODO
         }
 
-        private void RequestRival()
+        protected override void RequestRival()
         {
             ShowActionDebugLogs(name + " Requesting Rival");
             
@@ -152,7 +197,7 @@ namespace ECS.Entities.AI.Combat
             OnTargetAcquired(targetID, CombatManager.Instance.RequestAlly(targetID).GetContext());
         }
 
-        private uint ObtainTargetID(List<uint> possibleRivals)
+        protected override uint ObtainTargetID(List<uint> possibleRivals)
         {
             uint targetID;
 
@@ -174,6 +219,7 @@ namespace ECS.Entities.AI.Combat
         {
             SetRivalIndex(enemyID);
             SetRivalRadius(allyContext.GetRadius());
+            SetRivalHeight(allyContext.GetHeight());
             SetHasATarget(true);
             SetRivalTransform(allyContext.GetAgentTransform());
         }
@@ -190,25 +236,117 @@ namespace ECS.Entities.AI.Combat
 
         private void Attack()
         {
+            ShowActionDebugLogs(name + " Attacking");
+            
             StopNavigation();
 
             AttackComponent attackComponent = ReturnNextAttack();
             
             Attacking();
             
-            CombatManager.Instance.EnemyStartCastingAnAttack(transform, attackComponent, this);
+            StartCastingAttack(attackComponent);
         }
 
         private void Flee()
         {
+            ShowActionDebugLogs(name + " Fleeing");
+            
             ContinueNavigation();
         }
 
         #endregion
 
+        #region Attacks Managing
+
+        #region Own Attacks
+
+        protected override void StartCastingAttack(AttackComponent attackComponent)
+        {
+            if (attackComponent.IsOnCooldown())
+            {
+                NotAttacking();
+                return;
+            }
+            
+            AIAttackCollider attackCollider = _attacksColliders[attackComponent];
+            attackCollider.SetParent(transform);
+            attackCollider.gameObject.SetActive(true);
+            StartCoroutine(StartAttackCastTimeCoroutine(attackComponent, attackCollider));
+        }
+
+        protected override IEnumerator StartAttackCastTimeCoroutine(AttackComponent attackComponent, AIAttackCollider attackCollider)
+        {
+            attackComponent.StartCastTime();
+
+            bool isStunned = _context.IsStunned();
+            
+            while (attackComponent.IsCasting() && !isStunned)
+            {
+                attackComponent.DecreaseCurrentCastTime();
+                yield return null;
+            }
+
+            if (!isStunned)
+            {
+                attackCollider.StartInflictingDamage();
+
+                if (attackComponent.DoesDamageOverTime())
+                {
+                    StartCoroutine(StartDamageOverTime(attackComponent, attackCollider));
+                    yield break;
+                }
+            
+                Rotate();
+            }
+            
+            PutAttackOnCooldown(attackComponent);
+            attackCollider.Deactivate();
+        }
+
+        protected override IEnumerator StartDamageOverTime(AttackComponent attackComponent, AIAttackCollider attackCollider)
+        {
+            while (attackComponent.DidDamageOverTimeFinished())
+            {
+                attackComponent.DecreaseRemainingTimeDealingDamage();
+                yield return null;
+            }
+           
+            Rotate();
+            PutAttackOnCooldown(attackComponent);
+            attackCollider.Deactivate();
+        }
+
+        protected override void PutAttackOnCooldown(AttackComponent attackComponent)
+        {
+            NotAttacking();
+            StartCoroutine(StartCooldownCoroutine(attackComponent));
+        }
+
+        protected override IEnumerator StartCooldownCoroutine(AttackComponent attackComponent)
+        {
+            attackComponent.StartCooldown();
+            while (attackComponent.IsOnCooldown())
+            {
+                attackComponent.DecreaseCooldown();
+                yield return null;
+            }
+            
+            OnAttackAvailableAgain(attackComponent);
+        }
+
+        #endregion
+
+        #region Rival Attacks
+
+        
+
+        #endregion
+
+        #endregion
+
         public override void OnReceiveDamage(AllyDamageComponent damageComponent)
         {
-            _context.SetHealth(_context.GetHealth() - damageComponent.GetDamage());
+            SetHealth(_context.GetHealth() - damageComponent.GetDamage());
 
             uint health = _context.GetHealth();
 
@@ -247,6 +385,7 @@ namespace ECS.Entities.AI.Combat
         {
             CombatManager.Instance.OnEnemyDefeated(this);
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
+            _alive = false;
             Destroy(gameObject);
         }
 
@@ -267,7 +406,7 @@ namespace ECS.Entities.AI.Combat
             
             GetContext().SetIsStunned(false);
             
-            RotateToNextPathCorner();
+            Rotate();
             CombatManager.Instance.OnEnemyStunEnds(GetAgentID());
         }
 
@@ -279,11 +418,6 @@ namespace ECS.Entities.AI.Combat
         public override AIEnemyContext GetContext()
         {
             return _context;
-        }
-
-        public void SetCurrentStress(float currentStress)
-        {
-            _context.SetCurrentStress(currentStress);
         }
 
         public List<AttackComponent> GetAttackComponents()

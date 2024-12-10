@@ -17,7 +17,9 @@ namespace AI.Combat.ScriptableObjects
         private uint _rivalIndex;
 
         private float _radius;
+        private float _height;
         private float _rivalRadius;
+        private float _rivalHeight;
         private float _sightMaximumDistance;
         private float _distanceToRival;
         private float _minimumRangeToAttack;
@@ -34,12 +36,13 @@ namespace AI.Combat.ScriptableObjects
         private Transform _agentTransform;
         private Transform _rivalTransform;
 
-        protected AICombatAgentContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
+        protected AICombatAgentContext(uint totalHealth, float radius, float height, float sightMaximumDistance, float minimumRangeToAttack, 
             float maximumRangeToAttack, Transform agentTransform)
         {
             _totalHealth = totalHealth;
             _health = totalHealth;
             _radius = radius;
+            _height = height;
             _sightMaximumDistance = sightMaximumDistance != 0 ? sightMaximumDistance : Mathf.Infinity; 
             _minimumRangeToAttack = minimumRangeToAttack;
             _maximumRangeToAttack = maximumRangeToAttack;
@@ -91,6 +94,11 @@ namespace AI.Combat.ScriptableObjects
             return _radius;
         }
 
+        public float GetHeight()
+        {
+            return _height;
+        }
+
         public void SetRivalRadius(float rivalRadius)
         {
             _rivalRadius = rivalRadius;
@@ -99,6 +107,16 @@ namespace AI.Combat.ScriptableObjects
         public float GetRivalRadius()
         {
             return _rivalRadius;
+        }
+
+        public void SetRivalHeight(float rivalHeight)
+        {
+            _rivalHeight = rivalHeight;
+        }
+
+        public float GetRivalHeight()
+        {
+            return _rivalHeight;
         }
 
         public float GetSightMaximumDistance()
@@ -200,7 +218,14 @@ namespace AI.Combat.ScriptableObjects
         public void SetRivalTransform(Transform rivalTransform)
         {
             _rivalTransform = rivalTransform;
-            SetVectorToRival(_rivalTransform.position - _agentTransform.position);
+
+            Vector3 rivalPosition = _rivalTransform.position;
+            rivalPosition.y -= _rivalHeight / 2;
+
+            Vector3 agentPosition = _agentTransform.position;
+            agentPosition.y -= _height / 2;
+            
+            SetVectorToRival(rivalPosition - agentPosition);
         }
 
         public Transform GetRivalTransform()

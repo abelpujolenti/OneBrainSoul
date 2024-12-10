@@ -1,5 +1,6 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
+using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using Interfaces.AI.Navigation;
@@ -35,12 +36,12 @@ namespace ECS.Entities.AI.Navigation
             _rotationSpeed = _navMeshAgentSpecs.rotationSpeed;
         }
 
-        public void ContinueNavigation()
+        protected void ContinueNavigation()
         {
             _navMeshAgentComponent.GetNavMeshAgent().isStopped = false;
         }
 
-        public void StopNavigation()
+        protected void StopNavigation()
         {
             _navMeshAgentComponent.GetNavMeshAgent().isStopped = true;
         }
@@ -48,21 +49,16 @@ namespace ECS.Entities.AI.Navigation
         public void Rotate()
         {
             Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(_agentId).GetPosition();
-            
-            Transform ownTransform = transform;
-            
-            Vector3 position = ownTransform.position;
-            
-            float angleToDestination = Vector3.Angle(ownTransform.forward, destination - position);
+
+            List<Node> nodes = _navMeshAgentComponent.GetAStarPath().path;
                     
-            if (angleToDestination > 15f)
+            if (nodes.Count == 0)
             {
                 RotateToGivenPosition(destination);
                 return;
             }
-
-            StartCoroutine(EnsureAPathExists(() =>
-                Vector3.Angle(ownTransform.forward, _navMeshAgent.path.corners[0] - position) > 120f));
+            
+            RotateToGivenPosition(nodes[0].position);
         }
 
         private void RotateToGivenPosition(Vector3 position)
@@ -79,45 +75,16 @@ namespace ECS.Entities.AI.Navigation
             StartCoroutine(RotateToGivenPositionCoroutine(position));
         }
 
-        public void RotateToNextPathCorner()
-        {
-            if (_isRotating)
-            {
-                return;
-            }
-            
-            StopNavigation();
-
-            _isRotating = true;
-
-            StartCoroutine(EnsureAPathExists(()=> true));
-        }
-
-        private IEnumerator EnsureAPathExists(Func<bool> action)
-        {
-            while (_navMeshAgent.path.corners.Length <= 0)
-            {
-                yield return null;
-            }
-
-            if (!action())
-            {
-                yield break;
-            }
-
-            StartCoroutine(RotateToGivenPositionCoroutine(_navMeshAgent.path.corners[0]));
-        }
-
         protected virtual IEnumerator RotateToGivenPositionCoroutine(Vector3 position)
         {
             Transform ownTransform = transform;
             
-            Vector3 vectorToNextPathCorner = position - ownTransform.position;
-            vectorToNextPathCorner.y = 0;
+            Vector3 vectorToPosition = position - ownTransform.position;
+            vectorToPosition.y = 0;
 
-            while (Vector3.Angle(ownTransform.forward, vectorToNextPathCorner) >= 5f)
+            while (Vector3.Angle(ownTransform.forward, vectorToPosition) >= 5f)
             {
-                Quaternion rotation = Quaternion.LookRotation(vectorToNextPathCorner);
+                Quaternion rotation = Quaternion.LookRotation(vectorToPosition);
                 ownTransform.rotation = Quaternion.Slerp(ownTransform.rotation, rotation, _rotationSpeed * Time.deltaTime);
                 yield return null;
             }
