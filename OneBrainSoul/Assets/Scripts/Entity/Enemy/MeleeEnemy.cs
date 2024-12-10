@@ -50,7 +50,7 @@ public class MeleeEnemy : EnemyBase
 
     void FollowUpdate(PlayerCharacterController player)
     {
-        Vector3 plVector = (player.transform.position - transform.position);
+        /*Vector3 plVector = (player.transform.position - transform.position);
         plVector.y = 0f;
         if (plVector.magnitude > radius + 2f && damageCooldown <= 0)
         {
@@ -61,6 +61,6 @@ public class MeleeEnemy : EnemyBase
             Vector3 horizontalVelocity = rb.velocity;
             horizontalVelocity.y = 0;
             rb.AddForce(-horizontalVelocity * 15f, ForceMode.Acceleration);
-        }
+        }*/
     }
 }
