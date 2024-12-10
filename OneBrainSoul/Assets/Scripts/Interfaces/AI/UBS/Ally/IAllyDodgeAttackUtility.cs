@@ -2,6 +2,7 @@
 
 namespace Interfaces.AI.UBS.Ally
 {
-    public interface IAllyDodgeAttackUtility : IIsUnderAttack, IGetHealth, IGetTotalHealth, IGetOncomingAttackDamage, IGetRivalHealth
+    public interface IAllyDodgeAttackUtility : IIsUnderAttack, IGetHealth, IGetTotalHealth, IGetTimeToNextEnemyMeleeAttack, 
+        IGetDistanceToCloserEnemyProjectile, IGetOncomingAttackDamage, IGetRivalHealth
     {}
 }

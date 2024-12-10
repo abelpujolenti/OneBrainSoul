@@ -95,27 +95,34 @@ namespace ECS.Entities.AI.Combat
                 {
                     case AIAttackAoEType.RECTANGLE_AREA:
                         colliderObject = Instantiate(_rectangleAttackColliderPrefab);
-                        AIEnemyRectangleAttackCollider enemyRectangleAttackCollider = 
+                        AIEnemyRectangleAttackCollider rectangleAttackCollider = 
                             colliderObject.GetComponent<AIEnemyRectangleAttackCollider>();
                         
-                        enemyRectangleAttackCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
-                        enemyRectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, enemyRectangleAttackCollider);
+                        rectangleAttackCollider.SetOwner(GetAgentID());
+                        rectangleAttackCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
+                        rectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, rectangleAttackCollider);
                         break;
 
                     case AIAttackAoEType.CIRCLE_AREA:
                         colliderObject = Instantiate(_circleAttackColliderPrefab);
-                        AIEnemyCircleAttackCollider enemyCircleAttackCollider = colliderObject.GetComponent<AIEnemyCircleAttackCollider>();
-                        enemyCircleAttackCollider.SetCircleAttackComponent((CircleAttackComponent)attackComponent);
-                        enemyCircleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, enemyCircleAttackCollider);
+                        AIEnemyCircleAttackCollider circleAttackCollider = 
+                            colliderObject.GetComponent<AIEnemyCircleAttackCollider>();
+                        
+                        circleAttackCollider.SetOwner(GetAgentID());
+                        circleAttackCollider.SetCircleAttackComponent((CircleAttackComponent)attackComponent);
+                        circleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, circleAttackCollider);
                         break;
 
                     case AIAttackAoEType.CONE_AREA:
-                        AIEnemyConeAttackCollider enemyConeAttackCollider = colliderObject.GetComponent<AIEnemyConeAttackCollider>();
-                        enemyConeAttackCollider.SetConeAttackComponent((ConeAttackComponent)attackComponent);
-                        enemyConeAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, enemyConeAttackCollider);
+                        AIEnemyConeAttackCollider coneAttackCollider = 
+                            colliderObject.GetComponent<AIEnemyConeAttackCollider>();
+                        
+                        coneAttackCollider.SetOwner(GetAgentID());
+                        coneAttackCollider.SetConeAttackComponent((ConeAttackComponent)attackComponent);
+                        coneAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, coneAttackCollider);
                         break;
                 }
 
@@ -396,10 +403,15 @@ namespace ECS.Entities.AI.Combat
         
         protected override void OnDefeated()
         {
+            Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            EventsManager.OnAgentDefeated(GetAgentID());
             CombatManager.Instance.OnEnemyDefeated(this);
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
             _alive = false;
-            Destroy(gameObject);
         }
 
         #endregion
@@ -433,6 +445,7 @@ namespace ECS.Entities.AI.Combat
             GetContext().SetIsStunned(false);
             
             Rotate();
+            
             CombatManager.Instance.OnEnemyStunEnds(GetAgentID());
         }
 

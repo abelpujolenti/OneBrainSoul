@@ -18,7 +18,7 @@ namespace AI.Navigation
         public Vector3 destination;
         public List<Vector3> dynamicObstaclesPositions = new List<Vector3>();
 
-        private Mutex mutex = new Mutex();
+        private Mutex _mutex = new Mutex();
 
         public AStarPath(IPosition destinationPosition)
         {
@@ -51,12 +51,12 @@ namespace AI.Navigation
 
         public void LockMutex()
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
         }
 
         public void ReleaseMutex()
         {
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 }

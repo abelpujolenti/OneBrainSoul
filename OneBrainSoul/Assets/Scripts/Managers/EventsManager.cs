@@ -39,5 +39,11 @@ namespace Managers
 
         #endregion
 
+        #region Combat Events
+
+        public static Action<uint> OnAgentDefeated;
+
+        #endregion
+
     }
 }
