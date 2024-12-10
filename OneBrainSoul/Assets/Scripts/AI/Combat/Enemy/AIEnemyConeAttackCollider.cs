@@ -75,11 +75,6 @@ namespace AI.Combat.Enemy
             ally.OnReceiveDamage(new DamageComponent(_coneAttackComponent.GetDamage()));
         }
 
-        protected override Vector2[] GetCornerPoints()
-        {
-            return new Vector2[2];
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             AIAlly targetAlly = other.GetComponent<AIAlly>();

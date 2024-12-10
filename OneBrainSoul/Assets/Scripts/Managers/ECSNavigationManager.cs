@@ -261,9 +261,17 @@ namespace Managers
 
         private void NotifyNewDynamicObstacle(DynamicObstacle dynamicObstacle)
         {
+            AStarPath aStarPath;
+            
             foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                navMeshAgentComponent.GetAStarPath().dynamicObstacles.Add(dynamicObstacle);
+                aStarPath = navMeshAgentComponent.GetAStarPath();
+                
+                aStarPath.LockMutex();
+                
+                aStarPath.dynamicObstacles.Add(dynamicObstacle);
+                
+                aStarPath.ReleaseMutex();
             }
         }
 
@@ -356,10 +364,18 @@ namespace Managers
         private void RemoveDynamicObstacle(uint obstacleID)
         {
             DynamicObstacle dynamicObstacle = _dynamicObstaclesID[obstacleID];
+
+            AStarPath aStarPath;
             
             foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                navMeshAgentComponent.GetAStarPath().dynamicObstacles.Remove(dynamicObstacle);
+                aStarPath = navMeshAgentComponent.GetAStarPath();
+                
+                aStarPath.LockMutex();
+                
+                aStarPath.dynamicObstacles.Remove(dynamicObstacle);
+                
+                aStarPath.ReleaseMutex();
             }
         }
 

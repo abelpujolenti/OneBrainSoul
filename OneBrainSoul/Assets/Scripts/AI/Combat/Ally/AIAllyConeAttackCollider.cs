@@ -43,7 +43,7 @@ namespace AI.Combat.Ally
 
         public void SetConeAttackComponent(AllyConeAttackComponent coneAttackComponent)
         {
-            _allyID = coneAttackComponent.GetAllyID();
+            _ownerID = coneAttackComponent.GetAllyID();
             
             _sphereCollider = gameObject.AddComponent<SphereCollider>();
             _sphereCollider.isTrigger = true;

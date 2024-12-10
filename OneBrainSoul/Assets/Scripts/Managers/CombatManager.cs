@@ -249,7 +249,17 @@ namespace Managers
         
         public void OnAllyDefeated(AIAlly aiAlly)
         {
-            //TODO ON ALLY DEFEATED
+            uint agentID = aiAlly.GetAgentID();
+            
+            foreach (AIEnemy enemy in _aiEnemies.Values)
+            {
+                if (enemy.GetContext().GetRivalID() != agentID)
+                {
+                    continue;
+                }
+                
+                enemy.SetIsDueling(false);
+            }
             
             OnAgentDefeated<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction, 
                 AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>(aiAlly, ref _aiEnemies);

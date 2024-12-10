@@ -460,21 +460,21 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
         }
 
-        /*private void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             if (ECSNavigationManager.Instance == null)
             {
                 return;
             }
             
-            Vector3 position = transform.position;
+            /*Vector3 position = transform.position;
             
             Gizmos.color = Color.green;
             
             foreach (DirectionWeights directionAndWeight in _raysDirectionAndWeights)
             {
                 Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
-            }
+            }*/
 
             Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
 
@@ -493,7 +493,7 @@ namespace ECS.Entities.AI.Combat
             }
             
             Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
-        }*/
+        }
 
         private Vector3 Up(Vector3 position)
         {

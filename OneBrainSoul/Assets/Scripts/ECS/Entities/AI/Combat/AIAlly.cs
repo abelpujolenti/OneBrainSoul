@@ -114,6 +114,7 @@ namespace ECS.Entities.AI.Combat
                         AIAllyRectangleAttackCollider rectangleAttackCollider =
                             colliderObject.GetComponent<AIAllyRectangleAttackCollider>();
                         
+                        rectangleAttackCollider.SetOwner(GetAgentID(), _context);
                         rectangleAttackCollider.SetRectangleAttackComponent((AllyRectangleAttackComponent)attackComponent);
                         rectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
                         _attacksColliders.Add(attackComponent, rectangleAttackCollider);
@@ -124,13 +125,16 @@ namespace ECS.Entities.AI.Combat
                         AIAllyCircleAttackCollider circleAttackCollider = 
                             colliderObject.GetComponent<AIAllyCircleAttackCollider>();
                         
+                        circleAttackCollider.SetOwner(GetAgentID(), _context);
                         circleAttackCollider.SetCircleAttackComponent((AllyCircleAttackComponent)attackComponent);
                         circleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
                         _attacksColliders.Add(attackComponent, circleAttackCollider);
                         break;
 
                     case AIAttackAoEType.CONE_AREA:
-                        AIAllyConeAttackCollider coneAttackCollider = colliderObject.AddComponent<AIAllyConeAttackCollider>();
+                        AIAllyConeAttackCollider coneAttackCollider = colliderObject.GetComponent<AIAllyConeAttackCollider>();
+                        
+                        coneAttackCollider.SetOwner(GetAgentID(), _context);
                         coneAttackCollider.SetConeAttackComponent((AllyConeAttackComponent)attackComponent);
                         coneAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
                         _attacksColliders.Add(attackComponent, coneAttackCollider);
@@ -325,23 +329,24 @@ namespace ECS.Entities.AI.Combat
 
             foreach (Vector3 vector in _context.GetVectorsToEnemiesThatTargetsMe())
             {
-                angles.Add(MathUtil.VectorToAngle(-vector));   
+                angles.Add(MathUtil.VectorToAngle(vector));   
             }
             
             angles.Sort();
 
             (int, float) widerSubtendedAngle = GetWiderSubtendedAngle(angles);
 
-            Vector3 position = MathUtil.AngleToVector(angles[widerSubtendedAngle.Item1] + widerSubtendedAngle.Item2 / 2);
+            Vector3 position = MathUtil.AngleToVector((angles[widerSubtendedAngle.Item1] + widerSubtendedAngle.Item2 / 2) % 360);
 
             position *= _context.GetSafetyRadius() * 2;
             
-            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), new VectorComponent(position));
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), 
+                new VectorComponent(transform.position + position));
         }
 
         private (int, float) GetWiderSubtendedAngle(List<float> angles)
         {
-            float shortestDistanceToNextAngle = Mathf.Infinity;
+            float longestDistanceToNextAngle = 0;
 
             int chosenAngleIndex = 0;
             
@@ -354,27 +359,27 @@ namespace ECS.Entities.AI.Combat
             for (int i = 0; i < anglesCount; i++)
             {
                 currentAngle = angles[i];
-                nextAngle = angles[(i + 1) % (anglesCount - 1)];
+                nextAngle = angles[(i + 1) % anglesCount];
 
                 if (currentAngle > nextAngle)
                 {
-                    currentDistanceToNextAngle = Math.Abs(currentAngle + (360 - nextAngle));
+                    currentDistanceToNextAngle = Math.Abs(nextAngle + (360 - currentAngle));
                 }
                 else
                 {
                     currentDistanceToNextAngle = nextAngle - currentAngle;
                 }
 
-                if (shortestDistanceToNextAngle > currentDistanceToNextAngle)
+                if (longestDistanceToNextAngle > currentDistanceToNextAngle)
                 {
                     continue;
                 }
 
-                shortestDistanceToNextAngle = currentDistanceToNextAngle;
+                longestDistanceToNextAngle = currentDistanceToNextAngle;
                 chosenAngleIndex = i;
             }
 
-            return (chosenAngleIndex, shortestDistanceToNextAngle);
+            return (chosenAngleIndex, longestDistanceToNextAngle);
         }
 
         private void Dodge()
@@ -609,14 +614,14 @@ namespace ECS.Entities.AI.Combat
             OnDefeated();
         }
 
-        #endregion
-
-        #endregion
-
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnAllyDefeated(this);
         }
+
+        #endregion
+
+        #endregion
 
         private void OnBeingRescued()
         {

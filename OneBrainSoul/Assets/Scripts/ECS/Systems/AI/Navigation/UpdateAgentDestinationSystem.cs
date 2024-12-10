@@ -14,6 +14,11 @@ namespace ECS.Systems.AI.Navigation
             
             aStarPath.GetNavMeshGraph().ResetNodesImportantInfo();
 
+            if (newPath.Count == 0)
+            {
+                return;
+            }
+
             aStarPath.path = newPath;
             
             aStarPath.path.RemoveAt(0);

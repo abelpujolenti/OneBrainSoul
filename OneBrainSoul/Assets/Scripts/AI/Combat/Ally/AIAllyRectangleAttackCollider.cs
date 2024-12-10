@@ -44,7 +44,7 @@ namespace AI.Combat.Ally
 
         public void SetRectangleAttackComponent(AllyRectangleAttackComponent rectangleAttackComponent)
         {
-            _allyID = rectangleAttackComponent.GetAllyID();
+            _ownerID = rectangleAttackComponent.GetAllyID();
             
             _rectangleAttackComponent = rectangleAttackComponent;
 
@@ -69,6 +69,13 @@ namespace AI.Combat.Ally
             foreach (AIEnemy enemy in _combatAgentsTriggering)
             {
                 InflictDamageToEnemy(enemy);
+
+                if (enemy.GetAgentID() != _ownerContext.GetRivalID())
+                {
+                    continue;
+                }
+                
+                enemy.RequestDuel(_ownerID, _ownerContext);
             }
         }
 
