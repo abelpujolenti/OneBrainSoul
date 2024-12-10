@@ -253,7 +253,7 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                LaunchRaycasts();
+                //LaunchRaycasts();
 
                 if (_isRotating)
                 {

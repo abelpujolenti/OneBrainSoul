@@ -146,7 +146,7 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                LaunchRaycasts();
+                //LaunchRaycasts();
             
                 CalculateBestAction();
 
