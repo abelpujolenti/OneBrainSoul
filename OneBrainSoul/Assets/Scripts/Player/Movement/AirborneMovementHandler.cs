@@ -74,6 +74,7 @@ public class AirborneMovementHandler : MovementHandler
             doubleJumps++;
             canDoubleJump = false;
             player.cam.FovWarp(2.8f, .35f);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, player.transform.position);
         }
 
         if (!canDoubleJump && !player.jumpInput && jumpTimer <= 0f)

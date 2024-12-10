@@ -222,6 +222,7 @@ public class PlayerCharacterController : MonoBehaviour
                 {
                     cam.gameObject.SetActive(true);
                     display.SetActive(false);
+                    AudioManager.instance.PlayOneShot(FMODEvents.instance.openSwitchMode, transform.position);
                 }
                 cam.tag = "MainCamera";
                 switchModeCamera.tag = "Player";

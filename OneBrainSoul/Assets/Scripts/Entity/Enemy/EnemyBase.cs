@@ -29,6 +29,7 @@ public class EnemyBase : DamageTakingEntity
         }
         damageParticle.transform.position = hitPos;
         damageParticle.Play();
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
     }
 
     public void Heal(EnemyBase source, int amount)

@@ -102,6 +102,8 @@ public class BraincellManager : Singleton<BraincellManager>
         DeactivatePlayerController(playerControllers[currentCharacter]);
         
         currentCharacter = id;
+
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.swap, transform.position);
     }
 
     private void ActivatePlayerController(PlayerCharacterController c)

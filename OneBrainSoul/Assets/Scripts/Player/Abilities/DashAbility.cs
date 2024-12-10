@@ -30,6 +30,7 @@ public class DashAbility : MonoBehaviour
             player.ability1Time = player.ability1Cooldown;
 
             timesDashed++;
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
         }
     }
 }
