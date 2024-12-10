@@ -53,12 +53,12 @@ namespace ECS.Entities.AI.Combat
         {
             _actions = new Dictionary<AIEnemyAction, Action>
             {
-                { AIEnemyAction.PATROL , Patrol},
-                { AIEnemyAction.CHOOSE_NEW_RIVAL , RequestRival},
-                { AIEnemyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival},
-                { AIEnemyAction.ROTATE , Rotate},
-                { AIEnemyAction.ATTACK , Attack},
-                { AIEnemyAction.FLEE , Flee}
+                { AIEnemyAction.PATROL , Patrol },
+                { AIEnemyAction.CHOOSE_NEW_RIVAL , RequestRival },
+                { AIEnemyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival },
+                { AIEnemyAction.ROTATE , Rotate },
+                { AIEnemyAction.ATTACK , Attack },
+                { AIEnemyAction.FLEE , Flee }
             };
         }
 
@@ -156,17 +156,17 @@ namespace ECS.Entities.AI.Combat
                     continue;
                 }
                 
-                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestAlly(_context.GetRivalID())
-                    .GetRivalSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
+                AgentSlotPosition agentSlotPosition = CombatManager.Instance.RequestAlly(_context.GetRivalID())
+                    .GetAgentSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
 
-                if (rivalSlotPosition == null)
+                if (agentSlotPosition == null)
                 {
                     yield return null;
                     continue;
                 }
 
-                _rivalSlot = rivalSlotPosition.rivalSlot;
-                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);
+                _agentSlot = agentSlotPosition.agentSlot;
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
 
                 yield return null;
             }
@@ -197,6 +197,13 @@ namespace ECS.Entities.AI.Combat
             if (_visibleRivals.Count == 0)
             {
                 return;
+            }
+
+            AIAlly previousAlly = CombatManager.Instance.RequestAlly(_context.GetRivalID());
+
+            if (previousAlly != null)
+            {
+                previousAlly.ReleaseAgentSlot(GetAgentID());
             }
 
             uint targetID = ObtainTargetID(_visibleRivals);
@@ -408,7 +415,11 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDestroy()
         {
-            EventsManager.OnAgentDefeated(GetAgentID());
+            if (EventsManager.OnAgentDefeated != null)
+            {
+                EventsManager.OnAgentDefeated(GetAgentID());
+            }
+            
             CombatManager.Instance.OnEnemyDefeated(this);
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
             _alive = false;

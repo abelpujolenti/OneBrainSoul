@@ -8,21 +8,21 @@ namespace AI.Combat.Position
     public class SurroundingSlots
     {
         private readonly float _radiusFromAgent;
-        private Dictionary<uint, RivalSlot> _rivalSlots = new Dictionary<uint, RivalSlot>();
+        private Dictionary<uint, AgentSlot> _rivalSlots = new Dictionary<uint, AgentSlot>();
 
         public SurroundingSlots(float radiusFromAgent)
         {
             _radiusFromAgent = radiusFromAgent;
         }
 
-        public RivalSlotPosition ReserveSubtendedAngle(uint agentID, Vector3 direction, float radius)
+        public AgentSlotPosition ReserveSubtendedAngle(uint agentID, Vector3 direction, float radius)
         {
-            if (direction.magnitude < _radiusFromAgent)
+            if (_rivalSlots.ContainsKey(agentID) && direction.magnitude < _radiusFromAgent)
             {
-                return new RivalSlotPosition
+                return new AgentSlotPosition
                 {
                     deviationVector = -direction,
-                    rivalSlot = _rivalSlots[agentID]
+                    agentSlot = _rivalSlots[agentID]
                 };
             }
             
@@ -72,19 +72,19 @@ namespace AI.Combat.Position
             }
             else
             {
-                RivalSlot newRivalSlot = new RivalSlot
+                AgentSlot newAgentSlot = new AgentSlot
                 {
                     angle = doesExistAvailableAngle.Item2,
                     subtendedAngle = subtendedAngle
                 };
             
-                _rivalSlots.Add(agentID, newRivalSlot);
+                _rivalSlots.Add(agentID, newAgentSlot);
             }
 
-            return new RivalSlotPosition
+            return new AgentSlotPosition
             {
                 deviationVector = CalculateDeviationVector(_rivalSlots[agentID].angle, radius),
-                rivalSlot = _rivalSlots[agentID]
+                agentSlot = _rivalSlots[agentID]
             };
         }
 
@@ -111,7 +111,7 @@ namespace AI.Combat.Position
             
             bool wraps0;
             
-            foreach (RivalSlot rivalSlot in _rivalSlots.Values)
+            foreach (AgentSlot rivalSlot in _rivalSlots.Values)
             {
                 if (Math.Abs(rivalSlot.angle - oldAngle) < 0.1f)
                 {
@@ -172,7 +172,7 @@ namespace AI.Combat.Position
             
             bool wraps0;
             
-            foreach (RivalSlot rivalSlot in _rivalSlots.Values)
+            foreach (AgentSlot rivalSlot in _rivalSlots.Values)
             {
                 float currentMinimumAngle = rivalSlot.angle - rivalSlot.subtendedAngle / 2;
 
