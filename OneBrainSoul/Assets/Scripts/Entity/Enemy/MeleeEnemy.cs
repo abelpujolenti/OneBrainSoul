@@ -44,6 +44,7 @@ public class MeleeEnemy : EnemyBase
             if (player.health.Damage(damage, gameObject))
             {
                 attackTime = attackCooldown;
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyAttack, transform.position);
             }
         }
     }

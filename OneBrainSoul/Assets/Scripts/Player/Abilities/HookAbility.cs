@@ -71,6 +71,7 @@ public class HookAbility : MonoBehaviour
 
             player.movementHandler = new HookMovementHandler(player, startPos, endPos, ledgeFound ? ledgeHit.point: hit.point, ledgeFound);
             player.ability1Time = player.ability1Cooldown;
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.hookThrow, transform.position);
         }
     }
 }

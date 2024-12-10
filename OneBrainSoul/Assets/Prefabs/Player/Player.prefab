@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 7644145240796908984}
   - component: {fileID: 6350386376657103053}
   - component: {fileID: 5104957741736639978}
+  - component: {fileID: 8406850375352929687}
+  - component: {fileID: -5475084074820425321}
   m_Layer: 8
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -183,6 +185,28 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!81 &8406850375352929687
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306789094334657040}
+  m_Enabled: 1
+--- !u!114 &-5475084074820425321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306789094334657040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &409918385343837410
 GameObject:
   m_ObjectHideFlags: 0
@@ -993,7 +1017,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1991020809725938089}
   - component: {fileID: 8659892158976705853}
-  - component: {fileID: 5728119426100460355}
   - component: {fileID: 8029337504561334678}
   m_Layer: 8
   m_Name: SwitchModeCamera
@@ -1070,14 +1093,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &5728119426100460355
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052426544794895764}
-  m_Enabled: 1
 --- !u!114 &8029337504561334678
 MonoBehaviour:
   m_ObjectHideFlags: 0
