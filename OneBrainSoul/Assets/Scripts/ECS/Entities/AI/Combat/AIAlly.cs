@@ -203,10 +203,21 @@ namespace ECS.Entities.AI.Combat
 
         protected override void StartUpdate()
         {
+            StartCoroutine(EnsurePlayerTransformIsNotNull());
+        }
+
+        private IEnumerator EnsurePlayerTransformIsNotNull()
+        {
+            while (_playerTransform == null)
+            {
+                yield return null;
+            }
+            
             _isAI = true;
             _navMeshAgent.enabled = true;
             ECSNavigationManager.Instance.ReturnNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent());
             base.StartUpdate();
+            
         }
 
         public void CallStopUpdate()
@@ -220,6 +231,8 @@ namespace ECS.Entities.AI.Combat
         {
             _navMeshAgent.enabled = false;
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), false);
+            _playerBody = null;
+            _playerTransform = null;
             _isAI = false;
             base.StopUpdate();
         }
