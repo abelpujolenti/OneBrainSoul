@@ -41,7 +41,7 @@ namespace AI.Combat.Ally
 
         public void SetCircleAttackComponent(AllyCircleAttackComponent circleAttackComponent)
         {
-            _allyID = circleAttackComponent.GetAllyID();
+            _ownerID = circleAttackComponent.GetAllyID();
             
             _circleAttackComponent = circleAttackComponent;
             _sphereCollider.radius = _circleAttackComponent.GetRadius();
@@ -52,6 +52,13 @@ namespace AI.Combat.Ally
             foreach (AIEnemy enemy in _combatAgentsTriggering)
             {
                 InflictDamageToEnemy(enemy);
+
+                if (enemy.GetAgentID() != _ownerContext.GetRivalID())
+                {
+                    continue;
+                }
+                
+                enemy.RequestDuel(_ownerID, _ownerContext);
             }
         }
 

@@ -194,6 +194,8 @@ namespace ECS.Entities.AI.Combat
 
             uint targetID = ObtainTargetID(_visibleRivals);
             
+            _context.SetIsDueling(false);
+            
             OnTargetAcquired(targetID, CombatManager.Instance.RequestAlly(targetID).GetContext());
         }
 
@@ -215,9 +217,9 @@ namespace ECS.Entities.AI.Combat
             return targetID;
         }
 
-        private void OnTargetAcquired(uint enemyID, AIAllyContext allyContext)
+        private void OnTargetAcquired(uint allyID, AIAllyContext allyContext)
         {
-            SetRivalIndex(enemyID);
+            SetRivalIndex(allyID);
             SetRivalRadius(allyContext.GetRadius());
             SetRivalHeight(allyContext.GetHeight());
             SetHasATarget(true);
@@ -338,11 +340,22 @@ namespace ECS.Entities.AI.Combat
 
         #region Rival Attacks
 
-        
-
-        #endregion
-
-        #endregion
+        public void RequestDuel(uint agentID, AIAllyContext allyContext)
+        {
+            if (_context.IsDueling())
+            {
+                return;
+            }
+            
+            _context.SetIsDueling(true);
+            
+            if (agentID == _context.GetRivalID())
+            {
+                return;
+            }
+            
+            OnTargetAcquired(agentID, allyContext);
+        }
 
         public override void OnReceiveDamage(AllyDamageComponent damageComponent)
         {
@@ -380,7 +393,7 @@ namespace ECS.Entities.AI.Combat
             
             CombatManager.Instance.OnEnemyReceiveDamage(combatAgentInstanceID, health, _context.GetCurrentStress(), true);
         }
-
+        
         protected override void OnDefeated()
         {
             CombatManager.Instance.OnEnemyDefeated(this);
@@ -388,6 +401,19 @@ namespace ECS.Entities.AI.Combat
             _alive = false;
             Destroy(gameObject);
         }
+
+        #endregion
+
+        #endregion
+
+        #region Context
+
+        public void SetIsDueling(bool isDueling)
+        {
+            _context.SetIsDueling(isDueling);
+        }
+
+        #endregion
 
         private IEnumerator StunDuration()
         {

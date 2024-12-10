@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AI.Combat.AttackColliders;
+﻿using AI.Combat.AttackColliders;
 using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
-using Unity.AI.Navigation;
 using UnityEngine;
-using Utilities;
 
 namespace AI.Combat.Enemy
 {
@@ -69,48 +65,6 @@ namespace AI.Combat.Enemy
         private void InflictDamageToAlly(AIAlly ally)
         {
             ally.OnReceiveDamage(new DamageComponent(_circleAttackComponent.GetDamage()));
-        }
-
-        protected override Vector2[] GetCornerPoints()
-        {
-            List<Vector2> corners = new List<Vector2>();
-
-            /*for (int i = 0; i < _navMeshModifierVolumes.Count; i++)
-            {
-                Vector2[] currentCorners = GetGivenVolumeCornerPoints(_navMeshModifierVolumes[i]);
-
-                for (int j = 0; j < 4; j++)
-                {
-                    corners.Add(currentCorners[j]);
-                }
-            }*/
-
-            return PolygonUtilities.OrderVerticesCounterClockwise(corners).ToArray();
-        }
-
-        private Vector2[] GetGivenVolumeCornerPoints(NavMeshModifierVolume navMeshModifierVolume)
-        {
-            Vector3 size = navMeshModifierVolume.size;
-
-            Vector3 halfExtents = size / 2f;
-            
-            Vector3[] localCorners = new Vector3[]
-            {
-                new Vector3(-halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, halfExtents.z),
-                new Vector3(-halfExtents.x, 0, halfExtents.z),
-            };
-
-            Vector2[] corners = new Vector2[localCorners.Length];
-
-            for (int i = 0; i < localCorners.Length; i++)
-            {
-                Vector3 worldCorner = navMeshModifierVolume.transform.TransformPoint(localCorners[i]);
-                corners[i] = new Vector2(worldCorner.x, worldCorner.z);
-            }
-            
-            return corners.ToArray();
         }
 
         private void OnTriggerEnter(Collider other)

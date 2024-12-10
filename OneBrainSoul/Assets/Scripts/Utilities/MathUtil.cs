@@ -13,7 +13,7 @@ namespace Utilities
         {
             float radians = AngleToRadians(angle);
 
-            return new Vector3(Mathf.Sin(radians), 0, -Mathf.Cos(radians));
+            return new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians));
         }
 
         public static float VectorToAngle(Vector3 position)

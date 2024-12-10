@@ -89,33 +89,6 @@ namespace AI.Combat.Enemy
             ally.OnReceiveDamage(new DamageComponent(_rectangleAttackComponent.GetDamage()));
         }
 
-        protected override Vector2[] GetCornerPoints()
-        {
-            Vector3 center = _boxCollider.center;
-            
-            Vector3 size = _boxCollider.size;
-
-            Vector3 halfExtents = size / 2f;
-            
-            Vector3[] localCorners = new Vector3[]
-            {
-                new Vector3(-halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, halfExtents.z),
-                new Vector3(-halfExtents.x, 0, halfExtents.z),
-            };
-
-            Vector2[] corners = new Vector2[localCorners.Length];
-
-            for (int i = 0; i < localCorners.Length; i++)
-            {
-                Vector3 worldCorner = _boxCollider.transform.TransformPoint(localCorners[i]);
-                corners[i] = new Vector2(worldCorner.x + center.x, worldCorner.z + center.z);
-            }
-            
-            return corners;
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             AIAlly targetAlly = other.GetComponent<AIAlly>();

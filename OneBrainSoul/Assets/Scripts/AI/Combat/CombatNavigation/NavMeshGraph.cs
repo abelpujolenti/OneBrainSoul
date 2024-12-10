@@ -116,22 +116,6 @@ namespace AI.Combat.CombatNavigation
             });
         }
 
-        public void UpdateEdgeWeights(uint obstacleID, Vector3 obstaclePosition, float radius, float weightMultiplier)
-        {
-            foreach (Node node in nodes.Values)
-            {
-                foreach (Edge edge in node.edges)
-                {
-                    if (Vector3.Distance(nodes[edge.toNodeIndex].position, obstaclePosition) > radius)
-                    {
-                        continue;
-                    }
-                    
-                    edge.MultiplyDefaultCost(weightMultiplier);
-                }
-            }
-        }
-
         private Node GetClosestNode(Vector3 position)
         {
             Node closestNode = null;
@@ -153,6 +137,22 @@ namespace AI.Combat.CombatNavigation
             }
 
             return closestNode;
+        }
+
+        public void UpdateEdgeWeights(uint obstacleID, Vector3 obstaclePosition, float radius, float weightMultiplier)
+        {
+            foreach (Node node in nodes.Values)
+            {
+                foreach (Edge edge in node.edges)
+                {
+                    if (Vector3.Distance(nodes[edge.toNodeIndex].position, obstaclePosition) > radius)
+                    {
+                        continue;
+                    }
+                    
+                    edge.MultiplyDefaultCost(weightMultiplier);
+                }
+            }
         }
 
         public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
