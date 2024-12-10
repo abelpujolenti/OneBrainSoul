@@ -61,7 +61,11 @@ namespace Managers
 
         public int GetRaycastLayers()
         {
-            return GetInteractableLayer() | GetAllyLayer() | GetGroundLayer() | GetEnemyLayer() | 1;
+            return (int)(Mathf.Pow(2,GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetAllyLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
+        }
+        public int GetRaycastLayersWithoutAlly()
+        {
+            return (int)(Mathf.Pow(2, GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
         }
     }
 }
