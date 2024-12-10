@@ -1,4 +1,5 @@
-﻿using ECS.Components.AI.Combat;
+﻿using AI.Combat.AttackColliders;
+using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
 using UnityEngine;
 
@@ -65,11 +66,11 @@ namespace AI.Combat.Enemy
 
             foreach (AIAlly ally in _combatAgentsTriggering)
             {
-                InflictDamageToAnAlly(ally);
+                InflictDamageToAlly(ally);
             }
         }
 
-        private void InflictDamageToAnAlly(AIAlly ally)
+        private void InflictDamageToAlly(AIAlly ally)
         {
             ally.OnReceiveDamage(new DamageComponent(_coneAttackComponent.GetDamage()));
         }
@@ -89,7 +90,7 @@ namespace AI.Combat.Enemy
             }
             else
             {
-                InflictDamageToAnAlly(targetAlly);   
+                InflictDamageToAlly(targetAlly);   
             }
             
             _combatAgentsTriggering.Add(targetAlly);

@@ -14,9 +14,9 @@ namespace AI.Combat.ScriptableObjects
 
         private bool _isStunned;
 
-        public AIEnemyContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
+        public AIEnemyContext(uint totalHealth, float radius, float height, float sightMaximumDistance, float minimumRangeToAttack, 
             float maximumRangeToAttack, Transform agentTransform, float maximumStress, float stunDuration) : 
-            base(totalHealth, radius, sightMaximumDistance, minimumRangeToAttack, maximumRangeToAttack, agentTransform)
+            base(totalHealth, radius, height, sightMaximumDistance, minimumRangeToAttack, maximumRangeToAttack, agentTransform)
         {
             _repeatableActions.Add((uint)AIEnemyAction.CHOOSE_NEW_RIVAL);
             _repeatableActions.Add((uint)AIEnemyAction.ROTATE);

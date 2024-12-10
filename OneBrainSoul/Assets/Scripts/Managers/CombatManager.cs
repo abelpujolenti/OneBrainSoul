@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using AI;
-using AI.Combat;
 using AI.Combat.Ally;
 using AI.Combat.AttackColliders;
 using AI.Combat.Enemy;
@@ -182,46 +180,6 @@ namespace Managers
             uint agentID = aiEnemy.GetAgentID();
             
             _aiEnemies.Add(agentID, aiEnemy);
-            
-            AddEnemyAttack(aiEnemy.GetAttackComponents(), GameManager.Instance.GetAllyLayer());
-        }
-
-        private void AddEnemyAttack(List<AttackComponent> attackComponents, int layerTarget)
-        {
-            foreach (AttackComponent attackComponent in attackComponents)
-            {
-                GameObject colliderObject = null;
-
-                switch (attackComponent.GetAIAttackAoEType())
-                {
-                    case AIAttackAoEType.RECTANGLE_AREA:
-                        colliderObject = Instantiate(_enemyRectangleAttackColliderPrefab);
-                        AIEnemyRectangleAttackCollider enemyRectangleAttackCollider = 
-                            colliderObject.GetComponent<AIEnemyRectangleAttackCollider>();
-                        
-                        enemyRectangleAttackCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
-                        enemyRectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _enemiesAttacksColliders.Add(attackComponent, enemyRectangleAttackCollider);
-                        break;
-
-                    case AIAttackAoEType.CIRCLE_AREA:
-                        colliderObject = Instantiate(_enemyCircleAttackColliderPrefab);
-                        AIEnemyCircleAttackCollider enemyCircleAttackCollider = colliderObject.GetComponent<AIEnemyCircleAttackCollider>();
-                        enemyCircleAttackCollider.SetCircleAttackComponent((CircleAttackComponent)attackComponent);
-                        enemyCircleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _enemiesAttacksColliders.Add(attackComponent, enemyCircleAttackCollider);
-                        break;
-
-                    case AIAttackAoEType.CONE_AREA:
-                        AIEnemyConeAttackCollider enemyConeAttackCollider = colliderObject.GetComponent<AIEnemyConeAttackCollider>();
-                        enemyConeAttackCollider.SetConeAttackComponent((ConeAttackComponent)attackComponent);
-                        enemyConeAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _enemiesAttacksColliders.Add(attackComponent, enemyConeAttackCollider);
-                        break;
-                }
-
-                colliderObject.SetActive(false);
-            }
         }
 
         #endregion
@@ -356,33 +314,9 @@ namespace Managers
                 }
                 
                 agent.GetContext().SetHasATarget(false);
-                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(agent.GetAgentID(), (VectorComponent)null);
+                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(agent.GetAgentID(), 
+                    new VectorComponent(agent.GetNavMeshAgentComponent().GetTransformComponent().GetPosition()));
             }
-        }
-
-        #endregion
-
-        #region Attack Events
-
-        public void EnemyStartCastingAnAttack(Transform attackerTransform, 
-            AttackComponent attackComponent, AIEnemy enemy)
-        {
-            if (attackComponent.IsOnCooldown())
-            {
-                enemy.NotAttacking();
-                return;
-            }
-            
-            AIAttackCollider attackCollider = _enemiesAttacksColliders[attackComponent];
-            attackCollider.SetParent(attackerTransform);
-            attackCollider.gameObject.SetActive(true);
-            StartCoroutine(StartEnemyAttackCastTimeCoroutine(attackComponent, attackCollider, enemy));
-        }
-
-        private void PutAttackOnCooldown(AttackComponent attackComponent, AIEnemy enemy)
-        {
-            enemy.NotAttacking();
-            StartCoroutine(StartCooldownCoroutine(attackComponent, enemy));
         }
 
         #endregion
@@ -394,59 +328,6 @@ namespace Managers
         #endregion
         
         #region Attack System
-
-        private IEnumerator StartEnemyAttackCastTimeCoroutine(AttackComponent attackComponent, AIAttackCollider attackCollider, 
-            AIEnemy enemy)
-        {
-            attackComponent.StartCastTime();
-            while (attackComponent.IsCasting() && !enemy.GetContext().IsStunned())
-            {
-                attackComponent.DecreaseCurrentCastTime();
-                yield return null;
-            }
-
-            if (!enemy.GetContext().IsStunned())
-            {
-                attackCollider.StartInflictingDamage();
-
-                if (attackComponent.DoesDamageOverTime())
-                {
-                    StartCoroutine(StartDamageOverTime(attackComponent, attackCollider, enemy));
-                    yield break;
-                }
-            
-                enemy.RotateToNextPathCorner();
-            }
-            
-            Instance.PutAttackOnCooldown(attackComponent, enemy);
-            attackCollider.Deactivate();
-        }
-
-        private IEnumerator StartDamageOverTime(AttackComponent attackComponent, AIAttackCollider attackCollider, 
-            AIEnemy enemy)
-        {
-            while (attackComponent.DidDamageOverTimeFinished())
-            {
-                attackComponent.DecreaseRemainingTimeDealingDamage();
-                yield return null;
-            }
-           
-            enemy.RotateToNextPathCorner();
-            Instance.PutAttackOnCooldown(attackComponent, enemy);
-            attackCollider.Deactivate();
-        }
-
-        private IEnumerator StartCooldownCoroutine(AttackComponent attackComponent, AIEnemy enemy)
-        {
-            attackComponent.StartCooldown();
-            while (attackComponent.IsOnCooldown())
-            {
-                attackComponent.DecreaseCooldown();
-                yield return null;
-            }
-            
-            enemy.OnAttackAvailableAgain(attackComponent);
-        }
         
         #endregion
 

@@ -14,7 +14,6 @@ namespace AI.Combat.ScriptableObjects
         private uint _minimumEnemiesInsideAlertRadiusToFlee;
 
         private float _remainingDistance;
-        private float _height;
         private float _threatSuffering;
         private float _alertRadius;
         private float _safetyRadius;
@@ -34,9 +33,9 @@ namespace AI.Combat.ScriptableObjects
         private List<Vector3> _vectorToEnemiesThatThreatMe = new List<Vector3>();
         private List<float> _distancesToEnemiesThatTargetsMe = new List<float>();
 
-        public AIAllyContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
+        public AIAllyContext(uint totalHealth, float radius, float height, float sightMaximumDistance, float minimumRangeToAttack, 
             float maximumRangeToAttack, Transform agentTransform, uint minimumEnemiesInsideAlertRadiusToFlee, 
-            float height, float alertRadius, float safetyRadius) : base(totalHealth, radius, sightMaximumDistance, 
+            float alertRadius, float safetyRadius) : base(totalHealth, radius, height, sightMaximumDistance, 
             minimumRangeToAttack, maximumRangeToAttack, agentTransform)
         {
             _repeatableActions.Add((uint)AIAllyAction.CHOOSE_NEW_RIVAL);
@@ -47,7 +46,6 @@ namespace AI.Combat.ScriptableObjects
 
             _minimumEnemiesInsideAlertRadiusToFlee = minimumEnemiesInsideAlertRadiusToFlee;
 
-            _height = height;
             _alertRadius = alertRadius;
             _safetyRadius = safetyRadius;
         }
@@ -75,11 +73,6 @@ namespace AI.Combat.ScriptableObjects
         public float GetRemainingDistance()
         {
             return _remainingDistance;
-        }
-
-        public float GetHeight()
-        {
-            return _height;
         }
 
         public void SetThreatSuffering(float threatSuffering)

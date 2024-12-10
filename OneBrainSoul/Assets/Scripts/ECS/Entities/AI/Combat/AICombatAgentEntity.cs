@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
+using AI.Combat.AttackColliders;
 using AI.Combat.CombatNavigation;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
@@ -31,7 +32,13 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
+        [SerializeField] protected GameObject _rectangleAttackColliderPrefab;
+        [SerializeField] protected GameObject _circleAttackColliderPrefab;
+
         protected List<TAttackComponent> _attackComponents = new List<TAttackComponent>();
+
+        protected Dictionary<TAttackComponent, AIAttackCollider> _attacksColliders =
+            new Dictionary<TAttackComponent, AIAttackCollider>();
 
         protected List<uint> _visibleRivals = new List<uint>();
 
@@ -235,7 +242,7 @@ namespace ECS.Entities.AI.Combat
             _context.SetLastActionIndex(lastActionIndex);
         }
 
-        public void SetHealth(uint health)
+        protected void SetHealth(uint health)
         {
             _context.SetHealth(health);
         }
@@ -250,12 +257,17 @@ namespace ECS.Entities.AI.Combat
             _context.SetRivalRadius(rivalRadius);
         }
 
+        protected void SetRivalHeight(float rivalHeight)
+        {
+            _context.SetRivalHeight(rivalHeight);
+        }
+
         public void SetDistanceToRival(float distanceToRival)
         {
             _context.SetDistanceToRival(distanceToRival);
         }
 
-        public void SetIsSeeingARival(bool isSeeingARival)
+        protected void SetIsSeeingARival(bool isSeeingARival)
         {
             _context.SetIsSeeingARival(isSeeingARival);
         }
@@ -328,8 +340,12 @@ namespace ECS.Entities.AI.Combat
             }
 
             Vector3 rivalPosition = _context.GetRivalTransform().position;
+            Vector3 agentPosition = transform.position;
             
-            _context.SetVectorToRival(rivalPosition - transform.position);
+            rivalPosition.y -= _context.GetRivalHeight() / 2;
+            agentPosition.y -= _context.GetHeight() / 2;
+            
+            _context.SetVectorToRival(rivalPosition - agentPosition);
         }
 
         private void UpdateMinimumRangeToCast(List<float> minimumRangesInsideCurrentRange)
@@ -402,6 +418,26 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        #region FSM
+
+        protected abstract void RequestRival();
+
+        protected abstract uint ObtainTargetID(List<uint> possibleRivals);
+
+        protected abstract void StartCastingAttack(TAttackComponent attackComponent);
+
+        protected abstract IEnumerator StartAttackCastTimeCoroutine(TAttackComponent attackComponent,
+            AIAttackCollider attackCollider);
+        
+        protected abstract IEnumerator StartDamageOverTime(TAttackComponent attackComponent,
+            AIAttackCollider attackCollider);
+
+        protected abstract void PutAttackOnCooldown(TAttackComponent attackComponent);
+
+        protected abstract IEnumerator StartCooldownCoroutine(TAttackComponent attackComponent);
+
+        #endregion
+
         public abstract void OnReceiveDamage(TDamageComponent damageComponent);
         protected abstract void OnDefeated();
 
@@ -412,7 +448,7 @@ namespace ECS.Entities.AI.Combat
             return _visibleRivals;
         }
 
-        public void SetDestination(TransformComponent transformComponent)
+        protected void SetDestination(TransformComponent transformComponent)
         {
             _lastDestination = null;
             ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), transformComponent);
@@ -424,21 +460,21 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
         }
 
-        private void OnDrawGizmos()
+        /*private void OnDrawGizmos()
         {
             if (ECSNavigationManager.Instance == null)
             {
                 return;
             }
             
-            /*Vector3 position = transform.position;
+            Vector3 position = transform.position;
             
             Gizmos.color = Color.green;
             
             foreach (DirectionWeights directionAndWeight in _raysDirectionAndWeights)
             {
                 Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
-            }*/
+            }
 
             Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
 
@@ -457,7 +493,7 @@ namespace ECS.Entities.AI.Combat
             }
             
             Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
-        }
+        }*/
 
         private Vector3 Up(Vector3 position)
         {

@@ -26,9 +26,6 @@ namespace ECS.Entities.AI.Combat
 
         private List<AIEnemyAttackCollider> _oncomingEnemyAttacks = new List<AIEnemyAttackCollider>();
 
-        private Dictionary<AllyAttackComponent, AIAttackCollider> _attacksColliders =
-            new Dictionary<AllyAttackComponent, AIAttackCollider>();
-
         [SerializeField] private bool _isAI;
 
         private void Start()
@@ -48,9 +45,9 @@ namespace ECS.Entities.AI.Combat
 
             _surroundingSlots = new SurroundingSlots(radius + _aiAllySpecs.rivalsPositionRadius);
             
-            _context = new AIAllyContext(_aiAllySpecs.totalHealth, radius,
+            _context = new AIAllyContext(_aiAllySpecs.totalHealth, radius, capsuleCollider.height,
                 _aiAllySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
-                _aiAllySpecs.minimumEnemiesInsideAlertRadiusToFlee, capsuleCollider.height, 
+                _aiAllySpecs.minimumEnemiesInsideAlertRadiusToFlee, 
                 _aiAllySpecs.alertRadius, _aiAllySpecs.safetyRadius);
             
             CombatManager.Instance.AddAIAlly(this);
@@ -108,13 +105,14 @@ namespace ECS.Entities.AI.Combat
             
             foreach (AllyAttackComponent attackComponent in _attackComponents)
             {
-                GameObject colliderObject = new GameObject();
+                GameObject colliderObject = null;
 
                 switch (attackComponent.GetAIAttackAoEType())
                 {
                     case AIAttackAoEType.RECTANGLE_AREA:
+                        colliderObject = Instantiate(_rectangleAttackColliderPrefab);
                         AIAllyRectangleAttackCollider rectangleAttackCollider =
-                            colliderObject.AddComponent<AIAllyRectangleAttackCollider>();
+                            colliderObject.GetComponent<AIAllyRectangleAttackCollider>();
                         
                         rectangleAttackCollider.SetRectangleAttackComponent((AllyRectangleAttackComponent)attackComponent);
                         rectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
@@ -122,8 +120,9 @@ namespace ECS.Entities.AI.Combat
                         break;
 
                     case AIAttackAoEType.CIRCLE_AREA:
-                        AIAllyCircleAttackCollider circleAttackCollider =
-                            colliderObject.AddComponent<AIAllyCircleAttackCollider>();
+                        colliderObject = Instantiate(_circleAttackColliderPrefab);
+                        AIAllyCircleAttackCollider circleAttackCollider = 
+                            colliderObject.GetComponent<AIAllyCircleAttackCollider>();
                         
                         circleAttackCollider.SetCircleAttackComponent((AllyCircleAttackComponent)attackComponent);
                         circleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
@@ -223,7 +222,7 @@ namespace ECS.Entities.AI.Combat
             _visibleRivals = CombatManager.Instance.GetVisibleRivals<AIEnemy, AIEnemyContext, AttackComponent, 
                 AllyDamageComponent, AIEnemyAction, AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>(this);
 
-            _context.SetIsSeeingARival(_visibleRivals.Count != 0);
+            SetIsSeeingARival(_visibleRivals.Count != 0);
 
             _enemiesThatTargetsMe = CombatManager.Instance.FilterEnemiesThatTargetsMe(GetAgentID(), _visibleRivals);
         }
@@ -246,7 +245,7 @@ namespace ECS.Entities.AI.Combat
             ShowActionDebugLogs(name + " Following Player");
         }
 
-        private void RequestRival()
+        protected override void RequestRival()
         {
             ShowActionDebugLogs(name + " Requesting Rival");
 
@@ -267,7 +266,7 @@ namespace ECS.Entities.AI.Combat
             OnTargetAcquired(targetID, CombatManager.Instance.RequestEnemy(targetID).GetContext());
         }
 
-        private uint ObtainTargetID(List<uint> possibleRivals)
+        protected override uint ObtainTargetID(List<uint> possibleRivals)
         {
             uint targetID;
 
@@ -289,6 +288,7 @@ namespace ECS.Entities.AI.Combat
         {
             SetRivalIndex(enemyID);
             SetRivalRadius(enemyContext.GetRadius());
+            SetRivalHeight(enemyContext.GetHeight());
             SetHasATarget(true);
             SetEnemyHealth(enemyContext.GetHealth());
             SetEnemyMaximumStress(enemyContext.GetMaximumStress());
@@ -312,7 +312,7 @@ namespace ECS.Entities.AI.Combat
             
             Attacking();
 
-            StartCastingAnAttack(attackComponent);
+            StartCastingAttack(attackComponent);
         }
 
         private void Flee()
@@ -380,6 +380,7 @@ namespace ECS.Entities.AI.Combat
         private void Dodge()
         {
             return;
+            ShowActionDebugLogs(name + " Dodging");
             
             ContinueNavigation();
 
@@ -468,7 +469,7 @@ namespace ECS.Entities.AI.Combat
                      _context.GetRivalMaximumStress());
         }
 
-        private void StartCastingAnAttack(AllyAttackComponent allyAttackComponent)
+        protected override void StartCastingAttack(AllyAttackComponent allyAttackComponent)
         {
             if (allyAttackComponent.IsOnCooldown())
             {
@@ -482,13 +483,7 @@ namespace ECS.Entities.AI.Combat
             StartCoroutine(StartAttackCastTimeCoroutine(allyAttackComponent, attackCollider));
         }
 
-        private void PutAttackOnCooldown(AllyAttackComponent attackComponent)
-        {
-            NotAttacking();
-            StartCoroutine(StartCooldownCoroutine(attackComponent));
-        }
-
-        private IEnumerator StartAttackCastTimeCoroutine(AllyAttackComponent allyAttackComponent, 
+        protected override IEnumerator StartAttackCastTimeCoroutine(AllyAttackComponent allyAttackComponent, 
             AIAttackCollider attackCollider)
         {
             allyAttackComponent.StartCastTime();
@@ -521,10 +516,10 @@ namespace ECS.Entities.AI.Combat
                 yield break;
             }
             
-            RotateToNextPathCorner();   
+            Rotate(); 
         }
 
-        private IEnumerator StartDamageOverTime(AllyAttackComponent allyAttackComponent, 
+        protected override IEnumerator StartDamageOverTime(AllyAttackComponent allyAttackComponent, 
             AIAttackCollider attackCollider)
         {
             while (allyAttackComponent.DidDamageOverTimeFinished())
@@ -541,10 +536,16 @@ namespace ECS.Entities.AI.Combat
                 yield break;
             }
             
-            RotateToNextPathCorner();    
+            Rotate();    
         }
 
-        private IEnumerator StartCooldownCoroutine(AllyAttackComponent allyAttackComponent)
+        protected override void PutAttackOnCooldown(AllyAttackComponent attackComponent)
+        {
+            NotAttacking();
+            StartCoroutine(StartCooldownCoroutine(attackComponent));
+        }
+
+        protected override IEnumerator StartCooldownCoroutine(AllyAttackComponent allyAttackComponent)
         {
             allyAttackComponent.StartCooldown();
             while (allyAttackComponent.IsOnCooldown())
@@ -558,7 +559,7 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        #region Enemy Attacks
+        #region Rival Attacks
 
         public void WarnOncomingDamage(AttackComponent attackComponent, AIEnemyAttackCollider enemyAttackCollider)
         {
@@ -597,7 +598,7 @@ namespace ECS.Entities.AI.Combat
 
         public override void OnReceiveDamage(DamageComponent damageComponent)
         {
-            _context.SetHealth(_context.GetHealth() - damageComponent.GetDamage());
+            SetHealth(_context.GetHealth() - damageComponent.GetDamage());
 
             if (_context.GetHealth() != 0)
             {

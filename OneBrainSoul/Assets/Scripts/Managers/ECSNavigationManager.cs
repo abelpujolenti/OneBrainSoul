@@ -9,7 +9,6 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
-using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -203,6 +202,11 @@ namespace Managers
                     mutex.ReleaseMutex();
                     
                 } while (selectedAgentID == 0 && _active);
+
+                if (!_active)
+                {
+                    return;
+                }
                     
                 AStarPath aStarPath =  _navMeshAgentDestinations[selectedAgentID].GetAStarPath();
 

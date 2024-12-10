@@ -16,7 +16,7 @@ MonoBehaviour:
   height: 5
   doesRelativePositionToCasterChange: 0
   relativePositionToCaster: {x: 0, y: 0, z: 5}
-  attachToAttacker: 1
+  attachToAttacker: 0
   isRelativePositionXCenterOfColliderX: 1
   isRelativePositionYCenterOfColliderY: 1
   isRelativePositionZCenterOfColliderZ: 1
