@@ -26,6 +26,12 @@ namespace ECS.Entities.AI.Combat
 
         private List<AttackColliderCountdown> _oncomingEnemyAttacks = new List<AttackColliderCountdown>();
 
+        private AIAlly _playerBody;
+        private Transform _playerTransform;
+
+        private Action _releaseAgentSlot;
+        private Func<AgentSlotPosition> _requestAgentSlotPositionFunc;
+
         [SerializeField] private bool _isAI;
 
         private void Start()
@@ -59,8 +65,41 @@ namespace ECS.Entities.AI.Combat
 
             if (!_isAI)
             {
+                StartCoroutine(BrainCellWaitSubscribes());
                 ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), false);
                 return;
+            }
+
+            EventsManager.OnSwitch += UpdatePlayerBody;
+
+            StartCoroutine(CommonersWaitSubscribes());
+        }
+
+        private IEnumerator BrainCellWaitSubscribes()
+        {
+            while (EventsManager.OnSwitch == null ||
+                   EventsManager.OnSwitch.GetInvocationList().Length < 2)
+            {
+                yield return null;
+            }
+
+            EventsManager.OnSwitch(this);
+        }
+
+        private IEnumerator CommonersWaitSubscribes()
+        {
+            while (EventsManager.OnSwitch == null ||
+                   EventsManager.OnSwitch.GetInvocationList().Length < 2)
+            {
+                yield return null;
+            }
+
+            float time = 0;
+
+            while (time < 0.2f)
+            {
+                time += Time.deltaTime;
+                yield return null;
             }
             
             base.StartUpdate();
@@ -70,13 +109,13 @@ namespace ECS.Entities.AI.Combat
         {
             _actions = new Dictionary<AIAllyAction, Action>
             {
-                { AIAllyAction.FOLLOW_PLAYER , FollowPlayer},
+                { AIAllyAction.FOLLOW_PLAYER , FollowPlayer },
                 { AIAllyAction.CHOOSE_NEW_RIVAL , RequestRival },
-                { AIAllyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival},
-                { AIAllyAction.ROTATE , Rotate},
-                { AIAllyAction.ATTACK , Attack},
-                { AIAllyAction.FLEE , Flee},
-                { AIAllyAction.DODGE_ATTACK , Dodge}
+                { AIAllyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival },
+                { AIAllyAction.ROTATE , Rotate },
+                { AIAllyAction.ATTACK , Attack },
+                { AIAllyAction.FLEE , Flee },
+                { AIAllyAction.DODGE_ATTACK , Dodge }
             };
         }
 
@@ -149,21 +188,42 @@ namespace ECS.Entities.AI.Combat
 
         #region AI Loop
 
+        private void UpdatePlayerBody(AIAlly playerBody)
+        {
+            _playerBody = playerBody;
+            _playerTransform = _playerBody.GetNavMeshAgentComponent().GetTransformComponent().GetTransform();
+            _context.SetDoesBrainCellSwitched(true);
+        }
+
         public void CallStartUpdate()
         {
+            EventsManager.OnSwitch += UpdatePlayerBody;
             StartUpdate();
         }
 
         protected override void StartUpdate()
         {
+            StartCoroutine(EnsurePlayerTransformIsNotNull());
+        }
+
+        private IEnumerator EnsurePlayerTransformIsNotNull()
+        {
+            while (_playerTransform == null)
+            {
+                yield return null;
+            }
+            
             _isAI = true;
             _navMeshAgent.enabled = true;
             ECSNavigationManager.Instance.ReturnNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent());
             base.StartUpdate();
+            
         }
 
         public void CallStopUpdate()
         {
+            EventsManager.OnSwitch -= UpdatePlayerBody;
+            EventsManager.OnSwitch(this);
             StopUpdate();
         }
 
@@ -171,6 +231,8 @@ namespace ECS.Entities.AI.Combat
         {
             _navMeshAgent.enabled = false;
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), false);
+            _playerBody = null;
+            _playerTransform = null;
             _isAI = false;
             base.StopUpdate();
         }
@@ -201,23 +263,22 @@ namespace ECS.Entities.AI.Combat
             
                 CalculateBestAction();
 
-                if (!_context.HasATarget())
-                {
-                    yield return null;
-                    continue;
-                }
-                
-                RivalSlotPosition rivalSlotPosition = CombatManager.Instance.RequestEnemy(_context.GetRivalID())
-                    .GetRivalSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
-
-                if (rivalSlotPosition == null)
+                if (!_context.HasATarget() && !_context.IsFollowingAlly())
                 {
                     yield return null;
                     continue;
                 }
 
-                _rivalSlot = rivalSlotPosition.rivalSlot;
-                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), rivalSlotPosition.deviationVector);
+                AgentSlotPosition agentSlotPosition = _requestAgentSlotPositionFunc();
+
+                if (agentSlotPosition == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                _agentSlot = agentSlotPosition.agentSlot;
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
 
                 yield return null;
             }
@@ -249,6 +310,21 @@ namespace ECS.Entities.AI.Combat
         private void FollowPlayer()
         {
             ShowActionDebugLogs(name + " Following Player");
+
+            if (_releaseAgentSlot != null)
+            {
+                _releaseAgentSlot();    
+            }
+
+            _releaseAgentSlot = () => _playerBody.ReleaseAgentSlot(GetAgentID());
+            
+            _requestAgentSlotPositionFunc = () => 
+                _playerBody.GetAgentSlotPosition(_playerTransform.position - transform.position, _context.GetRadius());
+            
+            SetHasATarget(false);
+            _context.SetIsFollowingAlly(true);
+            _context.SetDoesBrainCellSwitched(false);
+            SetDestination(new TransformComponent(_playerTransform));
         }
 
         protected override void RequestRival()
@@ -265,6 +341,13 @@ namespace ECS.Entities.AI.Combat
             if (possibleRivals.Count == 0)
             {
                 return;
+            }
+
+            AIEnemy previousEnemy = CombatManager.Instance.RequestEnemy(_context.GetRivalID());
+
+            if (previousEnemy != null)
+            {
+                previousEnemy.ReleaseAgentSlot(GetAgentID());
             }
 
             uint targetID = ObtainTargetID(possibleRivals);
@@ -300,6 +383,19 @@ namespace ECS.Entities.AI.Combat
             SetEnemyMaximumStress(enemyContext.GetMaximumStress());
             SetEnemyCurrentStress(enemyContext.GetCurrentStress());
             SetRivalTransform(enemyContext.GetAgentTransform());
+
+            _context.SetIsFollowingAlly(false);
+
+            if (_releaseAgentSlot != null)
+            {
+                _releaseAgentSlot();    
+            }
+
+            _releaseAgentSlot = () =>
+                CombatManager.Instance.RequestEnemy(_context.GetRivalID()).ReleaseAgentSlot(GetAgentID());
+            
+            _requestAgentSlotPositionFunc = () => CombatManager.Instance.RequestEnemy(_context.GetRivalID())
+                .GetAgentSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
         }
 
         private void GetCloserToRival()
@@ -407,7 +503,7 @@ namespace ECS.Entities.AI.Combat
 
         #region Own Attacks
 
-        public override void OnAttackAvailableAgain(AllyAttackComponent attackComponent)
+        protected override void OnAttackAvailableAgain(AllyAttackComponent attackComponent)
         {
             base.OnAttackAvailableAgain(attackComponent);
 
@@ -645,7 +741,12 @@ namespace ECS.Entities.AI.Combat
 
         private void OnDestroy()
         {
-            EventsManager.OnAgentDefeated(GetAgentID());
+            if (EventsManager.OnAgentDefeated != null)
+            {
+                EventsManager.OnAgentDefeated(GetAgentID());
+            }
+            
+            EventsManager.OnSwitch -= UpdatePlayerBody;
             CombatManager.Instance.OnAllyDefeated(this);
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
         }
