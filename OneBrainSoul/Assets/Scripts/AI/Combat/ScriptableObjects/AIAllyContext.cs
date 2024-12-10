@@ -11,16 +11,19 @@ namespace AI.Combat.ScriptableObjects
     {
         private uint _oncomingAttackDamage;
         private uint _enemyHealth;
+        private uint _minimumEnemiesInsideAlertRadiusToFlee;
 
         private float _remainingDistance;
-        private float _stoppingDistance;
-        private float _height;
         private float _threatSuffering;
         private float _alertRadius;
         private float _safetyRadius;
         private float _enemyMaximumStress;
         private float _enemyCurrentStress;
+        private float _timeToNextEnemyMeleeAttack;
+        private float _distanceToCloserEnemyProjectile;
 
+        private bool _isFollowingAlly;
+        private bool _doesBrainCellSwitched;
         private bool _canDefeatEnemy;
         private bool _canStunEnemy;
         private bool _isEnemyStunned;
@@ -30,21 +33,25 @@ namespace AI.Combat.ScriptableObjects
         private bool _wasRetreatOrderUsed;
         private bool _wasAttackOrderUsed;
         private bool _wasFleeOrderUsed;
-        
-        private List<float> _distancesToEnemiesThatThreatMe = new List<float>();
 
-        public AIAllyContext(uint totalHealth, float radius, float sightMaximumDistance, float minimumRangeToAttack, 
-            float maximumRangeToAttack, Transform agentTransform, float stoppingDistance, float height, float alertRadius, 
-            float safetyRadius) : base(totalHealth, radius, sightMaximumDistance, minimumRangeToAttack, 
-            maximumRangeToAttack, agentTransform)
+        private List<Vector3> _vectorToEnemiesThatThreatMe = new List<Vector3>();
+        private List<float> _distancesToEnemiesThatTargetsMe = new List<float>();
+
+        public AIAllyContext(uint totalHealth, float radius, float height, float sightMaximumDistance, float minimumRangeToAttack, 
+            float maximumRangeToAttack, Transform agentTransform, uint minimumEnemiesInsideAlertRadiusToFlee, 
+            float alertRadius, float safetyRadius) : base(totalHealth, radius, height, sightMaximumDistance, 
+            minimumRangeToAttack, maximumRangeToAttack, agentTransform)
         {
+            _repeatableActions.Add((uint)AIAllyAction.FOLLOW_PLAYER);
             _repeatableActions.Add((uint)AIAllyAction.CHOOSE_NEW_RIVAL);
+            _repeatableActions.Add((uint)AIAllyAction.GET_CLOSER_TO_RIVAL);
             _repeatableActions.Add((uint)AIAllyAction.ROTATE);
-            _repeatableActions.Add((uint)AIAllyAction.DODGE_ATTACK);
             _repeatableActions.Add((uint)AIAllyAction.ATTACK);
+            _repeatableActions.Add((uint)AIAllyAction.FLEE);
+            _repeatableActions.Add((uint)AIAllyAction.DODGE_ATTACK);
 
-            _stoppingDistance = stoppingDistance;
-            _height = height;
+            _minimumEnemiesInsideAlertRadiusToFlee = minimumEnemiesInsideAlertRadiusToFlee;
+
             _alertRadius = alertRadius;
             _safetyRadius = safetyRadius;
         }
@@ -59,9 +66,9 @@ namespace AI.Combat.ScriptableObjects
             return _enemyHealth;
         }
 
-        public void SetStoppingDistance(float stoppingDistance)
+        public uint GetMinimumEnemiesAroundToFlee()
         {
-            _stoppingDistance = stoppingDistance;
+            return _minimumEnemiesInsideAlertRadiusToFlee;
         }
 
         public void SetRemainingDistance(float remainingDistance)
@@ -72,16 +79,6 @@ namespace AI.Combat.ScriptableObjects
         public float GetRemainingDistance()
         {
             return _remainingDistance;
-        }
-
-        public float GetStoppingDistance()
-        {
-            return _stoppingDistance;
-        }
-
-        public float GetHeight()
-        {
-            return _height;
         }
 
         public void SetThreatSuffering(float threatSuffering)
@@ -97,6 +94,11 @@ namespace AI.Combat.ScriptableObjects
         public float GetAlertRadius()
         {
             return _alertRadius;
+        }
+
+        public float GetSafetyRadius()
+        {
+            return _safetyRadius;
         }
 
         public void SetRivalMaximumStress(float rivalMaximumStress)
@@ -117,6 +119,46 @@ namespace AI.Combat.ScriptableObjects
         public float GetRivalCurrentStress()
         {
             return _enemyCurrentStress;
+        }
+
+        public void SetTimeToNextEnemyMeleeAttack(float timeToNextEnemyMeleeAttack)
+        {
+            _timeToNextEnemyMeleeAttack = timeToNextEnemyMeleeAttack;
+        }
+
+        public float GetTimeToNextEnemyMeleeAttack()
+        {
+            return _timeToNextEnemyMeleeAttack;
+        }
+
+        public void SetDistanceToCloserEnemyProjectile(float distanceToCloserEnemyProjectile)
+        {
+            _distanceToCloserEnemyProjectile = distanceToCloserEnemyProjectile;
+        }
+
+        public float GetDistanceToCloserEnemyProjectile()
+        {
+            return _distanceToCloserEnemyProjectile;
+        }
+
+        public void SetIsFollowingAlly(bool isFollowingAlly)
+        {
+            _isFollowingAlly = isFollowingAlly;
+        }
+
+        public bool IsFollowingAlly()
+        {
+            return _isFollowingAlly;
+        }
+
+        public void SetDoesBrainCellSwitched(bool doesBrainCellSwitched)
+        {
+            _doesBrainCellSwitched = doesBrainCellSwitched;
+        }
+
+        public bool DoesBrainCellSwitched()
+        {
+            return _doesBrainCellSwitched;
         }
 
         public void SetCanDefeatEnemy(bool canDefeatEnemy)
@@ -214,14 +256,24 @@ namespace AI.Combat.ScriptableObjects
             return _wasFleeOrderUsed;
         }
         
-        public void SetDistancesToEnemiesThatThreatMe(List<float> distancesToThreatGroupsThatThreatMe)
+        public void SetVectorsToEnemiesThatTargetsMe(List<Vector3> vectorsToEnemiesThatTargetsMe)
         {
-            _distancesToEnemiesThatThreatMe = distancesToThreatGroupsThatThreatMe;
+            _vectorToEnemiesThatThreatMe = vectorsToEnemiesThatTargetsMe;
         }
 
-        public List<float> GetDistancesToEnemiesThatThreatMe()
+        public List<Vector3> GetVectorsToEnemiesThatTargetsMe()
         {
-            return _distancesToEnemiesThatThreatMe;
+            return _vectorToEnemiesThatThreatMe;
+        }
+        
+        public void SetDistancesToEnemiesThatTargetsMe(List<float> distancesToEnemiesThatTargetsMe)
+        {
+            _distancesToEnemiesThatTargetsMe = distancesToEnemiesThatTargetsMe;
+        }
+
+        public List<float> GetDistancesToEnemiesThatTargetsMe()
+        {
+            return _distancesToEnemiesThatTargetsMe;
         }
     }
 }

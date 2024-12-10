@@ -2,29 +2,43 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
+using AI.Combat.AttackColliders;
+using AI.Combat.CombatNavigation;
+using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
+using AI.Combat.Steering;
 using ECS.Components.AI.Combat;
 using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Navigation;
-using Interfaces.AI.Combat;
+using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
+using Utilities;
 using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
 {
-    public abstract class AICombatAgentEntity<TContext, TAttackComponent, TDamageComponent> : NavMeshAgentEntity 
+    public abstract class AICombatAgentEntity<TContext, TAttackComponent, TDamageComponent, TAction> : NavMeshAgentEntity 
         where TContext : AICombatAgentContext
         where TAttackComponent : AttackComponent
         where TDamageComponent : DamageComponent
+        where TAction : Enum
     {
-        private uint _combatAgentInstanceID;
+        private List<Node> TESTpath;
 
         protected TContext _context;
 
-        //BIG REFACTOR, I HATE DUPLICATE CLASSES
+        protected IGetBestAction<TAction, TContext> _utilityFunction;
+
+        protected Dictionary<TAction, Action> _actions;
+
+        [SerializeField] protected GameObject _rectangleAttackColliderPrefab;
+        [SerializeField] protected GameObject _circleAttackColliderPrefab;
+
         protected List<TAttackComponent> _attackComponents = new List<TAttackComponent>();
-        //
+
+        protected Dictionary<TAttackComponent, AIAttackCollider> _attacksColliders =
+            new Dictionary<TAttackComponent, AIAttackCollider>();
 
         protected List<uint> _visibleRivals = new List<uint>();
 
@@ -36,7 +50,33 @@ namespace ECS.Entities.AI.Combat
 
         protected float _minimumRangeToCastAnAttack;
         protected float _maximumRangeToCastAnAttack;
+
+        protected DirectionWeights[] _raysDirectionAndWeights;
         
+        protected float _raysOpeningAngle = 90f;
+        protected float _raysDistance = 20f;
+        
+        protected uint _numberOfVicinityRays = 12;
+
+        protected int _raysTargetsLayerMask;
+
+        protected SurroundingSlots _surroundingSlots;
+        protected AgentSlot _agentSlot;
+        
+        //TEST
+        [SerializeField] protected bool _showActionsDebugLogs;
+        //
+
+        protected void ShowActionDebugLogs(string message)
+        {
+            if (!_showActionsDebugLogs)
+            {
+                return;
+            }
+            
+            Debug.Log(message);
+        }
+
         protected virtual void StartUpdate()
         {
             if (_updateCoroutine != null)
@@ -48,23 +88,74 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void StopUpdate()
         {
+            if (_updateCoroutine == null)
+            {
+                return;
+            }
             StopCoroutine(_updateCoroutine);
             _updateCoroutine = null;
         }
+
+        protected abstract IEnumerator UpdateCoroutine();
 
         protected override IEnumerator RotateToGivenPositionCoroutine(Vector3 position)
         {
             yield return base.RotateToGivenPositionCoroutine(position);
         }
 
-        protected abstract IEnumerator UpdateCoroutine();
+        #region Steering
 
-        protected void SetupCombatComponents()
+        protected void SetRaysDirections()
         {
-            _combatAgentInstanceID = (uint)gameObject.GetInstanceID();
+            _raysDirectionAndWeights = new DirectionWeights[_numberOfVicinityRays];
+            
+            float angle = -(_raysOpeningAngle / 2);
+            float angleStep = _raysOpeningAngle / _numberOfVicinityRays;
+
+            Transform ownTransform = transform;
+
+            for (int i = 0; i < _numberOfVicinityRays; i++)
+            {
+                Vector3 direction = Quaternion.Euler(0, angle, 0) * ownTransform.forward;
+                _raysDirectionAndWeights[i].direction = direction.normalized;
+                angle += angleStep;
+            }
         }
 
-        protected abstract void OnDefeated();
+        protected void LaunchRaycasts()
+        {
+            SetRaysDirections();
+            
+            Vector3 position = transform.position;
+
+            RaycastHit hit;
+            
+            for (int i = 0; i < _numberOfVicinityRays; i++)
+            {
+                if (Physics.Raycast(position, _raysDirectionAndWeights[i].direction, out hit, _raysDistance, _raysTargetsLayerMask))
+                {
+                    _raysDirectionAndWeights[i].weight = MathUtil.Map(hit.distance, 0, 1, _raysDistance, 0);
+                    //Debug.Log(hit.collider.name);
+                    continue;
+                }
+
+                _raysDirectionAndWeights[i].weight = 0;
+            }
+        }
+
+        #endregion
+
+        public AgentSlotPosition GetAgentSlotPosition(Vector3 direction, float radius)
+        {
+            return _surroundingSlots.ReserveSubtendedAngle(GetAgentID(), direction, radius);
+        }
+
+        public void ReleaseAgentSlot(uint agentID)
+        {
+            _surroundingSlots.FreeSubtendedAngle(agentID);
+        }
+
+        #region Attacks
 
         protected void CalculateMinimumAndMaximumRangeToAttacks(List<TAttackComponent> attacks)
         {
@@ -145,54 +236,35 @@ namespace ECS.Entities.AI.Combat
             return selectedAttackComponent;
         }
 
-        protected void Attacking()
-        {
-            _context.SetIsAttacking(true);
-            _navMeshAgent.isStopped = true;
-        }
+        #endregion
 
-        public void NotAttacking()
-        {
-            _context.SetIsAttacking(false);
-            _navMeshAgent.isStopped = false;
-        }
+        #region Context
+        
+        public abstract TContext GetContext();
 
-        public virtual void OnAttackAvailableAgain(TAttackComponent attackComponent)
-        {
-            float attackMinimumRangeToCast = attackComponent.GetMinimumRangeCast();
-            float attackMaximumRangeToCast = attackComponent.GetMaximumRangeCast();
-
-            if (_context.GetMinimumRangeToAttack() > attackMinimumRangeToCast)
-            {
-                _context.SetMinimumRangeToAttack(attackMinimumRangeToCast);
-            }
-
-            if (_context.GetMaximumRangeToAttack() > attackMaximumRangeToCast)
-            {
-                return;
-            }
-            
-            _context.SetMaximumRangeToAttack(attackMaximumRangeToCast);
-        }
-
-        public void SetLastActionIndex(uint lastActionIndex)
+        private void SetLastActionIndex(uint lastActionIndex)
         {
             _context.SetLastActionIndex(lastActionIndex);
         }
 
-        public void SetHealth(uint health)
+        protected void SetHealth(uint health)
         {
             _context.SetHealth(health);
         }
 
-        public void SetRivalIndex(uint rivalIndex)
+        protected void SetRivalIndex(uint rivalIndex)
         {
             _context.SetRivalIndex(rivalIndex);
         }
 
-        public void SetRivalRadius(float rivalRadius)
+        protected void SetRivalRadius(float rivalRadius)
         {
             _context.SetRivalRadius(rivalRadius);
+        }
+
+        protected void SetRivalHeight(float rivalHeight)
+        {
+            _context.SetRivalHeight(rivalHeight);
         }
 
         public void SetDistanceToRival(float distanceToRival)
@@ -200,12 +272,12 @@ namespace ECS.Entities.AI.Combat
             _context.SetDistanceToRival(distanceToRival);
         }
 
-        public void SetIsSeeingARival(bool isSeeingARival)
+        protected void SetIsSeeingARival(bool isSeeingARival)
         {
             _context.SetIsSeeingARival(isSeeingARival);
         }
 
-        public void SetHasATarget(bool hasATarget)
+        protected void SetHasATarget(bool hasATarget)
         {
             _context.SetHasATarget(hasATarget);
         }
@@ -230,54 +302,55 @@ namespace ECS.Entities.AI.Combat
             _context.SetVectorToRival(vectorToRival);
         }
 
-        public void SetRivalTransform(Transform rivalTransform)
+        protected void SetRivalTransform(Transform rivalTransform)
         {
             _context.SetRivalTransform(rivalTransform);
         }
 
-        protected abstract void UpdateVisibleRivals();
-        protected abstract void CalculateBestAction();
-
-        public abstract void OnReceiveDamage(TDamageComponent damageComponent);
-
-        public abstract AIAgentType GetAIAgentType();
-        
-        public abstract TContext GetContext();
-
-        public uint GetCombatAgentInstance()
+        protected void Attacking()
         {
-            return _combatAgentInstanceID;
+            _context.SetIsAttacking(true);
+            _navMeshAgent.isStopped = true;
         }
 
-        public List<uint> GetVisibleRivals()
+        protected void NotAttacking()
         {
-            return _visibleRivals;
+            _context.SetIsAttacking(false);
+            _navMeshAgent.isStopped = false;
         }
 
-        public void SetDestination(TransformComponent transformComponent)
+        protected virtual void OnAttackAvailableAgain(TAttackComponent attackComponent)
         {
-            _lastDestination = null;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentTransformDestination(GetNavMeshAgentComponent(), transformComponent);
-        }
+            float attackMinimumRangeToCast = attackComponent.GetMinimumRangeCast();
+            float attackMaximumRangeToCast = attackComponent.GetMaximumRangeCast();
 
-        public void SetDestination(VectorComponent vectorComponent)
-        {
-            _lastDestination = vectorComponent;
-            ECSNavigationManager.Instance.UpdateNavMeshAgentVectorDestination(GetNavMeshAgentComponent(), _lastDestination);
+            if (_context.GetMinimumRangeToAttack() > attackMinimumRangeToCast)
+            {
+                _context.SetMinimumRangeToAttack(attackMinimumRangeToCast);
+            }
+
+            if (_context.GetMaximumRangeToAttack() > attackMaximumRangeToCast)
+            {
+                return;
+            }
+            
+            _context.SetMaximumRangeToAttack(attackMaximumRangeToCast);
         }
 
         protected void UpdateVectorToRival()
         {
-            TContext context = GetContext();
-
-            if (!context.HasATarget())
+            if (!_context.HasATarget())
             {
                 return;
             }
 
-            Vector3 rivalPosition = context.GetRivalTransform().position;
+            Vector3 rivalPosition = _context.GetRivalTransform().position;
+            Vector3 agentPosition = transform.position;
             
-            context.SetVectorToRival(rivalPosition - transform.position);
+            rivalPosition.y -= _context.GetRivalHeight() / 2;
+            agentPosition.y -= _context.GetHeight() / 2;
+            
+            _context.SetVectorToRival(rivalPosition - agentPosition);
         }
 
         private void UpdateMinimumRangeToCast(List<float> minimumRangesInsideCurrentRange)
@@ -296,7 +369,7 @@ namespace ECS.Entities.AI.Combat
                 newMinimumRange = currentMinimumRange;
             }
             
-            GetContext().SetMinimumRangeToAttack(newMinimumRange);
+            _context.SetMinimumRangeToAttack(newMinimumRange);
         }
 
         private void UpdateMaximumRangeToCast(List<float> maximumRangesInsideCurrentRange)
@@ -315,7 +388,121 @@ namespace ECS.Entities.AI.Combat
                 newMaximumRange = currentMaximumRange;
             }
             
-            GetContext().SetMaximumRangeToAttack(newMaximumRange);
+            _context.SetMaximumRangeToAttack(newMaximumRange);
+        }
+
+        #endregion
+
+        #region UBS
+
+        protected abstract void UpdateVisibleRivals();
+
+        protected abstract void InitiateDictionaries();
+
+        protected void CalculateBestAction()
+        {
+            CheckIfCanPerformGivenAction(_utilityFunction.GetBestAction(_context));
+        }
+
+        private void CheckIfCanPerformGivenAction(TAction action)
+        {
+            uint agentActionUInt = Convert.ToUInt16(action);
+            uint lastAction = _context.GetLastActionIndex();
+
+            List<uint> repeatableActions = _context.GetRepeatableActions();
+
+            if (agentActionUInt == lastAction && !repeatableActions.Contains(lastAction))
+            {
+                return;
+            }
+            
+            SetLastActionIndex(agentActionUInt);
+
+            _actions[action]();
+        }
+
+        #endregion
+
+        #region FSM
+
+        protected abstract void RequestRival();
+
+        protected abstract uint ObtainTargetID(List<uint> possibleRivals);
+
+        protected abstract void StartCastingAttack(TAttackComponent attackComponent);
+
+        protected abstract IEnumerator StartAttackCastTimeCoroutine(TAttackComponent attackComponent,
+            AIAttackCollider attackCollider);
+        
+        protected abstract IEnumerator StartDamageOverTime(TAttackComponent attackComponent,
+            AIAttackCollider attackCollider);
+
+        protected abstract void PutAttackOnCooldown(TAttackComponent attackComponent);
+
+        protected abstract IEnumerator StartCooldownCoroutine(TAttackComponent attackComponent);
+
+        #endregion
+
+        public abstract void OnReceiveDamage(TDamageComponent damageComponent);
+        protected abstract void OnDefeated();
+
+        public abstract AIAgentType GetAIAgentType();
+
+        public List<uint> GetVisibleRivals()
+        {
+            return _visibleRivals;
+        }
+
+        protected void SetDestination(TransformComponent transformComponent)
+        {
+            _lastDestination = null;
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), transformComponent);
+        }
+
+        public void SetDestination(VectorComponent vectorComponent)
+        {
+            _lastDestination = vectorComponent;
+            ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (ECSNavigationManager.Instance == null)
+            {
+                return;
+            }
+            
+            /*Vector3 position = transform.position;
+            
+            Gizmos.color = Color.green;
+            
+            foreach (DirectionWeights directionAndWeight in _raysDirectionAndWeights)
+            {
+                Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
+            }*/
+
+            Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
+
+            if (corners.Length == 0)
+            {
+                return;
+            }
+            
+            Gizmos.color = Color.blue;
+
+            for (int i = 0; i < corners.Length - 1; i++)
+            {
+                Gizmos.DrawSphere(Up(corners[i]), 0.2f);
+                
+                Gizmos.DrawLine(Up(corners[i]), Up(corners[i + 1]));
+            }
+            
+            Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
+        }
+
+        private Vector3 Up(Vector3 position)
+        {
+            return new Vector3(position.x, position.y + 0, position.z);
         }
     }
 }

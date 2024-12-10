@@ -11,6 +11,9 @@ namespace AI.Combat.ScriptableObjects
         public float alertRadius;
         public float safetyRadius;
 
+        [Min(1)]
+        public uint minimumEnemiesInsideAlertRadiusToFlee;
+        
         [SerializeField] public List<AIAllyAttack> aiAttacks;
     }
 }

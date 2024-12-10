@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Weapon : MonoBehaviour
 {
@@ -24,18 +22,11 @@ public class Weapon : MonoBehaviour
     [SerializeField] protected Transform parent;
     [SerializeField] protected PlayerCharacterController player;
     [SerializeField] private AnimationCurve animationCurve;
-    [SerializeField] protected ActiveEnemyManager activeEnemyManager;
     public float animationTimer { get; private set; }
     public float animationSpeed { get; private set; }
     private Vector3 targetPos;
     private Quaternion targetRot;
     protected bool attackLanded = false;
-
-    private void Start()
-    {
-        //REMOVE THIS
-        activeEnemyManager = FindObjectOfType<ActiveEnemyManager>();
-    }
 
     private void OnGUI()
     {
@@ -85,11 +76,11 @@ public class Weapon : MonoBehaviour
 
     }
 
-    protected virtual void AttackLand(List<EnemyTest> enemies)
+    protected virtual void AttackLand(List<DamageTakingEntity> enemies)
     {
-        foreach(EnemyTest enemy in enemies)
+        foreach(DamageTakingEntity entity in enemies)
         {
-            enemy.Damage(player, player.cam.transform.position + (enemy.transform.position - player.cam.transform.position).normalized * ((enemy.transform.position - player.cam.transform.position).magnitude - enemy.radius), baseDamage);
+            entity.Damage(player, player.cam.transform.position + (entity.transform.position - player.cam.transform.position).normalized * ((entity.transform.position - player.cam.transform.position).magnitude - entity.radius), baseDamage);
         }
         player.hitstop.Add(hitstop * (.8f + enemies.Count * .2f));
         attackLanded = true;

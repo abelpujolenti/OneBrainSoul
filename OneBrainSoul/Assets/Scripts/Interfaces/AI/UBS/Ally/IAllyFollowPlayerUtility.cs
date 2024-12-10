@@ -2,6 +2,6 @@
 
 namespace Interfaces.AI.UBS.Ally
 {
-    public interface IAllyFollowPlayerUtility : IIsInRetractState, IIsSeeingARival
+    public interface IAllyFollowPlayerUtility : IIsInRetractState, IIsSeeingARival, IIsFollowingAlly, IDoesBrainCellSwitched
     {}
 }

@@ -305,7 +305,7 @@ namespace Characters
 
         private void OnCollisionEnter(Collision other)
         {
-            if (other.gameObject.layer != GameManager.Instance.GetTerrainLayer())
+            if (other.gameObject.layer != GameManager.Instance.GetGroundLayer())
             {
                 return;
             }

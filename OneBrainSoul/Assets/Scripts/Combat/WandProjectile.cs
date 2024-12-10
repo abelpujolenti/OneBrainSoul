@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,11 +31,12 @@ public class WandProjectile : MonoBehaviour
         {
             material.SetColor("_Color", new Color(0f, .7f, 1f));
         }
+        GetComponent<Rigidbody>().AddForce(direction * speed);
     }
     private void OnCollisionEnter(Collision collision)
     {
         if (deathTime > 0f || landTime > 0f) return;
-        EnemyTest enemy = collision.collider.GetComponent<EnemyTest>();
+        DamageTakingEntity enemy = collision.collider.GetComponent<DamageTakingEntity>();
         if (enemy != null)
         {
             Land(enemy);
@@ -44,15 +44,6 @@ public class WandProjectile : MonoBehaviour
         else
         {
             deathTime = deathDuration;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (lifeTime > 0f && landTime == 0f && deathTime == 0f)
-        {
-            Vector3 movement = direction * speed * Time.fixedDeltaTime;
-            transform.position += movement;
         }
     }
 
@@ -90,11 +81,11 @@ public class WandProjectile : MonoBehaviour
         lifeTime -= Time.deltaTime;
     }
 
-    private void Land(EnemyTest enemy)
+    private void Land(DamageTakingEntity entity)
     {
         landTime = landDuration;
-        enemy.Damage(player, transform.position, empowered ? 3 : 2);
-        List<EnemyTest> enemies = new List<EnemyTest> { enemy };
-        wand.ProjectileLanded(this, enemies);
+        entity.Damage(player, transform.position, empowered ? 3 : 2);
+        List<DamageTakingEntity> entities = new List<DamageTakingEntity> { entity };
+        wand.ProjectileLanded(this, entities);
     }
 }

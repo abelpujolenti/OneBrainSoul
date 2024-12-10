@@ -8,13 +8,12 @@ namespace Managers
 
         public static GameManager Instance => _instance;
 
-        private int TERRAIN_LAYER = 6;
+        private int GROUND_LAYER = 6;
+        private int INTERACTABLE_LAYER = 7;
         private int ALLY_LAYER = 8;
         private int ENEMY_LAYER = 9;
-        private int ALLY_TRIGGER_DETECTION = 10;
-        private int ENEMY_TRIGGER_DETECTION = 11;
-        private int RIVAL_TRIGGER_DETECTION = 12;
-        private int ENEMY_ATTACK_ZONE = 13;
+        private int ALLY_ATTACK_ZONE = 10;
+        private int ENEMY_ATTACK_ZONE = 11;
 
         private void Awake()
         {
@@ -30,6 +29,11 @@ namespace Managers
             Destroy(gameObject);
         }
 
+        public int GetInteractableLayer()
+        {
+            return INTERACTABLE_LAYER;
+        }
+
         public int GetAllyLayer()
         {
             return ALLY_LAYER;
@@ -40,29 +44,28 @@ namespace Managers
             return ENEMY_LAYER;
         }
 
-        public int GetTerrainLayer()
+        public int GetGroundLayer()
         {
-            return TERRAIN_LAYER;
+            return GROUND_LAYER;
         }
 
-        public int GetAllyTriggerDetectionLayer()
+        public int GetAllyAttackZoneLayer()
         {
-            return ALLY_TRIGGER_DETECTION;
+            return ALLY_ATTACK_ZONE;
         }
 
-        public int GetEnemyTriggerDetectionLayer()
-        {
-            return ENEMY_TRIGGER_DETECTION;
-        }
-
-        public int GetRivalTriggerDetectionLayer()
-        {
-            return RIVAL_TRIGGER_DETECTION;
-        }
-
-        public int GetEnemyAttackZone()
+        public int GetEnemyAttackZoneLayer()
         {
             return ENEMY_ATTACK_ZONE;
+        }
+
+        public int GetRaycastLayers()
+        {
+            return (int)(Mathf.Pow(2,GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetAllyLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
+        }
+        public int GetRaycastLayersWithoutAlly()
+        {
+            return (int)(Mathf.Pow(2, GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
         }
     }
 }

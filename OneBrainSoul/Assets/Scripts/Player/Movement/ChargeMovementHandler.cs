@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 
 public class ChargeMovementHandler : MovementHandler
@@ -20,7 +21,8 @@ public class ChargeMovementHandler : MovementHandler
     {
         this.chargeDirection = chargeDirection;
         player.cam.FovWarp(1f, 2f);
-        player.urpManager.ChargeRunEffect(duration);
+        PostProcessingManager.Instance.ChargeRunEffect(duration);
+        player.canSwitch = false;
     }
 
     public void Move(PlayerCharacterController player)
@@ -57,7 +59,7 @@ public class ChargeMovementHandler : MovementHandler
         player.rb.AddForce(-horizontalVelocity * horizontalDrag, ForceMode.Acceleration);
 
         RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, chargeDirection, out hit, player.rb.velocity.magnitude * 0.04f, 127, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(player.transform.position, chargeDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
         {
             DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
             bool hitTerrain = destructibleTerrain != null;
@@ -65,13 +67,13 @@ public class ChargeMovementHandler : MovementHandler
             {
                 destructibleTerrain.Break(hit.point);
             }
-            EnemyTest enemy = hit.collider.GetComponent<EnemyTest>();
-            if (enemy != null)
+            DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
+            if (entity != null)
             {
-                enemy.Damage(player, hit.point);
+                entity.Damage(player, hit.point);
             }
 
-            bool damaged = hitTerrain || enemy != null;
+            bool damaged = hitTerrain || entity != null;
             Collide(player, hit.normal, damaged);
             //Exit(player);
             return;
@@ -80,22 +82,25 @@ public class ChargeMovementHandler : MovementHandler
 
     private void Collide(PlayerCharacterController player, Vector3 normal, bool damaged)
     {
-        player.urpManager.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
+        PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
 
         player.cam.StopFovWarp();
-        player.hitstop.Add(damaged ? .12f : .07f);
-        player.cam.ScreenShake(damaged ? .12f : .07f, damaged ? .6f : .25f);
-
+        player.hitstop.Add(damaged ? .12f : .2f);
+        player.cam.ScreenShake(damaged ? .2f : .25f, damaged ? .8f : 1.3f);
         player.hitstop.AddAftershock(damaged ? .23f : .2f);
         player.rb.velocity = Vector3.zero;
         player.rb.AddForce((new Vector3(normal.x, Mathf.Max(0f, normal.y), normal.z).normalized + new Vector3(0f, bounceVerticalRatio * (damaged ? 1.2f : 1f), 0f)).normalized * bounceStrength * (damaged ? 1.4f : 1f) , ForceMode.Acceleration);
-        
+
+        player.canSwitch = true;
+
         player.movementHandler = new AirborneMovementHandler();
         (player.movementHandler as AirborneMovementHandler).horizontalDrag = 5f;
     }
 
     private void Exit(PlayerCharacterController player)
     {
+        player.canSwitch = true;
+
         if (!player.onGround)
         {
             player.movementHandler = new AirborneMovementHandler();

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,14 +20,14 @@ public class Wand : Weapon
         base.AttackCommand();
     }
 
-    protected override void AttackLand(List<EnemyTest> enemies)
+    protected override void AttackLand(List<DamageTakingEntity> entities)
     {
-        player.hitstop.Add(hitstop * (.8f + enemies.Count * .2f));
+        player.hitstop.Add(hitstop * (.8f + entities.Count * .2f));
     }
 
-    public void ProjectileLanded(WandProjectile wandProjectile, List<EnemyTest> enemies)
+    public void ProjectileLanded(WandProjectile wandProjectile, List<DamageTakingEntity> entities)
     {
-        AttackLand(enemies);
+        AttackLand(entities);
     }
 
     private void ShootProjectile()
@@ -36,5 +35,6 @@ public class Wand : Weapon
         attackLanded = true;
         WandProjectile shotProjectile = Instantiate(projectile.transform, player.transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity).GetComponent<WandProjectile>();
         shotProjectile.Init(player, this, range, player.cam.transform.forward, projectileSpeed);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
     }
 }

@@ -3,7 +3,7 @@ using Interfaces.AI.UBS.BaseInterfaces.Set;
 
 namespace Interfaces.AI.UBS.BaseInterfaces.Property
 {
-    public interface IDistancesToEnemiesThatThreatMe : ISetDistancesToEnemiesThatTargetMe, 
-        IGetDistancesToEnemiesThatThreatMe
+    public interface IDistancesToEnemiesThatTargetsMe : ISetDistancesToEnemiesThatTargetMe, 
+        IGetDistancesToEnemiesThatTargetsMe
     {}
 }

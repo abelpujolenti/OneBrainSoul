@@ -47,6 +47,11 @@ namespace AI.Combat.Ally
 
         private static float CalculateFollowPlayerUtility(IAllyFollowPlayerUtility allyFollowPlayerUtility)
         {
+            if (allyFollowPlayerUtility.IsFollowingAlly())
+            {
+                return allyFollowPlayerUtility.DoesBrainCellSwitched() ? 1 : 0;
+            }
+            
             return Convert.ToUInt16(allyFollowPlayerUtility.IsInRetreatState() || !allyFollowPlayerUtility.IsSeeingARival());
         }
         
@@ -55,11 +60,6 @@ namespace AI.Combat.Ally
             if (!allyChooseNewRivalUtility.HasATarget())
             {
                 return 0.9f;
-            }
-            
-            if (allyChooseNewRivalUtility.IsSeeingARival())
-            {
-                return 0.4f;
             }
             
             return 0;
@@ -76,19 +76,8 @@ namespace AI.Combat.Ally
             {
                 return 0;
             }
-
-            /*if (allyGetCloserToRivalUtility.GetStoppingDistance() > allyGetCloserToRivalUtility.GetRemainingDistance())
-            {
-                Debug.Log(allyGetCloserToRivalUtility.GetStoppingDistance() + " " + allyGetCloserToRivalUtility.GetRemainingDistance());
-                return 0;
-            }*/
-
-            if (allyGetCloserToRivalUtility.IsUnderAttack())
-            {
-                return 0.3f;
-            }
             
-            return 0.9f;
+            return 0.7f;
         }
 
         private static float CalculateAttackUtility(IAllyAttackUtility allyAttackUtility)
@@ -132,19 +121,29 @@ namespace AI.Combat.Ally
                 return 1;
             }
 
-            /*List<float> distancesToThreatGroups = allyFleeUtility.GetDistancesToThreatGroupsThatThreatMe();
+            List<float> distancesToEnemies = allyFleeUtility.GetDistancesToEnemiesThatTargetsMe();
 
-            float radiusOfAlert = allyFleeUtility.GetAlertRadius();
+            float radius = allyFleeUtility.IsFleeing() ? allyFleeUtility.GetAlertRadius() : allyFleeUtility.GetSafetyRadius();
 
-            foreach (float distance in distancesToThreatGroups)
+            uint minimumEnemiesAroundToFlee = allyFleeUtility.GetMinimumEnemiesAroundToFlee();
+            uint enemiesCounter = 0;
+
+            foreach (float distance in distancesToEnemies)
             {
-                if (distance > radiusOfAlert)
+                if (distance > radius)
+                {
+                    continue;
+                }
+
+                enemiesCounter++;
+                
+                if (enemiesCounter < minimumEnemiesAroundToFlee)
                 {
                     continue;
                 }
 
                 return 0.8f;
-            }*/
+            }
             
             return 0;
         }
@@ -156,12 +155,18 @@ namespace AI.Combat.Ally
                 return 0;
             }
 
+            if (allyDodgeAttackUtility.GetTimeToNextEnemyMeleeAttack() < 0.3f)
+            {
+                return 0.8f;
+            }
+
             /*if (allyDodgeAttackUtility.GetHealth() < allyDodgeAttackUtility.GetTotalHealth() * 0.3f)
             {
                 return 0.8f;
             }*/
 
-            return 0.8f;
+            //return 0.8f;
+            return 0f;
         }
     }
 }

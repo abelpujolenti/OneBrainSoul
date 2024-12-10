@@ -6,6 +6,8 @@ namespace AI.Combat.ScriptableObjects
     {
         public uint  totalHealth;
 
+        public float rivalsPositionRadius;
+
         public float sightMaximumDistance;
     }
 }

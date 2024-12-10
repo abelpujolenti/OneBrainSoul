@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GroundedMovementHandler : MovementHandler
@@ -21,7 +18,7 @@ public class GroundedMovementHandler : MovementHandler
         // Running around
         Vector3 direction = (player.orientation.right * player.xInput + player.orientation.forward * player.yInput).normalized;
         direction = Quaternion.FromToRotation(Vector3.up, player.groundHit.normal) * direction;
-        player.rb.AddForce(direction * runSpeed, ForceMode.Acceleration);
+        player.rb.AddForce(direction * runSpeed * player.moveSpeedMultiplier, ForceMode.Acceleration);
 
         // Add camera bobbing torque
         bobbingCycle += Time.fixedDeltaTime * player.rb.velocity.magnitude / 2f;

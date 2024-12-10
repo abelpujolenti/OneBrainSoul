@@ -1,4 +1,5 @@
 using System;
+using ECS.Entities.AI.Combat;
 
 namespace Managers
 {
@@ -38,6 +39,9 @@ namespace Managers
         public static Action ScrollDown;        
 
         #endregion
+
+        public static Action<AIAlly> OnSwitch;
+        public static Action<uint> OnAgentDefeated;
 
     }
 }

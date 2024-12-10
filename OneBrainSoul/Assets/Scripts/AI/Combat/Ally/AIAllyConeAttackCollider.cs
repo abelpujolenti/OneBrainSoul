@@ -1,4 +1,5 @@
-﻿using ECS.Components.AI.Combat;
+﻿using AI.Combat.AttackColliders;
+using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
 using UnityEngine;
 
@@ -42,7 +43,7 @@ namespace AI.Combat.Ally
 
         public void SetConeAttackComponent(AllyConeAttackComponent coneAttackComponent)
         {
-            _allyID = coneAttackComponent.GetAllyID();
+            _ownerID = coneAttackComponent.GetAllyID();
             
             _sphereCollider = gameObject.AddComponent<SphereCollider>();
             _sphereCollider.isTrigger = true;
@@ -56,11 +57,11 @@ namespace AI.Combat.Ally
         {
             foreach (AIEnemy enemy in _combatAgentsTriggering)
             {
-                InflictDamageToAnAlly(enemy);
+                InflictDamageToEnemy(enemy);
             }
         }
 
-        private void InflictDamageToAnAlly(AIEnemy enemy)
+        private void InflictDamageToEnemy(AIEnemy enemy)
         {
             enemy.OnReceiveDamage(new AllyDamageComponent(_coneAttackComponent.GetDamage(),
                 _coneAttackComponent.GetStressDamage()));
