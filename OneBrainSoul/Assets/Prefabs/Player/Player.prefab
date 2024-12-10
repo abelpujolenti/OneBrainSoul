@@ -126,7 +126,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 3063
+    m_Bits: 4087
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -901,6 +901,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _navMeshAgentSpecs: {fileID: 0}
   _navMeshAgent: {fileID: 7776869638404985418}
+  _rectangleAttackColliderPrefab: {fileID: 1018056785021335438, guid: f834fc903d19caf49b452a88e7827d91,
+    type: 3}
+  _circleAttackColliderPrefab: {fileID: 1018056785021335438, guid: c5c8ae4ed8b2c744b8790ede06809fc7,
+    type: 3}
+  _showActionsDebugLogs: 0
   _aiAllySpecs: {fileID: 0}
   _isAI: 0
 --- !u!1 &2866942340978029141
@@ -1053,7 +1058,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1015
+    m_Bits: 4087
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2866,7 +2871,7 @@ GameObject:
   - component: {fileID: 2009339665420481395}
   - component: {fileID: 6260910306295680330}
   - component: {fileID: 8567426508853251648}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}

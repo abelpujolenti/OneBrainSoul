@@ -150,6 +150,11 @@ namespace AI.Combat.Ally
                 return 0;
             }
 
+            if (allyDodgeAttackUtility.GetTimeToNextEnemyMeleeAttack() < 0.3f)
+            {
+                return 0.8f;
+            }
+
             /*if (allyDodgeAttackUtility.GetHealth() < allyDodgeAttackUtility.GetTotalHealth() * 0.3f)
             {
                 return 0.8f;

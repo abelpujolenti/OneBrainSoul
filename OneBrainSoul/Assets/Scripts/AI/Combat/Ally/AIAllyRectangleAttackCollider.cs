@@ -8,9 +8,9 @@ namespace AI.Combat.Ally
 {
     public class AIAllyRectangleAttackCollider : AIAllyAttackCollider
     {
-        private AllyRectangleAttackComponent _rectangleAttackComponent; 
-
-        private BoxCollider _boxCollider;
+        [SerializeField] private BoxCollider _boxCollider;
+        
+        private AllyRectangleAttackComponent _rectangleAttackComponent;
 
         protected override void OnEnable()
         {
@@ -22,7 +22,7 @@ namespace AI.Combat.Ally
             MoveToPosition(_rectangleAttackComponent.GetRelativePosition());
             Rotate();
 
-            if (!_rectangleAttackComponent.IsAttachedToAttacker())
+            if (_rectangleAttackComponent.IsAttachedToAttacker())
             {
                 return;
             }
@@ -44,10 +44,7 @@ namespace AI.Combat.Ally
 
         public void SetRectangleAttackComponent(AllyRectangleAttackComponent rectangleAttackComponent)
         {
-            _allyID = rectangleAttackComponent.GetAllyID();
-            
-            _boxCollider = gameObject.AddComponent<BoxCollider>();
-            _boxCollider.isTrigger = true;
+            _ownerID = rectangleAttackComponent.GetAllyID();
             
             _rectangleAttackComponent = rectangleAttackComponent;
 
@@ -71,11 +68,18 @@ namespace AI.Combat.Ally
         {
             foreach (AIEnemy enemy in _combatAgentsTriggering)
             {
-                InflictDamageToAnAlly(enemy);
+                InflictDamageToEnemy(enemy);
+
+                if (enemy.GetAgentID() != _ownerContext.GetRivalID())
+                {
+                    continue;
+                }
+                
+                enemy.RequestDuel(_ownerID, _ownerContext);
             }
         }
 
-        private void InflictDamageToAnAlly(AIEnemy enemy)
+        private void InflictDamageToEnemy(AIEnemy enemy)
         {
             enemy.OnReceiveDamage(new AllyDamageComponent(_rectangleAttackComponent.GetDamage(),
                 _rectangleAttackComponent.GetStressDamage()));
@@ -91,40 +95,6 @@ namespace AI.Combat.Ally
             }
             
             _combatAgentsTriggering.Add(targetEnemy);
-        }
-
-        private void OnDrawGizmos()
-        {
-            Vector3 center = _boxCollider.center;
-            
-            Vector3 size = _boxCollider.size;
-
-            Vector3 halfExtents = size / 2f;
-            
-            Vector3[] localCorners = new Vector3[]
-            {
-                new Vector3(-halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, halfExtents.z),
-                new Vector3(-halfExtents.x, 0, halfExtents.z),
-            };
-
-            Vector2[] corners = new Vector2[localCorners.Length];
-
-            for (int i = 0; i < localCorners.Length; i++)
-            {
-                Vector3 worldCorner = _boxCollider.transform.TransformPoint(localCorners[i]);
-                corners[i] = new Vector2(worldCorner.x + center.x, worldCorner.z + center.z);
-            }
-            
-            Gizmos.color = Color.green;
-
-            for (int i = 0; i < corners.Length; i++)
-            {
-                Gizmos.DrawSphere(new Vector3(corners[i].x, 0, corners[i].y), 0.1f);
-                Gizmos.DrawLine(new Vector3(corners[i].x, 0, corners[i].y), 
-                    new Vector3(corners[(i + 1) % corners.Length].x, 0, corners[(i + 1) % corners.Length].y));
-            }
         }
     }
 }

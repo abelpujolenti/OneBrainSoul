@@ -9,7 +9,6 @@ using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
-using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -133,10 +132,14 @@ namespace Managers
         {
             aStarPath.dynamicObstaclesPositions.Clear();
             
+            aStarPath.LockMutex();
+            
             foreach (DynamicObstacle dynamicObstacle in aStarPath.dynamicObstacles)
             {
                 aStarPath.dynamicObstaclesPositions.Add(dynamicObstacle.iPosition.GetPosition());
             }
+            
+            aStarPath.ReleaseMutex();
         }
 
         private void CleanPreviousWayPoints(Vector3 origin, List<Node> nodes)
@@ -203,6 +206,11 @@ namespace Managers
                     mutex.ReleaseMutex();
                     
                 } while (selectedAgentID == 0 && _active);
+
+                if (!_active)
+                {
+                    return;
+                }
                     
                 AStarPath aStarPath =  _navMeshAgentDestinations[selectedAgentID].GetAStarPath();
 
@@ -257,9 +265,17 @@ namespace Managers
 
         private void NotifyNewDynamicObstacle(DynamicObstacle dynamicObstacle)
         {
+            AStarPath aStarPath;
+            
             foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                navMeshAgentComponent.GetAStarPath().dynamicObstacles.Add(dynamicObstacle);
+                aStarPath = navMeshAgentComponent.GetAStarPath();
+                
+                aStarPath.LockMutex();
+                
+                aStarPath.dynamicObstacles.Add(dynamicObstacle);
+                
+                aStarPath.ReleaseMutex();
             }
         }
 
@@ -310,6 +326,11 @@ namespace Managers
 
         public void RemoveNavMeshAgentEntity(uint agentID, bool removeObstacle)
         {
+            if (!_navMeshAgentDestinations.ContainsKey(agentID))
+            {
+                return;
+            }
+            
             _navMeshAgentDestinations.Remove(agentID);
 
             int index = 0;
@@ -352,10 +373,18 @@ namespace Managers
         private void RemoveDynamicObstacle(uint obstacleID)
         {
             DynamicObstacle dynamicObstacle = _dynamicObstaclesID[obstacleID];
+
+            AStarPath aStarPath;
             
             foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                navMeshAgentComponent.GetAStarPath().dynamicObstacles.Remove(dynamicObstacle);
+                aStarPath = navMeshAgentComponent.GetAStarPath();
+                
+                aStarPath.LockMutex();
+                
+                aStarPath.dynamicObstacles.Remove(dynamicObstacle);
+                
+                aStarPath.ReleaseMutex();
             }
         }
 

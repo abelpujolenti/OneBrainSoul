@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using AI.Combat.CombatNavigation;
 using Interfaces.AI.Navigation;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace AI.Navigation
         public Vector3 destination;
         public List<Vector3> dynamicObstaclesPositions = new List<Vector3>();
 
+        private Mutex _mutex = new Mutex();
+
         public AStarPath(IPosition destinationPosition)
         {
             _navMeshGraph = new NavMeshGraph();
@@ -26,10 +29,14 @@ namespace AI.Navigation
 
         public void UpdateNavMeshGraphObstacles()
         {
+            LockMutex();
+            
             for (int i = 0; i < dynamicObstaclesPositions.Count; i++)
             {
                 _navMeshGraph.UpdateEdgeWeights(dynamicObstaclesPositions[i], dynamicObstacles[i].radius, 100);
             }
+            
+            ReleaseMutex();
         }
 
         public Vector3 GetPosition()
@@ -40,6 +47,16 @@ namespace AI.Navigation
         public NavMeshGraph GetNavMeshGraph()
         {
             return _navMeshGraph;
+        }
+
+        public void LockMutex()
+        {
+            _mutex.WaitOne();
+        }
+
+        public void ReleaseMutex()
+        {
+            _mutex.ReleaseMutex();
         }
     }
 }

@@ -7,9 +7,9 @@ namespace AI.Combat.Ally
 {
     public class AIAllyCircleAttackCollider : AIAllyAttackCollider
     {
+        [SerializeField] private SphereCollider _sphereCollider;
+        
         private AllyCircleAttackComponent _circleAttackComponent;
-
-        private SphereCollider _sphereCollider;
 
         protected override void OnEnable()
         {
@@ -41,10 +41,7 @@ namespace AI.Combat.Ally
 
         public void SetCircleAttackComponent(AllyCircleAttackComponent circleAttackComponent)
         {
-            _allyID = circleAttackComponent.GetAllyID();
-            
-            _sphereCollider = gameObject.AddComponent<SphereCollider>();
-            _sphereCollider.isTrigger = true;
+            _ownerID = circleAttackComponent.GetAllyID();
             
             _circleAttackComponent = circleAttackComponent;
             _sphereCollider.radius = _circleAttackComponent.GetRadius();
@@ -54,11 +51,18 @@ namespace AI.Combat.Ally
         {
             foreach (AIEnemy enemy in _combatAgentsTriggering)
             {
-                InflictDamageToAnAlly(enemy);
+                InflictDamageToEnemy(enemy);
+
+                if (enemy.GetAgentID() != _ownerContext.GetRivalID())
+                {
+                    continue;
+                }
+                
+                enemy.RequestDuel(_ownerID, _ownerContext);
             }
         }
 
-        private void InflictDamageToAnAlly(AIEnemy enemy)
+        private void InflictDamageToEnemy(AIEnemy enemy)
         {
             enemy.OnReceiveDamage(new AllyDamageComponent(_circleAttackComponent.GetDamage(),
                 _circleAttackComponent.GetStressDamage()));

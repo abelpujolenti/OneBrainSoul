@@ -1,30 +1,51 @@
 ﻿using System.Collections.Generic;
-using AI.Combat.AttackColliders;
+using System.Diagnostics;
 using ECS.Entities.AI.Combat;
-using Unity.AI.Navigation;
-using UnityEngine;
 
-namespace AI.Combat
+namespace AI.Combat.AttackColliders
 {
     public abstract class AIEnemyAttackCollider : AIAttackCollider
     {
-        protected bool _isWarning;
-
-        [SerializeField] protected List<NavMeshModifierVolume> _navMeshModifierVolumes = 
-            new List<NavMeshModifierVolume>();
+        private uint _ownerID;
         
-        protected List<AIAlly> _combatAgentsTriggering = new List<AIAlly>();
+        protected bool _isWarning;
+        
+        protected List<uint> _combatAgentsIDsTriggering = new List<uint>();
 
-        protected abstract Vector2[] GetCornerPoints();
+        protected Stopwatch _stopwatch;
+
+        public void SetOwner(uint ownerID)
+        {
+            _ownerID = ownerID;
+        }
 
         public bool HasCombatAgentsTriggering()
         {
-            return _combatAgentsTriggering.Count != 0;
+            return _combatAgentsIDsTriggering.Count != 0;
+        }
+
+        protected override void RemoveAgentID(uint agentID)
+        {
+            if (_ownerID == agentID)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
+            for (int i = 0; i < _combatAgentsIDsTriggering.Count; i++)
+            {
+                if (_combatAgentsIDsTriggering[i] != agentID)
+                {
+                    continue;
+                }
+                
+                _combatAgentsIDsTriggering.RemoveAt(i);
+            }
         }
 
         protected override void OnDisable()
         {
-            _combatAgentsTriggering.Clear();
+            _combatAgentsIDsTriggering.Clear();
         }
     }
 }

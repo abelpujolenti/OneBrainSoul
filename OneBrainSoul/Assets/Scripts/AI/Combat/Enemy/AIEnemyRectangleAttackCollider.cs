@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using AI.Combat.AttackColliders;
 using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
-using Unity.AI.Navigation;
+using Managers;
 using UnityEngine;
 
 namespace AI.Combat.Enemy
@@ -18,13 +20,16 @@ namespace AI.Combat.Enemy
             {
                 return;
             }
+            
+            _stopwatch.Reset();
+            _stopwatch.Start();
 
             _isWarning = true;
             
             MoveToPosition(_rectangleAttackComponent.GetRelativePosition());
             Rotate();
 
-            if (!_rectangleAttackComponent.IsAttachedToAttacker())
+            if (_rectangleAttackComponent.IsAttachedToAttacker())
             {
                 return;
             }
@@ -34,7 +39,14 @@ namespace AI.Combat.Enemy
 
         protected override void OnDisable()
         {
-            foreach (AIAlly ally in _combatAgentsTriggering)
+            List<AIAlly> combatAgentsIDsTriggering = new List<AIAlly>();
+
+            foreach (uint agentID in _combatAgentsIDsTriggering)
+            {
+                combatAgentsIDsTriggering.Add(CombatManager.Instance.RequestAlly(agentID));
+            }
+            
+            foreach (AIAlly ally in combatAgentsIDsTriggering)
             {
                 ally.FreeOfWarnArea(_rectangleAttackComponent, this);
             }
@@ -61,14 +73,7 @@ namespace AI.Combat.Enemy
             float width = _rectangleAttackComponent.GetWidth();
             float length = _rectangleAttackComponent.GetLength();
             
-            Vector3 sizes = new Vector3(width, height, length);
-            
-            _boxCollider.size = sizes;
-
-            foreach (NavMeshModifierVolume navMeshModifierVolume in _navMeshModifierVolumes)
-            {
-                navMeshModifierVolume.size = sizes;
-            }
+            _boxCollider.size = new Vector3(width, height, length);
 
             Vector3 center = new Vector3
             {
@@ -84,43 +89,23 @@ namespace AI.Combat.Enemy
         {
             _isWarning = false;
 
-            foreach (AIAlly ally in _combatAgentsTriggering)
+            List<AIAlly> combatAgentsIDsTriggering = new List<AIAlly>();
+
+            foreach (uint agentID in _combatAgentsIDsTriggering)
             {
-                InflictDamageToAnAlly(ally);
+                combatAgentsIDsTriggering.Add(CombatManager.Instance.RequestAlly(agentID));
+            }
+
+            foreach (AIAlly ally in combatAgentsIDsTriggering)
+            {
+                InflictDamageToAlly(ally);
             }
         }
 
-        private void InflictDamageToAnAlly(AIAlly ally)
+        private void InflictDamageToAlly(AIAlly ally)
         {
             ally.FreeOfWarnArea(_rectangleAttackComponent, this);
             ally.OnReceiveDamage(new DamageComponent(_rectangleAttackComponent.GetDamage()));
-        }
-
-        protected override Vector2[] GetCornerPoints()
-        {
-            Vector3 center = _boxCollider.center;
-            
-            Vector3 size = _boxCollider.size;
-
-            Vector3 halfExtents = size / 2f;
-            
-            Vector3[] localCorners = new Vector3[]
-            {
-                new Vector3(-halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, -halfExtents.z),
-                new Vector3(halfExtents.x, 0, halfExtents.z),
-                new Vector3(-halfExtents.x, 0, halfExtents.z),
-            };
-
-            Vector2[] corners = new Vector2[localCorners.Length];
-
-            for (int i = 0; i < localCorners.Length; i++)
-            {
-                Vector3 worldCorner = _boxCollider.transform.TransformPoint(localCorners[i]);
-                corners[i] = new Vector2(worldCorner.x + center.x, worldCorner.z + center.z);
-            }
-            
-            return corners;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -129,14 +114,14 @@ namespace AI.Combat.Enemy
 
             if (_isWarning)
             {
-                targetAlly.WarnOncomingDamage(_rectangleAttackComponent, this);    
+                targetAlly.WarnOncomingDamage(_rectangleAttackComponent, this, _stopwatch.ElapsedMilliseconds / 1000);    
             }
             else
             {
-                InflictDamageToAnAlly(targetAlly);   
+                InflictDamageToAlly(targetAlly);   
             }
             
-            _combatAgentsTriggering.Add(targetAlly);
+            _combatAgentsIDsTriggering.Add(targetAlly.GetAgentID());
         }
 
         private void OnTriggerExit(Collider other)
@@ -149,20 +134,7 @@ namespace AI.Combat.Enemy
             }
             
             targetAlly.FreeOfWarnArea(_rectangleAttackComponent, this);    
-            _combatAgentsTriggering.Remove(targetAlly);
-        }
-
-        private void OnDrawGizmos()
-        {
-            Vector2[] corners = GetCornerPoints();
-            
-            Gizmos.color = Color.red;
-
-            for (int i = 0; i < corners.Length; i++)
-            {
-                Gizmos.DrawSphere(new Vector3(corners[i].x, 0, corners[i].y), 0.1f);
-                Gizmos.DrawLine(new Vector3(corners[i].x, 0, corners[i].y), new Vector3(corners[(i + 1) % corners.Length].x, 0, corners[(i + 1) % corners.Length].y));
-            }
+            _combatAgentsIDsTriggering.Remove(targetAlly.GetAgentID());
         }
     }
 }

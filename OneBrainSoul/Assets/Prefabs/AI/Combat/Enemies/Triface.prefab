@@ -245,4 +245,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _navMeshAgentSpecs: {fileID: 11400000, guid: d537537af89fa8145ac55661ac62efa7, type: 2}
   _navMeshAgent: {fileID: 956940607707248733}
+  _showActionsDebugLogs: 0
   _aiEnemySpecs: {fileID: 11400000, guid: 076492a5609594c47abb6f1e66f6fc3a, type: 2}
+  _rectangleAttackColliderPrefab: {fileID: 1018056785021335438, guid: a79453eb95ef63149818601c0a1eb517,
+    type: 3}
+  _circleAttackColliderPrefab: {fileID: 1018056785021335438, guid: 4a3e967c27daceb4ca195ed7d56c1311,
+    type: 3}
