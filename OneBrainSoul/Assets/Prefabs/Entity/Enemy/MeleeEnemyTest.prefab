@@ -198,7 +198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91263bb093cdbbe4cac0a6c4f009fd78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 1
+  health: 5
   radius: 0.5
   damageParticlePrefab: {fileID: 3606423612210623298, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
     type: 3}
