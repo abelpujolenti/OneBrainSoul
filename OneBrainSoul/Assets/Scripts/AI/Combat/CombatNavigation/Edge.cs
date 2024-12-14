@@ -2,7 +2,7 @@
 
 namespace AI.Combat.CombatNavigation
 {
-    public class Edge : ICopy<Edge>
+    public class Edge
     {
         public uint fromNodeIndex;
         public uint toNodeIndex;
@@ -29,19 +29,6 @@ namespace AI.Combat.CombatNavigation
         public void MultiplyDefaultCost(float multiplierValue)
         {
             defaultCost *= baseCostMultiplier * multiplierValue;
-        }
-
-        public Edge Copy()
-        {
-            return new Edge
-            {
-                fromNodeIndex = fromNodeIndex,
-                toNodeIndex = toNodeIndex,
-                distance = distance,
-                cost = cost,
-                defaultCost = defaultCost,
-                baseCostMultiplier = baseCostMultiplier
-            };
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using Interfaces.AI.Navigation;
 using MessagePack;
 using Serialize.NavMeshGraph;
 using UnityEngine;
@@ -8,9 +8,18 @@ using UnityEngine.AI;
 
 namespace AI.Combat.CombatNavigation
 {
-    public class NavMeshGraph : ICopy<NavMeshGraph>
+    public class NavMeshGraph
     {
         public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
+
+        public NavMeshGraph()
+        {
+        }
+
+        private NavMeshGraph(Dictionary<uint, Node> nodes)
+        {
+            this.nodes = nodes;
+        }
 
         public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float triangleSideLength)
         {
@@ -32,35 +41,37 @@ namespace AI.Combat.CombatNavigation
 
             Bounds bounds = mesh.bounds;
 
-            List<Vector3> planeVertices = new List<Vector3>();
+            List<RaycastHit[]> raycastHits = new List<RaycastHit[]>();
 
             for (float x = bounds.min.x; x < bounds.max.x; x += triangleSideLength)
             {
                 for (float z = bounds.min.z; z < bounds.max.z; z += triangleSideLength)
                 {
-                    planeVertices.Add(new Vector3(x, 0, z));
+                    raycastHits.Add(Physics.RaycastAll(new Vector3(x, bounds.max.y, z), Vector3.down));
                 }
             }
             
-            NavMeshHit hit;
+            NavMeshHit navMeshHit;
             
-            foreach (Vector3 vertex in planeVertices)
+            foreach (RaycastHit[] hits in raycastHits)
             {
-                
-                if (!NavMesh.SamplePosition(vertex, out hit, Mathf.Infinity, NavMesh.AllAreas))
+                foreach (RaycastHit hit in hits)
                 {
-                    continue;
-                }
+                    if (!NavMesh.SamplePosition(hit.point, out navMeshHit, Mathf.Infinity, NavMesh.AllAreas))
+                    {
+                        continue;
+                    }
 
-                uint index = (uint)nodes.Count;
+                    uint index = (uint)nodes.Count;
 
-                Node newNode = new Node
-                {
-                    index = index,
-                    position = hit.position
-                };
+                    Node newNode = new Node
+                    {
+                        index = index,
+                        position = navMeshHit.position
+                    };
                     
-                nodes.Add(index, newNode);
+                    nodes.Add(index, newNode);
+                }
             }
 
             foreach (Node firstNode in nodes.Values)
@@ -77,7 +88,7 @@ namespace AI.Combat.CombatNavigation
                         continue;
                     }
                 
-                    if (NavMesh.Raycast(firstNode.position, secondNode.position, out hit, NavMesh.AllAreas))
+                    if (NavMesh.Raycast(firstNode.position, secondNode.position, out navMeshHit, NavMesh.AllAreas))
                     {
                         continue;
                     }
@@ -301,19 +312,9 @@ namespace AI.Combat.CombatNavigation
             return Path.Combine(Application.streamingAssetsPath, "NavMeshGraph.json");
         }
 
-        public NavMeshGraph Copy()
+        public NavMeshGraph DeepCopy()
         {
-            Dictionary<uint, Node> copyNodes = new Dictionary<uint, Node>();
-            
-            foreach (Node node in nodes.Values)
-            {
-                copyNodes.Add(node.index, node);
-            }
-
-            return new NavMeshGraph
-            {
-                nodes = copyNodes
-            };
+            return new NavMeshGraph(nodes);
         }
     }
 }

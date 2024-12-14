@@ -1,4 +1,5 @@
 using System;
+using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using Interfaces.AI.Navigation;
 using UnityEngine;
