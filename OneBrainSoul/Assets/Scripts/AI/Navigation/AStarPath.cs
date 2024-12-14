@@ -8,7 +8,7 @@ namespace AI.Navigation
 {
     public class AStarPath : IPosition
     {
-        private NavMeshGraph _navMeshGraph;
+        public NavMeshGraph navMeshGraph;
         public IPosition destinationPosition;
         public Vector3 deviationVector;
         public List<Node> path = new List<Node>();
@@ -22,8 +22,6 @@ namespace AI.Navigation
 
         public AStarPath(IPosition destinationPosition)
         {
-            _navMeshGraph = new NavMeshGraph();
-            _navMeshGraph.LoadGraph();
             this.destinationPosition = destinationPosition;
         }
 
@@ -33,7 +31,7 @@ namespace AI.Navigation
             
             for (int i = 0; i < dynamicObstaclesPositions.Count; i++)
             {
-                _navMeshGraph.UpdateEdgeWeights(dynamicObstaclesPositions[i], dynamicObstacles[i].radius, 100);
+                navMeshGraph.UpdateEdgeWeights(dynamicObstaclesPositions[i], dynamicObstacles[i].radius, 100);
             }
             
             ReleaseMutex();
@@ -42,11 +40,6 @@ namespace AI.Navigation
         public Vector3 GetPosition()
         {
             return destinationPosition.GetPosition();
-        }
-
-        public NavMeshGraph GetNavMeshGraph()
-        {
-            return _navMeshGraph;
         }
 
         public void LockMutex()
