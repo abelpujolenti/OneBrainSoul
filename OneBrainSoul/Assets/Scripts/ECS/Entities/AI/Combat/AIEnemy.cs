@@ -199,6 +199,15 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
+            /*List<uint> reachableRivals = CombatManager.Instance
+                .GetReachableRivals<AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>(
+                    GetNavMeshAgentComponent().GetNavMeshAgent(), _visibleRivals, AIAgentType.ALLY);
+
+            if (reachableRivals.Count == 0)
+            {
+                return;
+            }*/
+
             AIAlly previousAlly = CombatManager.Instance.RequestAlly(_context.GetRivalID());
 
             if (previousAlly != null)

@@ -336,7 +336,16 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
-            List<uint> possibleRivals = CombatManager.Instance.GetPossibleRivals(_visibleRivals);
+            List<uint> reachableRivals = CombatManager.Instance
+                .GetReachableRivals<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>(
+                    GetNavMeshAgentComponent().GetNavMeshAgent(), _visibleRivals, AIAgentType.ENEMY);
+
+            if (reachableRivals.Count == 0)
+            {
+                return;
+            }
+
+            List<uint> possibleRivals = CombatManager.Instance.GetPossibleRivals(reachableRivals);
 
             if (possibleRivals.Count == 0)
             {
@@ -392,8 +401,18 @@ namespace ECS.Entities.AI.Combat
             }
 
             _releaseAgentSlot = () =>
-                CombatManager.Instance.RequestEnemy(_context.GetRivalID()).ReleaseAgentSlot(GetAgentID());
-            
+            {
+                AIEnemy enemy = CombatManager.Instance.RequestEnemy(_context.GetRivalID());
+
+                if (enemy == null)
+                {
+                    return;
+                }
+
+                enemy.ReleaseAgentSlot(GetAgentID());
+            };
+
+
             _requestAgentSlotPositionFunc = () => CombatManager.Instance.RequestEnemy(_context.GetRivalID())
                 .GetAgentSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
         }

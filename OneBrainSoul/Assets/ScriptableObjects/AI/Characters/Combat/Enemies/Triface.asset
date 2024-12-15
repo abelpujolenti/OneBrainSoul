@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f92b1bce00f44b5587588848063e1e9c, type: 3}
   m_Name: Triface
   m_EditorClassIdentifier: 
-  totalHealth: 100
+  totalHealth: 10
   rivalsPositionRadius: 4
-  sightMaximumDistance: 0
+  sightMaximumDistance: 50
   maximumStress: 10
   stunDuration: 3
   aiAttacks:

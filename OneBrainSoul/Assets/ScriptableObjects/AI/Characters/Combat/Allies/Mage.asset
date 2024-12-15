@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 100
   rivalsPositionRadius: 4
-  sightMaximumDistance: 0
+  sightMaximumDistance: 50
   alertRadius: 20
   safetyRadius: 30
   minimumEnemiesInsideAlertRadiusToFlee: 4
