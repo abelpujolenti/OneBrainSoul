@@ -29,7 +29,6 @@ namespace ECS.Entities.AI.Navigation
         protected void Setup()
         {
             _agentId = (uint)gameObject.GetInstanceID();
-            //Debug.Log(name + " " + _agentId);
             Transform ownTransform = transform;
             _navMeshAgent.speed = _navMeshAgentSpecs.speed;
             _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, ownTransform);

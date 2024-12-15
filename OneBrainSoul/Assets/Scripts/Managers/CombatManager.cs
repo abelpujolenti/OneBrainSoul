@@ -10,6 +10,7 @@ using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Combat;
 using Interfaces.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Managers
 {
@@ -97,6 +98,7 @@ namespace Managers
             float sightMaximumDistance = aiCombatAgent.GetContext().GetSightMaximumDistance();
 
             Vector3 position;
+            Vector3 rivalPosition;
             Vector3 vectorToEnemy;
 
             float distanceToEnemy;
@@ -104,9 +106,10 @@ namespace Managers
             foreach (TAgent rival in rivals)
             {
                 position = aiCombatAgent.transform.position;
-                vectorToEnemy = (rival.transform.position - position).normalized;
-
-                distanceToEnemy = vectorToEnemy.magnitude;
+                rivalPosition = rival.transform.position;
+                
+                vectorToEnemy = (rivalPosition - position).normalized;
+                distanceToEnemy = (rivalPosition - position).magnitude;
 
                 if (distanceToEnemy > sightMaximumDistance)
                 {
@@ -186,28 +189,60 @@ namespace Managers
 
         #region Combat Agents Events
 
-        public List<uint> GetPossibleRivals(List<uint> visibleRivals)
+        public List<uint> GetReachableRivals<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, 
+            TRivalAction>(NavMeshAgent navMeshAgent, List<uint> visibleRivals, AIAgentType agentType)
+        
+            where TRivalAgent : AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>
+            where TRivalContext : AICombatAgentContext
+            where TRivalAttackComponent : AttackComponent
+            where TRivalDamageComponent : DamageComponent
+            where TRivalAction : Enum
+        {
+            List<uint> reachableRivals = new List<uint>();
+            
+            Dictionary<uint, TRivalAgent> rivalDictionary = ReturnAgentTypeDictionary<TRivalAgent, TRivalContext, 
+                TRivalAttackComponent, TRivalDamageComponent, TRivalAction>(agentType);
+
+            NavMeshPath navMeshPath = new NavMeshPath();
+
+            foreach (uint rivalID in visibleRivals)
+            {
+                navMeshAgent.CalculatePath(
+                    rivalDictionary[rivalID].GetNavMeshAgentComponent().GetTransformComponent().GetPosition(), navMeshPath);
+                
+                if (navMeshPath.status != NavMeshPathStatus.PathComplete)
+                {
+                    continue;
+                }
+                
+                reachableRivals.Add(rivalID);
+            }
+
+            return reachableRivals;
+        }
+
+        public List<uint> GetPossibleRivals(List<uint> reachableRivals)
         {
             List<uint> auxVisibleRivals = new List<uint>();
             
-            auxVisibleRivals.AddRange(visibleRivals);
+            auxVisibleRivals.AddRange(reachableRivals);
             
             foreach (AIAlly otherAlly in _aiAllies.Values)
             {
-                for (int i = visibleRivals.Count - 1; i >= 0; i--)
+                for (int i = reachableRivals.Count - 1; i >= 0; i--)
                 {
-                    uint enemyID = visibleRivals[i];
+                    uint enemyID = reachableRivals[i];
                     
                     if (otherAlly.GetContext().GetRivalID() != enemyID)
                     {
                         continue;
                     }
                     
-                    visibleRivals.RemoveAt(i);
+                    reachableRivals.RemoveAt(i);
                 }
             }
 
-            return visibleRivals.Count == 0 ? auxVisibleRivals : visibleRivals;
+            return reachableRivals.Count == 0 ? auxVisibleRivals : reachableRivals;
         }
 
         public uint GetClosestRivalID<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>(
