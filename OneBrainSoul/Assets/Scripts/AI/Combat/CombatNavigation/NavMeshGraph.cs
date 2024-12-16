@@ -11,6 +11,8 @@ namespace AI.Combat.CombatNavigation
     public class NavMeshGraph
     {
         public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
+        
+        public List<Vector3> hitsPositions = new List<Vector3>();
 
         public NavMeshGraph()
         {
@@ -52,12 +54,16 @@ namespace AI.Combat.CombatNavigation
             }
             
             NavMeshHit navMeshHit;
+
+            float radius = triangleSideLength * 0.5f;
             
             foreach (RaycastHit[] hits in raycastHits)
             {
                 foreach (RaycastHit hit in hits)
                 {
-                    if (!NavMesh.SamplePosition(hit.point, out navMeshHit, Mathf.Infinity, NavMesh.AllAreas))
+                    hitsPositions.Add(hit.point);
+                    
+                    if (!NavMesh.SamplePosition(hit.point, out navMeshHit, radius, NavMesh.AllAreas))
                     {
                         continue;
                     }

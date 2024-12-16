@@ -42,6 +42,8 @@ namespace Managers
         
         [SerializeField]private uint _maxThreads = 3;
 
+        [SerializeField]private bool _drawGizmos;
+
         private void Awake()
         {
             if (_instance == null)
@@ -411,23 +413,37 @@ namespace Managers
             _navMeshAgentDestinations[agentID].GetAStarPath().deviationVector = deviationVector;
         }
 
-        /*private void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
+            if (!_drawGizmos)
+            {
+                return;
+            }
+            
+            Gizmos.color = Color.blue;
+            
             foreach (Node node in _navMeshGraph.nodes.Values)
             {
-                Gizmos.color = Color.blue;
                 Gizmos.DrawSphere(node.position, 0.2f);
 
                 foreach (Edge edge in node.edges)
                 {
-                    Gizmos.color = new Color(1, edge.cost / 1000, edge.cost / 1000);
+                    Gizmos.color = Color.red;
                     Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
                 }
             }
+            
+            Gizmos.color = Color.green;
+
+            foreach (Vector3 position in _navMeshGraph.hitsPositions)
+            {
+                Gizmos.DrawSphere(position, 0.2f);
+            }
+            
+            Gizmos.color = Color.blue;
 
             foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-                Gizmos.color = Color.blue;
 
                 AStarPath aStarPath = navMeshAgentComponent.GetAStarPath();
 
@@ -436,7 +452,7 @@ namespace Managers
                     Gizmos.DrawLine(aStarPath.path[i].position, aStarPath.path[i + 1].position);
                 }
             }
-        }*/
+        }
 
         public List<Vector3> GetPath(uint agentID)
         {
