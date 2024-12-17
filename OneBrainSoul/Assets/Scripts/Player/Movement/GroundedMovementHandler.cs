@@ -1,3 +1,4 @@
+using FMOD.Studio;
 using UnityEngine;
 
 public class GroundedMovementHandler : MovementHandler
@@ -13,12 +14,24 @@ public class GroundedMovementHandler : MovementHandler
 
     private float bobbingCycle = 0f;
 
+    private EventInstance footstepSound;
+    private Vector3 prevDirection = Vector3.zero;
+
+    public GroundedMovementHandler()
+    {
+        footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
+        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(Vector3.zero));
+    }
+
     public void Move(PlayerCharacterController player)
     {
         // Running around
         Vector3 direction = (player.orientation.right * player.xInput + player.orientation.forward * player.yInput).normalized;
         direction = Quaternion.FromToRotation(Vector3.up, player.groundHit.normal) * direction;
         player.rb.AddForce(direction * runSpeed * player.moveSpeedMultiplier, ForceMode.Acceleration);
+
+        //Sound
+        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(player.transform.position));
 
         // Add camera bobbing torque
         bobbingCycle += Time.fixedDeltaTime * player.rb.velocity.magnitude / 2f;
@@ -44,6 +57,7 @@ public class GroundedMovementHandler : MovementHandler
             velocity.y = jumpStrength;
             rb.velocity = velocity;
             player.movementHandler = new AirborneMovementHandler();
+            footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
             return;
         }
 
@@ -58,6 +72,7 @@ public class GroundedMovementHandler : MovementHandler
             if (coyoteTimer <= 0f || Vector3.Angle(player.groundHit.normal, Vector3.up) > 37.5f)
             {
                 player.movementHandler = new AirborneMovementHandler();
+                footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
                 return;
             }
         }
@@ -66,5 +81,17 @@ public class GroundedMovementHandler : MovementHandler
         Vector3 horizontalVelocity = player.rb.velocity;
         horizontalVelocity.y = 0;
         player.rb.AddForce(-horizontalVelocity * horizontalDrag, ForceMode.Acceleration);
+
+        //Stop & Start
+        if ((direction.x != 0f || direction.z != 0f) && (prevDirection.x == 0f && prevDirection.z == 0f))
+        {
+            footstepSound.start();
+        }
+        if ((direction.x == 0f && direction.z == 0f) && (prevDirection.x != 0f || prevDirection.z != 0f))
+        {
+            footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
+        }
+
+        prevDirection = direction;
     }
 }

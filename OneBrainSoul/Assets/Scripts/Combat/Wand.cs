@@ -35,6 +35,6 @@ public class Wand : Weapon
         attackLanded = true;
         WandProjectile shotProjectile = Instantiate(projectile.transform, player.transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity).GetComponent<WandProjectile>();
         shotProjectile.Init(player, this, range, player.cam.transform.forward, projectileSpeed);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, player.transform.position);
     }
 }

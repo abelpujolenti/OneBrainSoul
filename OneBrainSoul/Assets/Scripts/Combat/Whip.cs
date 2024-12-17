@@ -6,6 +6,7 @@ public class Whip : Weapon
     protected override void AttackCommand()
     {
         base.AttackCommand();
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.whipAttack, player.transform.position);
     }
 
     protected override void AttackUpdate()
@@ -45,6 +46,5 @@ public class Whip : Weapon
     protected override void AttackLand(List<DamageTakingEntity> enemies)
     {
         base.AttackLand(enemies);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.whipAttack, transform.position);
     }
 }

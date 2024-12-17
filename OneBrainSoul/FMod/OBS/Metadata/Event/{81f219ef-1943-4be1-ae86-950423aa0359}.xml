@@ -5,10 +5,10 @@
 			<value>Hook</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
-			<destination>{34d8c880-bd5f-47ba-8f27-11a3d6696e3c}</destination>
+			<destination>{03ced9e9-3918-413d-ab7e-fbd6c718b651}</destination>
 		</relationship>
 		<relationship name="mixer">
 			<destination>{df892b1a-fdb6-4a5d-a9d7-ae3b79fdfd01}</destination>
@@ -96,7 +96,6 @@
 	<object class="MixerBusEffectChain" id="{12ea8b43-a96d-4e71-93c9-8634fec5a851}">
 		<relationship name="effects">
 			<destination>{cf22d445-8494-40de-a8cf-26ee3f5a0870}</destination>
-			<destination>{0275fed5-71c9-415d-9700-682cf072c414}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{9c0aa841-ec49-48a5-b266-cf093f6a79a5}" />
@@ -107,5 +106,4 @@
 	</object>
 	<object class="MixerBusFader" id="{a5cac644-d6ee-4d75-94fe-b8170defe2d0}" />
 	<object class="MixerBusFader" id="{cf22d445-8494-40de-a8cf-26ee3f5a0870}" />
-	<object class="SpatialiserEffect" id="{0275fed5-71c9-415d-9700-682cf072c414}" />
 </objects>

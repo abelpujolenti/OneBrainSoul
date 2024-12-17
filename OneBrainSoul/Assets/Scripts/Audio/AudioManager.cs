@@ -55,8 +55,8 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        /*InitializeAmbience();
         InitializeMusic();
+        /*InitializeAmbience();
         InitializeSnapshots();*/
     }
 
@@ -80,12 +80,12 @@ public class AudioManager : MonoBehaviour
     {
         insideSnapshotEventInstance = CreateInstance(FMODEvents.instance.insideSnapshot);
         insideSnapshotEventInstance.start();
-    }
+    }*/
     private void InitializeMusic()
     {
         musicEventInstance = CreateInstance(FMODEvents.instance.music);
         musicEventInstance.start();
-    }*/
+    }
 
     public void SetAmbienceParameter(string parameterName, float parameterValue)
     {

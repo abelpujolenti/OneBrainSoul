@@ -6,6 +6,7 @@ public class Hammer : Weapon
     protected override void AttackCommand()
     {
         base.AttackCommand();
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
     }
 
     protected override void AttackUpdate()
@@ -45,7 +46,6 @@ public class Hammer : Weapon
     protected override void AttackLand(List<DamageTakingEntity> enemies)
     {
         base.AttackLand(enemies);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, transform.position);
         if (!player.onGround)
         {
             player.cam.ScreenShake(.1f, .4f);

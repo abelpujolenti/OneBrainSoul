@@ -222,7 +222,6 @@ public class PlayerCharacterController : MonoBehaviour
                 {
                     cam.gameObject.SetActive(true);
                     display.SetActive(false);
-                    AudioManager.instance.PlayOneShot(FMODEvents.instance.openSwitchMode, transform.position);
                 }
                 cam.tag = "MainCamera";
                 switchModeCamera.tag = "Player";
@@ -245,6 +244,7 @@ public class PlayerCharacterController : MonoBehaviour
             switchModeCamera.transform.position = cam.transform.position;
             display.SetActive(true);
             PostProcessingManager.Instance.EnableSwitchMode(.45f, .1f);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.openSwitchMode, transform.position);
         }
 
         float t = Mathf.Pow(switchModeTime, 1f / switchModeFalloffPower);

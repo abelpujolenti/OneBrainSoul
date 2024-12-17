@@ -6,7 +6,10 @@ using FMODUnity;
 public class FMODEvents : MonoBehaviour
 {
     [field: Header("Snapshots")]
-    
+
+    [field: Header("Music")]
+    [field: SerializeField] public EventReference music { get; private set; }
+
     [field: Header("Hook SFX")]
     [field: SerializeField] public EventReference hookThrow { get; private set; }
     [field: SerializeField] public EventReference charge { get; private set; }
@@ -19,6 +22,8 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference openSwitchMode { get; private set; }
     [field: SerializeField] public EventReference swap { get; private set; }
     [field: SerializeField] public EventReference catDamage { get; private set; }
+    [field: SerializeField] public EventReference land { get; private set; }
+    [field: SerializeField] public EventReference playerFootsteps { get; private set; }
 
     public static FMODEvents instance { get; private set; }
 

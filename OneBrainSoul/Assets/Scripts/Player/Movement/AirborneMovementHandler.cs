@@ -51,6 +51,7 @@ public class AirborneMovementHandler : MovementHandler
             groundedTimer += 0.1f;
             if (player.rb.velocity.y < -player.gravityStrength / 2f + 0.01f || groundedTimer > 0.1f && player.rb.velocity.y < 0.01f || groundedTimer > 0.3f)
             {
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.land, player.transform.position);
                 player.movementHandler = new GroundedMovementHandler();
             }            
         }

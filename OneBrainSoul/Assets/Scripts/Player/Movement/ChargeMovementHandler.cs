@@ -83,6 +83,8 @@ public class ChargeMovementHandler : MovementHandler
     private void Collide(PlayerCharacterController player, Vector3 normal, bool damaged)
     {
         PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
 
         player.cam.StopFovWarp();
         player.hitstop.Add(damaged ? .12f : .2f);
