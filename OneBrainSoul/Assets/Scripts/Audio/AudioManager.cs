@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using FMODUnity;
 using FMOD.Studio;
-using System;
+using FMODUnity;
+using UnityEngine;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class AudioManager : MonoBehaviour
 {
@@ -122,7 +121,7 @@ public class AudioManager : MonoBehaviour
         // stop and release any created instances
         foreach (EventInstance eventInstance in eventInstances)
         {
-            eventInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            eventInstance.stop(STOP_MODE.IMMEDIATE);
             eventInstance.release();
         }
         // stop all of the event emitters, because if we don't they may hang around in other scenes

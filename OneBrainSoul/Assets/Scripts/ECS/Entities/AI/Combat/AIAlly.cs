@@ -446,14 +446,14 @@ namespace ECS.Entities.AI.Combat
 
             foreach (Vector3 vector in _context.GetVectorsToEnemiesThatTargetsMe())
             {
-                angles.Add(MathUtil.VectorToAngle(vector));   
+                angles.Add(MathUtil.VectorXZToYAxisAngle(vector));   
             }
             
             angles.Sort();
 
             (int, float) widerSubtendedAngle = GetWiderSubtendedAngle(angles);
 
-            Vector3 position = MathUtil.AngleToVector((angles[widerSubtendedAngle.Item1] + widerSubtendedAngle.Item2 / 2) % 360);
+            Vector3 position = MathUtil.YAxisAngleToVectorXZ((angles[widerSubtendedAngle.Item1] + widerSubtendedAngle.Item2 / 2) % 360);
 
             position *= _context.GetSafetyRadius() * 2;
             

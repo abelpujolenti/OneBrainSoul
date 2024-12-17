@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using UnityEngine;
 using Utilities;
@@ -16,14 +17,16 @@ namespace ECS.Entities.AI.Combat
             Node startNode = GetClosestNode(navMeshGraph, startPosition);
             Node goalNode = GetClosestNode(navMeshGraph, goalPosition);
 
+            Node currentNode;
+
             startNode.gCost = 0;
             startNode.hCost = Heuristic(startNode, goalNode);
         
             openSet.Enqueue(startNode, startNode.fCost);
 
-            while (openSet.Count > 0)
+            while (openSet.Count != 0)
             {
-                Node currentNode = openSet.Dequeue();
+                currentNode = openSet.Dequeue();
 
                 if (currentNode == goalNode)
                 {
@@ -138,6 +141,175 @@ namespace ECS.Entities.AI.Combat
             path.Add(lastNode);
 
             return path;
+        }
+
+        public static List<Node> OptimizePath(List<Node> path, Vector3 origin, Dictionary<uint, Node> nodes, 
+            float triangleSideLength)
+        {
+            path.RemoveAt(0);
+
+            if (path.Count < 3)
+            {
+                return path;
+            }
+
+            return RemoveNodesWithSameAngleBetweenCorners(path);
+            path = RemoveNodesWithSameAngleBetweenCorners(path);
+
+            if (path.Count < 3)
+            {
+                return path;
+            }
+            
+            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength);
+        }
+
+        private static List<Node> RemoveNodesWithSameAngleBetweenCorners(List<Node> path)
+        {
+            Vector3 currentVector;
+            Vector3 previousVector = (path[1].position - path[0].position).normalized;
+            
+            int counter = 1;
+
+            while (counter < path.Count - 1)
+            {
+                currentVector = (path[counter + 1].position - path[counter].position).normalized;
+
+                if (Math.Abs(Vector3.Dot(previousVector, currentVector) - 1) > 0.01f)
+                {
+                    previousVector = currentVector;
+                    counter++;
+                    continue;
+                }
+                
+                path.RemoveAt(counter);
+            }
+
+            return path;
+        }
+
+        private static List<Node> RemoveUnnecessaryCorners(List<Node> path, Vector3 origin, 
+            Dictionary<uint, Node> nodes, float triangleSideLength)
+        {
+            path.Insert(0, new Node
+            {
+                position = origin
+            });
+            
+            int counter = 0;
+
+            Vector3 segmentStart;
+            Vector3 segmentBetweenNodes;
+            
+            List<Node> closestNodesToSegment;
+
+            while (counter < path.Count - 2)
+            {
+                Node startNode = path[counter];
+
+                if (IsAJumpEdge(startNode, path[counter + 1].index))
+                {
+                    counter++;
+                    continue;
+                }
+                
+                Node endNode = path[counter + 2];
+                segmentStart = startNode.position;
+                segmentBetweenNodes = endNode.position - startNode.position;
+                
+                closestNodesToSegment = GetClosestNodesToSegment(startNode, endNode, nodes, segmentStart, segmentBetweenNodes, triangleSideLength);
+
+                if (CheckHoles(closestNodesToSegment, segmentStart, segmentBetweenNodes) || 
+                    CheckEdgesCosts(closestNodesToSegment, segmentStart, segmentBetweenNodes))
+                {
+                    counter++;
+                    continue;
+                }
+                
+                path.RemoveAt(counter + 1);
+            }
+            
+            path.RemoveAt(0);
+
+            return path;
+        }
+
+        private static bool IsAJumpEdge(Node startNode, uint nextNodeIndex)
+        {
+            int i = 0;
+
+            for (; i < startNode.edges.Count; i++)
+            {
+                if (startNode.edges[i].toNodeIndex != nextNodeIndex)
+                {
+                    continue;
+                }
+                break;
+            }
+
+            return startNode.edges[i].isAJump;
+        }
+
+        private static List<Node> GetClosestNodesToSegment(Node node1, Node node2, 
+            Dictionary<uint, Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes, float maximumDistance)
+        {
+            float distanceSquared = segmentBetweenNodes.magnitude;
+
+            float closestPointNormalized;
+
+            List<Node> closestNodesToSegment = new List<Node>();
+            Queue<Node> openSet = new Queue<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
+            
+            openSet.Enqueue(node1);
+            openSet.Enqueue(node2);
+
+            Node currentNode;
+
+            Vector3 pointVector;
+            Vector3 closestPoint;
+
+            while (openSet.Count != 0)
+            {
+                currentNode = openSet.Dequeue();
+
+                closedSet.Add(currentNode);
+
+                pointVector = currentNode.position - segmentStart;
+
+                closestPointNormalized = Vector3.Dot(pointVector, segmentBetweenNodes) / distanceSquared;
+
+                if (closestPointNormalized < 0f || closestPointNormalized > 1f)
+                {
+                    continue;
+                }
+
+                closestPoint = segmentStart + closestPointNormalized * segmentBetweenNodes;
+
+                if ((currentNode.position - closestPoint).sqrMagnitude >= maximumDistance * maximumDistance)
+                {
+                    continue;
+                }
+
+                foreach (Edge edge in currentNode.edges)
+                {
+                    openSet.Enqueue(nodes[edge.toNodeIndex]);
+                }
+                
+                closestNodesToSegment.Add(currentNode);
+            }
+            
+            return closestNodesToSegment;
+        }
+
+        private static bool CheckHoles(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes)
+        {
+            return true;
+        }
+
+        private static bool CheckEdgesCosts(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes)
+        {
+            return true;
         }
     }
 }

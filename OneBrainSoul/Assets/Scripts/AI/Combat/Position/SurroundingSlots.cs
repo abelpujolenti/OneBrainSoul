@@ -26,7 +26,7 @@ namespace AI.Combat.Position
                 };
             }
             
-            float angle = MathUtil.VectorToAngle(-direction);
+            float angle = MathUtil.VectorXZToYAxisAngle(-direction);
             float subtendedAngle = CalculateSubtendedAngle(radius) + 10;
 
             PriorityQueue<float> angles = new PriorityQueue<float>();

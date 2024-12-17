@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Utilities
 {
@@ -9,16 +10,37 @@ namespace Utilities
             return newMin + (value - originalMin) * (newMax - newMin) / (originalMax - originalMin);
         }
 
-        public static Vector3 AngleToVector(float angle)
+        public static Vector3 YAxisAngleToVectorXZ(float angle)
         {
             float radians = AngleToRadians(angle);
 
             return new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians));
         }
 
-        public static float VectorToAngle(Vector3 position)
+        public static Vector3 XAxisAngleToVectorYZ(float angle)
+        {
+            float radians = AngleToRadians(angle);
+
+            return new Vector3(0, Mathf.Sin(radians), Mathf.Cos(radians));
+        }
+
+        public static float VectorXZToYAxisAngle(Vector3 position)
         {
             float radians = Mathf.Atan2(position.z, position.x);
+            
+            float angle = RadiansToAngle(radians) % 360;
+
+            if (angle < 0)
+            {
+                angle += 360;
+            }
+
+            return angle;
+        }
+
+        public static float VectorYZToXAxisAngle(Vector3 position)
+        {
+            float radians = Mathf.Atan2(position.z, position.y);
             
             float angle = RadiansToAngle(radians) % 360;
 
