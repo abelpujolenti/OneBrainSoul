@@ -234,6 +234,8 @@ namespace ECS.Entities.AI.Combat
             _playerBody = null;
             _playerTransform = null;
             _isAI = false;
+            SetHasATarget(false);
+            SetRivalIndex(0);
             base.StopUpdate();
         }
 
@@ -296,8 +298,12 @@ namespace ECS.Entities.AI.Combat
 
         private void UpdateVectorsToEnemiesThatTargetsMe()
         {
+            Vector3 position = transform.position;
+
+            position.y -= _context.GetHeight() / 2;
+            
             (List<Vector3>, List<float>) vectorsAndDistancesToEnemies =
-                CombatManager.Instance.GetVectorsAndDistancesToGivenEnemies(transform.position, _enemiesThatTargetsMe);
+                CombatManager.Instance.GetVectorsAndDistancesToGivenEnemies(position, _enemiesThatTargetsMe);
             
             _context.SetVectorsToEnemiesThatTargetsMe(vectorsAndDistancesToEnemies.Item1);
             _context.SetDistancesToEnemiesThatTargetsMe(vectorsAndDistancesToEnemies.Item2);

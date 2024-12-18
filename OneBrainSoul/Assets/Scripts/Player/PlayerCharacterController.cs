@@ -116,7 +116,11 @@ public class PlayerCharacterController : MonoBehaviour
             Hover();
         }
 
-        CorrectRotation();
+        if (braincell)
+        {
+            CorrectRotation();
+        }
+        
         movementHandler.Move(this);
         VoidReturn();
     }
@@ -226,7 +230,7 @@ public class PlayerCharacterController : MonoBehaviour
         braincell = true;
         GetComponent<AIAlly>().CallStopUpdate();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        TransferRotationFromRigidbodyToOrientation();
+        //TransferRotationFromRigidbodyToOrientation();
     }
 
     public void SwitchOut()
@@ -239,7 +243,7 @@ public class PlayerCharacterController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.None;
     }
 
-    public void TransferRotationFromRigidbodyToOrientation()
+    private void TransferRotationFromRigidbodyToOrientation()
     {
         Quaternion r = transform.rotation;
         transform.rotation = Quaternion.identity;

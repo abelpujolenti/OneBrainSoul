@@ -136,7 +136,11 @@ namespace Managers
             {
                 AIEnemy enemy = _aiEnemies[enemyID];
 
-                Vector3 vector = enemy.transform.position - position;
+                Vector3 enemyPosition = transform.position;
+
+                enemyPosition.y -= enemy.GetContext().GetHeight() / 2;
+
+                Vector3 vector = enemyPosition - position;
                 
                 vectorsToEnemies.Add(vector);
                 

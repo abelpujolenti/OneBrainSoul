@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using MessagePack;
 using Serialize.NavMeshGraph;
@@ -315,7 +314,7 @@ namespace AI.Combat.CombatNavigation
 
         private string GetFilePath()
         {
-            return Path.Combine(Application.streamingAssetsPath, "NavMeshGraph.json");
+            return Path.Combine(Application.streamingAssetsPath, "JSON/NavMeshGraph.json");
         }
 
         public NavMeshGraph DeepCopy()

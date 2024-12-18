@@ -1,6 +1,4 @@
-﻿using Interfaces.AI.Navigation;
-
-namespace AI.Combat.CombatNavigation
+﻿namespace AI.Combat.CombatNavigation
 {
     public class Edge
     {
