@@ -1,3 +1,4 @@
+using ECS.Entities.AI.Combat;
 using TMPro;
 using UnityEngine;
 
@@ -102,12 +103,7 @@ public class PlayerCharacterController : MonoBehaviour
     }
     
     private void FixedUpdate()
-    {
-        if (!braincell)
-        {
-            return;
-        }
-        
+    {        
         if (movementHandler.ShouldGravityApply(this))
         {
             ApplyGravity();
@@ -209,6 +205,34 @@ public class PlayerCharacterController : MonoBehaviour
     public void SetCrosshairColor(Color color)
     {
         crosshair.color = color;
+    }
+
+    public void SwitchIn()
+    {
+        cam.gameObject.SetActive(true);
+        display.SetActive(false);
+        allyIcon.gameObject.SetActive(false);
+        braincell = true;
+        GetComponent<AIAlly>().CallStopUpdate();
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        TransferRotationFromRigidbodyToOrientation();
+    }
+
+    public void SwitchOut()
+    {
+        cam.gameObject.SetActive(false);
+        display.SetActive(true);
+        allyIcon.gameObject.SetActive(true);
+        braincell = false;
+        GetComponent<AIAlly>().CallStartUpdate();
+        rb.interpolation = RigidbodyInterpolation.None;
+    }
+
+    public void TransferRotationFromRigidbodyToOrientation()
+    {
+        Quaternion r = transform.rotation;
+        transform.rotation = Quaternion.identity;
+        orientation.rotation = r;
     }
 
     private void SwitchModeUpdate()

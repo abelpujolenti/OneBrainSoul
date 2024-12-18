@@ -108,20 +108,10 @@ public class BraincellManager : Singleton<BraincellManager>
 
     private void ActivatePlayerController(PlayerCharacterController c)
     {
-        c.cam.gameObject.SetActive(true);
-        c.display.SetActive(false);
-        c.allyIcon.gameObject.SetActive(false);
-        c.braincell = true;
-        c.GetComponent<AIAlly>().CallStopUpdate();
-        c.rb.interpolation = RigidbodyInterpolation.Interpolate;
+        c.SwitchIn();
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
     {
-        c.cam.gameObject.SetActive(false);
-        c.display.SetActive(true);
-        c.allyIcon.gameObject.SetActive(true);
-        c.braincell = false;
-        c.GetComponent<AIAlly>().CallStartUpdate();
-        c.rb.interpolation = RigidbodyInterpolation.None;
+        c.SwitchOut();
     }
 }
