@@ -59,7 +59,8 @@ public class ChargeMovementHandler : MovementHandler
         player.rb.AddForce(-horizontalVelocity * horizontalDrag, ForceMode.Acceleration);
 
         RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, chargeDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(player.transform.position + 0.5f * Vector3.up, chargeDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore)
+            && Vector3.Angle(hit.normal, Vector3.up) > AirborneMovementHandler.slideAngle)
         {
             DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
             bool hitTerrain = destructibleTerrain != null;
@@ -83,6 +84,8 @@ public class ChargeMovementHandler : MovementHandler
     private void Collide(PlayerCharacterController player, Vector3 normal, bool damaged)
     {
         PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
 
         player.cam.StopFovWarp();
         player.hitstop.Add(damaged ? .12f : .2f);

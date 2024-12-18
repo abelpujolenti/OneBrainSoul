@@ -28,7 +28,8 @@ public class DashMovementHandler : MovementHandler
         bobbingCycle += Time.fixedDeltaTime * player.rb.velocity.magnitude / 2f;
         player.rb.AddTorque(Quaternion.Euler(0, 90, 0) * player.rb.velocity * bobbingStrength, ForceMode.Acceleration);
 
-        Vector3 dashForwardDirection = Quaternion.FromToRotation(Vector3.up, player.groundHit.normal) * dashDirection;
+        Quaternion groundNormalRotation = Quaternion.FromToRotation(Vector3.up, player.groundHit.normal);
+        Vector3 dashForwardDirection = (player.onGround ? groundNormalRotation : Quaternion.identity) * dashDirection;
         float chargeSpeedWithFalloff = dashSpeed - Mathf.Pow(chargeTime / duration, 1f / dashSpeedFalloffPower) * dashSpeedFalloff;
         player.rb.AddForce(dashForwardDirection * chargeSpeedWithFalloff, ForceMode.Acceleration);
 
@@ -45,7 +46,7 @@ public class DashMovementHandler : MovementHandler
         player.rb.AddForce(-horizontalVelocity * (player.onGround ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
 
         RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, dashDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(player.transform.position, dashForwardDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
         {
             DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
             if (entity != null)

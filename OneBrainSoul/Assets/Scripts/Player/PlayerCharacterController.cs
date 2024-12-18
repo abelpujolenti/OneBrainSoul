@@ -1,3 +1,4 @@
+using ECS.Entities.AI.Combat;
 using TMPro;
 using UnityEngine;
 
@@ -66,6 +67,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     public float airTime = 0f;
     public float switchModeTime = 0f;
+    Vector3 startPos;
     
     private void Start()
     {
@@ -89,6 +91,7 @@ public class PlayerCharacterController : MonoBehaviour
         crosshair = uiCanvas.GetComponentInChildren<TextMeshProUGUI>();
         hitstop = GetComponent<Hitstop>();
         health = GetComponent<PlayerHealth>();
+        startPos = transform.position;
     }
 
     private void Update()
@@ -102,12 +105,7 @@ public class PlayerCharacterController : MonoBehaviour
     }
     
     private void FixedUpdate()
-    {
-        if (!braincell)
-        {
-            return;
-        }
-        
+    {        
         if (movementHandler.ShouldGravityApply(this))
         {
             ApplyGravity();
@@ -118,8 +116,13 @@ public class PlayerCharacterController : MonoBehaviour
             Hover();
         }
 
-        CorrectRotation();
+        if (braincell)
+        {
+            CorrectRotation();
+        }
+        
         movementHandler.Move(this);
+        VoidReturn();
     }
 
     private void ApplyGravity()
@@ -143,6 +146,14 @@ public class PlayerCharacterController : MonoBehaviour
         Quaternion correction2 = Quaternion.FromToRotation(transform.forward, Vector3.forward);
         correction2.ToAngleAxis(out float alpha2, out Vector3 axis2);
         rb.AddTorque(axis2.normalized * alpha2 * Mathf.Deg2Rad * rotationCorrectionStrength - rb.angularVelocity * rotationCorrectionDamp, ForceMode.Acceleration);
+    }
+
+    private void VoidReturn()
+    {
+        if (transform.position.y < -30f)
+        {
+            transform.position = startPos;
+        }
     }
 
     private void ApplyTerminalVelocity()
@@ -211,6 +222,34 @@ public class PlayerCharacterController : MonoBehaviour
         crosshair.color = color;
     }
 
+    public void SwitchIn()
+    {
+        cam.gameObject.SetActive(true);
+        display.SetActive(false);
+        allyIcon.gameObject.SetActive(false);
+        braincell = true;
+        GetComponent<AIAlly>().CallStopUpdate();
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        //TransferRotationFromRigidbodyToOrientation();
+    }
+
+    public void SwitchOut()
+    {
+        cam.gameObject.SetActive(false);
+        display.SetActive(true);
+        allyIcon.gameObject.SetActive(true);
+        braincell = false;
+        GetComponent<AIAlly>().CallStartUpdate();
+        rb.interpolation = RigidbodyInterpolation.None;
+    }
+
+    private void TransferRotationFromRigidbodyToOrientation()
+    {
+        Quaternion r = transform.rotation;
+        transform.rotation = Quaternion.identity;
+        orientation.rotation = r;
+    }
+
     private void SwitchModeUpdate()
     {
         bool cantSwitchMode = !switchModeInput || !canSwitch || !braincell || BraincellManager.Instance.transitionTime > 0f;
@@ -222,7 +261,6 @@ public class PlayerCharacterController : MonoBehaviour
                 {
                     cam.gameObject.SetActive(true);
                     display.SetActive(false);
-                    AudioManager.instance.PlayOneShot(FMODEvents.instance.openSwitchMode, transform.position);
                 }
                 cam.tag = "MainCamera";
                 switchModeCamera.tag = "Player";
@@ -245,6 +283,7 @@ public class PlayerCharacterController : MonoBehaviour
             switchModeCamera.transform.position = cam.transform.position;
             display.SetActive(true);
             PostProcessingManager.Instance.EnableSwitchMode(.45f, .1f);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.openSwitchMode, transform.position);
         }
 
         float t = Mathf.Pow(switchModeTime, 1f / switchModeFalloffPower);

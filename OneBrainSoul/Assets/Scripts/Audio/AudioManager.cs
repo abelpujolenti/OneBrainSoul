@@ -47,24 +47,24 @@ public class AudioManager : MonoBehaviour
         eventEmitters = new List<StudioEventEmitter>();
 
         masterBus = RuntimeManager.GetBus("bus:/");
-        /*musicBus = RuntimeManager.GetBus("bus:/Music");
+        musicBus = RuntimeManager.GetBus("bus:/Music");
         ambienceBus = RuntimeManager.GetBus("bus:/Ambience");
-        sfxBus = RuntimeManager.GetBus("bus:/SFX");*/
+        sfxBus = RuntimeManager.GetBus("bus:/SFX");
     }
 
     private void Start()
     {
-        /*InitializeAmbience();
         InitializeMusic();
+        /*InitializeAmbience();
         InitializeSnapshots();*/
     }
 
     private void Update()
     {
         masterBus.setVolume(masterVolume);
-        /*musicBus.setVolume(musicVolume);
+        musicBus.setVolume(musicVolume);
         ambienceBus.setVolume(ambienceVolume);
-        sfxBus.setVolume(SFXVolume);*/
+        sfxBus.setVolume(SFXVolume);
     }
 /*
     private void InitializeAmbience()
@@ -79,12 +79,12 @@ public class AudioManager : MonoBehaviour
     {
         insideSnapshotEventInstance = CreateInstance(FMODEvents.instance.insideSnapshot);
         insideSnapshotEventInstance.start();
-    }
+    }*/
     private void InitializeMusic()
     {
         musicEventInstance = CreateInstance(FMODEvents.instance.music);
         musicEventInstance.start();
-    }*/
+    }
 
     public void SetAmbienceParameter(string parameterName, float parameterValue)
     {
