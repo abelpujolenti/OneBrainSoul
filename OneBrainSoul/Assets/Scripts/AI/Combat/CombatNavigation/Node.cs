@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Interfaces.AI.Navigation;
 using UnityEngine;
 
 namespace AI.Combat.CombatNavigation

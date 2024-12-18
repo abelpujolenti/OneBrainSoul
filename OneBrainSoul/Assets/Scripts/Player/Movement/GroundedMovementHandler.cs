@@ -1,5 +1,7 @@
 using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class GroundedMovementHandler : MovementHandler
 {
@@ -20,7 +22,7 @@ public class GroundedMovementHandler : MovementHandler
     public GroundedMovementHandler()
     {
         footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
-        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(Vector3.zero));
+        footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(Vector3.zero));
     }
 
     public void Move(PlayerCharacterController player)
@@ -31,7 +33,7 @@ public class GroundedMovementHandler : MovementHandler
         player.rb.AddForce(direction * runSpeed * player.moveSpeedMultiplier, ForceMode.Acceleration);
 
         //Sound
-        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(player.transform.position));
+        footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(player.transform.position));
 
         // Add camera bobbing torque
         bobbingCycle += Time.fixedDeltaTime * player.rb.velocity.magnitude / 2f;

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 10
   rivalsPositionRadius: 4
-  sightMaximumDistance: 50
+  sightMaximumDistance: 0
   maximumStress: 10
   stunDuration: 3
   aiAttacks:
