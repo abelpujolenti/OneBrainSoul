@@ -40,7 +40,6 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         AttackUpdate();
@@ -99,4 +98,13 @@ public class Weapon : MonoBehaviour
         animationTimer = 1f;
     }
 
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Deactivate()
+    {
+        gameObject.SetActive(false);
+    }
 }

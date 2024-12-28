@@ -107,10 +107,10 @@ public class BraincellManager : Singleton<BraincellManager>
 
     private void ActivatePlayerController(PlayerCharacterController c)
     {
-        c.SwitchIn();
+    //    c.SwitchIn();
     } 
     private void DeactivatePlayerController(PlayerCharacterController c)
     {
-        c.SwitchOut();
+    //    c.SwitchOut();
     }
 }

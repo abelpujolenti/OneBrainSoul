@@ -36,11 +36,8 @@ public class PlayerHealth : MonoBehaviour
                 player.movementHandler = new AirborneMovementHandler();
             }
 
-            if (player.braincell)
-            {
-                PostProcessingManager.Instance.DamageEffect(damageEffectDuration);
-                player.cam.ScreenShake(damageEffectDuration * .25f, 1f);
-            }
+            PostProcessingManager.Instance.DamageEffect(damageEffectDuration);
+            player.cam.ScreenShake(damageEffectDuration * .25f, 1f);
         }
         return true;
     }

@@ -33,9 +33,9 @@ public class DebugManager : Singleton<DebugManager>
 
     void SetPlayersPosition(int pos)
     {
-        for (int i = 0; i < BraincellManager.Instance.playerControllers.Length && i < positions.Length; i++)
-        {
-            BraincellManager.Instance.playerControllers[i].transform.position = positions[pos];
-        }
+        var p = FindObjectOfType<PlayerCharacterController>();
+        p.enabled = false;
+        p.transform.position = positions[pos];
+        p.enabled = true;
     }
 }

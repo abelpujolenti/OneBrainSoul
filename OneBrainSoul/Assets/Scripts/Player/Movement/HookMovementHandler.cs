@@ -126,7 +126,6 @@ public class HookMovementHandler : MovementHandler
 
             return;
         }
-
     }
 
     private void Exit(PlayerCharacterController player)

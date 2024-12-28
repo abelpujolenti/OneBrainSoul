@@ -4,15 +4,32 @@ using UnityEngine;
 
 public class HookAbility : MonoBehaviour
 {
+    [SerializeField] HookUI hookUI;
     [SerializeField] Material hookshotChainMaterial;
+    [Range(1f, 1000f)]
     [SerializeField] float range = 100f;
+    [Range(1, 7)]
+    [SerializeField] int maxHookCharges = 3;
+    [Range(0f, 3f)]
     [SerializeField] float radius = .5f;
+    [Range(1f, 10f)]
     [SerializeField] float ledgeSnapLeniency = 4f;
+    [Range(0f, 1f)]
     [SerializeField] float ledgeSnapNormalThreshold = .5f;
+    [Range(0f, 3f)]
     [SerializeField] float ledgeSnapDistance = 1f;
+
+    [Range(0.5f, 20f)]
+    [SerializeField] private float outOfCombatRechargeDuration = 0.5f;
+    [Range(0.5f, 20f)]
+    [SerializeField] private float inCombatRechargeDuration = 2f;
 
     PlayerCharacterController player;
     RaycastHit hit;
+
+    int hookCharges = 0;
+    float rechargeTime = 0f;
+
     private void Start()
     {
         player = GetComponent<PlayerCharacterController>();
@@ -20,6 +37,8 @@ public class HookAbility : MonoBehaviour
         line.startWidth = 0.4f;
         line.endWidth = 0.3f;
         line.material = hookshotChainMaterial;
+        hookCharges = maxHookCharges;
+        hookUI.SetMaxCharges(maxHookCharges);
     }
 
     private void Update()
@@ -29,8 +48,6 @@ public class HookAbility : MonoBehaviour
             (player.movementHandler as HookMovementHandler).VisualUpdate(player);
         }
 
-        if (!player.braincell) return;
-
         Vector3 startPos, endPos;
         Vector3 dir = player.cam.transform.forward;
         startPos = player.transform.position + new Vector3(0f, .5f, 0f);
@@ -38,7 +55,7 @@ public class HookAbility : MonoBehaviour
 
         if (landed)
         {
-            if (player.ability1Time == 0f)
+            if (player.ability2Time == 0f)
             {
                 player.SetCrosshairColor(new Color(.9f, .9f, .1f));
             }
@@ -53,9 +70,8 @@ public class HookAbility : MonoBehaviour
         }
 
 
-        if (player.ability1Input && player.ability1Time == 0f && landed)
+        if (hookCharges > 0 && player.ability2Input && player.ability2Time == 0f && landed)
         {
-
             RaycastHit ledgeHit;
             ledgeSnapLeniency = 4f;
             Vector3 dirNoY = new Vector3(dir.x, 0f, dir.z).normalized; 
@@ -70,8 +86,24 @@ public class HookAbility : MonoBehaviour
             }
 
             player.movementHandler = new HookMovementHandler(player, startPos, endPos, ledgeFound ? ledgeHit.point: hit.point, ledgeFound);
-            player.ability1Time = player.ability1Cooldown;
+            player.ability2Time = player.ability2Cooldown;
+
             AudioManager.instance.PlayOneShot(FMODEvents.instance.hookThrow, transform.position);
+
+            hookCharges--;
+        }
+
+        if (player.inCombat && rechargeTime > inCombatRechargeDuration || !player.inCombat && rechargeTime > outOfCombatRechargeDuration)
+        {
+            hookCharges++;
+            rechargeTime = 0f;
+        }
+
+        hookUI.UpdateUI(hookCharges, rechargeTime, player.inCombat ? inCombatRechargeDuration : outOfCombatRechargeDuration);
+
+        if (hookCharges < maxHookCharges)
+        {
+            rechargeTime += Time.deltaTime;
         }
     }
 }

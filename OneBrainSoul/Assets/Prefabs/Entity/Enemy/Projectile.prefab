@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 2096996376411321490}
   - component: {fileID: 1351902395342765457}
   - component: {fileID: 1191276740024796869}
-  - component: {fileID: 1643580319285505517}
   - component: {fileID: 2556580529609729721}
   - component: {fileID: 7732941597709341574}
+  - component: {fileID: 3492996876057385088}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3590945238801262960}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -57.48, y: 6.36, z: 24.98}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.6, y: 1.6, z: 1.6}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b0117242426ef1842b3476c3ecf7b346, type: 2}
+  - {fileID: 2100000, guid: e64a13350ffefa14f8525938fea87bec, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,19 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1643580319285505517
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3590945238801262960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 616f231e30154b449ab9ce4a1a9d34c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  material: {fileID: 0}
 --- !u!135 &2556580529609729721
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -109,10 +96,10 @@ SphereCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 83
+    m_Bits: 705
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 1
@@ -136,7 +123,7 @@ Rigidbody:
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 727
+    m_Bits: 705
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 256
@@ -145,5 +132,19 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 1
+--- !u!114 &3492996876057385088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3590945238801262960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 616f231e30154b449ab9ce4a1a9d34c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: -876546973899608171, guid: 41ad4ef12ff0ff34583f1078561d9a5f,
+    type: 3}

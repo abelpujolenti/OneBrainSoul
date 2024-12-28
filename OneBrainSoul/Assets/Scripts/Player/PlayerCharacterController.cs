@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PlayerCharacterController : MonoBehaviour
 {
-    public bool braincell = false;
     public Transform orientation;
     public LayerMask groundMask;
     public RaycastHit groundHit;
@@ -50,6 +49,7 @@ public class PlayerCharacterController : MonoBehaviour
     public bool ability2Input { get; private set; }
     public bool switchModeInput { get; private set; }
     public bool canSwitch { get; set; } = true;
+    public bool inCombat { get; private set; } = false;
 
     public float ability1Time = 0f;
     public float ability2Time = 0f;
@@ -75,17 +75,9 @@ public class PlayerCharacterController : MonoBehaviour
         capsuleCollider = GetComponent<CapsuleCollider>();
         cam = GetComponentInChildren<FirstPersonCamera>();
         cam.Setup();
-        if (braincell)
-        {
-            display.SetActive(false);
-            allyIcon.gameObject.SetActive(false);
-            rb.interpolation = RigidbodyInterpolation.Interpolate;
-        }
-        else
-        {
-            cam.gameObject.SetActive(false);
-            rb.interpolation = RigidbodyInterpolation.None;
-        }
+        display.SetActive(false);
+        allyIcon.gameObject.SetActive(false);
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
         movementHandler = new GroundedMovementHandler();
         uiCanvas.gameObject.SetActive(true);
         crosshair = uiCanvas.GetComponentInChildren<TextMeshProUGUI>();
@@ -101,7 +93,6 @@ public class PlayerCharacterController : MonoBehaviour
         HandWobble();
         CalculateAirTime();
         CalculateCooldowns();
-        SwitchModeUpdate();
     }
     
     private void FixedUpdate()
@@ -116,10 +107,7 @@ public class PlayerCharacterController : MonoBehaviour
             Hover();
         }
 
-        if (braincell)
-        {
-            CorrectRotation();
-        }
+        CorrectRotation();
         
         movementHandler.Move(this);
         VoidReturn();
@@ -174,19 +162,11 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void CheckInput()
     {
-        if (!braincell)
-        {
-            yInput = 0f;
-            xInput = 0f;
-            jumpInput = false;
-            ability1Input = false;
-            return;
-        }
         xInput = Input.GetAxis("Horizontal");
         yInput = Input.GetAxis("Vertical");
         jumpInput = Input.GetButton("Jump");
-        ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.Return);
-        ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightCurlyBracket);
+        ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Return);
 
         switchModeInput = Input.GetMouseButton(1);
     }
@@ -220,92 +200,5 @@ public class PlayerCharacterController : MonoBehaviour
     public void SetCrosshairColor(Color color)
     {
         crosshair.color = color;
-    }
-
-    public void SwitchIn()
-    {
-        cam.gameObject.SetActive(true);
-        display.SetActive(false);
-        allyIcon.gameObject.SetActive(false);
-        braincell = true;
-        GetComponent<AIAlly>().CallStopUpdate();
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
-        //TransferRotationFromRigidbodyToOrientation();
-    }
-
-    public void SwitchOut()
-    {
-        cam.gameObject.SetActive(false);
-        display.SetActive(true);
-        allyIcon.gameObject.SetActive(true);
-        braincell = false;
-        GetComponent<AIAlly>().CallStartUpdate();
-        rb.interpolation = RigidbodyInterpolation.None;
-    }
-
-    private void TransferRotationFromRigidbodyToOrientation()
-    {
-        Quaternion r = transform.rotation;
-        transform.rotation = Quaternion.identity;
-        orientation.rotation = r;
-    }
-
-    private void SwitchModeUpdate()
-    {
-        bool cantSwitchMode = !switchModeInput || !canSwitch || !braincell || BraincellManager.Instance.transitionTime > 0f;
-        if (cantSwitchMode)
-        {
-            if (switchModeTime > 0)
-            {
-                if (braincell)
-                {
-                    cam.gameObject.SetActive(true);
-                    display.SetActive(false);
-                }
-                cam.tag = "MainCamera";
-                switchModeCamera.tag = "Player";
-                switchModeUI.ReleaseSwitch(this);
-                switchModeCamera.gameObject.SetActive(false);
-                PostProcessingManager.Instance.DisableSwitchMode();
-                Time.timeScale = 1f;
-            }
-            switchModeTime = 0f;
-            return;
-        }
-
-        if (switchModeTime == 0f)
-        {
-            cam.gameObject.SetActive(false);
-            switchModeCamera.gameObject.SetActive(true);
-            cam.tag = "Player";
-            switchModeCamera.tag = "MainCamera";
-            switchModeCamera.transform.rotation = orientation.rotation;
-            switchModeCamera.transform.position = cam.transform.position;
-            display.SetActive(true);
-            PostProcessingManager.Instance.EnableSwitchMode(.45f, .1f);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.openSwitchMode, transform.position);
-        }
-
-        float t = Mathf.Pow(switchModeTime, 1f / switchModeFalloffPower);
-        float z = -t * switchModeSpeed;
-        float rx = Mathf.Pow(t, 0.5f) * switchModeRotationFactor;
-        Vector3 forwardnoY = new Vector3(switchModeCamera.transform.forward.x, 0f, switchModeCamera.transform.forward.z).normalized;
-        float ryfangle = Vector3.Angle(forwardnoY, orientation.forward);
-        float ryf = 8f / (8f + ryfangle);
-        float dot = Vector3.Dot(forwardnoY, orientation.forward);
-        ryf = dot < -0.45f ? 0f : ryf;
-        ryf = Quaternion.FromToRotation(forwardnoY, orientation.forward).y * Input.GetAxis("Mouse X") <= 0 ? ryf : 1f;
-        //Debug.Log("DOT:"+dot + ", RYF:"+ ryf);
-        ryf = ryf > 0f && ryf < 0.3f ? 0.3f : ryf;
-        float ry = switchModeCamera.transform.rotation.eulerAngles.y + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf;
-        float rz = switchModeCamera.transform.rotation.eulerAngles.z + Input.GetAxis("Mouse X") * switchModeMouseSpeed * ryf * 0.1f;
-        switchModeCamera.transform.rotation = Quaternion.Euler(rx, ry, rz);
-        switchModeCamera.transform.localPosition = cam.transform.localPosition + (orientation.transform.forward + Vector3.down * switchModeYFactor).normalized * z;
-
-        Time.timeScale = 1f / (1f + t * 10f);
-
-        switchModeUI.SwitchModeUpdate(this);
-
-        switchModeTime += Time.unscaledDeltaTime;
     }
 }

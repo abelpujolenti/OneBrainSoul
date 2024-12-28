@@ -14,23 +14,26 @@ public class DashAbility : MonoBehaviour
     }
     private void Update()
     {
-        if (!player.braincell) return;
-
         if (player.onGround)
         {
             timesDashed = 0;
         }
 
-        if (player.ability1Input && player.ability1Time == 0f && timesDashed < airDashes)
+        if (player.ability1Input && player.ability1Time == 0f && player.movementHandler is not HookMovementHandler && timesDashed < airDashes)
         {
-            Quaternion r = player.orientation.rotation;
-            Vector3 dir = r * new Vector3(player.xInput, 0f, player.yInput).normalized;
-            dir = dir == Vector3.zero ? new Vector3(player.cam.transform.forward.x, 0f, player.cam.transform.forward.z).normalized : dir;
-            player.movementHandler = new DashMovementHandler(player, dir);
-            player.ability1Time = player.ability1Cooldown;
-
-            timesDashed++;
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
+            Dash();
         }
+    }
+
+    private void Dash()
+    {
+        Quaternion r = player.orientation.rotation;
+        Vector3 dir = r * new Vector3(player.xInput, 0f, player.yInput).normalized;
+        dir = dir == Vector3.zero ? new Vector3(player.cam.transform.forward.x, 0f, player.cam.transform.forward.z).normalized : dir;
+        player.movementHandler = new DashMovementHandler(player, dir);
+        player.ability1Time = player.ability1Cooldown;
+
+        timesDashed++;
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
     }
 }

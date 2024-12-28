@@ -10,8 +10,6 @@ public class ChargeAbility : MonoBehaviour
 
     private void Update()
     {
-        if (!player.braincell) return;
-
         if (player.onGround && player.ability1Input && player.ability1Time == 0f)
         {
             player.movementHandler = new ChargeMovementHandler(player, player.orientation.forward);
