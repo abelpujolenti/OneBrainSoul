@@ -8,7 +8,7 @@ public class HookMovementHandler : MovementHandler
     public static float endDistance = 1.5f;
     public static float speedFalloff = 77.5f;
     public static float speedFalloffPower = 3f;
-    public static float bobbingStrength = .6f;
+    public static float bobbingStrength = .65f;
     public static float snapDownwardsStrength = 6f;
 
     public static float delay = 0.2f;

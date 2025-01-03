@@ -8,10 +8,11 @@ public class WallClimbMovementHandler : MovementHandler
 {
     public static float runSpeed = 450f;
     public static float strafeSpeed = 30f;
+    public static float torqueStrength = 7f;
     public static float jumpStrength = 14f;
     public static float verticalDrag = 30f;
     public static float horizontalDrag = 7f;
-    public static float bobbingStrength = 0.3f;
+    public static float bobbingStrength = 5f;
     public static float bonusSpeedDuration = .2f;
     public static float bonusSpeed = 180f;
 
@@ -19,7 +20,8 @@ public class WallClimbMovementHandler : MovementHandler
     public static float moveAngleThreshold = 0.4f;
     public static float climbDuration = 1f;
 
-    float climbTime = 0f;
+    private float climbTime = 0f;
+    private float bobbingCycle = 0f;
 
     public void Move(PlayerCharacterController player)
     {
@@ -33,6 +35,14 @@ public class WallClimbMovementHandler : MovementHandler
         player.rb.AddForce(-new Vector3(player.rb.velocity.x, 0f, player.rb.velocity.z) * horizontalDrag, ForceMode.Acceleration);
 
         player.rb.AddForce(directionStrafe * strafeSpeed * player.moveSpeedMultiplier, ForceMode.Acceleration);
+        
+        Vector3 horizontalVelocity = player.rb.velocity;
+        horizontalVelocity.y = 0;
+        player.rb.AddTorque(Quaternion.Euler(0, 90, 0) * horizontalVelocity * torqueStrength, ForceMode.Acceleration);
+
+        bobbingCycle += Time.fixedDeltaTime * player.rb.velocity.magnitude * 0.75f;
+        float sidewaysBobbingMagnitude = Mathf.Sin(bobbingCycle) * player.rb.velocity.magnitude * bobbingStrength / 8f;
+        player.rb.AddTorque(player.orientation.forward * sidewaysBobbingMagnitude, ForceMode.Acceleration);
 
         if (!player.jumpInput)
         {

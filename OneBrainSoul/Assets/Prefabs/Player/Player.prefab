@@ -850,6 +850,7 @@ MonoBehaviour:
   hand: {fileID: 301469152948751642}
   display: {fileID: 4680270387884578829}
   uiCanvas: {fileID: 6518029982840348272}
+  hookCanvas: {fileID: 4624849087584893552}
   switchModeUI: {fileID: 1259152054302789281}
   allyIcon: {fileID: 5122525329779642324}
   switchModeCamera: {fileID: 8659892158976705853}
@@ -2168,7 +2169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5438044640109834729
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2432,7 +2433,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3937896328071316555
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2885,7 +2886,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52474c84662d6e54e8f89e676ffcf0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distanceScaling: 0.1
   highlightIntensity: 4
   alpha: 0.2
 --- !u!1 &8619368495227971514

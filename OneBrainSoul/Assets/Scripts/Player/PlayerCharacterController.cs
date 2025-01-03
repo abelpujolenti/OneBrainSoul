@@ -1,4 +1,5 @@
 using ECS.Entities.AI.Combat;
+using FMOD.Studio;
 using TMPro;
 using UnityEngine;
 
@@ -59,6 +60,7 @@ public class PlayerCharacterController : MonoBehaviour
     public Transform hand;
     public GameObject display;
     public Canvas uiCanvas;
+    public Canvas hookCanvas;
     private TextMeshProUGUI crosshair;
     public SwitchModeUI switchModeUI;
     public AllyIcon allyIcon;
@@ -68,7 +70,8 @@ public class PlayerCharacterController : MonoBehaviour
     public float airTime = 0f;
     public float switchModeTime = 0f;
     Vector3 startPos;
-    
+    private EventInstance footstepSound;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -80,10 +83,14 @@ public class PlayerCharacterController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         movementHandler = new GroundedMovementHandler();
         uiCanvas.gameObject.SetActive(true);
+        hookCanvas.gameObject.SetActive(true);
         crosshair = uiCanvas.GetComponentInChildren<TextMeshProUGUI>();
         hitstop = GetComponent<Hitstop>();
         health = GetComponent<PlayerHealth>();
         startPos = transform.position;
+
+        footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
+        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
     }
 
     private void Update()
@@ -111,6 +118,8 @@ public class PlayerCharacterController : MonoBehaviour
         
         movementHandler.Move(this);
         VoidReturn();
+
+        SoundUpdate();
     }
 
     private void ApplyGravity()
@@ -195,6 +204,25 @@ public class PlayerCharacterController : MonoBehaviour
     {
         ability1Time = Mathf.Max(0f, ability1Time - Time.deltaTime);
         ability2Time = Mathf.Max(0f, ability2Time - Time.deltaTime);
+    }
+
+    private void SoundUpdate()
+    {
+        //Walk sound
+        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
+        PLAYBACK_STATE playbackState;
+        footstepSound.getPlaybackState(out playbackState);
+        if (onGround && (xInput != 0f || yInput != 0f) && rb.velocity != Vector3.zero)
+        {
+            if (playbackState.Equals(PLAYBACK_STATE.STOPPED))
+            {
+                footstepSound.start();
+            }
+        }
+        else if (playbackState.Equals(PLAYBACK_STATE.PLAYING))
+        {
+            footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
+        }
     }
 
     public void SetCrosshairColor(Color color)
