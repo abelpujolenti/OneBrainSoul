@@ -1,14 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
+using DEBUG;
 using ECS.Components.AI.Navigation;
+using ECS.Entities.AI.Combat;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
 using Threads;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -113,7 +117,7 @@ namespace Managers
                 path.RemoveAt(0);
             }
             
-            //_mainThreadQueue.Execute(5);
+            _mainThreadQueue.Execute(5);
         }
 
         private void UpdateOwnPosition(NavMeshAgentComponent navMeshAgentComponent)
@@ -224,12 +228,51 @@ namespace Managers
                 }
                     
                 aStarPath.UpdateNavMeshGraphObstacles();
-
-                _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath, _triangleSideLength);
+                
+                _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath, _triangleSideLength, _mainThreadQueue);
                     
                 aStarPath.navMeshGraph.ResetGraphImportantInfo();
             }
         }
+
+        #region DEBUG
+
+        public void AddObstacle(Transform ownTransform, float radius)
+        {
+            DynamicObstacle dynamicObstacle = new DynamicObstacle
+            {
+                iPosition = new TransformComponent(ownTransform),
+                radius = radius + 4
+            };
+            
+            NotifyNewDynamicObstacle(dynamicObstacle);
+        }
+
+        public void DEBUG_PassOriginalPathToAgent(List<Node> originalPath)
+        {
+            _navMeshAgentDestinations[ID].GetNavMeshAgent().gameObject.GetComponent<DEBUG_NavigationAgent>()
+                .SetOriginalPath(originalPath);
+        }
+
+        public void DEBUG_PassOptimizedPathToAgent(List<Node> optimizedPath)
+        {
+            _navMeshAgentDestinations[ID].GetNavMeshAgent().gameObject.GetComponent<DEBUG_NavigationAgent>()
+                .optimizedPath = optimizedPath;
+        }
+
+        public void DEBUG_PassClosestNodesToAgent(List<Node> closestNodes)
+        {
+            _navMeshAgentDestinations[ID].GetNavMeshAgent().gameObject.GetComponent<DEBUG_NavigationAgent>()
+                .SetClosestNodes(closestNodes);
+        }
+
+        public void DEBUG_PassCubesToAgent(Vector3 start, Vector3 direction, float length, float width)
+        {
+            _navMeshAgentDestinations[ID].GetNavMeshAgent().gameObject.GetComponent<DEBUG_NavigationAgent>()
+                .SetCubes(start, direction, length, width);
+        }
+
+        #endregion
 
         public void AddNavMeshAgentEntity(uint agentID, NavMeshAgentComponent navMeshAgentComponent, float radius)
         {
@@ -467,38 +510,6 @@ namespace Managers
                     Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
                 }
             }
-            
-            Gizmos.color = Color.blue;
-
-            foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
-            {
-
-                AStarPath aStarPath = navMeshAgentComponent.GetAStarPath();
-
-                for (int i = 0; i < aStarPath.path.Count - 1; i++)
-                {
-                    Gizmos.DrawLine(aStarPath.path[i].position, aStarPath.path[i + 1].position);
-                }
-            }
-        }
-
-        public List<Vector3> GetPath(uint agentID)
-        {
-            if (!_navMeshAgentDestinations.ContainsKey(agentID))
-            {
-                return new List<Vector3>();
-            }
-            
-            List<Node> nodes = _navMeshAgentDestinations[agentID].GetAStarPath().path;
-
-            List<Vector3> points = new List<Vector3>();
-
-            foreach (Node node in nodes)
-            {
-                points.Add(node.position);
-            }
-
-            return points;
         }
 
         private void OnDestroy()

@@ -20,8 +20,6 @@ namespace ECS.Entities.AI.Combat
     {
         [SerializeField] private AIAllySpecs _aiAllySpecs;
 
-        private AIAllyUtilityFunction _aiAllyUtilityFunction = new AIAllyUtilityFunction();
-
         private List<uint> _enemiesThatTargetsMe = new List<uint>();
 
         private List<AttackColliderCountdown> _oncomingEnemyAttacks = new List<AttackColliderCountdown>();

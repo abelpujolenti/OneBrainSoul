@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AI.Combat.CombatNavigation;
+using Managers;
+using Threads;
 using UnityEngine;
 using Utilities;
 using Edge = AI.Combat.CombatNavigation.Edge;
@@ -144,7 +147,7 @@ namespace ECS.Entities.AI.Combat
         }
 
         public static List<Node> OptimizePath(List<Node> path, Vector3 origin, Dictionary<uint, Node> nodes, 
-            float triangleSideLength)
+            float triangleSideLength, MainThreadQueue mainThreadQueue)
         {
             path.RemoveAt(0);
 
@@ -153,18 +156,17 @@ namespace ECS.Entities.AI.Combat
                 return path;
             }
 
-            return RemoveNodesWithSameAngleBetweenCorners(path);
-            path = RemoveNodesWithSameAngleBetweenCorners(path);
+            path = RemoveNonCorners(path);
 
             if (path.Count < 3)
             {
                 return path;
             }
-            
-            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength);
+
+            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength, mainThreadQueue);
         }
 
-        private static List<Node> RemoveNodesWithSameAngleBetweenCorners(List<Node> path)
+        private static List<Node> RemoveNonCorners(List<Node> path)
         {
             Vector3 currentVector;
             Vector3 previousVector = (path[1].position - path[0].position).normalized;
@@ -189,7 +191,7 @@ namespace ECS.Entities.AI.Combat
         }
 
         private static List<Node> RemoveUnnecessaryCorners(List<Node> path, Vector3 origin, 
-            Dictionary<uint, Node> nodes, float triangleSideLength)
+            Dictionary<uint, Node> nodes, float triangleSideLength, MainThreadQueue mainThreadQueue)
         {
             path.Insert(0, new Node
             {
@@ -217,10 +219,16 @@ namespace ECS.Entities.AI.Combat
                 segmentStart = startNode.position;
                 segmentBetweenNodes = endNode.position - startNode.position;
                 
-                closestNodesToSegment = GetClosestNodesToSegment(startNode, endNode, nodes, segmentStart, segmentBetweenNodes, triangleSideLength);
+                closestNodesToSegment = GetClosestNodesToSegment(startNode, nodes, segmentStart, segmentBetweenNodes, 
+                    triangleSideLength, mainThreadQueue);
 
-                if (CheckHoles(closestNodesToSegment, segmentStart, segmentBetweenNodes) || 
-                    CheckEdgesCosts(closestNodesToSegment, segmentStart, segmentBetweenNodes))
+                HashSet<Node> leftSideNodes;
+                HashSet<Node> rightSideNodes;
+
+                if (!closestNodesToSegment.Contains(endNode.parent) ||
+                    ExistHoles(closestNodesToSegment, segmentStart, segmentBetweenNodes, nodes, 
+                        out leftSideNodes, out rightSideNodes)/* || 
+                    CheckEdgesCosts(closestNodesToSegment, segmentStart, segmentBetweenNodes)*/)
                 {
                     counter++;
                     continue;
@@ -238,31 +246,42 @@ namespace ECS.Entities.AI.Combat
         {
             int i = 0;
 
+            bool matched = false;
+
             for (; i < startNode.edges.Count; i++)
             {
                 if (startNode.edges[i].toNodeIndex != nextNodeIndex)
                 {
                     continue;
                 }
+
+                matched = true;
                 break;
             }
 
-            return startNode.edges[i].isAJump;
+            return matched && startNode.edges[i].isAJump;
         }
 
-        private static List<Node> GetClosestNodesToSegment(Node node1, Node node2, 
-            Dictionary<uint, Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes, float maximumDistance)
+        private static List<Node> GetClosestNodesToSegment(Node startNode, Dictionary<uint, Node> nodes, 
+            Vector3 segmentStart, Vector3 segmentBetweenNodes, float maximumDistance, MainThreadQueue mainThreadQueue)
         {
-            float distanceSquared = segmentBetweenNodes.magnitude;
+            float segmentLengthSquared = Vector3.Dot(segmentBetweenNodes, segmentBetweenNodes);
+            
+            if (segmentLengthSquared == 0)
+            {
+                return new List<Node>();
+            }
+            
+            mainThreadQueue.SetAction(() => ECSNavigationManager.Instance.DEBUG_PassCubesToAgent(segmentStart, segmentBetweenNodes.normalized, 
+                segmentBetweenNodes.magnitude, maximumDistance * 2));
 
             float closestPointNormalized;
 
             List<Node> closestNodesToSegment = new List<Node>();
-            Queue<Node> openSet = new Queue<Node>();
+            PriorityQueue<Node> openSet = new PriorityQueue<Node>();
             HashSet<Node> closedSet = new HashSet<Node>();
             
-            openSet.Enqueue(node1);
-            openSet.Enqueue(node2);
+            openSet.Enqueue(startNode, 0);
 
             Node currentNode;
 
@@ -277,7 +296,7 @@ namespace ECS.Entities.AI.Combat
 
                 pointVector = currentNode.position - segmentStart;
 
-                closestPointNormalized = Vector3.Dot(pointVector, segmentBetweenNodes) / distanceSquared;
+                closestPointNormalized = Vector3.Dot(pointVector, segmentBetweenNodes) / segmentLengthSquared; 
 
                 if (closestPointNormalized < 0f || closestPointNormalized > 1f)
                 {
@@ -286,24 +305,139 @@ namespace ECS.Entities.AI.Combat
 
                 closestPoint = segmentStart + closestPointNormalized * segmentBetweenNodes;
 
-                if ((currentNode.position - closestPoint).sqrMagnitude >= maximumDistance * maximumDistance)
+                if ((currentNode.position - closestPoint).sqrMagnitude > maximumDistance * maximumDistance)
                 {
                     continue;
                 }
+                
+                closestNodesToSegment.Add(currentNode);
 
                 foreach (Edge edge in currentNode.edges)
                 {
-                    openSet.Enqueue(nodes[edge.toNodeIndex]);
+                    Node neighbor = nodes[edge.toNodeIndex];
+                    
+                    if (closedSet.Contains(neighbor) || openSet.Contains(neighbor))
+                    {
+                        continue;
+                    }
+                    
+                    openSet.Enqueue(neighbor, (segmentStart - neighbor.position).sqrMagnitude);
                 }
-                
-                closestNodesToSegment.Add(currentNode);
             }
+            
+            mainThreadQueue.SetAction(() => ECSNavigationManager.Instance.DEBUG_PassClosestNodesToAgent(closestNodesToSegment));
             
             return closestNodesToSegment;
         }
 
-        private static bool CheckHoles(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes)
+        private static bool ExistHoles(List<Node> closestNodesToSegment, Vector3 segmentStart, Vector3 segmentBetweenNodes, 
+            Dictionary<uint, Node> nodes, out HashSet<Node> leftSideNodes, out HashSet<Node> rightSideNodes)
         {
+            GetEachSideNodes(closestNodesToSegment, segmentStart, segmentBetweenNodes, out leftSideNodes, out rightSideNodes);
+
+            if (leftSideNodes.Count == 0 || rightSideNodes.Count == 0)
+            {
+                return false;
+            }
+
+            if (!AllSideIsInterconnected(leftSideNodes, nodes))
+            {
+                return true;
+            }
+            
+            if (!AllSideIsInterconnected(rightSideNodes, nodes))
+            {
+                return true;
+            }
+
+            return !ExistConnectionsBetweenSides(leftSideNodes, rightSideNodes, nodes);
+        }
+
+        private static void GetEachSideNodes(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes, 
+            out HashSet<Node> leftSideNodes, out HashSet<Node> rightSideNodes)
+        {
+            leftSideNodes = new HashSet<Node>();
+            rightSideNodes = new HashSet<Node>();
+            
+            Vector3 perpendicularVector = Vector3.Cross(segmentBetweenNodes, Vector3.up);
+            
+            Vector3 pointVector;
+
+            foreach (Node node in nodes)
+            {
+                pointVector = node.position - segmentStart;
+
+                float dotProduct = Vector3.Dot(perpendicularVector, pointVector);
+
+                if (dotProduct > 0)
+                {
+                    rightSideNodes.Add(node);
+                }
+                else if (dotProduct < 0)
+                {
+                    leftSideNodes.Add(node);
+                }
+            }
+        }
+
+        private static bool AllSideIsInterconnected(HashSet<Node> sideNodes, Dictionary<uint, Node> nodes)
+        {
+            Queue<Node> openSet = new Queue<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
+            
+            openSet.Enqueue(sideNodes.First());
+
+            while (openSet.Count > 0)
+            {
+                Node currentNode = openSet.Dequeue();
+
+                closedSet.Add(currentNode);
+
+                foreach (Edge edge in currentNode.edges)
+                {
+                    Node toNode = nodes[edge.toNodeIndex];
+
+                    if (!sideNodes.Contains(toNode))
+                    {
+                        continue;
+                    }
+
+                    if (closedSet.Contains(toNode))
+                    {
+                        continue;
+                    }
+                    
+                    openSet.Enqueue(toNode);
+                }
+            }
+            
+            return closedSet.Count == sideNodes.Count;
+        }
+
+        private static bool ExistConnectionsBetweenSides(HashSet<Node> leftSide, HashSet<Node> rightSide, 
+            Dictionary<uint, Node> nodes)
+        {
+            uint counter = 0;
+            
+            foreach (Node node in rightSide)
+            {
+                foreach (Edge edge in node.edges)
+                {
+                    if (!leftSide.Contains(nodes[edge.toNodeIndex]))
+                    {
+                        continue;
+                    }
+
+                    counter++;
+                }
+
+                if (counter < 2)
+                {
+                    return false;    
+                }
+
+                counter = 0;
+            }
             return true;
         }
 

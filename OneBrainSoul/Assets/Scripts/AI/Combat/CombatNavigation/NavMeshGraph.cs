@@ -52,7 +52,7 @@ namespace AI.Combat.CombatNavigation
             
             NavMeshHit navMeshHit;
 
-            float radius = triangleSideLength * 0.5f;
+            float radius = triangleSideLength;
             
             foreach (RaycastHit[] hits in raycastHits)
             {

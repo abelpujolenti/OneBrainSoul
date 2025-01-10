@@ -19,4 +19,4 @@ MonoBehaviour:
   safetyRadius: 30
   minimumEnemiesInsideAlertRadiusToFlee: 4
   aiAttacks:
-  - {fileID: 11400000, guid: 00baaff0f6219f344acb4e0a2ac7b72e, type: 2}
+  - {fileID: 11400000, guid: 695d309e8ba8d824db68a09f0d9c654e, type: 2}
