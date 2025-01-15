@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class DebugManager : Singleton<DebugManager>
 {
+    [SerializeField] PlayerCharacterController player;
     [SerializeField] Vector3[] positions;
     private void OnGUI()
     {
@@ -11,21 +12,13 @@ public class DebugManager : Singleton<DebugManager>
             switch(e.keyCode)
             {
                 case KeyCode.F1:
-                case KeyCode.F2:
-                case KeyCode.F3:
-                case KeyCode.F4:
-                case KeyCode.F5:
-                case KeyCode.F6:
-                case KeyCode.F7:
-                case KeyCode.F8:
-                case KeyCode.F9:
-                case KeyCode.F10:
-                case KeyCode.F11:
-                case KeyCode.F12:
-                    SetPlayersPosition((int)e.keyCode - (int)KeyCode.F1);
+                    player.GetComponent<DashAbility>().enabled = true;
+                    player.GetComponent<HookAbility>().enabled = true;
+                    player.GetComponent<WallClimbAbility>().enabled = true;
+                    player.jumps = 2;
                     break;
-                case KeyCode.M:
-                    AudioManager.instance.musicVolume = 1f - AudioManager.instance.musicVolume;
+                case KeyCode.F2:
+                    player.moveSpeedMultiplier = 5f;
                     break;
             }
         }
@@ -33,9 +26,8 @@ public class DebugManager : Singleton<DebugManager>
 
     void SetPlayersPosition(int pos)
     {
-        var p = FindObjectOfType<PlayerCharacterController>();
-        p.enabled = false;
-        p.transform.position = positions[pos];
-        p.enabled = true;
+        player.enabled = false;
+        player.transform.position = positions[pos];
+        player.enabled = true;
     }
 }
