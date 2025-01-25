@@ -1,7 +1,4 @@
-using FMOD.Studio;
-using FMODUnity;
 using UnityEngine;
-using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class GroundedMovementHandler : MovementHandler
 {

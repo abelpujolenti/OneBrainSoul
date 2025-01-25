@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
-using AI;
-using AI.Combat.Ally;
-using AI.Combat.AttackColliders;
+using AI.Combat.AbilityColliders;
+using AI.Combat.Contexts;
 using AI.Combat.Enemy;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.Enemy.LongArms;
+using AI.Combat.Enemy.Triface;
 using ECS.Components.AI.Combat;
-using ECS.Components.AI.Navigation;
 using ECS.Entities.AI.Combat;
-using Interfaces.AI.Navigation;
+using Player;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace Managers
 {
@@ -22,42 +20,36 @@ namespace Managers
 
         [SerializeField] private GameObject _enemyRectangleAttackColliderPrefab;
         [SerializeField] private GameObject _enemyCircleAttackColliderPrefab;
+
+        private PlayerStatus _playerStatus;
         
-        private Dictionary<uint, AIAlly> _aiAllies = new Dictionary<uint, AIAlly>();
-        private Dictionary<uint, AIEnemy> _aiEnemies = new Dictionary<uint, AIEnemy>();
+        private Dictionary<uint, Triface> _trifaces = new Dictionary<uint, Triface>();
+        private Dictionary<uint, LongArms> _longArms = new Dictionary<uint, LongArms>();
         
-        private readonly Dictionary<AIAgentType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<AIAgentType, Delegate>
+        private readonly Dictionary<AIEnemyType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<AIEnemyType, Delegate>
         {
             {
-                AIAgentType.ALLY, new Func<Dictionary<uint, AIAlly>>(() => _instance._aiAllies)
+                AIEnemyType.TRIFACE, new Func<Dictionary<uint, Triface>>(() => _instance._trifaces)
             },
             {
-                AIAgentType.ENEMY, new Func<Dictionary<uint, AIEnemy>>(() => _instance._aiEnemies)
+                AIEnemyType.LONG_ARMS, new Func<Dictionary<uint, LongArms>>(() => _instance._longArms)
             },
         };
 
-        private readonly Dictionary<AIAgentType, Delegate> _returnTheSameAgentsType = new Dictionary<AIAgentType, Delegate>
+        private readonly Dictionary<AIEnemyType, Delegate> _returnTheSameAgentsType = new Dictionary<AIEnemyType, Delegate>
         {
             { 
-                AIAgentType.ALLY, new Func<List<AIAlly>>(() => 
-                _instance.ReturnAllDictionaryValuesInAList<AIAlly ,AIAllyContext, AllyAttackComponent, DamageComponent, 
-                    AIAllyAction>(_instance._aiAllies)) 
+                AIEnemyType.TRIFACE, new Func<List<Triface>>(() => 
+                _instance.ReturnAllDictionaryValuesInAList<Triface, TrifaceContext, TrifaceAction>(_instance._trifaces)) 
             },
             { 
-                AIAgentType.ENEMY, new Func<List<AIEnemy>>(() => 
-                _instance.ReturnAllDictionaryValuesInAList<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent, 
-                    AIEnemyAction>(_instance._aiEnemies)) 
+                AIEnemyType.LONG_ARMS, new Func<List<LongArms>>(() => 
+                _instance.ReturnAllDictionaryValuesInAList<LongArms, LongArmsContext, LongArmsAction>(_instance._longArms)) 
             }
         };
 
-        private readonly Dictionary<AIAgentType, int> _targetsLayerMask = new Dictionary<AIAgentType, int>
-        {
-            { AIAgentType.ALLY, (int)(Math.Pow(2, 7) + Math.Pow(2, 6)) },
-            { AIAgentType.ENEMY, (int)(Math.Pow(2, 8) + Math.Pow(2, 6)) }
-        };
-
-        private Dictionary<AttackComponent, AIEnemyAttackCollider> _enemiesAttacksColliders =
-            new Dictionary<AttackComponent, AIEnemyAttackCollider>();
+        private Dictionary<AttackComponent, AIEnemyAbilityCollider> _enemiesAttacksColliders =
+            new Dictionary<AttackComponent, AIEnemyAbilityCollider>();
 
         private void Awake()
         {
@@ -74,298 +66,57 @@ namespace Managers
         }
 
         #region UBS
-        
-        public List<uint> GetVisibleRivals<TAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction, 
-            TOwnContext, TOwnAttackComponent, TOwnDamageComponent, TOwnAction>(
-            AICombatAgentEntity<TOwnContext, TOwnAttackComponent, TOwnDamageComponent, TOwnAction> aiCombatAgent)
-        
-            where TAgent : AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>
-            where TRivalContext : AICombatAgentContext
-            where TRivalAttackComponent : AttackComponent
-            where TRivalDamageComponent : DamageComponent
-            where TRivalAction : Enum
-            where TOwnContext : AICombatAgentContext
-            where TOwnAttackComponent : AttackComponent
-            where TOwnDamageComponent : DamageComponent
-            where TOwnAction : Enum
+
+        public bool CanSeePlayer(Vector3 position, float sightMaximumDistance)
         {
-            AIAgentType ownAgentType = aiCombatAgent.GetAIAgentType();
+            Vector3 playerPosition = _playerStatus.GetPosition();
 
-            List<uint> visibleRivals = new List<uint>();
+            Vector3 vectorToPlayer = (playerPosition - position).normalized;
+            float distanceToPlayer = (playerPosition - position).sqrMagnitude;
 
-            List<TAgent> rivals = ReturnAllRivals<TAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>(ownAgentType);
-
-            float sightMaximumDistance = aiCombatAgent.GetContext().GetSightMaximumDistance();
-
-            Vector3 position;
-            Vector3 rivalPosition;
-            Vector3 vectorToEnemy;
-
-            float distanceToEnemy;
-
-            foreach (TAgent rival in rivals)
+            if (distanceToPlayer > sightMaximumDistance * sightMaximumDistance)
             {
-                position = aiCombatAgent.transform.position;
-                rivalPosition = rival.transform.position;
-                
-                vectorToEnemy = (rivalPosition - position).normalized;
-                distanceToEnemy = (rivalPosition - position).magnitude;
-
-                if (distanceToEnemy > sightMaximumDistance)
-                {
-                    continue;
-                }
-                
-                if (Physics.Raycast(position, vectorToEnemy, distanceToEnemy, _targetsLayerMask[ownAgentType]))
-                {
-                    continue;
-                }
-
-                visibleRivals.Add(rival.GetAgentID());
+                return false;
             }
-
-            return visibleRivals;
+            
+            return !Physics.Raycast(position, vectorToPlayer, distanceToPlayer, (int)(Math.Pow(2, 8) + Math.Pow(2, 6)));
         }
-
-        public (List<Vector3>, List<float>) GetVectorsAndDistancesToGivenEnemies(Vector3 position, List<uint> enemies)
-        {
-            List<Vector3> vectorsToEnemies = new List<Vector3>();
-            List<float> distancesToEnemies = new List<float>();
-
-            foreach (uint enemyID in enemies)
-            {
-                AIEnemy enemy = _aiEnemies[enemyID];
-
-                Vector3 enemyPosition = transform.position;
-
-                enemyPosition.y -= enemy.GetContext().GetHeight() / 2;
-
-                Vector3 vector = enemyPosition - position;
-                
-                vectorsToEnemies.Add(vector);
-                
-                distancesToEnemies.Add(vector.magnitude - enemy.GetContext().GetRadius());
-            }
-
-            return (vectorsToEnemies, distancesToEnemies);
-        }
-
-        #region Ally
-
-        public List<uint> FilterEnemiesThatTargetsMe(uint combatAgentID, List<uint> visibleRivalsIDs)
-        {
-            List<uint> enemiesThatTargetsMe = new List<uint>();
-
-            foreach (uint enemyID in visibleRivalsIDs)
-            {
-                AIEnemy enemy = _aiEnemies[enemyID];
-                if (enemy.GetContext().GetRivalID() != combatAgentID)
-                {
-                    continue;
-                }
-                enemiesThatTargetsMe.Add(enemyID);
-            }
-
-            return enemiesThatTargetsMe;
-        }
-
-        #endregion
 
         #endregion
 
         #region Add Combat Agent
 
-        public void AddAIAlly(AIAlly aiAlly)
+        public void AddPlayer(PlayerStatus playerStatus)
         {
-            uint agentID = aiAlly.GetAgentID();
-            
-            _aiAllies.Add(agentID, aiAlly);
+            _playerStatus = playerStatus;
         }
 
-        public void AddAIEnemy(AIEnemy aiEnemy)
+        public void AddEnemy(Triface triface)
         {
-            uint agentID = aiEnemy.GetAgentID();
+            uint agentID = triface.GetAgentID();
             
-            _aiEnemies.Add(agentID, aiEnemy);
+            _trifaces.Add(agentID, triface);
+        }
+
+        public void AddEnemy(LongArms longArms)
+        {
+            uint agentID = longArms.GetAgentID();
+            
+            _longArms.Add(agentID, longArms);
         }
 
         #endregion
 
         #region Combat Agents Events
 
-        public List<uint> GetReachableRivals<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, 
-            TRivalAction>(NavMeshAgent navMeshAgent, List<uint> visibleRivals, AIAgentType agentType)
-        
-            where TRivalAgent : AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>
-            where TRivalContext : AICombatAgentContext
-            where TRivalAttackComponent : AttackComponent
-            where TRivalDamageComponent : DamageComponent
-            where TRivalAction : Enum
+        public void OnEnemyDefeated(Triface triface)
         {
-            List<uint> reachableRivals = new List<uint>();
-            
-            Dictionary<uint, TRivalAgent> rivalDictionary = ReturnAgentTypeDictionary<TRivalAgent, TRivalContext, 
-                TRivalAttackComponent, TRivalDamageComponent, TRivalAction>(agentType);
-
-            NavMeshPath navMeshPath = new NavMeshPath();
-
-            foreach (uint rivalID in visibleRivals)
-            {
-                navMeshAgent.CalculatePath(
-                    rivalDictionary[rivalID].GetNavMeshAgentComponent().GetTransformComponent().GetPosition(), navMeshPath);
-                
-                if (navMeshPath.status != NavMeshPathStatus.PathComplete)
-                {
-                    continue;
-                }
-                
-                reachableRivals.Add(rivalID);
-            }
-
-            return reachableRivals;
+            _trifaces.Remove(triface.GetAgentID());
         }
 
-        public List<uint> GetPossibleRivals(List<uint> reachableRivals)
+        public void OnEnemyDefeated(LongArms longArms)
         {
-            List<uint> auxVisibleRivals = new List<uint>();
-            
-            auxVisibleRivals.AddRange(reachableRivals);
-            
-            foreach (AIAlly otherAlly in _aiAllies.Values)
-            {
-                for (int i = reachableRivals.Count - 1; i >= 0; i--)
-                {
-                    uint enemyID = reachableRivals[i];
-                    
-                    if (otherAlly.GetContext().GetRivalID() != enemyID)
-                    {
-                        continue;
-                    }
-                    
-                    reachableRivals.RemoveAt(i);
-                }
-            }
-
-            return reachableRivals.Count == 0 ? auxVisibleRivals : reachableRivals;
-        }
-
-        public uint GetClosestRivalID<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>(
-            IPosition positionComponent, List<uint> possibleTargetsAICombatAgentIDs, AIAgentType agentType)
-        
-            where TRivalAgent : AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>
-            where TRivalContext : AICombatAgentContext
-            where TRivalAttackComponent : AttackComponent
-            where TRivalDamageComponent : DamageComponent
-            where TRivalAction : Enum
-        {
-            
-            Dictionary<uint, TRivalAgent> rivalsDictionary = 
-                ReturnAgentTypeDictionary<TRivalAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>(agentType);
-            
-            uint targetID = 0;
-            TRivalAgent currentTarget;
-
-            float targetDistance = Mathf.Infinity;
-            float currentTargetDistance;
-
-            for (int i = 0; i < possibleTargetsAICombatAgentIDs.Count; i++)
-            {
-                currentTarget = rivalsDictionary[possibleTargetsAICombatAgentIDs[i]];
-
-                currentTargetDistance = (currentTarget.transform.position - positionComponent.GetPosition()).magnitude;
-
-                if (currentTargetDistance >= targetDistance)
-                {
-                    continue;
-                }
-
-                targetID = currentTarget.GetAgentID();
-                targetDistance = currentTargetDistance;
-            }
-
-            return targetID;
-        }
-        
-        public void OnAllyDefeated(AIAlly aiAlly)
-        {
-            uint agentID = aiAlly.GetAgentID();
-            
-            foreach (AIEnemy enemy in _aiEnemies.Values)
-            {
-                if (enemy.GetContext().GetRivalID() != agentID)
-                {
-                    continue;
-                }
-                
-                enemy.SetIsDueling(false);
-            }
-            
-            OnAgentDefeated<AIEnemy, AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction, 
-                AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>(aiAlly, ref _aiEnemies);
-        }
-
-        public void OnEnemyReceiveDamage(uint enemyAgentInstanceID, uint enemyHealth, float enemyStress, bool isStunned)
-        {
-            foreach (AIAlly ally in _aiAllies.Values)
-            {
-                if (ally.GetContext().GetRivalID() != enemyAgentInstanceID)
-                {
-                    continue;
-                }
-
-                ally.SetEnemyHealth(enemyHealth);
-                ally.SetEnemyCurrentStress(enemyStress);
-                ally.SetIsEnemyStunned(isStunned);
-            }
-        }
-
-        public void OnEnemyStunEnds(uint enemyAgentInstanceID)
-        {
-            foreach (AIAlly ally in _aiAllies.Values)
-            {
-                if (ally.GetContext().GetRivalID() != enemyAgentInstanceID)
-                {
-                    continue;
-                }
-                
-                ally.SetIsEnemyStunned(false);
-            }
-        }
-
-        public void OnEnemyDefeated(AIEnemy aiEnemy)
-        {
-            _aiEnemies.Remove(aiEnemy.GetAgentID());
-            
-            OnAgentDefeated<AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction, 
-                AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>(aiEnemy, ref _aiAllies);
-        }
-
-        private void OnAgentDefeated<TAgent, TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction, 
-            TOwnContext, TOwnAttackComponent, TOwnDamageComponent, TOwnAction>(
-            AICombatAgentEntity<TOwnContext, TOwnAttackComponent, TOwnDamageComponent, TOwnAction> aiCombatAgentDefeated, 
-            ref Dictionary<uint, TAgent> agents)
-        
-            where TAgent : AICombatAgentEntity<TRivalContext, TRivalAttackComponent, TRivalDamageComponent, TRivalAction>
-            where TRivalContext : AICombatAgentContext
-            where TRivalAttackComponent : AttackComponent
-            where TRivalDamageComponent : DamageComponent
-            where TRivalAction : Enum
-            where TOwnContext : AICombatAgentContext
-            where TOwnAttackComponent : AttackComponent
-            where TOwnDamageComponent : DamageComponent
-            where TOwnAction : Enum
-        {
-            foreach (TAgent agent in agents.Values)
-            {
-                if (agent.GetContext().GetRivalID() != aiCombatAgentDefeated.GetAgentID())
-                {
-                    continue;
-                }
-                
-                agent.GetContext().SetHasATarget(false);
-                ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(agent.GetAgentID(), 
-                    new VectorComponent(agent.GetNavMeshAgentComponent().GetTransformComponent().GetPosition()));
-            }
+            _longArms.Remove(longArms.GetAgentID());
         }
 
         #endregion
@@ -430,83 +181,23 @@ namespace Managers
         
         #endregion
 
-        public AIAlly RequestAlly(uint agentID)
-        {
-            if (!_aiAllies.ContainsKey(agentID))
-            {
-                return null;
-            }
-            
-            return _aiAllies[agentID];
-        }
-
-        public AIEnemy RequestEnemy(uint agentID)
-        {
-            if (!_aiEnemies.ContainsKey(agentID))
-            {
-                return null;
-            }
-            
-            return _aiEnemies[agentID];
-        }
-
         #region Collections Methods
 
-        private Dictionary<uint, TAgent>
-            ReturnAgentTypeDictionary<TAgent, TContext, TAttackComponent, TDamageComponent, TAction>(AIAgentType aiAgentType)
+        private Dictionary<uint, TAgent> ReturnAgentTypeDictionary<TAgent, TContext, TAction>(AIEnemyType aiEnemyType)
         
-            where TAgent : AICombatAgentEntity<TContext, TAttackComponent, TDamageComponent, TAction>
-            where TContext : AICombatAgentContext
-            where TAttackComponent : AttackComponent
-            where TDamageComponent : DamageComponent
+            where TAgent : AIEnemy<TContext, TAction>
+            where TContext : AIEnemyContext
             where TAction : Enum
         {
-            return ExecuteDelegate<Dictionary<uint, TAgent>, Dictionary<AIAgentType, Delegate>>
-                (_returnDictionaryOfTheSameType, aiAgentType);
+            return ExecuteDelegate<Dictionary<uint, TAgent>, Dictionary<AIEnemyType, Delegate>>
+                (_returnDictionaryOfTheSameType, aiEnemyType);
         }
 
-        private List<TAgent> 
-            ReturnAllRivals<TAgent, TContext, TAttackComponent, TDamageComponent, TAction>(AIAgentType aiAgentType)
+        private List<TAgent> ReturnAllDictionaryValuesInAList<TAgent, TContext, TAction>
+            (Dictionary<uint, TAgent> agentsDictionary)
         
-            where TAgent : AICombatAgentEntity<TContext, TAttackComponent, TDamageComponent, TAction>
-            where TContext : AICombatAgentContext
-            where TAttackComponent : AttackComponent
-            where TDamageComponent : DamageComponent
-            where TAction : Enum
-        {
-            List<TAgent> combatAgents = new List<TAgent>();
-
-            for (AIAgentType i = 0; i < AIAgentType.ENUM_SIZE; i++)
-            {
-                if (aiAgentType == i)
-                {
-                    continue;
-                }
-
-                if (!_returnTheSameAgentsType.ContainsKey(i))
-                {
-                    continue;
-                }
-
-                List<TAgent> currentCombatAgents = 
-                    ExecuteDelegate<List<TAgent>, Dictionary<AIAgentType, Delegate>>(_returnTheSameAgentsType, i);
-
-                if (currentCombatAgents != null)
-                {
-                    combatAgents.AddRange(currentCombatAgents);    
-                }
-            }
-
-            return combatAgents;
-        }
-
-        private List<TAgent> ReturnAllDictionaryValuesInAList<TAgent, TContext, TAttackComponent, TDamageComponent, 
-            TAction>(Dictionary<uint, TAgent> agentsDictionary)
-        
-            where TAgent : AICombatAgentEntity<TContext, TAttackComponent, TDamageComponent, TAction>
-            where TContext : AICombatAgentContext
-            where TAttackComponent : AttackComponent
-            where TDamageComponent : DamageComponent
+            where TAgent : AIEnemy<TContext, TAction>
+            where TContext : AIEnemyContext
             where TAction : Enum
         {
             List<TAgent> agentsList = new List<TAgent>();
@@ -518,11 +209,43 @@ namespace Managers
 
             return agentsList;
         }
+
+        private List<TAgent> ReturnAllRivals<TAgent, TContext, TAction>(AIEnemyType aiEnemyType)
         
-        private TReturn ExecuteDelegate<TReturn, TCollection>(TCollection collection, AIAgentType agentType)
-            where TCollection : Dictionary<AIAgentType, Delegate>
+            where TAgent : AIEnemy<TContext, TAction>
+            where TContext : AIEnemyContext
+            where TAction : Enum
         {
-            Delegate del = collection[agentType];
+            List<TAgent> combatAgents = new List<TAgent>();
+
+            for (AIEnemyType i = 0; i < AIEnemyType.ENUM_SIZE; i++)
+            {
+                if (aiEnemyType == i)
+                {
+                    continue;
+                }
+
+                if (!_returnTheSameAgentsType.ContainsKey(i))
+                {
+                    continue;
+                }
+
+                List<TAgent> currentCombatAgents = 
+                    ExecuteDelegate<List<TAgent>, Dictionary<AIEnemyType, Delegate>>(_returnTheSameAgentsType, i);
+
+                if (currentCombatAgents != null)
+                {
+                    combatAgents.AddRange(currentCombatAgents);    
+                }
+            }
+
+            return combatAgents;
+        }
+        
+        private TReturn ExecuteDelegate<TReturn, TCollection>(TCollection collection, AIEnemyType aiEnemyType)
+            where TCollection : Dictionary<AIEnemyType, Delegate>
+        {
+            Delegate del = collection[aiEnemyType];
             
             if (del is Func<TReturn> func)
             {

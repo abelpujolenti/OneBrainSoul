@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "AI Enemy Properties", menuName = "ScriptableObjects/AI/Combat/Entity/AI Enemy Properties", order = 1)]
-    public class AIEnemySpecs : AICombatAgentSpecs
+    public abstract class AIEnemySpecs : ScriptableObject
     {
-        public readonly AIAgentType aiAgentType = AIAgentType.ENEMY;
+        public uint  totalHealth;
 
-        public float maximumStress;
-        public float stunDuration;
+        public float agentsPositionRadius;
 
-        [SerializeField] public List<AIAttack> aiAttacks;
-
+        public float sightMaximumDistance;
     }
 }

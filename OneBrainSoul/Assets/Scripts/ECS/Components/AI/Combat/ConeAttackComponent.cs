@@ -1,4 +1,4 @@
-﻿using AI.Combat;
+﻿using AI.Combat.AbilitySpecs;
 using AI.Combat.ScriptableObjects;
 using UnityEngine;
 
@@ -10,13 +10,13 @@ namespace ECS.Components.AI.Combat
         private float _radius;
         private float _degrees;
 
-        public ConeAttackComponent(AIAttack aiAttack) : base(aiAttack)
+        public ConeAttackComponent(CombatAgentAbility combatAgentAbility) : base(combatAgentAbility)
         {
-            AIAttackAoE aiAttackAoE = aiAttack.attackAoE;
+            AbilityAoE abilityAoE = combatAgentAbility.abilityAoE;
             
-            _direction = aiAttackAoE.GetDirection();
-            _radius = aiAttackAoE.GetRadius();
-            _degrees = aiAttackAoE.GetDegrees();
+            _direction = abilityAoE.GetDirection();
+            _radius = abilityAoE.GetRadius();
+            _degrees = abilityAoE.GetDegrees();
         }
 
         public Vector3 GetDirection()

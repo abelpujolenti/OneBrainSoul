@@ -2,6 +2,6 @@
 
 namespace Interfaces.AI.UBS.Enemy
 {
-    public interface IEnemyChooseNewRivalUtility : IIsStunned, IIsSeeingARival, IHasATarget
+    public interface IEnemyChooseNewRivalUtility : IIsSeeingPlayer, IHasATarget
     {}
 }

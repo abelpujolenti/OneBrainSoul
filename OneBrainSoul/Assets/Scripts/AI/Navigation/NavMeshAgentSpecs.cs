@@ -9,7 +9,7 @@ namespace AI.Navigation
         public float radius;
 
         [Min(1f)]
-        public float speed;
+        public float movementSpeed;
 
         [Min(1f)] 
         public float rotationSpeed;

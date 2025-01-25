@@ -1,38 +1,39 @@
 using Managers;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class WallClimbAbility : MonoBehaviour
+namespace Player.Abilities
 {
-    bool canClimb = true;
-    PlayerCharacterController player;
-    RaycastHit hit;
-
-    private void Start()
+    public class WallClimbAbility : MonoBehaviour
     {
-        player = GetComponent<PlayerCharacterController>();
+        bool canClimb = true;
+        PlayerCharacterController player;
+        RaycastHit hit;
 
-    }
-    private void Update()
-    {
-        if (player.movementHandler is WallClimbMovementHandler) return;
-
-        if (player.onGround || player.movementHandler is HookMovementHandler)
+        private void Start()
         {
-            canClimb = true;
+            player = GetComponent<PlayerCharacterController>();
+
         }
-
-        if (!canClimb || !player.jumpInput || player.onGround) return;
-
-        if (Physics.Raycast(player.transform.position + new Vector3(0f, 1.9f, 0f), player.orientation.forward, out hit, 1f, GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
+        private void Update()
         {
-            float viewDot = Vector3.Dot(hit.normal, player.orientation.forward);
-            float moveDot = Vector3.Dot(hit.normal, player.orientation.right * player.xInput + player.orientation.forward * player.yInput);
-            if (viewDot < -WallClimbMovementHandler.viewAngleThreshold && moveDot < -WallClimbMovementHandler.moveAngleThreshold)
+            if (player.movementHandler is WallClimbMovementHandler) return;
+
+            if (player.onGround || player.movementHandler is HookMovementHandler)
             {
-                canClimb = false;
-                player.movementHandler = new WallClimbMovementHandler();
+                canClimb = true;
+            }
+
+            if (!canClimb || !player.jumpInput || player.onGround) return;
+
+            if (Physics.Raycast(player.transform.position + new Vector3(0f, 1.9f, 0f), player.orientation.forward, out hit, 1f, GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
+            {
+                float viewDot = Vector3.Dot(hit.normal, player.orientation.forward);
+                float moveDot = Vector3.Dot(hit.normal, player.orientation.right * player.xInput + player.orientation.forward * player.yInput);
+                if (viewDot < -WallClimbMovementHandler.viewAngleThreshold && moveDot < -WallClimbMovementHandler.moveAngleThreshold)
+                {
+                    canClimb = false;
+                    player.movementHandler = new WallClimbMovementHandler();
+                }
             }
         }
     }

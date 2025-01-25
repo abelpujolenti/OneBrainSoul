@@ -1,4 +1,4 @@
-﻿using AI.Combat;
+﻿using AI.Combat.AbilitySpecs;
 using AI.Combat.ScriptableObjects;
 using UnityEngine;
 
@@ -36,30 +36,30 @@ namespace ECS.Components.AI.Combat
         private float _timeDealingDamage;
         private float _remainingTimeDealingDamage;
 
-        private AIAttackAoEType _aiAttackAoEType;
+        private AbilityAoEType _abilityAoEType;
 
-        protected AttackComponent(AIAttack aiAttack)
+        protected AttackComponent(CombatAgentAbility combatAgentAbility)
         {
-            _totalDamage = aiAttack.totalDamage;
-            _height = aiAttack.height;
-            _doesRelativePositionToCasterChange = aiAttack.doesRelativePositionToCasterChange;
-            _relativePositionToCaster = aiAttack.relativePositionToCaster;
-            _isAttachedToAttacker = aiAttack.attachToAttacker;
-            _minimumRangeToCast = aiAttack.minimumRangeCast;
-            _maximumRangeToCast = aiAttack.maximumRangeCast;
-            _isRelativePositionXCenterOfColliderX = aiAttack.isRelativePositionXCenterOfColliderX;
-            _isRelativePositionYCenterOfColliderY = aiAttack.isRelativePositionYCenterOfColliderY;
-            _isRelativePositionZCenterOfColliderZ = aiAttack.isRelativePositionZCenterOfColliderZ;
-            _timeToCast = aiAttack.timeToCast;
-            _cooldown = aiAttack.cooldown;
-            _itLandsInstantly = aiAttack.itLandsInstantly;
-            _delayBeforeApplyingDamage = aiAttack.delayBeforeApplyingDamage;
-            _startRelativePositionToCasterOfTheProjectile = aiAttack.startRelativePositionToCasterOfTheProjectile;
-            _projectileSpeed = aiAttack.projectileSpeed;
-            _doesProjectileExplodeOnAnyContact = aiAttack.doesProjectileExplodeOnAnyContact;
-            _doesDamageOverTime = aiAttack.doesDamageOverTime;
-            _timeDealingDamage = aiAttack.timeDealingDamage;
-            _aiAttackAoEType = aiAttack.aiAttackAoEType;
+            _totalDamage = combatAgentAbility.totalDamage;
+            _height = combatAgentAbility.height;
+            _doesRelativePositionToCasterChange = combatAgentAbility.doesRelativePositionToCasterChange;
+            _relativePositionToCaster = combatAgentAbility.relativePositionToCaster;
+            _isAttachedToAttacker = combatAgentAbility.attachToAttacker;
+            _minimumRangeToCast = combatAgentAbility.minimumRangeCast;
+            _maximumRangeToCast = combatAgentAbility.maximumRangeCast;
+            _isRelativePositionXCenterOfColliderX = combatAgentAbility.isRelativePositionXCenterOfColliderX;
+            _isRelativePositionYCenterOfColliderY = combatAgentAbility.isRelativePositionYCenterOfColliderY;
+            _isRelativePositionZCenterOfColliderZ = combatAgentAbility.isRelativePositionZCenterOfColliderZ;
+            _timeToCast = combatAgentAbility.timeToCast;
+            _cooldown = combatAgentAbility.cooldown;
+            _itLandsInstantly = combatAgentAbility.itLandsInstantly;
+            _delayBeforeApplyingDamage = combatAgentAbility.delayBeforeApplyingDamage;
+            _startRelativePositionToCasterOfTheProjectile = combatAgentAbility.startRelativePositionToCasterOfTheProjectile;
+            _projectileSpeed = combatAgentAbility.projectileSpeed;
+            _doesProjectileExplodeOnAnyContact = combatAgentAbility.doesProjectileExplodeOnAnyContact;
+            _doesDamageOverTime = combatAgentAbility.doesDamageOverTime;
+            _timeDealingDamage = combatAgentAbility.timeDealingDamage;
+            _abilityAoEType = combatAgentAbility.abilityAoEType;
         }
 
         public uint GetDamage()
@@ -203,9 +203,9 @@ namespace ECS.Components.AI.Combat
             return _remainingTimeDealingDamage != 0;
         }
 
-        public AIAttackAoEType GetAIAttackAoEType()
+        public AbilityAoEType GetAIAttackAoEType()
         {
-            return _aiAttackAoEType;
+            return _abilityAoEType;
         }
     }
 }

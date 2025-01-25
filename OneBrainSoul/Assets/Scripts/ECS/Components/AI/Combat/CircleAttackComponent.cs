@@ -6,9 +6,9 @@ namespace ECS.Components.AI.Combat
     {
         private float _radius;
 
-        public CircleAttackComponent(AIAttack aiAttack) : base(aiAttack)
+        public CircleAttackComponent(CombatAgentAbility combatAgentAbility) : base(combatAgentAbility)
         {
-            _radius = aiAttack.attackAoE.GetRadius();
+            _radius = combatAgentAbility.abilityAoE.GetRadius();
         }
 
         public float GetRadius()

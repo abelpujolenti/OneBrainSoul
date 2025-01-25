@@ -1,7 +1,8 @@
-using ECS.Entities.AI.Combat;
 using FMOD.Studio;
+using FMODUnity;
 using TMPro;
 using UnityEngine;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class PlayerCharacterController : MonoBehaviour
 {
@@ -90,7 +91,7 @@ public class PlayerCharacterController : MonoBehaviour
         startPos = transform.position;
 
         footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
-        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
+        footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
     }
 
     private void Update()
@@ -209,7 +210,7 @@ public class PlayerCharacterController : MonoBehaviour
     private void SoundUpdate()
     {
         //Walk sound
-        footstepSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
+        footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
         PLAYBACK_STATE playbackState;
         footstepSound.getPlaybackState(out playbackState);
         if (onGround && (xInput != 0f || yInput != 0f) && rb.velocity != Vector3.zero)

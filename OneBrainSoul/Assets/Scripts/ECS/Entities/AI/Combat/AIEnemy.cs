@@ -1,82 +1,201 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AI;
-using AI.Combat;
-using AI.Combat.Ally;
-using AI.Combat.AttackColliders;
+using AI.Combat.AbilityColliders;
+using AI.Combat.AbilitySpecs;
+using AI.Combat.Contexts;
 using AI.Combat.Enemy;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat;
+using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
 
 namespace ECS.Entities.AI.Combat
 {
-    public class AIEnemy : AICombatAgentEntity<AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>
+    public abstract class AIEnemy<TContext, TAction> : AgentEntity
+        where TContext : AIEnemyContext
+        where TAction : Enum
     {
-        [SerializeField] private AIEnemySpecs _aiEnemySpecs;
+        protected TContext _context;
 
-        private bool _alive = true;
+        protected IGetBestAction<TAction, TContext> _utilityFunction;
+
+        protected Dictionary<TAction, Action> _actions;
+
+        [SerializeField] protected GameObject _rectangleAttackColliderPrefab;
+        [SerializeField] protected GameObject _circleAttackColliderPrefab;
+
+        protected List<AttackComponent> _attackComponents = new List<AttackComponent>();
+
+        protected Dictionary<AttackComponent, AbilityCollider> _attacksColliders =
+            new Dictionary<AttackComponent, AbilityCollider>();
+
+        private Coroutine _updateCoroutine;
+
+        protected SurroundingSlots _surroundingSlots;
+        protected AgentSlot _agentSlot;
+
+        protected bool _alive = true;
         
-        private void Start()
+        public AgentSlotPosition GetAgentSlotPosition(Vector3 direction, float radius)
         {
-            _utilityFunction = new AIEnemyUtilityFunction();
+            return _surroundingSlots.ReserveSubtendedAngle(GetAgentID(), direction, radius);
+        }
+
+        public void ReleaseAgentSlot(uint agentID)
+        {
+            _surroundingSlots.FreeSubtendedAngle(agentID);
+        }
+        
+        #region Context
+        
+        public abstract TContext GetContext();
+
+        private void SetLastActionIndex(uint lastActionIndex)
+        {
+            _context.SetLastActionIndex(lastActionIndex);
+        }
+
+        protected void SetHealth(uint health)
+        {
+            _context.SetHealth(health);
+        }
+
+        protected void SetRivalRadius(float rivalRadius)
+        {
+            _context.SetTargetRadius(rivalRadius);
+        }
+
+        protected void SetRivalHeight(float rivalHeight)
+        {
+            _context.SetTargetHeight(rivalHeight);
+        }
+
+        public void SetDistanceToRival(float distanceToRival)
+        {
+            _context.SetDistanceToTarget(distanceToRival);
+        }
+
+        protected void SetIsSeeingARival(bool isSeeingARival)
+        {
+            _context.SetIsSeeingPlayer(isSeeingARival);
+        }
+
+        protected void SetHasATarget(bool hasATarget)
+        {
+            _context.SetHasATarget(hasATarget);
+        }
+
+        public void SetIsFighting(bool isFighting)
+        {
+            _context.SetIsFighting(isFighting);
+        }
+
+        public void SetIsAttacking(bool isAttacking)
+        {
+            _context.SetIsAttacking(isAttacking);
+        }
+
+        public void SetIsAirborne(bool isAirborne)
+        {
+            _context.SetIsAirborne(isAirborne);
+        }
+
+        public void SetVectorToRival(Vector3 vectorToRival)
+        {
+            _context.SetVectorToTarget(vectorToRival);
+        }
+
+        protected void SetRivalTransform(Transform rivalTransform)
+        {
+            _context.SetTargetTransform(rivalTransform);
+        }
+
+        protected virtual void Attacking()
+        {
+            _context.SetIsAttacking(true);
+        }
+
+        protected virtual void NotAttacking()
+        {
+            _context.SetIsAttacking(false);
+        }
+
+        protected void UpdateVectorToTarget()
+        {
+            if (!_context.HasATarget())
+            {
+                return;
+            }
+
+            Vector3 rivalPosition = _context.GetTargetTransform().position;
+            Vector3 agentPosition = transform.position;
+            
+            rivalPosition.y -= _context.GetTargetHeight() / 2;
+            agentPosition.y -= _context.GetHeight() / 2;
+            
+            _context.SetVectorToTarget(rivalPosition - agentPosition);
+        }
+
+        #endregion
+        
+        #region UBS
+
+        protected abstract void InitiateDictionaries();
+
+        protected void CalculateBestAction()
+        {
+            CheckIfCanPerformGivenAction(_utilityFunction.GetBestAction(_context));
+        }
+
+        private void CheckIfCanPerformGivenAction(TAction action)
+        {
+            uint agentActionUInt = Convert.ToUInt16(action);
+            uint lastAction = _context.GetLastActionIndex();
+
+            List<uint> repeatableActions = _context.GetRepeatableActions();
+
+            if (agentActionUInt == lastAction && !repeatableActions.Contains(lastAction))
+            {
+                return;
+            }
+            
+            SetLastActionIndex(agentActionUInt);
+
+            _actions[action]();
+        }
+
+        #endregion
+
+        public abstract void OnReceiveDamage(DamageComponent damageComponent);
+
+        protected virtual void EnemySetup(float radius, AIEnemySpecs aiEnemySpecs)
+        {
             InitiateDictionaries();
-            Setup();
-            InstantiateAttackComponents(_aiEnemySpecs.aiAttacks);
-            CalculateMinimumAndMaximumRangeToAttacks(_attackComponents);
 
-            _raysTargetsLayerMask = (int)(Math.Pow(2, GameManager.Instance.GetEnemyLayer()) + 
-                                          Math.Pow(2, GameManager.Instance.GetGroundLayer()));
+            _surroundingSlots = new SurroundingSlots(radius + aiEnemySpecs.agentsPositionRadius);
 
-            CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
-
-            float radius = capsuleCollider.radius;
-
-            _surroundingSlots = new SurroundingSlots(radius + _aiEnemySpecs.rivalsPositionRadius);
-            
-            _context = new AIEnemyContext(_aiEnemySpecs.totalHealth, radius, capsuleCollider.height, 
-                _aiEnemySpecs.sightMaximumDistance, _minimumRangeToCastAnAttack, _maximumRangeToCastAnAttack, transform, 
-                _aiEnemySpecs.maximumStress, _aiEnemySpecs.stunDuration);
-            
-            CombatManager.Instance.AddAIEnemy(this);
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
-
+            //InstantiateAttackComponents(aiEnemySpecs.aiAttacks);
             InstantiateAttacksColliders();
-            
-            StartUpdate();
         }
 
-        protected override void InitiateDictionaries()
+        private void InstantiateAttackComponents(List<CombatAgentAbility> attacks)
         {
-            _actions = new Dictionary<AIEnemyAction, Action>
+            foreach (CombatAgentAbility aiAttack in attacks)
             {
-                { AIEnemyAction.PATROL , Patrol },
-                { AIEnemyAction.CHOOSE_NEW_RIVAL , RequestRival },
-                { AIEnemyAction.GET_CLOSER_TO_RIVAL , GetCloserToRival },
-                { AIEnemyAction.ROTATE , Rotate },
-                { AIEnemyAction.ATTACK , Attack },
-                { AIEnemyAction.FLEE , Flee }
-            };
-        }
-
-        private void InstantiateAttackComponents(List<AIAttack> attacks)
-        {
-            foreach (AIAttack aiAttack in attacks)
-            {
-                switch (aiAttack.aiAttackAoEType)
+                switch (aiAttack.abilityAoEType)
                 {
-                    case AIAttackAoEType.RECTANGLE_AREA:
+                    case AbilityAoEType.RECTANGLE_AREA:
                         _attackComponents.Add(new RectangleAttackComponent(aiAttack));
                         break;
                     
-                    case AIAttackAoEType.CIRCLE_AREA:
+                    case AbilityAoEType.CIRCLE_AREA:
                         _attackComponents.Add(new CircleAttackComponent(aiAttack));
                         break;
                     
-                    case AIAttackAoEType.CONE_AREA:
+                    case AbilityAoEType.CONE_AREA:
                         _attackComponents.Add(new ConeAttackComponent(aiAttack));
                         break;
                 }
@@ -93,36 +212,36 @@ namespace ECS.Entities.AI.Combat
 
                 switch (attackComponent.GetAIAttackAoEType())
                 {
-                    case AIAttackAoEType.RECTANGLE_AREA:
+                    case AbilityAoEType.RECTANGLE_AREA:
                         colliderObject = Instantiate(_rectangleAttackColliderPrefab);
-                        AIEnemyRectangleAttackCollider rectangleAttackCollider = 
-                            colliderObject.GetComponent<AIEnemyRectangleAttackCollider>();
+                        AIEnemyRectangleAbilityCollider rectangleAbilityCollider = 
+                            colliderObject.GetComponent<AIEnemyRectangleAbilityCollider>();
                         
-                        rectangleAttackCollider.SetOwner(GetAgentID());
-                        rectangleAttackCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
-                        rectangleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, rectangleAttackCollider);
+                        rectangleAbilityCollider.SetOwner(GetAgentID());
+                        rectangleAbilityCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
+                        rectangleAbilityCollider.SetAbilityTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, rectangleAbilityCollider);
                         break;
 
-                    case AIAttackAoEType.CIRCLE_AREA:
+                    case AbilityAoEType.CIRCLE_AREA:
                         colliderObject = Instantiate(_circleAttackColliderPrefab);
-                        AIEnemyCircleAttackCollider circleAttackCollider = 
-                            colliderObject.GetComponent<AIEnemyCircleAttackCollider>();
+                        AIEnemyCircleAbilityCollider circleAbilityCollider = 
+                            colliderObject.GetComponent<AIEnemyCircleAbilityCollider>();
                         
-                        circleAttackCollider.SetOwner(GetAgentID());
-                        circleAttackCollider.SetCircleAttackComponent((CircleAttackComponent)attackComponent);
-                        circleAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, circleAttackCollider);
+                        circleAbilityCollider.SetOwner(GetAgentID());
+                        circleAbilityCollider.SetCircleAbilityComponent((CircleAttackComponent)attackComponent);
+                        circleAbilityCollider.SetAbilityTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, circleAbilityCollider);
                         break;
 
-                    case AIAttackAoEType.CONE_AREA:
-                        AIEnemyConeAttackCollider coneAttackCollider = 
-                            colliderObject.GetComponent<AIEnemyConeAttackCollider>();
+                    case AbilityAoEType.CONE_AREA:
+                        AIEnemyConeAbilityCollider coneAbilityCollider = 
+                            colliderObject.GetComponent<AIEnemyConeAbilityCollider>();
                         
-                        coneAttackCollider.SetOwner(GetAgentID());
-                        coneAttackCollider.SetConeAttackComponent((ConeAttackComponent)attackComponent);
-                        coneAttackCollider.SetAttackTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, coneAttackCollider);
+                        coneAbilityCollider.SetOwner(GetAgentID());
+                        coneAbilityCollider.SetConeAbilityComponent((ConeAttackComponent)attackComponent);
+                        coneAbilityCollider.SetAbilityTargets((int)Mathf.Pow(2, layerTarget));
+                        _attacksColliders.Add(attackComponent, coneAbilityCollider);
                         break;
                 }
 
@@ -130,307 +249,44 @@ namespace ECS.Entities.AI.Combat
             }
         }
 
-        #region AI Loop
-
-        protected override IEnumerator UpdateCoroutine()
-        {
-            while (_alive)
-            {
-                UpdateVisibleRivals();
-
-                UpdateVectorToRival();
-
-                if (_context.IsAttacking())
-                {
-                    yield return null;
-                    continue;
-                }
-                
-                //LaunchRaycasts();
-            
-                CalculateBestAction();
-
-                if (!_context.HasATarget())
-                {
-                    yield return null;
-                    continue;
-                }
-                
-                AgentSlotPosition agentSlotPosition = CombatManager.Instance.RequestAlly(_context.GetRivalID())
-                    .GetAgentSlotPosition(_context.GetVectorToRival(), _context.GetRadius());
-
-                if (agentSlotPosition == null)
-                {
-                    yield return null;
-                    continue;
-                }
-
-                _agentSlot = agentSlotPosition.agentSlot;
-                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
-
-                yield return null;
-            }
-        }
-
-        protected override void UpdateVisibleRivals()
-        {
-            _visibleRivals = CombatManager.Instance.GetVisibleRivals<AIAlly, AIAllyContext, AllyAttackComponent, 
-                DamageComponent, AIAllyAction, AIEnemyContext, AttackComponent, AllyDamageComponent, AIEnemyAction>(this);
-
-            SetIsSeeingARival(_visibleRivals.Count != 0);
-        }
-
-        #endregion
-
-        #region FSM
-
-        private void Patrol()
-        {
-            ShowActionDebugLogs(name + " Patrolling");
-            //TODO
-        }
-
-        protected override void RequestRival()
-        {
-            ShowActionDebugLogs(name + " Requesting Rival");
-            
-            if (_visibleRivals.Count == 0)
-            {
-                return;
-            }
-
-            /*List<uint> reachableRivals = CombatManager.Instance
-                .GetReachableRivals<AIAlly, AIAllyContext, AllyAttackComponent, DamageComponent, AIAllyAction>(
-                    GetNavMeshAgentComponent().GetNavMeshAgent(), _visibleRivals, AIAgentType.ALLY);
-
-            if (reachableRivals.Count == 0)
-            {
-                return;
-            }*/
-
-            AIAlly previousAlly = CombatManager.Instance.RequestAlly(_context.GetRivalID());
-
-            if (previousAlly != null)
-            {
-                previousAlly.ReleaseAgentSlot(GetAgentID());
-            }
-
-            uint targetID = ObtainTargetID(_visibleRivals);
-            
-            _context.SetIsDueling(false);
-            
-            OnTargetAcquired(targetID, CombatManager.Instance.RequestAlly(targetID).GetContext());
-        }
-
-        protected override uint ObtainTargetID(List<uint> possibleRivals)
-        {
-            uint targetID;
-
-            if (possibleRivals.Count == 1)
-            {
-                targetID = possibleRivals[0];
-            }
-            else
-            {
-                targetID = CombatManager.Instance.GetClosestRivalID<AIAlly, AIAllyContext, AllyAttackComponent,
-                    DamageComponent, AIAllyAction>(GetNavMeshAgentComponent().GetTransformComponent(),
-                    possibleRivals, AIAgentType.ALLY);
-            }
-
-            return targetID;
-        }
-
-        private void OnTargetAcquired(uint allyID, AIAllyContext allyContext)
-        {
-            SetRivalIndex(allyID);
-            SetRivalRadius(allyContext.GetRadius());
-            SetRivalHeight(allyContext.GetHeight());
-            SetHasATarget(true);
-            SetRivalTransform(allyContext.GetAgentTransform());
-        }
-
-        private void GetCloserToRival()
-        {
-            ShowActionDebugLogs(name + " Getting Closer To Rival");
-            
-            ContinueNavigation();
-            
-            SetDestination(CombatManager.Instance.RequestAlly(_context.GetRivalID())
-                .GetNavMeshAgentComponent().GetTransformComponent());
-        }
-
-        private void Attack()
-        {
-            ShowActionDebugLogs(name + " Attacking");
-            
-            StopNavigation();
-
-            AttackComponent attackComponent = ReturnNextAttack();
-            
-            Attacking();
-            
-            StartCastingAttack(attackComponent);
-        }
-
-        private void Flee()
-        {
-            ShowActionDebugLogs(name + " Fleeing");
-            
-            ContinueNavigation();
-        }
-
-        #endregion
-
         #region Attacks Managing
 
         #region Own Attacks
 
-        protected override void StartCastingAttack(AttackComponent attackComponent)
-        {
-            if (attackComponent.IsOnCooldown())
-            {
-                NotAttacking();
-                return;
-            }
-            
-            AIAttackCollider attackCollider = _attacksColliders[attackComponent];
-            attackCollider.SetParent(transform);
-            attackCollider.gameObject.SetActive(true);
-            StartCoroutine(StartAttackCastTimeCoroutine(attackComponent, attackCollider));
-        }
+        protected abstract void StartCastingAbility(AttackComponent attackComponent);
 
-        protected override IEnumerator StartAttackCastTimeCoroutine(AttackComponent attackComponent, AIAttackCollider attackCollider)
-        {
-            attackComponent.StartCastTime();
+        protected abstract IEnumerator StartAbilityCastTimeCoroutine(AttackComponent attackComponent,
+            AbilityCollider abilityCollider);
 
-            bool isStunned = _context.IsStunned();
-            
-            while (attackComponent.IsCasting() && !isStunned)
-            {
-                attackComponent.DecreaseCurrentCastTime();
-                yield return null;
-            }
+        protected abstract void PutAbilityOnCooldown(AttackComponent attackComponent);
 
-            if (!isStunned)
-            {
-                attackCollider.StartInflictingDamage();
-
-                if (attackComponent.DoesDamageOverTime())
-                {
-                    StartCoroutine(StartDamageOverTime(attackComponent, attackCollider));
-                    yield break;
-                }
-            
-                Rotate();
-            }
-            
-            PutAttackOnCooldown(attackComponent);
-            attackCollider.Deactivate();
-        }
-
-        protected override IEnumerator StartDamageOverTime(AttackComponent attackComponent, AIAttackCollider attackCollider)
-        {
-            while (attackComponent.DidDamageOverTimeFinished())
-            {
-                attackComponent.DecreaseRemainingTimeDealingDamage();
-                yield return null;
-            }
-           
-            Rotate();
-            PutAttackOnCooldown(attackComponent);
-            attackCollider.Deactivate();
-        }
-
-        protected override void PutAttackOnCooldown(AttackComponent attackComponent)
-        {
-            NotAttacking();
-            StartCoroutine(StartCooldownCoroutine(attackComponent));
-        }
-
-        protected override IEnumerator StartCooldownCoroutine(AttackComponent attackComponent)
-        {
-            attackComponent.StartCooldown();
-            while (attackComponent.IsOnCooldown())
-            {
-                attackComponent.DecreaseCooldown();
-                yield return null;
-            }
-            
-            OnAttackAvailableAgain(attackComponent);
-        }
+        protected abstract IEnumerator StartCooldownCoroutine(AttackComponent attackComponent);
 
         #endregion
 
         #region Rival Attacks
 
-        public void RequestDuel(uint agentID, AIAllyContext allyContext)
-        {
-            if (_context.IsDueling())
-            {
-                return;
-            }
-            
-            _context.SetIsDueling(true);
-            
-            if (agentID == _context.GetRivalID())
-            {
-                return;
-            }
-            
-            OnTargetAcquired(agentID, allyContext);
-        }
-
-        public override void OnReceiveDamage(AllyDamageComponent damageComponent)
+        /*public void OnReceiveDamage(DamageComponent damageComponent)
         {
             SetHealth(_context.GetHealth() - damageComponent.GetDamage());
 
             uint health = _context.GetHealth();
 
-            if (health == 0)
+            if (health != 0)
             {
-                OnDefeated();
                 return;
             }
 
-            uint combatAgentInstanceID = GetAgentID();
-            
-            bool isStunned = _context.IsStunned();
-
-            if (!isStunned)
-            {
-                _context.SetCurrentStress(_context.GetCurrentStress() + damageComponent.GetStressDamage());
-                isStunned = _context.IsStunned();
-                
-                if (isStunned)
-                {
-                    StartCoroutine(StunDuration());
-                }
-                else
-                {
-                    //TODO FEEDBACK
-                }
-                
-                CombatManager.Instance.OnEnemyReceiveDamage(combatAgentInstanceID, health, _context.GetCurrentStress(), isStunned);
-                return;
-            }
-            
-            CombatManager.Instance.OnEnemyReceiveDamage(combatAgentInstanceID, health, _context.GetCurrentStress(), true);
-        }
-        
-        protected override void OnDefeated()
-        {
             Destroy(gameObject);
-        }
+        }*/
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             if (EventsManager.OnAgentDefeated != null)
             {
                 EventsManager.OnAgentDefeated(GetAgentID());
             }
             
-            CombatManager.Instance.OnEnemyDefeated(this);
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
             _alive = false;
         }
 
@@ -438,45 +294,9 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        #region Context
-
-        public void SetIsDueling(bool isDueling)
+        public AIEnemyType GetAIEnemyType()
         {
-            _context.SetIsDueling(isDueling);
-        }
-
-        #endregion
-
-        private IEnumerator StunDuration()
-        {
-            float stunDuration = GetContext().GetStunDuration();
-            float time = 0;
-
-            GetNavMeshAgentComponent().GetNavMeshAgent().isStopped = true;
-            
-            while (time < stunDuration)
-            {
-                time += Time.deltaTime;
-                yield return null;
-            }
-
-            GetNavMeshAgentComponent().GetNavMeshAgent().isStopped = false;
-            
-            GetContext().SetIsStunned(false);
-            
-            Rotate();
-            
-            CombatManager.Instance.OnEnemyStunEnds(GetAgentID());
-        }
-
-        public override AIAgentType GetAIAgentType()
-        {
-            return _aiEnemySpecs.aiAgentType;
-        }
-
-        public override AIEnemyContext GetContext()
-        {
-            return _context;
+            return _context.GetEnemyType();
         }
 
         public List<AttackComponent> GetAttackComponents()

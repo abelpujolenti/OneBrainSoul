@@ -2,6 +2,6 @@
 
 namespace Interfaces.AI.UBS.Enemy
 {
-    public interface IEnemyFleeUtility : IIsStunned, IGetDistanceToRival
+    public interface IEnemyFleeUtility : IGetDistanceToTarget
     {}
 }

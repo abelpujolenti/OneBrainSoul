@@ -2,7 +2,7 @@
 
 namespace Interfaces.AI.UBS.Enemy
 {
-    public interface IEnemyAttackUtility : IIsStunned, IHasATarget, IGetAgentTransform, IGetRivalTransform, IGetVectorToRival, 
-        IGetDistanceToRival, IGetMinimumRangeToAttack, IGetMaximumRangeToAttack
+    public interface IEnemyAttackUtility : IHasATarget, IGetAgentTransform, IGetTargetTransform, IGetVectorToTarget, 
+        IGetDistanceToTarget
     {}
 }
