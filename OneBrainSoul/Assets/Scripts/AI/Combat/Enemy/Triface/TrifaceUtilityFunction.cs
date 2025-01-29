@@ -2,6 +2,7 @@ using System;
 using AI.Combat.Contexts;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.Enemy;
+using Interfaces.AI.UBS.Enemy.Triface;
 using UnityEngine;
 
 namespace AI.Combat.Enemy.Triface
@@ -19,12 +20,11 @@ namespace AI.Combat.Enemy.Triface
                 new AICombatAgentAction<TrifaceAction>(TrifaceAction.SLAM)
             };
 
-            //TODO TRIFACE UTILITY METHODS
-            /*actions[0].utilityScore = CalculatePatrolUtility(context);
-            actions[1].utilityScore = CalculateLookForRivalUtility(context);
-            actions[2].utilityScore = CalculateGetCloserToRivalUtility(context);
+            actions[0].utilityScore = CalculatePatrolUtility(context);
+            actions[1].utilityScore = CalculateLookForPlayer(context);
+            actions[2].utilityScore = CalculateGetCloserToTargetUtility(context);
             actions[3].utilityScore = 0.1f;
-            actions[4].utilityScore = CalculateSlamUtility(context);*/
+            actions[4].utilityScore = CalculateSlamUtility(context);
 
             uint index = 0;
 
@@ -43,51 +43,32 @@ namespace AI.Combat.Enemy.Triface
 
         private static float CalculatePatrolUtility(IEnemyPatrolUtility enemyPatrolUtility)
         {
-            return Convert.ToInt16(!enemyPatrolUtility.IsSeeingPlayer());
+            return Convert.ToInt16(!enemyPatrolUtility.IsSeeingATarget());
         }
 
-        private static float CalculateLookForRivalUtility(IEnemyChooseNewRivalUtility enemyChooseNewRivalUtility)
+        private static float CalculateLookForPlayer(IEnemyLookForNewTargetUtility enemyLookForNewTargetUtility)
         {
-            if (!enemyChooseNewRivalUtility.IsSeeingPlayer())
-            {
-                return 0;
-            }
-            
-            if (!enemyChooseNewRivalUtility.HasATarget())
-            {
-                return 1f;
-            }
-            
-            return 0;
-        }
-        
-        private static float CalculateGetCloserToRivalUtility(IEnemyGetCloserToTargetUtility enemyGetCloserToTargetUtility)
-        {
-            if (!enemyGetCloserToTargetUtility.HasATarget() || enemyGetCloserToTargetUtility.IsAttacking())
-            {
-                return 0;
-            }
-            
-            float distanceToRival = enemyGetCloserToTargetUtility.GetDistanceToTarget();
-            
-            return 1;
+            return Convert.ToInt16(enemyLookForNewTargetUtility.IsSeeingATarget() && !enemyLookForNewTargetUtility.HasATarget());
         }
 
-        private static float CalculateSlamUtility(IEnemyAttackUtility enemyAttackUtility)
+        private static float CalculateGetCloserToTargetUtility(IEnemyGetCloserToTargetUtility enemyGetCloserToTargetUtility)
         {
-            if (!enemyAttackUtility.HasATarget())
+            return Convert.ToInt16(enemyGetCloserToTargetUtility.HasATarget()) * 0.8f;
+        }
+
+        private static float CalculateSlamUtility(ITrifaceSlamUtility trifaceSlamUtility)
+        {
+            if (!trifaceSlamUtility.HasATarget() || trifaceSlamUtility.IsOnCooldown())
             {
                 return 0;
             }
 
-            float distanceToRival = enemyAttackUtility.GetDistanceToTarget();
+            float distanceToRival = trifaceSlamUtility.GetDistanceToTarget();
 
-            if (Vector3.Angle(enemyAttackUtility.GetAgentTransform().forward, enemyAttackUtility.GetVectorToTarget()) < 15f)
-            {
-                return 0.9f;
-            }
-            
-            return 0;
+            return Convert.ToInt16(
+                trifaceSlamUtility.GetMinimumRangeToCast() < distanceToRival &&
+                trifaceSlamUtility.GetMaximumRangeToCast() > distanceToRival &&
+                Vector3.Angle(trifaceSlamUtility.GetAgentTransform().forward, trifaceSlamUtility.GetVectorToTarget()) < 15f);
         }
     }
 }

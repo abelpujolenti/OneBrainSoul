@@ -40,16 +40,15 @@ namespace ECS.Entities.AI.Combat
 
         protected override void EnemySetup(float radius, AIEnemySpecs aiEnemySpecs)
         {
-            _raysTargetsLayerMask = (int)(Math.Pow(2, GameManager.Instance.GetEnemyLayer()) +
-                                          Math.Pow(2, GameManager.Instance.GetGroundLayer()));
+            base.EnemySetup(radius, aiEnemySpecs);
             
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
-
+            _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
+            
             _navMeshAgent.speed = _navMeshAgentSpecs.movementSpeed;
-            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, transform);
+            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent());
             _rotationSpeed = _navMeshAgentSpecs.rotationSpeed;
             
-            base.EnemySetup(radius, aiEnemySpecs);
+            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
         }
 
         #region Steering
@@ -96,14 +95,14 @@ namespace ECS.Entities.AI.Combat
 
         #region Navigation
         
-        private void ContinueNavigation()
+        protected void ContinueNavigation()
         {
-            _navMeshAgentComponent.GetNavMeshAgent().isStopped = false;
+            _navMeshAgent.isStopped = false;
         }
 
-        private void StopNavigation()
+        protected void StopNavigation()
         {
-            _navMeshAgentComponent.GetNavMeshAgent().isStopped = true;
+            _navMeshAgent.isStopped = true;
         }
 
         protected void Rotate()
@@ -173,16 +172,16 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        protected override void Attacking()
+        protected override void CastingAnAbility()
         {
-            base.Attacking();
-            _navMeshAgent.isStopped = true;
+            base.CastingAnAbility();
+            ContinueNavigation();
         }
 
-        protected override void NotAttacking()
+        protected override void NotCastingAnAbility()
         {
-            base.NotAttacking();
-            _navMeshAgent.isStopped = false;
+            base.NotCastingAnAbility();
+            StopNavigation();
         }
 
         protected override void OnDestroy()

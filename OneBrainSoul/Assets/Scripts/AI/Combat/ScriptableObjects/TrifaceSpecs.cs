@@ -1,4 +1,4 @@
-﻿using AI.Combat.AbilitySpecs;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
@@ -6,18 +6,20 @@ namespace AI.Combat.ScriptableObjects
     [CreateAssetMenu(fileName = "Triface Properties", menuName = "ScriptableObjects/AI/Combat/Entity/Triface Properties", order = 1)]
     public class TrifaceSpecs : AIEnemySpecs
     {
-        public AbilityTarget slamTarget;
+        [SerializeField] private AgentAbility _slamAbility;
         
-        public AbilityEffectType slamEffectType;
-        
-        public AbilityEffect slamEffect;
+        public AgentAbility SlamAbility => _slamAbility;
 
-        public AbilityCastType slamCastType;
+        private void OnEnable()
+        {
+            if (_slamAbility != null)
+            {
+                return;
+            }
 
-        public AbilityCast slamCast;
-
-        public AbilityAoEType slamAoEType;
-
-        public AbilityAoE slamAoE;
+            _slamAbility = CreateInstance<AgentAbility>();
+            AssetDatabase.AddObjectToAsset(_slamAbility, this);
+            AssetDatabase.SaveAssets();
+        }
     }
 }

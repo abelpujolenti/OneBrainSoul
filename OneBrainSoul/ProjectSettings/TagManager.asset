@@ -14,22 +14,22 @@ TagManager:
   - UI
   - Ground
   - Interactable
-  - Ally
-  - Enemy
-  - Ally Attack Area
+  - Player
+  - Triface
+  - LongArms
+  - LongArmsBase
+  - Healer
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - Enemy Attack Area
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   - 
   - OverlayCamera
   - OverlayCamera2

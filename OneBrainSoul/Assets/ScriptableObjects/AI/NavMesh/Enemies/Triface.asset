@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Triface
   m_EditorClassIdentifier: 
   radius: 1.089506
-  speed: 3.5
+  movementSpeed: 3.5
   rotationSpeed: 2

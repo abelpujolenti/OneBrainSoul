@@ -2,6 +2,6 @@
 
 namespace Interfaces.AI.UBS.Enemy
 {
-    public interface IEnemyPatrolUtility : IIsSeeingPlayer
+    public interface IEnemyPatrolUtility : IIsSeeingATarget
     {}
 }

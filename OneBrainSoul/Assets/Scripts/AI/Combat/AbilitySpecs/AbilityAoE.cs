@@ -22,30 +22,5 @@ namespace AI.Combat.AbilitySpecs
         public float radius;
 
         public float degrees;
-
-        public float GetLength()
-        {
-            return length;
-        }
-        
-        public float GetWideness()
-        {
-            return width;
-        }
-
-        public float GetRadius()
-        {
-            return radius;
-        }
-
-        public Vector3 GetDirection()
-        {
-            return direction;
-        }
-
-        public float GetDegrees()
-        {
-            return degrees;
-        }
     }
 }

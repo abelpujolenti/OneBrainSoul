@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using ECS.Entities;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Managers
 {
@@ -8,12 +12,31 @@ namespace Managers
 
         public static GameManager Instance => _instance;
 
+        [Min(0f)] 
+        [SerializeField] private float _playerReceiveDamageCooldown;
+        
+        [FormerlySerializedAs("_enemiesReceiveDamageCooldown")]
+        [Min(0f)] 
+        [SerializeField] private float _enemyReceiveDamageCooldown;
+        
+        [Min(0f)]
+        [SerializeField] private float _timeBetweenDamageTicks;
+        
+        [Min(0f)]
+        [SerializeField] private float _timeBetweenHealTicks;
+
         private int GROUND_LAYER = 6;
         private int INTERACTABLE_LAYER = 7;
-        private int ALLY_LAYER = 8;
-        private int ENEMY_LAYER = 9;
-        private int ALLY_ATTACK_ZONE = 10;
-        private int ENEMY_ATTACK_ZONE = 11;
+        private int ENEMY_ATTACK_ZONE_LAYER = 23;
+
+        private Dictionary<EntityType, int> _entitiesLayer = new Dictionary<EntityType, int>
+        {
+            { EntityType.PLAYER , (int)Math.Pow(2, 8)},
+            { EntityType.TRIFACE , (int)Math.Pow(2, 9)},
+            { EntityType.LONG_ARMS , (int)Math.Pow(2, 10)},
+            { EntityType.LONG_ARMS_BASE , (int)Math.Pow(2, 11)},
+            { EntityType.HEALER , (int)Math.Pow(2, 12)},
+        };
 
         private void Awake()
         {
@@ -29,43 +52,71 @@ namespace Managers
             Destroy(gameObject);
         }
 
-        public int GetInteractableLayer()
+        public float GetPlayerReceiveDamageCooldown()
         {
-            return INTERACTABLE_LAYER;
+            return _playerReceiveDamageCooldown;
         }
 
-        public int GetAllyLayer()
+        public float GetEnemyReceiveDamageCooldown()
         {
-            return ALLY_LAYER;
+            return _enemyReceiveDamageCooldown;
         }
 
-        public int GetEnemyLayer()
+        public float GetTimeBetweenDamageTicks()
         {
-            return ENEMY_LAYER;
+            return _timeBetweenDamageTicks;
+        }
+
+        public float GetTimeBetweenHealTicks()
+        {
+            return _timeBetweenHealTicks;
         }
 
         public int GetGroundLayer()
         {
-            return GROUND_LAYER;
+            return (int)Math.Pow(2, GROUND_LAYER);
         }
 
-        public int GetAllyAttackZoneLayer()
+        public int GetInteractableLayer()
         {
-            return ALLY_ATTACK_ZONE;
+            return (int)Math.Pow(2, INTERACTABLE_LAYER);
+        }
+
+        public int GetEnemyLayer()
+        {
+            return _entitiesLayer[EntityType.TRIFACE] + 
+                   _entitiesLayer[EntityType.LONG_ARMS] +
+                   _entitiesLayer[EntityType.LONG_ARMS_BASE] +
+                   _entitiesLayer[EntityType.HEALER];
         }
 
         public int GetEnemyAttackZoneLayer()
         {
-            return ENEMY_ATTACK_ZONE;
+            return (int)Math.Pow(2, ENEMY_ATTACK_ZONE_LAYER);
         }
 
         public int GetRaycastLayers()
         {
-            return (int)(Mathf.Pow(2,GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetAllyLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
+            return GetInteractableLayer() + GetGroundLayer() + _entitiesLayer[EntityType.PLAYER] + GetEnemyLayer() + 1;
         }
+        
         public int GetRaycastLayersWithoutAlly()
         {
-            return (int)(Mathf.Pow(2, GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
+            return GetInteractableLayer() + GetGroundLayer() + GetEnemyLayer() + 1;
+        }
+
+        public int GetEntityTypeLayer(EntityType entityType)
+        {
+            return _entitiesLayer[entityType];
+        }
+
+        public int GetDifferentEnemiesLayerFromMyType(EntityType entityType)
+        {
+            int layer = GetEnemyLayer();
+
+            layer -= _entitiesLayer[entityType];
+
+            return layer;
         }
     }
 }

@@ -961,6 +961,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 926e6b99ce1245a6a5c7eaa6616f88a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _material: {fileID: 0}
+  _rigidbody: {fileID: 8142020339586624469}
+  _damageParticlePrefab: {fileID: 1782360678715371482, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
+    type: 3}
 --- !u!1 &2866942340978029141
 GameObject:
   m_ObjectHideFlags: 0

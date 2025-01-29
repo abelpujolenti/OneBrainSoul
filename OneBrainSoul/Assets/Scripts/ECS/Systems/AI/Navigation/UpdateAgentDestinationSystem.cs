@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
-using ECS.Entities.AI.Combat;
+using ECS.Entities.AI.Navigation;
 
 namespace ECS.Systems.AI.Navigation
 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AI.Combat.Enemy;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.BaseInterfaces.Property;
@@ -7,12 +8,12 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, ITargetRadius, 
-        IGetSightMaximumDistance, IDistanceToTarget, IIsSeeingPlayer, ITarget, IFighting, IAttacking, IVectorToTarget, 
+        IGetSightMaximumDistance, IDistanceToTarget, IIsSeeingATarget, ITarget, IFighting, IAttacking, IVectorToTarget, 
         ITargetTransform, IGetAgentTransform
     {
-        private AIEnemyType _enemyType;
+        private EnemyType _enemyType;
         
-        protected List<uint> _repeatableActions = new List<uint>();
+        protected List<uint> _repeatableActions;
         private uint _lastActionIndex = 10;
 
         private uint _totalHealth;
@@ -25,10 +26,10 @@ namespace AI.Combat.Contexts
         private float _sightMaximumDistance;
         private float _distanceToTarget;
 
-        private bool _isSeeingPlayer;
+        private bool _isSeeingATarget;
         private bool _hasATarget;
         private bool _isFighting;
-        private bool _isAttacking;
+        private bool _isCastingAnAbility;
         private bool _isAirborne;
 
         private Vector3 _vectorToTarget;
@@ -36,7 +37,7 @@ namespace AI.Combat.Contexts
         private Transform _agentTransform;
         private Transform _targetTransform;
 
-        protected AIEnemyContext(AIEnemyType enemyType, uint totalHealth, float radius, float height, 
+        protected AIEnemyContext(EnemyType enemyType, uint totalHealth, float radius, float height, 
             float sightMaximumDistance, Transform agentTransform)
         {
             _enemyType = enemyType;
@@ -48,7 +49,7 @@ namespace AI.Combat.Contexts
             _agentTransform = agentTransform;
         }
 
-        public AIEnemyType GetEnemyType()
+        public EnemyType GetEnemyType()
         {
             return _enemyType;
         }
@@ -75,7 +76,7 @@ namespace AI.Combat.Contexts
 
         public void SetHealth(uint health)
         {
-            _health = health;
+            _health = Math.Min(_totalHealth, health);
         }
 
         public uint GetHealth()
@@ -128,14 +129,14 @@ namespace AI.Combat.Contexts
             return _distanceToTarget;
         }
 
-        public void SetIsSeeingPlayer(bool isSeeingPlayer)
+        public void SetIsSeeingATarget(bool isSeeingATarget)
         {
-            _isSeeingPlayer = isSeeingPlayer;
+            _isSeeingATarget = isSeeingATarget;
         }
 
-        public bool IsSeeingPlayer()
+        public bool IsSeeingATarget()
         {
-            return _isSeeingPlayer;
+            return _isSeeingATarget;
         }
 
         public void SetHasATarget(bool hasATarget)
@@ -158,14 +159,14 @@ namespace AI.Combat.Contexts
             return _isFighting;
         }
 
-        public void SetIsAttacking(bool isAttacking)
+        public void SetICastingAnAbility(bool isCastingAnAbility)
         {
-            _isAttacking = isAttacking;
+            _isCastingAnAbility = isCastingAnAbility;
         }
 
-        public bool IsAttacking()
+        public bool IsCastingAnAbility()
         {
-            return _isAttacking;
+            return _isCastingAnAbility;
         }
 
         public void SetIsAirborne(bool isAirborne)
@@ -200,6 +201,8 @@ namespace AI.Combat.Contexts
             agentPosition.y -= _height / 2;
             
             SetVectorToTarget(targetPosition - agentPosition);
+
+            _hasATarget = true;
         }
 
         public Transform GetAgentTransform()

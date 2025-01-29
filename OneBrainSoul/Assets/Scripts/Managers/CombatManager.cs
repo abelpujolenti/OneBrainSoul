@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AI.Combat.AbilityColliders;
-using AI.Combat.Contexts;
 using AI.Combat.Enemy;
-using AI.Combat.Enemy.LongArms;
-using AI.Combat.Enemy.Triface;
-using ECS.Components.AI.Combat;
 using ECS.Entities.AI.Combat;
 using Player;
 using UnityEngine;
@@ -25,31 +20,36 @@ namespace Managers
         
         private Dictionary<uint, Triface> _trifaces = new Dictionary<uint, Triface>();
         private Dictionary<uint, LongArms> _longArms = new Dictionary<uint, LongArms>();
+        private Dictionary<uint, LongArmsBase> _longArmsBases = new Dictionary<uint, LongArmsBase>();
         
-        private readonly Dictionary<AIEnemyType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<AIEnemyType, Delegate>
+        private readonly Dictionary<EnemyType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<EnemyType, Delegate>
         {
             {
-                AIEnemyType.TRIFACE, new Func<Dictionary<uint, Triface>>(() => _instance._trifaces)
+                EnemyType.TRIFACE, new Func<Dictionary<uint, Triface>>(() => _instance._trifaces)
             },
             {
-                AIEnemyType.LONG_ARMS, new Func<Dictionary<uint, LongArms>>(() => _instance._longArms)
+                EnemyType.LONG_ARMS, new Func<Dictionary<uint, LongArms>>(() => _instance._longArms)
             },
-        };
-
-        private readonly Dictionary<AIEnemyType, Delegate> _returnTheSameAgentsType = new Dictionary<AIEnemyType, Delegate>
-        {
-            { 
-                AIEnemyType.TRIFACE, new Func<List<Triface>>(() => 
-                _instance.ReturnAllDictionaryValuesInAList<Triface, TrifaceContext, TrifaceAction>(_instance._trifaces)) 
-            },
-            { 
-                AIEnemyType.LONG_ARMS, new Func<List<LongArms>>(() => 
-                _instance.ReturnAllDictionaryValuesInAList<LongArms, LongArmsContext, LongArmsAction>(_instance._longArms)) 
+            {
+                EnemyType.LONG_ARMS_BASE, new Func<Dictionary<uint, LongArmsBase>>(() => _instance._longArmsBases)
             }
         };
 
-        private Dictionary<AttackComponent, AIEnemyAbilityCollider> _enemiesAttacksColliders =
-            new Dictionary<AttackComponent, AIEnemyAbilityCollider>();
+        private readonly Dictionary<EnemyType, Delegate> _returnTheSameAgentsType = new Dictionary<EnemyType, Delegate>
+        {
+            { 
+                EnemyType.TRIFACE, new Func<List<Triface>>(() => 
+                _instance.ReturnAllDictionaryValuesInAList<Triface>(_instance._trifaces)) 
+            },
+            { 
+                EnemyType.LONG_ARMS, new Func<List<LongArms>>(() => 
+                _instance.ReturnAllDictionaryValuesInAList<LongArms>(_instance._longArms)) 
+            },
+            { 
+                EnemyType.LONG_ARMS_BASE, new Func<List<LongArmsBase>>(() => 
+                _instance.ReturnAllDictionaryValuesInAList<LongArmsBase>(_instance._longArmsBases)) 
+            }
+        };
 
         private void Awake()
         {
@@ -69,17 +69,18 @@ namespace Managers
 
         public bool CanSeePlayer(Vector3 position, float sightMaximumDistance)
         {
-            Vector3 playerPosition = _playerStatus.GetPosition();
+            Vector3 playerPosition = _playerStatus.GetTransformComponent().GetPosition();
 
             Vector3 vectorToPlayer = (playerPosition - position).normalized;
-            float distanceToPlayer = (playerPosition - position).sqrMagnitude;
+            float distanceToPlayer = (playerPosition - position).magnitude;
 
-            if (distanceToPlayer > sightMaximumDistance * sightMaximumDistance)
+            if (distanceToPlayer > sightMaximumDistance)
             {
                 return false;
             }
-            
-            return !Physics.Raycast(position, vectorToPlayer, distanceToPlayer, (int)(Math.Pow(2, 8) + Math.Pow(2, 6)));
+
+            return !Physics.Raycast(position, vectorToPlayer, distanceToPlayer, 
+                GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
         }
 
         #endregion
@@ -103,6 +104,22 @@ namespace Managers
             uint agentID = longArms.GetAgentID();
             
             _longArms.Add(agentID, longArms);
+        }
+
+        public void AddEnemy(LongArmsBase longArmsBase)
+        {
+            uint agentID = (uint)longArmsBase.GetInstanceID();
+            
+            _longArmsBases.Add(agentID, longArmsBase);
+        }
+
+        #endregion
+
+        #region Requests
+
+        public PlayerStatus RequestPlayerStatus()
+        {
+            return _playerStatus;
         }
 
         #endregion
@@ -181,24 +198,42 @@ namespace Managers
         
         #endregion
 
+        public GameObject GetRectanglePrefab()
+        {
+            return _enemyRectangleAttackColliderPrefab;
+        }
+
+        public GameObject GetCirclePrefab()
+        {
+            return _enemyCircleAttackColliderPrefab;
+        }
+
         #region Collections Methods
 
-        private Dictionary<uint, TAgent> ReturnAgentTypeDictionary<TAgent, TContext, TAction>(AIEnemyType aiEnemyType)
+        /*private Dictionary<uint, TAgent> ReturnAgentTypeDictionary<TAgent, TContext, TAction, TAbility>(AIEnemyType aiEnemyType)
         
-            where TAgent : AIEnemy<TContext, TAction>
+            where TAgent : AIEnemy<TContext, TAction, TAbility>
             where TContext : AIEnemyContext
             where TAction : Enum
+            where TAbility : Enum
         {
             return ExecuteDelegate<Dictionary<uint, TAgent>, Dictionary<AIEnemyType, Delegate>>
                 (_returnDictionaryOfTheSameType, aiEnemyType);
+        }*/
+
+        private Dictionary<uint, T> ReturnAgentTypeDictionary<T>(EnemyType enemyType)
+        {
+            return ExecuteDelegate<Dictionary<uint, T>, Dictionary<EnemyType, Delegate>>
+                (_returnDictionaryOfTheSameType, enemyType);
         }
 
-        private List<TAgent> ReturnAllDictionaryValuesInAList<TAgent, TContext, TAction>
+        /*private List<TAgent> ReturnAllDictionaryValuesInAList<TAgent, TContext, TAction, TAbility>
             (Dictionary<uint, TAgent> agentsDictionary)
         
-            where TAgent : AIEnemy<TContext, TAction>
+            where TAgent : AIEnemy<TContext, TAction, TAbility>
             where TContext : AIEnemyContext
             where TAction : Enum
+            where TAbility : Enum
         {
             List<TAgent> agentsList = new List<TAgent>();
 
@@ -208,98 +243,30 @@ namespace Managers
             }
 
             return agentsList;
-        }
+        }*/
 
-        private List<TAgent> ReturnAllRivals<TAgent, TContext, TAction>(AIEnemyType aiEnemyType)
-        
-            where TAgent : AIEnemy<TContext, TAction>
-            where TContext : AIEnemyContext
-            where TAction : Enum
+        private List<T> ReturnAllDictionaryValuesInAList<T>(Dictionary<uint, T> agentsDictionary)
         {
-            List<TAgent> combatAgents = new List<TAgent>();
+            List<T> agentsList = new List<T>();
 
-            for (AIEnemyType i = 0; i < AIEnemyType.ENUM_SIZE; i++)
+            foreach (T combatAgent in agentsDictionary.Values)
             {
-                if (aiEnemyType == i)
-                {
-                    continue;
-                }
-
-                if (!_returnTheSameAgentsType.ContainsKey(i))
-                {
-                    continue;
-                }
-
-                List<TAgent> currentCombatAgents = 
-                    ExecuteDelegate<List<TAgent>, Dictionary<AIEnemyType, Delegate>>(_returnTheSameAgentsType, i);
-
-                if (currentCombatAgents != null)
-                {
-                    combatAgents.AddRange(currentCombatAgents);    
-                }
+                agentsList.Add(combatAgent);
             }
 
-            return combatAgents;
+            return agentsList;
         }
         
-        private TReturn ExecuteDelegate<TReturn, TCollection>(TCollection collection, AIEnemyType aiEnemyType)
-            where TCollection : Dictionary<AIEnemyType, Delegate>
+        private TReturn ExecuteDelegate<TReturn, TCollection>(TCollection collection, EnemyType enemyType)
+            where TCollection : Dictionary<EnemyType, Delegate>
         {
-            Delegate del = collection[aiEnemyType];
+            Delegate del = collection[enemyType];
             
             if (del is Func<TReturn> func)
             {
                 return func();
             }
             return default;
-        }
-
-        private List<T> UnifyArraysInAList<T>(T[] firstArray, T[] secondArray)
-        {
-            List<T> list = new List<T>();
-            
-            list.AddRange(firstArray);
-
-            foreach (T t in secondArray)
-            {
-                if (list.Contains(t))
-                {
-                    continue;
-                }
-                
-                list.Add(t);
-            }
-
-            return list;
-        }
-
-        private List<T> UnifyLists<T>(List<T> firstList, List<T> secondList)
-        {
-            foreach (T t in secondList)
-            {
-                if (firstList.Contains(t))
-                {
-                    continue;
-                }    
-                firstList.Add(t);
-            }
-            
-            return firstList;
-        }
-
-        private List<T> SubtractLists<T>(List<T> firstList, List<T> secondList)
-        {
-            foreach (T t in secondList)
-            {
-                if (!firstList.Contains(t))
-                {
-                    continue;
-                }
-
-                firstList.Remove(t);
-            }
-            
-            return firstList;
         }
 
         #endregion

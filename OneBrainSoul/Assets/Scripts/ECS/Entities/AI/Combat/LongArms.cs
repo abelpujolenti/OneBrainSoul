@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using AI.Combat.AbilityColliders;
+using AI.Combat.AbilityAoEColliders;
 using AI.Combat.Contexts;
 using AI.Combat.Enemy.LongArms;
 using AI.Combat.ScriptableObjects;
-using ECS.Components.AI.Combat;
+using ECS.Components.AI.Combat.Abilities;
+using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
 
 namespace ECS.Entities.AI.Combat
 {
-    public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>
+    public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>, INoProjectileAbility, IProjectileAbility
     {
         [SerializeField] private LongArmsSpecs _longArmsSpecs;
         
@@ -21,10 +22,13 @@ namespace ECS.Entities.AI.Combat
 
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
-            
-            //_context = new TrifaceContext()
+
+            _context = new LongArmsContext(_longArmsSpecs.totalHealth, radius, capsuleCollider.height,
+                _longArmsSpecs.sightMaximumDistance, transform);
             
             CombatManager.Instance.AddEnemy(this);
+
+            _entityType = EntityType.LONG_ARMS;
             
             EnemySetup(radius, _longArmsSpecs);
         }
@@ -48,8 +52,18 @@ namespace ECS.Entities.AI.Combat
                 { LongArmsAction.FLEE , Flee}
             };
         }
+        
+        protected override void CreateAbilities()
+        {
+            //InstantiateAbility(_longArmsSpecs.slamAbility);
+        }
 
         #region FSM
+
+        protected override void UpdateVisibleTargets()
+        {
+            
+        }
 
         private void Looking()
         {
@@ -76,32 +90,47 @@ namespace ECS.Entities.AI.Combat
 
         #region Attacks Managing
 
-        protected override void StartCastingAbility(AttackComponent attackComponent)
+        public void StartCastingNoProjectileAbility<TAbilityComponent, TAbilityCollider>(TAbilityComponent abilityComponent,
+            TAbilityCollider abilityCollider) where TAbilityComponent : AbilityComponent where TAbilityCollider : AbilityAoECollider<TAbilityComponent>
+        {
+            if (abilityComponent.GetCast().IsOnCooldown())
+            {
+                NotCastingAnAbility();
+                return;
+            }
+            
+            abilityCollider.SetParent(transform);
+            //abilityCollider.gameObject.SetActive(true);
+            StartCoroutine(StartNoProjectileAbilityCastTimeCoroutine(abilityComponent, abilityCollider));
+        }
+
+        public IEnumerator StartNoProjectileAbilityCastTimeCoroutine<TAbilityComponent, TAbilityCollider>(
+            TAbilityComponent abilityComponent, TAbilityCollider abilityCollider) where TAbilityComponent : AbilityComponent where TAbilityCollider : AbilityAoECollider<TAbilityComponent>
+        {
+            abilityComponent.GetCast().StartCastTime();
+
+            while (abilityComponent.GetCast().IsCasting())
+            {
+                abilityComponent.GetCast().DecreaseCurrentCastTime();
+                yield return null;
+            }
+            
+            abilityCollider.Activate();
+            
+            PutAbilityOnCooldown(abilityComponent);
+        }
+
+        protected override void PutAbilityOnCooldown(AbilityComponent abilityComponent)
         {
             throw new NotImplementedException();
         }
 
-        protected override IEnumerator StartAbilityCastTimeCoroutine(AttackComponent attackComponent, AbilityCollider abilityCollider)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void PutAbilityOnCooldown(AttackComponent attackComponent)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override IEnumerator StartCooldownCoroutine(AttackComponent attackComponent)
+        protected override IEnumerator StartCooldownCoroutine(AbilityComponent abilityComponent)
         {
             throw new NotImplementedException();
         }
 
         #endregion
-
-        public override void OnReceiveDamage(DamageComponent damageComponent)
-        {
-            throw new NotImplementedException();
-        }
 
         protected override void OnDestroy()
         {

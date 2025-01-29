@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AI.Combat.AbilityColliders;
+using AI.Combat.AbilityAoEColliders;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
 using AI.Combat.Enemy;
-using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
-using ECS.Components.AI.Combat;
+using ECS.Components.AI.Combat.Abilities;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
@@ -24,29 +23,84 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
-        [SerializeField] protected GameObject _rectangleAttackColliderPrefab;
-        [SerializeField] protected GameObject _circleAttackColliderPrefab;
-
-        protected List<AttackComponent> _attackComponents = new List<AttackComponent>();
-
-        protected Dictionary<AttackComponent, AbilityCollider> _attacksColliders =
-            new Dictionary<AttackComponent, AbilityCollider>();
-
         private Coroutine _updateCoroutine;
 
-        protected SurroundingSlots _surroundingSlots;
-        protected AgentSlot _agentSlot;
-
-        protected bool _alive = true;
-        
-        public AgentSlotPosition GetAgentSlotPosition(Vector3 direction, float radius)
+        protected virtual void EnemySetup(float radius, AIEnemySpecs aiEnemySpecs)
         {
-            return _surroundingSlots.ReserveSubtendedAngle(GetAgentID(), direction, radius);
+            _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
+            
+            Setup(radius + aiEnemySpecs.agentsPositionRadius);
+            
+            InitiateDictionaries();
+            
+            CreateAbilities();
         }
 
-        public void ReleaseAgentSlot(uint agentID)
+        protected abstract void CreateAbilities();
+
+        protected TAbilityCollider InstantiateAbilityCollider<TAbilityComponent, TAbilityCollider>
+            (TAbilityComponent abilityComponent)
+                where TAbilityCollider : AbilityAoECollider<TAbilityComponent>
+                where TAbilityComponent : AbilityComponent
         {
-            _surroundingSlots.FreeSubtendedAngle(agentID);
+            GameObject colliderObject = Instantiate(ReturnPrefab(abilityComponent.GetAoEType()));
+            
+            TAbilityCollider abilityCollider = colliderObject.GetComponent<TAbilityCollider>();
+            
+            abilityCollider.SetAbilitySpecs(abilityComponent);
+
+            switch (abilityComponent.GetTarget())
+            {
+                case AbilityTarget.PLAYER:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.PLAYER));
+                    break;
+                
+                case AbilityTarget.TRIFACE:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.TRIFACE));
+                    break;
+                
+                case AbilityTarget.LONG_ARMS:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.LONG_ARMS));
+                    break;
+                
+                case AbilityTarget.LONG_ARMS_BASE:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.LONG_ARMS_BASE));
+                    break;
+                
+                case AbilityTarget.OTHER_ENEMY:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEnemyLayer());
+                    break;
+                
+                case AbilityTarget.OTHER_ENEMY_EQUAL_OF_MY_TYPE:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(_entityType));
+                    break;
+                
+                case AbilityTarget.OTHER_ENEMY_DIFFERENT_FROM_MY_TYPE:
+                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetDifferentEnemiesLayerFromMyType(_entityType));
+                    break;
+            }
+            
+            colliderObject.SetActive(false);
+
+            return abilityCollider;
+        }
+
+        private GameObject ReturnPrefab(AbilityAoEType abilityAoEType)
+        {
+            switch (abilityAoEType)
+            {
+                case AbilityAoEType.RECTANGLE_AREA:
+                    return CombatManager.Instance.GetRectanglePrefab();
+                
+                case AbilityAoEType.CIRCLE_AREA:
+                    return CombatManager.Instance.GetCirclePrefab();
+                
+                case AbilityAoEType.CONE_AREA:
+                    //return _coneAbilityColliderPrefab;
+                    break;
+            }
+
+            return null;
         }
         
         #region Context
@@ -63,24 +117,24 @@ namespace ECS.Entities.AI.Combat
             _context.SetHealth(health);
         }
 
-        protected void SetRivalRadius(float rivalRadius)
+        protected void SetTargetRadius(float rivalRadius)
         {
             _context.SetTargetRadius(rivalRadius);
         }
 
-        protected void SetRivalHeight(float rivalHeight)
+        protected void SetTargetHeight(float rivalHeight)
         {
             _context.SetTargetHeight(rivalHeight);
         }
 
-        public void SetDistanceToRival(float distanceToRival)
+        public void SetDistanceToTarget(float distanceToRival)
         {
             _context.SetDistanceToTarget(distanceToRival);
         }
 
-        protected void SetIsSeeingARival(bool isSeeingARival)
+        protected void SetIsSeeingATarget(bool isSeeingATarget)
         {
-            _context.SetIsSeeingPlayer(isSeeingARival);
+            _context.SetIsSeeingATarget(isSeeingATarget);
         }
 
         protected void SetHasATarget(bool hasATarget)
@@ -93,9 +147,9 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsFighting(isFighting);
         }
 
-        public void SetIsAttacking(bool isAttacking)
+        public void SetIsCastingAnAbility(bool isAttacking)
         {
-            _context.SetIsAttacking(isAttacking);
+            _context.SetICastingAnAbility(isAttacking);
         }
 
         public void SetIsAirborne(bool isAirborne)
@@ -108,19 +162,19 @@ namespace ECS.Entities.AI.Combat
             _context.SetVectorToTarget(vectorToRival);
         }
 
-        protected void SetRivalTransform(Transform rivalTransform)
+        protected void SetTargetTransform(Transform rivalTransform)
         {
             _context.SetTargetTransform(rivalTransform);
         }
 
-        protected virtual void Attacking()
+        protected virtual void CastingAnAbility()
         {
-            _context.SetIsAttacking(true);
+            _context.SetICastingAnAbility(true);
         }
 
-        protected virtual void NotAttacking()
+        protected virtual void NotCastingAnAbility()
         {
-            _context.SetIsAttacking(false);
+            _context.SetICastingAnAbility(false);
         }
 
         protected void UpdateVectorToTarget()
@@ -168,117 +222,63 @@ namespace ECS.Entities.AI.Combat
         }
 
         #endregion
-
-        public abstract void OnReceiveDamage(DamageComponent damageComponent);
-
-        protected virtual void EnemySetup(float radius, AIEnemySpecs aiEnemySpecs)
-        {
-            InitiateDictionaries();
-
-            _surroundingSlots = new SurroundingSlots(radius + aiEnemySpecs.agentsPositionRadius);
-
-            //InstantiateAttackComponents(aiEnemySpecs.aiAttacks);
-            InstantiateAttacksColliders();
-        }
-
-        private void InstantiateAttackComponents(List<CombatAgentAbility> attacks)
-        {
-            foreach (CombatAgentAbility aiAttack in attacks)
-            {
-                switch (aiAttack.abilityAoEType)
-                {
-                    case AbilityAoEType.RECTANGLE_AREA:
-                        _attackComponents.Add(new RectangleAttackComponent(aiAttack));
-                        break;
-                    
-                    case AbilityAoEType.CIRCLE_AREA:
-                        _attackComponents.Add(new CircleAttackComponent(aiAttack));
-                        break;
-                    
-                    case AbilityAoEType.CONE_AREA:
-                        _attackComponents.Add(new ConeAttackComponent(aiAttack));
-                        break;
-                }
-            }
-        }
         
-        private void InstantiateAttacksColliders()
-        {
-            int layerTarget = GameManager.Instance.GetAllyLayer();
-            
-            foreach (AttackComponent attackComponent in _attackComponents)
-            {
-                GameObject colliderObject = null;
+        #region FSM
 
-                switch (attackComponent.GetAIAttackAoEType())
-                {
-                    case AbilityAoEType.RECTANGLE_AREA:
-                        colliderObject = Instantiate(_rectangleAttackColliderPrefab);
-                        AIEnemyRectangleAbilityCollider rectangleAbilityCollider = 
-                            colliderObject.GetComponent<AIEnemyRectangleAbilityCollider>();
-                        
-                        rectangleAbilityCollider.SetOwner(GetAgentID());
-                        rectangleAbilityCollider.SetRectangleAttackComponent((RectangleAttackComponent)attackComponent);
-                        rectangleAbilityCollider.SetAbilityTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, rectangleAbilityCollider);
-                        break;
-
-                    case AbilityAoEType.CIRCLE_AREA:
-                        colliderObject = Instantiate(_circleAttackColliderPrefab);
-                        AIEnemyCircleAbilityCollider circleAbilityCollider = 
-                            colliderObject.GetComponent<AIEnemyCircleAbilityCollider>();
-                        
-                        circleAbilityCollider.SetOwner(GetAgentID());
-                        circleAbilityCollider.SetCircleAbilityComponent((CircleAttackComponent)attackComponent);
-                        circleAbilityCollider.SetAbilityTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, circleAbilityCollider);
-                        break;
-
-                    case AbilityAoEType.CONE_AREA:
-                        AIEnemyConeAbilityCollider coneAbilityCollider = 
-                            colliderObject.GetComponent<AIEnemyConeAbilityCollider>();
-                        
-                        coneAbilityCollider.SetOwner(GetAgentID());
-                        coneAbilityCollider.SetConeAbilityComponent((ConeAttackComponent)attackComponent);
-                        coneAbilityCollider.SetAbilityTargets((int)Mathf.Pow(2, layerTarget));
-                        _attacksColliders.Add(attackComponent, coneAbilityCollider);
-                        break;
-                }
-
-                colliderObject.SetActive(false);
-            }
-        }
-
-        #region Attacks Managing
-
-        #region Own Attacks
-
-        protected abstract void StartCastingAbility(AttackComponent attackComponent);
-
-        protected abstract IEnumerator StartAbilityCastTimeCoroutine(AttackComponent attackComponent,
-            AbilityCollider abilityCollider);
-
-        protected abstract void PutAbilityOnCooldown(AttackComponent attackComponent);
-
-        protected abstract IEnumerator StartCooldownCoroutine(AttackComponent attackComponent);
+        protected abstract void UpdateVisibleTargets();
 
         #endregion
 
-        #region Rival Attacks
+        #region Abilities Managing
 
-        /*public void OnReceiveDamage(DamageComponent damageComponent)
+        #region Own Abilities
+
+        protected abstract void PutAbilityOnCooldown(AbilityComponent abilityComponent);
+
+        protected abstract IEnumerator StartCooldownCoroutine(AbilityComponent abilityComponent);
+
+        #endregion
+
+        #region Ally Abilities
+
+        public override void OnReceiveHeal(uint healValue)
         {
-            SetHealth(_context.GetHealth() - damageComponent.GetDamage());
+            SetHealth(_context.GetHealth() + healValue);
+        }
 
-            uint health = _context.GetHealth();
+        #endregion
 
-            if (health != 0)
+        #region Rival Abilities
+
+        public override void OnReceiveSlow(uint slowPercent)
+        {
+            //TODO ENEMY SLOW
+        }
+
+        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
+        {
+            if (_currentReceiveDamageCooldown > 0f)
             {
+                return;
+            }
+            
+            base.OnReceiveDamage(damageValue, hitPosition);
+            
+            SetHealth(_context.GetHealth() - damageValue);
+
+            if (_context.GetHealth() != 0)
+            {
+                StartCoroutine(DecreaseDamageCooldown());
                 return;
             }
 
             Destroy(gameObject);
-        }*/
+        }
+
+        public override void OnReceivePush(Vector3 forceDirection, float forceStrength)
+        {
+            base.OnReceivePush(forceDirection, forceStrength);
+        }
 
         protected virtual void OnDestroy()
         {
@@ -286,22 +286,31 @@ namespace ECS.Entities.AI.Combat
             {
                 EventsManager.OnAgentDefeated(GetAgentID());
             }
+            //TODO HEAL PLAYER IF MARKED
+        }
+
+        #endregion
+
+        #endregion
+        
+        ///////////////TODO ERASE
+        [SerializeField] private bool _showMessages;
+
+        protected void ShowDebugMessages(string message)
+        {
+            if (!_showMessages)
+            {
+                return;
+            }
             
-            _alive = false;
+            Debug.Log(message);
         }
+        ///////////////
 
-        #endregion
-
-        #endregion
-
-        public AIEnemyType GetAIEnemyType()
+        public EnemyType GetAIEnemyType()
         {
+            // TODO ?????
             return _context.GetEnemyType();
-        }
-
-        public List<AttackComponent> GetAttackComponents()
-        {
-            return _attackComponents;
         }
     }
 }

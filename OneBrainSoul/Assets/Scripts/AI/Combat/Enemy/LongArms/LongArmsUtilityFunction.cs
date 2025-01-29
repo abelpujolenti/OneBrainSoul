@@ -42,10 +42,10 @@ namespace AI.Combat.Enemy.LongArms
         {
             //TODO LOOKING
             
-            return Convert.ToInt16(!enemyPatrolUtility.IsSeeingPlayer());
+            return Convert.ToInt16(!enemyPatrolUtility.IsSeeingATarget());
         }
 
-        private static float CalculateThrowRockUtility(IEnemyChooseNewRivalUtility enemyChooseNewRivalUtility)
+        private static float CalculateThrowRockUtility(IEnemyLookForNewTargetUtility enemyLookForNewTargetUtility)
         {
             //TODO LONG ARMS THROW ROCK
             

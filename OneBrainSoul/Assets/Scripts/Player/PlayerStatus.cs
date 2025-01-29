@@ -1,31 +1,58 @@
-﻿using ECS.Components.AI.Navigation;
-using Interfaces.AI.Navigation;
+﻿using ECS.Entities.AI;
 using Managers;
 using UnityEngine;
 
 namespace Player
 {
-    public class PlayerStatus : MonoBehaviour, IPosition
+    public class PlayerStatus : AgentEntity
     {
-        private IPosition _position;
-
+        [SerializeField] private float _agentsPositionRadius;
+        
         private float _height;
         private float _radius;
 
         private void Start()
         {
+            _receiveDamageCooldown = GameManager.Instance.GetPlayerReceiveDamageCooldown();
+            
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
 
             _height = capsuleCollider.height;
             _radius = capsuleCollider.radius;
             
-            _position = new TransformComponent(transform);
+            Setup(_radius + _agentsPositionRadius);
+            
             CombatManager.Instance.AddPlayer(this);
         }
 
-        public Vector3 GetPosition()
+        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
         {
-            return _position.GetPosition();
+            if (_currentReceiveDamageCooldown > 0f)
+            {
+                return;
+            }
+            
+            Debug.Log("Player Damage Received: " + damageValue);
+            
+            base.OnReceiveDamage(damageValue, hitPosition);
+            
+            StartCoroutine(DecreaseDamageCooldown());
+            //TODO MANAGE PLAYER HEALTH
+        }
+        
+        public override void OnReceivePush(Vector3 forceDirection, float forceStrength)
+        {
+            base.OnReceivePush(forceDirection, forceStrength);
+        }
+
+        public override void OnReceiveHeal(uint healValue)
+        {
+            //TODO PLAYER HEAL
+        }
+
+        public override void OnReceiveSlow(uint slowPercent)
+        {
+            //TODO PLAYER SLOW
         }
 
         public float GetHeight()
