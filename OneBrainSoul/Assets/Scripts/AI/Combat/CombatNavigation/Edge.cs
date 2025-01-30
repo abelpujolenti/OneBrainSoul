@@ -4,6 +4,7 @@
     {
         public uint fromNodeIndex;
         public uint toNodeIndex;
+        public bool isAJump;
         public float distance;
         public float cost;
         public float defaultCost;

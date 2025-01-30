@@ -7,24 +7,21 @@ namespace ECS.Systems.AI.Navigation
 {
     public class UpdateAgentDestinationSystem
     {
-        public void UpdateAgentDestination(AStarPath aStarPath)
+        public void UpdateAgentDestination(AStarPath aStarPath, float triangleSideLength)
         {
             List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, aStarPath.origin, 
                 aStarPath.destination);
-            
-            aStarPath.navMeshGraph.ResetNodesImportantInfo();
 
             if (newPath.Count == 0)
             {
                 return;
             }
 
-            aStarPath.path = newPath;
+            aStarPath.path = AStarPathFindingAlgorithm.OptimizePath(newPath, aStarPath.origin, 
+                aStarPath.navMeshGraph.nodes, triangleSideLength);
             
             aStarPath.path.RemoveAt(0);
 
-            //aStarPath.path = SmoothPath(newPath);
-
             if (aStarPath.path.Count < 2)
             {
                 return;
@@ -36,14 +33,6 @@ namespace ECS.Systems.AI.Navigation
                 return;
             }
             aStarPath.path.RemoveAt(aStarPath.path.Count - 2);
-        }
-
-        private List<Node> SmoothPath(List<Node> originalPath)
-        {
-            //TODO
-            List<Node> smoothedPath = new List<Node>();
-
-            return smoothedPath;
         }
     }
 }

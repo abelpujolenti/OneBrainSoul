@@ -206,7 +206,7 @@ namespace ECS.Entities.AI.Combat
                 Gizmos.DrawRay(position, directionAndWeight.direction * _raysDistance);
             }*/
 
-            Vector3[] corners = ECSNavigationManager.Instance.GetPath(GetAgentID()).ToArray();
+            Vector3[] corners = GetCorners();
 
             if (corners.Length == 0)
             {
@@ -223,6 +223,18 @@ namespace ECS.Entities.AI.Combat
             }
             
             Gizmos.DrawSphere(Up(corners[^1]), 0.2f);
+        }
+
+        private Vector3[] GetCorners()
+        {
+            List<Vector3> corners = new List<Vector3>();
+
+            foreach (Node node in GetNavMeshAgentComponent().GetAStarPath().path)
+            {
+                corners.Add(node.position);
+            }
+
+            return corners.ToArray();
         }
 
         private Vector3 Up(Vector3 position)

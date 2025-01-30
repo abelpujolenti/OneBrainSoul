@@ -14,6 +14,9 @@ namespace Serialize.NavMeshGraph
         public Vector3 position;
         
         [Key(2)]
+        public int heightIndex;
+        
+        [Key(3)]
         public List<SerializableEdge> edges = new List<SerializableEdge>();
     }
 }

@@ -55,8 +55,7 @@ namespace AI.Combat.AbilityAoEColliders
 
         private void Rotate()
         {
-            transform.rotation = _parentRotation * 
-                    Quaternion.LookRotation(_direction, Vector3.up);
+            transform.rotation = _parentRotation * Quaternion.LookRotation(_direction, Vector3.up);
         }
 
         private void OnTriggerEnter(Collider other)

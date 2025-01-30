@@ -7,6 +7,7 @@ namespace AI.Combat.CombatNavigation
     {
         public uint index;
         public Vector3 position;
+        public int heightIndex;
         public List<Edge> edges = new List<Edge>();
         public float gCost = Mathf.Infinity;
         public float hCost = 0;
