@@ -38,9 +38,9 @@ namespace ECS.Entities.AI.Combat
         
         protected bool _isRotating;
 
-        protected override void EnemySetup(float radius, AIEnemySpecs aiEnemySpecs)
+        protected override void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties)
         {
-            base.EnemySetup(radius, aiEnemySpecs);
+            base.EnemySetup(radius, aiEnemyProperties);
             
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             

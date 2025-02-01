@@ -9,12 +9,13 @@ using ECS.Components.AI.Combat.Abilities;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ECS.Entities.AI.Combat
 {
     public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>, INoProjectileAbility, IProjectileAbility
     {
-        [SerializeField] private LongArmsSpecs _longArmsSpecs;
+        [FormerlySerializedAs("_longArmsSpecs")] [SerializeField] private LongArmsProperties longArmsProperties;
         
         private void Start()
         {
@@ -23,14 +24,14 @@ namespace ECS.Entities.AI.Combat
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
 
-            _context = new LongArmsContext(_longArmsSpecs.totalHealth, radius, capsuleCollider.height,
-                _longArmsSpecs.sightMaximumDistance, transform);
+            _context = new LongArmsContext(longArmsProperties.totalHealth, radius, capsuleCollider.height,
+                longArmsProperties.sightMaximumDistance, transform);
             
             CombatManager.Instance.AddEnemy(this);
 
             _entityType = EntityType.LONG_ARMS;
             
-            EnemySetup(radius, _longArmsSpecs);
+            EnemySetup(radius, longArmsProperties);
         }
 
         #region AI LOOP
@@ -100,7 +101,6 @@ namespace ECS.Entities.AI.Combat
             }
             
             abilityCollider.SetParent(transform);
-            //abilityCollider.gameObject.SetActive(true);
             StartCoroutine(StartNoProjectileAbilityCastTimeCoroutine(abilityComponent, abilityCollider));
         }
 

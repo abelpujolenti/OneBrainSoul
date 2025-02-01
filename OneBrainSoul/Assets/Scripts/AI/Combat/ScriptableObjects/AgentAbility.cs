@@ -8,17 +8,25 @@ namespace AI.Combat.ScriptableObjects
     {
         public AbilityTarget abilityTarget;
 
-        public AbilityEffectType abilityEffectType;
-        public AbilityEffect abilityEffect = new AbilityEffect();
-
         public AbilityCastType abilityCastType;
         public AbilityCast abilityCast = new AbilityCast();
+        
+        public AbilityProjectile abilityProjectile = new AbilityProjectile();
 
         public AbilityAoEType abilityAoEType;
         public AbilityAoE abilityAoE = new AbilityAoE();
 
-        public AbilityProjectileType abilityProjectileType;
-        public AbilityProjectile abilityProjectile = new AbilityProjectile();
-        public GameObject projectilePrefab;
+        public AbilityTrigger abilityTrigger = new AbilityTrigger();
+
+        public AbilityEffectOnHealthType abilityEffectOnHealthTypeOnStart;
+        public AbilityEffect abilityEffectOnStart = new AbilityEffect();
+        public bool doesItTriggerOnTriggerEnter;
+
+        public AbilityEffectOnHealthType abilityEffectOnHealthTypeOnTheDuration;
+        public AbilityEffect abilityEffectOnTheDuration = new AbilityEffect();
+
+        public AbilityEffectOnHealthType abilityEffectOnHealthTypeOnEnd;
+        public AbilityEffect abilityEffectOnEnd = new AbilityEffect();
+        public bool doesItTriggerOnTriggerExit;
     }
 }

@@ -61,5 +61,33 @@ namespace Utilities
         {
             return radians * (180 / Mathf.PI);
         }
+
+        public static T GetSmallerNumber<T>(T value, T min)
+            where T : IComparable<T>
+        {
+            return value.CompareTo(min) < 0 ? min : value;
+        }
+
+        public static T GetLargerNumber<T>(T value, T max)
+            where T : IComparable<T>
+        {
+            return value.CompareTo(max) > 0 ? max : value;
+        }
+
+        public static T ClampNumber<T>(T value, T min, T max)
+            where T : IComparable<T>
+        {
+            if (value.CompareTo(min) < 0)
+            {
+                return min;
+            }
+
+            if (value.CompareTo(max) > 0)
+            {
+                return max;
+            }
+
+            return value;
+        }
     }
 }

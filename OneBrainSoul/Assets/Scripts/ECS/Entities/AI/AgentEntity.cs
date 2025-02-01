@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ECS.Entities.AI
 {
-    public abstract class AgentEntity : MonoBehaviour, IDamageable, IPushable, IHealable, ISlowable
+    public abstract class AgentEntity : MonoBehaviour, IDamageable, IHealable, ISlowable, IPushable
     {
         private uint _agentId;
 
@@ -76,6 +76,11 @@ namespace ECS.Entities.AI
             AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
         }
 
+        public virtual void OnReceiveDamageOverTime(uint damageValue, float duration)
+        {
+            
+        }
+
         protected IEnumerator DecreaseDamageCooldown()
         {
             _currentReceiveDamageCooldown = _receiveDamageCooldown;
@@ -88,14 +93,25 @@ namespace ECS.Entities.AI
             
             //_material.SetColor("_DamageColor", new Color(1,1,1));
         }
-        
+
+        public abstract void OnReceiveHeal(uint healValue);
+
+        public abstract void OnReceiveHealOverTime(uint healValue, float duration);
+
+        public abstract void OnReceiveSlow(uint slowPercent);
+
+        public abstract void OnReceiveSlowOverTime(uint slowPercent, float duration);
+
+        public abstract void OnReceiveDecreasingSlow(uint slowPercent, float duration);
+
+        public virtual void OnReleaseFromSlow()
+        {
+            //TODO ON RELEASE FROM SLOW
+        }
+
         public virtual void OnReceivePush(Vector3 forceDirection, float forceStrength)
         {
             _rigidbody.AddForce(forceDirection * forceStrength, ForceMode.Acceleration);
         }
-
-        public abstract void OnReceiveHeal(uint healValue);
-
-        public abstract void OnReceiveSlow(uint slowPercent);
     }
 }

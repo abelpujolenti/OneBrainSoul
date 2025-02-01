@@ -4,24 +4,24 @@ using UnityEngine;
 
 namespace Editor.Enemies
 {
-    [CustomEditor(typeof(AIEnemySpecs))]
+    [CustomEditor(typeof(AIEnemyProperties))]
     public class EnemyEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
-            AIEnemySpecs aiEnemySpecs = (AIEnemySpecs)target;
+            AIEnemyProperties aiEnemyProperties = (AIEnemyProperties)target;
 
-            aiEnemySpecs.totalHealth = (uint)EditorGUILayout.IntField("Total Health", (int)aiEnemySpecs.totalHealth);
+            aiEnemyProperties.totalHealth = (uint)EditorGUILayout.IntField("Total Health", (int)aiEnemyProperties.totalHealth);
 
-            aiEnemySpecs.agentsPositionRadius =
-                EditorGUILayout.FloatField("Agents Position Radius", aiEnemySpecs.agentsPositionRadius);
+            aiEnemyProperties.agentsPositionRadius =
+                EditorGUILayout.FloatField("Agents Position Radius", aiEnemyProperties.agentsPositionRadius);
 
-            aiEnemySpecs.sightMaximumDistance =
-                EditorGUILayout.FloatField("Sight Maximum Distance", aiEnemySpecs.sightMaximumDistance);
+            aiEnemyProperties.sightMaximumDistance =
+                EditorGUILayout.FloatField("Sight Maximum Distance", aiEnemyProperties.sightMaximumDistance);
 
             if (GUI.changed)
             {
-                EditorUtility.SetDirty(aiEnemySpecs);
+                EditorUtility.SetDirty(aiEnemyProperties);
             }
         }
     }

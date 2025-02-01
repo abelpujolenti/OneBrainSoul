@@ -11,27 +11,28 @@ using Interfaces.AI.Combat;
 using Managers;
 using Player;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ECS.Entities.AI.Combat
 {
     public class Triface : FreeMobilityEnemy<TrifaceContext, TrifaceAction>, INoProjectileAbility
     {
-        [SerializeField] private TrifaceSpecs _trifaceSpecs;
+        [FormerlySerializedAs("_trifaceSpecs")] [SerializeField] private TrifaceProperties trifaceProperties;
 
-        private RectangleAbilityComponent _slamAbility;
-        private RectangleAbilityAoECollider _slamAoECollider;
+        private RectangularAbilityComponent _slamAbility;
+        private RectangularAbilityAoECollider _slamAoECollider;
         
         private void Start()
         {
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
             
-            EnemySetup(radius, _trifaceSpecs);
+            EnemySetup(radius, trifaceProperties);
 
             _utilityFunction = new TrifaceUtilityFunction();
 
-            _context = new TrifaceContext(_trifaceSpecs.totalHealth, radius, capsuleCollider.height,
-                _trifaceSpecs.sightMaximumDistance, transform, _slamAbility.GetCast());
+            _context = new TrifaceContext(trifaceProperties.totalHealth, radius, capsuleCollider.height,
+                trifaceProperties.sightMaximumDistance, transform, _slamAbility.GetCast());
             
             CombatManager.Instance.AddEnemy(this);
 
@@ -52,9 +53,9 @@ namespace ECS.Entities.AI.Combat
 
         protected override void CreateAbilities()
         {
-            _slamAbility = new RectangleAbilityComponent(_trifaceSpecs.SlamAbility);
+            _slamAbility = new RectangularAbilityComponent(trifaceProperties.slamAbility);
             
-            _slamAoECollider = InstantiateAbilityCollider<RectangleAbilityComponent, RectangleAbilityAoECollider>
+            _slamAoECollider = InstantiateAbilityCollider<RectangularAbilityComponent, RectangularAbilityAoECollider>
                  (_slamAbility);
         }
 
@@ -133,7 +134,7 @@ namespace ECS.Entities.AI.Combat
             
             CastingAnAbility();
             
-            StartCastingNoProjectileAbility<RectangleAbilityComponent, RectangleAbilityAoECollider>
+            StartCastingNoProjectileAbility<RectangularAbilityComponent, RectangularAbilityAoECollider>
                 (_slamAbility, _slamAoECollider);
         }
 

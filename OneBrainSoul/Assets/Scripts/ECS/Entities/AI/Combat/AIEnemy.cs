@@ -25,11 +25,11 @@ namespace ECS.Entities.AI.Combat
 
         private Coroutine _updateCoroutine;
 
-        protected virtual void EnemySetup(float radius, AIEnemySpecs aiEnemySpecs)
+        protected virtual void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties)
         {
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
             
-            Setup(radius + aiEnemySpecs.agentsPositionRadius);
+            Setup(radius + aiEnemyProperties.agentsPositionRadius);
             
             InitiateDictionaries();
             
@@ -47,7 +47,7 @@ namespace ECS.Entities.AI.Combat
             
             TAbilityCollider abilityCollider = colliderObject.GetComponent<TAbilityCollider>();
             
-            abilityCollider.SetAbilitySpecs(abilityComponent);
+            abilityCollider.SetAbilitySpecs(transform, abilityComponent);
 
             switch (abilityComponent.GetTarget())
             {
@@ -89,13 +89,13 @@ namespace ECS.Entities.AI.Combat
         {
             switch (abilityAoEType)
             {
-                case AbilityAoEType.RECTANGLE_AREA:
+                case AbilityAoEType.RECTANGULAR:
                     return CombatManager.Instance.GetRectanglePrefab();
                 
-                case AbilityAoEType.CIRCLE_AREA:
+                case AbilityAoEType.SPHERICAL:
                     return CombatManager.Instance.GetCirclePrefab();
                 
-                case AbilityAoEType.CONE_AREA:
+                case AbilityAoEType.CONICAL:
                     //return _coneAbilityColliderPrefab;
                     break;
             }
@@ -246,14 +246,14 @@ namespace ECS.Entities.AI.Combat
             SetHealth(_context.GetHealth() + healValue);
         }
 
+        public override void OnReceiveHealOverTime(uint healValue, float duration)
+        {
+            //TODO ENEMY HEAL OVER TIME
+        }
+
         #endregion
 
         #region Rival Abilities
-
-        public override void OnReceiveSlow(uint slowPercent)
-        {
-            //TODO ENEMY SLOW
-        }
 
         public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
         {
@@ -273,6 +273,21 @@ namespace ECS.Entities.AI.Combat
             }
 
             Destroy(gameObject);
+        }
+
+        public override void OnReceiveSlow(uint slowPercent)
+        {
+            //TODO ENEMY SLOW
+        }
+
+        public override void OnReceiveSlowOverTime(uint slowPercent, float duration)
+        {
+            //TODO ENEMY SLOW OVER TIME
+        }
+
+        public override void OnReceiveDecreasingSlow(uint slowPercent, float duration)
+        {
+            //TODO ENEMY DECREASING SLOW
         }
 
         public override void OnReceivePush(Vector3 forceDirection, float forceStrength)

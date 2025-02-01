@@ -19,7 +19,7 @@ namespace AI.Combat.AbilitySpecs
 
         public AbilityCast(float minimumRangeToCast, float maximumRangeToCast, bool doesSpawnInsideCaster, 
             Vector3 relativeSpawnPosition, bool isAttachedToCaster, float timeToCast, float currentTimeToFinishCast, 
-            float cooldown, float currentCooldown, float projectileSpeed)
+            float cooldown, float currentCooldown)
         {
             this.minimumRangeToCast = minimumRangeToCast;
             this.maximumRangeToCast = maximumRangeToCast;
@@ -30,9 +30,8 @@ namespace AI.Combat.AbilitySpecs
             _currentTimeToFinishCast = currentTimeToFinishCast;
             this.cooldown = cooldown;
             _currentCooldown = currentCooldown;
-            this.projectileSpeed = projectileSpeed;
         }
-
+        
         public float minimumRangeToCast;
         public float maximumRangeToCast;
 
@@ -46,8 +45,8 @@ namespace AI.Combat.AbilitySpecs
 
         public float cooldown;
         private float _currentCooldown;
-
-        public float projectileSpeed;
+        
+        public float duration;
     
         public void StartCastTime()
         {
@@ -83,7 +82,7 @@ namespace AI.Combat.AbilitySpecs
         {
             return new AbilityCast(minimumRangeToCast, maximumRangeToCast, doesSpawnInsideCaster,
                 relativeSpawnPosition, isAttachedToCaster, timeToCast, _currentTimeToFinishCast,
-                cooldown, _currentCooldown, projectileSpeed);
+                cooldown, _currentCooldown);
         }
     }
 }

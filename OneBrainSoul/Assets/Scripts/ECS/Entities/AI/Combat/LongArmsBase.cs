@@ -14,12 +14,12 @@ namespace ECS.Entities.AI.Combat
             //TODO LONG ARMS BASE DAMAGE
         }
 
-        public override void OnReceivePush(Vector3 forceDirection, float forceStrength)
+        public override void OnReceiveHeal(uint healValue)
         {
-            //TODO LONG ARMS BASE DAMAGE
+            //TODO LONG ARMS BASE HEAL
         }
 
-        public override void OnReceiveHeal(uint healValue)
+        public override void OnReceiveHealOverTime(uint healValue, float duration)
         {
             //TODO LONG ARMS BASE HEAL
         }
@@ -27,6 +27,21 @@ namespace ECS.Entities.AI.Combat
         public override void OnReceiveSlow(uint slowPercent)
         {
             //TODO LONG ARMS BASE SLOW
+        }
+
+        public override void OnReceiveSlowOverTime(uint slowPercent, float duration)
+        {
+            //TODO LONG ARMS BASE SLOW OVER TIME
+        }
+
+        public override void OnReceiveDecreasingSlow(uint slowPercent, float duration)
+        {
+            //TODO LONG ARMS BASE DECREASING SLOW
+        }
+
+        public override void OnReceivePush(Vector3 forceDirection, float forceStrength)
+        {
+            //TODO LONG ARMS BASE DAMAGE
         }
     }
 }

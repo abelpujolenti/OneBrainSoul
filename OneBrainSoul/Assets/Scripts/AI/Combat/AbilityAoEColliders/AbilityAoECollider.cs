@@ -8,99 +8,201 @@ using ECS.Entities.AI;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace AI.Combat.AbilityAoEColliders
 {
     public abstract class AbilityAoECollider<TAbilityComponent> : MonoBehaviour
         where TAbilityComponent : AbilityComponent
     {
-        private Coroutine _castingCoroutine;
-        
-        protected Quaternion _parentRotation;
-        
-        protected Stopwatch _stopwatch = new Stopwatch();
-        
-        protected List<AgentEntity> _agentsInside = new List<AgentEntity>();
-        
-        private Action<AgentEntity> _actionOnTriggerEffect;
+        private Coroutine _abilityDurationCoroutine;
 
-        protected Vector3 _relativePosition;
-
-        protected Action _actionAttaching;
+        protected Transform _parentTransform;
         
-        private uint _value;
+        private Stopwatch _stopwatch = new Stopwatch();
+        
+        private List<AgentEntity> _agentsInside = new List<AgentEntity>();
 
-        private float _duration;
+        private List<Action<AgentEntity>> _actionsOnTriggerEnter = new List<Action<AgentEntity>>();
+        private List<Action<AgentEntity>> _actionsOnTriggerStay = new List<Action<AgentEntity>>();
+        private List<Action<AgentEntity>> _actionsOnTriggerExit = new List<Action<AgentEntity>>();
+
+        private Vector3 _relativePosition;
+
+        private Action _actionAttaching;
+        private Action _actionOnStartTrigger = () => { };
+        private Action<AgentEntity> _actionOnTriggerEnter = agentEntity => { };
+        protected Action<float> _actionResizing = value => { };
+        private Action<AgentEntity> _actionOnTriggerExit  = agentEntity => { };
+
+        private float _abilityDuration;
         private float _tickTimer;
-        
-        protected abstract void OnEnable();
-        protected abstract void OnDisable();
-        
-        public virtual void SetAbilitySpecs(TAbilityComponent abilityComponent)
+
+        protected virtual void OnEnable()
         {
+            _stopwatch.Start();
+            MoveToPosition(_relativePosition);
+            _actionAttaching();
+        }
+
+        protected virtual void OnDisable()
+        {
+            _stopwatch.Reset();
+        }
+
+        public virtual void SetAbilitySpecs(Transform parentTransform, TAbilityComponent abilityComponent)
+        {
+            _parentTransform = parentTransform;
+            
+            _abilityDuration = abilityComponent.GetAoE().duration;
+            
             _relativePosition = abilityComponent.GetCast().relativeSpawnPosition;
 
             _actionAttaching = abilityComponent.GetCast().isAttachedToCaster
                 ? () => { }
                 : () =>
                 {
+                    SetParent(_parentTransform);
                     transform.parent = null;
                 };
+
+            AbilityTrigger abilityTrigger = abilityComponent.GetTrigger();
+
+            if (abilityTrigger.doesEffectOnStart)
+            {
+                SetupOnEnterExit(_actionsOnTriggerEnter, abilityComponent.GetEffectTypeOnStart(), abilityComponent.GetEffectOnStart());
+
+                if (abilityComponent.DoesItTriggerOnTriggerEnter())
+                {
+                    _actionOnTriggerEnter = TriggerOnEnterEffect;
+                }
+                else
+                {
+                    _actionOnStartTrigger = TriggerOnEnterEffect;
+                }
+            }
+
+            if (abilityTrigger.doesEffectOnTheDuration)
+            {
+                SetupOnStay(abilityComponent.GetEffectTypeOnTheDuration(), abilityComponent.GetEffectOnTheDuration());
+            }
+
+            if (!abilityTrigger.doesEffectOnEnd)
+            {
+                return;
+            }
             
-            _value = abilityComponent.GetEffect().value;
-            _duration = abilityComponent.GetEffect().duration;
+            SetupOnEnterExit(_actionsOnTriggerExit, abilityComponent.GetEffectTypeOnEnd(), abilityComponent.GetEffectOnEnd());
             
-            Setup(abilityComponent.GetEffectType());
+            if (!abilityComponent.DoesItTriggerOnTriggerExit())
+            {
+                return;
+            }
+            _actionOnTriggerExit = TriggerOnExitEffect;
         }
 
-        private void Setup(AbilityEffectType abilityEffectType)
+        private void SetupOnEnterExit(List<Action<AgentEntity>> actionsList, AbilityEffectOnHealthType abilityEffectOnHealthType, 
+            AbilityEffect abilityEffect)
         {
-            switch (abilityEffectType)
+            if (abilityEffect.hasAnEffectOnHealth)
             {
-                case AbilityEffectType.DIRECT_DAMAGE:
-                    
-                    _actionOnTriggerEffect = agentEntity => Damage(agentEntity, _value, Vector3.zero);
-                    
-                    break;
-                    
-                case AbilityEffectType.DAMAGE_PER_TICKS:
-
-                    _actionOnTriggerEffect = agentEntity => Damage(agentEntity, _value, Vector3.zero);
-                    _tickTimer = GameManager.Instance.GetTimeBetweenDamageTicks(); 
-
-                    break;
+                switch (abilityEffectOnHealthType)
+                {
+                    case AbilityEffectOnHealthType.DAMAGE:
+                        if (abilityEffect.isEffectOnHealthAttachedToEntity)
+                        {
+                            AddDamageOverTime(actionsList, abilityEffect.healthModificationValue, abilityEffect.effectOnHealthDuration);
+                            break;
+                        }
+                        AddDamage(actionsList, abilityEffect.healthModificationValue);
+                        break;
                 
-                case AbilityEffectType.DIRECT_HEAL:
+                    case AbilityEffectOnHealthType.HEAL:
+                        if (abilityEffect.isEffectOnHealthAttachedToEntity)
+                        {
+                            AddHealOverTime(actionsList, abilityEffect.healthModificationValue, abilityEffect.effectOnHealthDuration);
+                            break;
+                        }
                     
-                    _actionOnTriggerEffect = agentEntity => Heal(agentEntity, _value);
-                    
-                    break;
-                    
-                case AbilityEffectType.HEAL_PER_TICKS:
-                    
-                    _actionOnTriggerEffect = agentEntity => Heal(agentEntity, _value);
-                    _tickTimer = GameManager.Instance.GetTimeBetweenHealTicks();
-                        
-                    break;
-                
-                case AbilityEffectType.SLOW:
-
-                    _actionOnTriggerEffect = agentEntity => Slow(agentEntity, _value);
-                    
-                    break;
+                        AddHeal(actionsList, abilityEffect.healthModificationValue);
+                        break;
+                }
             }
+            
+            SetupSlowAndForce(actionsList, abilityEffect);
+        }
+
+        private void SetupOnStay(AbilityEffectOnHealthType abilityEffectOnHealthType, AbilityEffect abilityEffect)
+        {
+            if (abilityEffect.hasAnEffectOnHealth)
+            {
+                switch (abilityEffectOnHealthType)
+                {
+                    case AbilityEffectOnHealthType.DAMAGE:
+                        AddDamage(_actionsOnTriggerStay, abilityEffect.healthModificationValue);
+                        _tickTimer = GameManager.Instance.GetTimeBetweenDamageTicks();
+                        break;
+                
+                    
+                    case AbilityEffectOnHealthType.HEAL:
+                        AddHeal(_actionsOnTriggerStay, abilityEffect.healthModificationValue);
+                        _tickTimer = GameManager.Instance.GetTimeBetweenHealTicks();
+                        break;
+                }
+            }
+            
+            SetupSlowAndForce(_actionsOnTriggerStay, abilityEffect);
+        }
+
+        private void SetupSlowAndForce(List<Action<AgentEntity>> actionsList, AbilityEffect abilityEffect)
+        {
+            if (abilityEffect.doesSlow)
+            {
+                if (!abilityEffect.isSlowAttachedToEntity)
+                {
+                    AddSlow(actionsList, abilityEffect.slowPercent);
+                    _actionsOnTriggerExit.Add(ReleaseFromSlow);
+                }
+                else
+                {
+                    AddSlowOverTime(actionsList, abilityEffect.slowPercent, abilityEffect.slowDuration, 
+                        abilityEffect.doesDecreaseOverTime);
+                }
+            }
+
+            if (!abilityEffect.doesApplyAForce)
+            {
+                return;
+            }
+            AddPush(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
         }
 
         public abstract void SetAbilityTargets(int targetsLayerMask);
+
+        private void AddDamage(List<Action<AgentEntity>> actionsList, uint damageValue)
+        {
+            //TODO HIT POSITION
+            actionsList.Add(agentEntity => Damage(agentEntity, damageValue, Vector3.zero));
+        }
 
         private void Damage(IDamageable agent, uint damageValue, Vector3 hitPosition)
         {
             agent.OnReceiveDamage(damageValue, hitPosition);
         }
 
-        private void Push(IPushable agent, Vector3 forceDirection, float forceStrength)
+        private void AddDamageOverTime(List<Action<AgentEntity>> actionsList, uint damageValue, float duration)
         {
-            agent.OnReceivePush(forceDirection, forceStrength);
+            actionsList.Add(agentEntity => { DamageOverTime(agentEntity, damageValue, duration); });
+        }
+
+        private void DamageOverTime(IDamageable agent, uint damageValue, float duration)
+        {
+            agent.OnReceiveDamageOverTime(damageValue, duration);
+        }
+
+        private void AddHeal(List<Action<AgentEntity>> actionsList, uint healValue)
+        {
+            actionsList.Add(agentEntity => { Heal(agentEntity, healValue); });
         }
 
         private void Heal(IHealable agent, uint healValue)
@@ -108,61 +210,161 @@ namespace AI.Combat.AbilityAoEColliders
             agent.OnReceiveHeal(healValue);
         }
 
+        private void AddHealOverTime(List<Action<AgentEntity>> actionsList, uint healValue, float duration)
+        {
+            actionsList.Add(agentEntity => { HealOverTime(agentEntity, healValue, duration); });
+        }
+
+        private void HealOverTime(IHealable agent, uint healValue, float duration)
+        {
+            agent.OnReceiveHealOverTime(healValue, duration);
+        }
+
+        private void AddSlow(List<Action<AgentEntity>> actionsList, uint slowPercent)
+        {
+            actionsList.Add(agentEntity => { Slow(agentEntity, slowPercent); });
+        }
+
         private void Slow(ISlowable agent, uint slowPercent)
         {
             agent.OnReceiveSlow(slowPercent);
         }
 
+        private void AddSlowOverTime(List<Action<AgentEntity>> actionsList, uint slowPercent, float duration, bool doesDecrease)
+        {
+            if (doesDecrease)
+            {
+                actionsList.Add(agentEntity => { SlowOverTime(agentEntity, slowPercent, duration); });
+                return;
+            }
+            
+            actionsList.Add(agentEntity => { DecreasingSlow(agentEntity, slowPercent, duration); });
+        }
+
+        private void SlowOverTime(ISlowable agent, uint slowPercent, float duration)
+        {
+            agent.OnReceiveSlowOverTime(slowPercent, duration);
+        }
+
+        private void DecreasingSlow(ISlowable agent, uint slowPercent, float duration)
+        {
+            agent.OnReceiveDecreasingSlow(slowPercent, duration);
+        }
+
+        private void AddPush(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
+        {
+            actionsList.Add(agentEntity => { Push(agentEntity, forceDirection, forceStrength); });
+        }
+
+        private void Push(IPushable agent, Vector3 forceDirection, float forceStrength)
+        {
+            agent.OnReceivePush(forceDirection, forceStrength);
+        }
+
+        private void AddReleaseFromSlow(List<Action<AgentEntity>> actionsList)
+        {
+            actionsList.Add(ReleaseFromSlow);
+        }
+
+        private void ReleaseFromSlow(ISlowable agent)
+        {
+            agent.OnReleaseFromSlow();
+        }
+
         public void SetParent(Transform parentTransform)
         {
             transform.parent = parentTransform;
-            _parentRotation = parentTransform.rotation;
         }
 
-        protected void MoveToPosition(Vector3 position)
+        private void MoveToPosition(Vector3 position)
         {
             gameObject.transform.localPosition = position;
         }
 
         public void Activate()
         {
+            _actionResizing(0);
             gameObject.SetActive(true);
-            _castingCoroutine = StartCoroutine(DurationTimeCoroutine(_duration));
+            _abilityDurationCoroutine = StartCoroutine(AbilityDurationCoroutine());
         }
 
-        private IEnumerator DurationTimeCoroutine(float duration)
+        private IEnumerator AbilityDurationCoroutine()
         {
             float timer = 0;
             float tickTimer = 0;
 
             yield return new WaitForFixedUpdate();
             
-            TriggerEffect();
+            _actionOnStartTrigger();
             
             timer += Time.deltaTime;
 
-            while (timer < duration)
+            while (timer < _abilityDuration)
             {
                 timer += Time.deltaTime;
                 tickTimer += Time.deltaTime;
 
+                _actionResizing(timer);
+
                 if (tickTimer >= _tickTimer)
                 {
-                    TriggerEffect();
+                    TriggerOnStayEffect();
                     tickTimer = 0;
                 }
                 yield return null;
             }
             
+            TriggerOnExitEffect();
+            
             Deactivate();
         }
 
-        private void TriggerEffect()
+        private void TriggerOnEnterEffect()
         {
             foreach (AgentEntity agentEntity in _agentsInside)
             {
-                _actionOnTriggerEffect(agentEntity);
+                TriggerOnEnterEffect(agentEntity);
             }
+        }
+
+        private void TriggerOnEnterEffect(AgentEntity agentEntity)
+        {
+            foreach (Action<AgentEntity> action in _actionsOnTriggerEnter)
+            {
+                action(agentEntity);
+            }
+        }
+
+        private void TriggerOnStayEffect()
+        {
+            foreach (AgentEntity agentEntity in _agentsInside)
+            {
+                foreach (Action<AgentEntity> action in _actionsOnTriggerStay)
+                {
+                    action(agentEntity);
+                }
+            }
+        }
+
+        private void TriggerOnExitEffect()
+        {
+            foreach (AgentEntity agentEntity in _agentsInside)
+            {
+                TriggerOnExitEffect(agentEntity);
+            }
+        }
+
+        private void TriggerOnExitEffect(AgentEntity agentEntity)
+        {
+            foreach (Action<AgentEntity> action in _actionsOnTriggerExit)
+            {
+                action(agentEntity);
+            }
+        }
+
+        protected float ReturnSizeOverTime(float time, AnimationCurve animationCurve)
+        {
+            return animationCurve.Evaluate(time);
         }
 
         private void Deactivate()
@@ -170,6 +372,24 @@ namespace AI.Combat.AbilityAoEColliders
             _agentsInside.Clear();
             _stopwatch.Reset();
             gameObject.SetActive(false);
+        }
+
+        protected virtual void OnTriggerEnter(Collider other)
+        {
+            AgentEntity agentEntity = other.GetComponent<AgentEntity>();
+            
+            _agentsInside.Add(agentEntity);
+
+            _actionOnTriggerEnter(agentEntity);
+        }
+
+        protected void OnTriggerExit(Collider other)
+        {
+            AgentEntity agentEntity = other.GetComponent<AgentEntity>();
+            
+            _agentsInside.Remove(agentEntity);
+
+            _actionOnTriggerExit(agentEntity);
         }
     }
 }

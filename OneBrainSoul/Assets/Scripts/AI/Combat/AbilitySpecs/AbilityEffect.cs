@@ -1,21 +1,30 @@
 ﻿using System;
+using UnityEngine;
 
 namespace AI.Combat.AbilitySpecs
 {
-    public enum AbilityEffectType
+    public enum AbilityEffectOnHealthType
     {
-        DIRECT_DAMAGE,
-        DAMAGE_PER_TICKS,
-        DIRECT_HEAL,
-        HEAL_PER_TICKS,
-        SLOW
+        DAMAGE,
+        HEAL
     }
 
     [Serializable]
     public class AbilityEffect
     {
-        public uint value;
+        public bool hasAnEffectOnHealth;
+        public uint healthModificationValue;
+        public float effectOnHealthDuration;
+        public bool isEffectOnHealthAttachedToEntity;
 
-        public float duration;
+        public bool doesSlow;
+        public bool doesDecreaseOverTime;
+        public uint slowPercent;
+        public float slowDuration;
+        public bool isSlowAttachedToEntity;
+
+        public bool doesApplyAForce;
+        public Vector3 forceDirection;
+        public float forceStrength;
     }
 }

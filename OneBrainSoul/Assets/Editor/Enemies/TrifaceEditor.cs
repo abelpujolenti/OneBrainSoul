@@ -4,30 +4,32 @@ using UnityEngine;
 
 namespace Editor.Enemies
 {
-    [CustomEditor(typeof(TrifaceSpecs))]
+    [CustomEditor(typeof(TrifaceProperties))]
     public class TrifaceEditor : EnemyEditor
     {
-        private UnityEditor.Editor slamEditor;
-        
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             
-            TrifaceSpecs trifaceSpecs = (TrifaceSpecs)target;
-
-            slamEditor = CreateEditor(trifaceSpecs.SlamAbility);
+            TrifaceProperties trifaceProperties = (TrifaceProperties)target;
             
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Slam", EditorStyles.boldLabel);
-            
-            EditorGUILayout.Space();
-            
-            slamEditor.OnInspectorGUI();
 
-            if (GUI.changed)
+            EditorGUILayout.BeginHorizontal();
+            
+            EditorGUILayout.LabelField("Slam Ability", EditorStyles.boldLabel);
+
+            trifaceProperties.slamAbility =
+                (AgentAbility)EditorGUILayout.ObjectField(trifaceProperties.slamAbility, typeof(AgentAbility), false);
+            
+            EditorGUILayout.EndHorizontal();
+
+            if (!GUI.changed)
             {
-                EditorUtility.SetDirty(trifaceSpecs);
+                return;
             }
+            
+            EditorUtility.SetDirty(trifaceProperties);
         }
     }
 }
