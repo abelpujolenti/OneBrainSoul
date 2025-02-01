@@ -13,7 +13,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
-        playerCharacterController = GetComponent<PlayerCharacterController>();
+        player = GetComponent<PlayerCharacterController>();
         health = maxHealth;
     }
 
@@ -38,17 +38,17 @@ public class PlayerHealth : MonoBehaviour
         else
         {
             float kbDirHeight = .75f;
-            Vector3 hitDir = (playerCharacterController.transform.position - source.transform.position).normalized;
+            Vector3 hitDir = (player.transform.position - source.transform.position).normalized;
             Vector3 kbDir = new Vector3(hitDir.x, kbDirHeight, hitDir.z).normalized;
-            playerCharacterController.rb.AddForce(kbDir * 800f, ForceMode.Acceleration);
+            player.rb.AddForce(kbDir * 800f, ForceMode.Acceleration);
 
-            if (playerCharacterController.movementHandler is GroundedMovementHandler)
+            if (player.movementHandler is GroundedMovementHandler)
             {
-                playerCharacterController.movementHandler = new AirborneMovementHandler();
+                player.movementHandler = new AirborneMovementHandler();
             }
 
             PostProcessingManager.Instance.DamageEffect(damageEffectDuration);
-            playerCharacterController.cam.ScreenShake(damageEffectDuration * .25f, 1f);
+            player.cam.ScreenShake(damageEffectDuration * .25f, 1f);
         }
         return true;
     }

@@ -1,3 +1,4 @@
+using Player.Abilities;
 using UnityEngine;
 
 public class DebugManager : Singleton<DebugManager>

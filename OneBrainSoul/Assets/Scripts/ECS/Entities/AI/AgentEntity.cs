@@ -38,8 +38,6 @@ namespace ECS.Entities.AI
                     .GetComponent<ParticleSystem>();
             
             _damageParticle.gameObject.SetActive(false);
-
-            _currentReceiveDamageCooldown = _receiveDamageCooldown;
         }
 
         public uint GetAgentID()
