@@ -1,5 +1,4 @@
 using System;
-using ECS.Entities.AI.Combat;
 
 namespace Managers
 {
@@ -40,7 +39,6 @@ namespace Managers
 
         #endregion
 
-        public static Action<AIAlly> OnSwitch;
         public static Action<uint> OnAgentDefeated;
 
     }

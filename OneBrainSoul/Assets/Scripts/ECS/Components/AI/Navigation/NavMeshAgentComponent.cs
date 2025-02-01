@@ -1,7 +1,6 @@
 using System;
 using AI.Navigation;
 using Interfaces.AI.Navigation;
-using UnityEngine;
 using UnityEngine.AI;
 
 namespace ECS.Components.AI.Navigation
@@ -14,11 +13,11 @@ namespace ECS.Components.AI.Navigation
         private NavMeshAgent _agent;
         private AStarPath _aStarPath;
 
-        public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, Transform transform)
+        public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, TransformComponent transformComponent)
         {
             _navMeshAgentSpecs = navMeshAgentSpecs;
             _agent = agent;
-            _transformComponent = new TransformComponent(transform);
+            _transformComponent = transformComponent;
             _aStarPath = new AStarPath(_transformComponent);
         }
 

@@ -6,6 +6,7 @@ using Debug = UnityEngine.Debug;
 
 namespace Characters
 {
+    //TODO ERASE SCRIPT??
     public class Character : MonoBehaviour
     {
         [SerializeField] private Rigidbody _rigidbody;

@@ -2,6 +2,6 @@
 {
     public interface IIsAttacking
     {
-        public bool IsAttacking();
+        public bool IsCastingAnAbility();
     }
 }

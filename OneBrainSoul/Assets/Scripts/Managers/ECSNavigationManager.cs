@@ -41,8 +41,12 @@ namespace Managers
         private List<Mutex> _mutexes = new List<Mutex>();
         
         [SerializeField]private uint _maxThreads = 3;
-
+        
+        ////////////////TODO ERASE
         [SerializeField]private bool _drawGizmos;
+
+        [SerializeField]private uint ID;
+        /////////////////
 
         private void Awake()
         {
@@ -223,9 +227,9 @@ namespace Managers
                     
                 aStarPath.UpdateNavMeshGraphObstacles();
 
-                _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath);
+                _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath, _triangleSideLength);
                     
-                aStarPath.navMeshGraph.ResetEdgesCost();
+                aStarPath.navMeshGraph.ResetGraphImportantInfo();
             }
         }
 
@@ -444,7 +448,7 @@ namespace Managers
             
             Gizmos.color = Color.blue;
             
-            foreach (Node node in _navMeshGraph.nodes.Values)
+            /*foreach (Node node in _navMeshGraph.nodes.Values)
             {
                 Gizmos.DrawSphere(node.position, 0.2f);
 
@@ -453,13 +457,17 @@ namespace Managers
                     Gizmos.color = Color.red;
                     Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
                 }
-            }
+            }*/
             
-            Gizmos.color = Color.green;
-
-            foreach (Vector3 position in _navMeshGraph.hitsPositions)
+            foreach (Node node in _navMeshAgentDestinations[ID].GetAStarPath().navMeshGraph.nodes.Values)
             {
-                Gizmos.DrawSphere(position, 0.2f);
+                Gizmos.DrawSphere(node.position, 0.2f);
+
+                foreach (Edge edge in node.edges)
+                {
+                    Gizmos.color = new Color(1, edge.cost / 1000, edge.cost / 1000);
+                    Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
+                }
             }
             
             Gizmos.color = Color.blue;

@@ -9,9 +9,12 @@ namespace Serialize.NavMeshGraph
         public uint toNodeIndex;
         
         [Key(1)]
-        public float cost;
+        public bool isAJump;
         
         [Key(2)]
+        public float cost;
+        
+        [Key(3)]
         public float baseCostMultiplier;
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface ISetIsAttacking
     {
-        public void SetIsAttacking(bool isAttacking);
+        public void SetICastingAnAbility(bool isCastingAnAbility);
     }
 }

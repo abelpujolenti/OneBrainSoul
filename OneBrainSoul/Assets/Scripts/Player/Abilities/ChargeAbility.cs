@@ -1,20 +1,23 @@
 using UnityEngine;
 
-public class ChargeAbility : MonoBehaviour
+namespace Player.Abilities
 {
-    PlayerCharacterController player;
-    private void Start()
+    public class ChargeAbility : MonoBehaviour
     {
-        player = GetComponent<PlayerCharacterController>();
-    }
-
-    private void Update()
-    {
-        if (player.onGround && player.ability1Input && player.ability1Time == 0f)
+        PlayerCharacterController player;
+        private void Start()
         {
-            player.movementHandler = new ChargeMovementHandler(player, player.orientation.forward);
-            player.ability1Time = player.ability1Cooldown;
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+            player = GetComponent<PlayerCharacterController>();
+        }
+
+        private void Update()
+        {
+            if (player.onGround && player.ability1Input && player.ability1Time == 0f)
+            {
+                player.movementHandler = new ChargeMovementHandler(player, player.orientation.forward);
+                player.ability1Time = player.ability1Cooldown;
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+            }
         }
     }
 }
