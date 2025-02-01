@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    PlayerCharacterController playerCharacterController;
-    public int maxHealth = 20;
+    PlayerCharacterController player;
+    public int maxHealth = 100;
+    public int maxShield = 2;
     public int health { get; private set; }
+    public int shield { get; private set; }
     public float damageCooldown = .3f;
     public float damageEffectDuration = .2f;
     float damageTime;
@@ -18,7 +20,16 @@ public class PlayerHealth : MonoBehaviour
     public bool Damage(int amount, GameObject source)
     {
         if (damageTime > 0f) return false;
-        health = Mathf.Max(0, health - amount);
+
+        if (shield > 0)
+        {
+            shield--;
+        }
+        else
+        {
+            health = Mathf.Max(0, health - amount);
+        }
+
         damageTime = damageCooldown;
         if (health == 0)
         {

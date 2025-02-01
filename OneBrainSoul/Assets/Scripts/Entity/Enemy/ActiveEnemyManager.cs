@@ -9,7 +9,7 @@ public class ActiveDamageTakingEntityManager : Singleton<ActiveDamageTakingEntit
     private void Start()
     {
         //Find better way to do this
-        damageTakingEntities = FindObjectsByType<DamageTakingEntity>(FindObjectsSortMode.None).ToList();
+        damageTakingEntities.Concat(FindObjectsByType<DamageTakingEntity>(FindObjectsSortMode.None).ToList());
     }
 
     private void LateUpdate()

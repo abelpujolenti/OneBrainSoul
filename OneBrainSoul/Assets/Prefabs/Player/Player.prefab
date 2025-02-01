@@ -831,9 +831,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   jumps: 2
-  moveSpeedMultiplier: 1
+  moveSpeedMultiplier: 1.1
   pressToHover: 0
-  ability1Cooldown: 1
+  ability1Cooldown: 0.9
   ability2Cooldown: 0.8
   gravityStrength: 32
   hoverHeight: 1.2
@@ -871,8 +871,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapons:
   - {fileID: 4956135247688607953}
-  - {fileID: 1243210926395265609}
-  - {fileID: 5293005351795719311}
   transitionDuration: 0.1
 --- !u!114 &8022381131504467490
 MonoBehaviour:
@@ -935,6 +933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 999999
+  maxShield: 2
   damageCooldown: 0.4
   damageEffectDuration: 0.35
 --- !u!114 &5004512723018151163
