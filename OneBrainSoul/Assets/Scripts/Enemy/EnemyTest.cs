@@ -1,3 +1,4 @@
+using Player;
 using UnityEngine;
 
 public class EnemyTest : MonoBehaviour
@@ -37,7 +38,7 @@ public class EnemyTest : MonoBehaviour
 
     public void Knockback(PlayerCharacterController player)
     {
-        rb.AddForce(player.orientation.forward * 2000f, ForceMode.Acceleration);
+        //rb.AddForce(player.orientation.forward * 2000f, ForceMode.Acceleration);
         rb.AddForce(Vector3.up * 1000f, ForceMode.Acceleration);
     }
 

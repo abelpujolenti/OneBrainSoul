@@ -4,18 +4,12 @@ namespace Player.Abilities
 {
     public class ChargeAbility : MonoBehaviour
     {
-        PlayerCharacterController player;
-        private void Start()
+        public void CheckCharge(PlayerCharacterController playerCharacterController, bool ability1Input)
         {
-            player = GetComponent<PlayerCharacterController>();
-        }
-
-        private void Update()
-        {
-            if (player.onGround && player.ability1Input && player.ability1Time == 0f)
+            if (playerCharacterController.IsOnTheGround() && ability1Input && playerCharacterController.GetAbility1Time() == 0)
             {
-                player.movementHandler = new ChargeMovementHandler(player, player.orientation.forward);
-                player.ability1Time = player.ability1Cooldown;
+                playerCharacterController.ChangeMovementHandlerToCharge();
+                playerCharacterController.ResetAbility1Cooldown();
                 AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
             }
         }

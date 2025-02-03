@@ -9,6 +9,11 @@ namespace ECS.Entities.AI.Combat
             _entityType = EntityType.LONG_ARMS_BASE;
         }
 
+        public override float GetRadius()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
         {
             //TODO LONG ARMS BASE DAMAGE

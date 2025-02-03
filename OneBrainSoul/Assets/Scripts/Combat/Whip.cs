@@ -1,50 +1,51 @@
 using System.Collections.Generic;
+using ECS.Entities.AI;
+using Managers;
 using UnityEngine;
 
-public class Whip : Weapon
+namespace Combat
 {
-    protected override void AttackCommand()
+    public class Whip : Weapon
     {
-        base.AttackCommand();
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.whipAttack, player.transform.position);
-    }
-
-    protected override void AttackUpdate()
-    {
-        base.AttackUpdate();
-
-        if (!attackLanded && animationTimer <= 1 - activeStart && animationTimer >= 1 - activeEnd)
+        protected override void AttackCommand()
         {
-            List<DamageTakingEntity> affectedEntities = new List<DamageTakingEntity>();
-            for (int i = 0; i < ActiveDamageTakingEntityManager.Instance.damageTakingEntities.Count; i++)
+            base.AttackCommand();
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.whipAttack, player.transform.position);
+        }
+
+        protected override void AttackUpdate()
+        {
+            base.AttackUpdate();
+
+            if (!attackLanded && animationTimer <= 1 - activeStart && animationTimer >= 1 - activeEnd)
             {
-                DamageTakingEntity entity = ActiveDamageTakingEntityManager.Instance.damageTakingEntities[i];
-                Vector3 enemyPos = entity.transform.position;
-                Vector3 enemyPosOuter = entity.transform.position + (player.transform.position - entity.transform.position).normalized * entity.radius;
-                float distance = Vector3.Distance(player.transform.position, enemyPosOuter);
-                float dotInnerNormalized = Vector3.Dot(player.orientation.forward, (enemyPos - player.transform.position).normalized);
-                float dotOuterNormalized = Vector3.Dot(player.orientation.forward, (enemyPosOuter - player.transform.position).normalized);
-                if (distance < range)
+                List<AgentEntity> entities = CombatManager.Instance.RequestAllEntities();
+                List<AgentEntity> affectedEntities = new List<AgentEntity>();
+                for (int i = 0; i < entities.Count; i++)
                 {
-                    //Debug.Log("Dot inner: " + dotInnerNormalized + "  Dot outer: " + dotOuterNormalized);
-                    if (
-                        (dotOuterNormalized > 1f - outerArc / 180f) ||
-                        (dotInnerNormalized > 0.2f && distance < innerRange)
-                        )
+                    AgentEntity entity = entities[i];
+                    Vector3 enemyPos = entity.transform.position;
+                    Vector3 enemyPosOuter = entity.transform.position + (player.transform.position - entity.transform.position).normalized * entity.GetRadius();
+                    float distance = Vector3.Distance(player.transform.position, enemyPosOuter);
+                    float dotInnerNormalized = Vector3.Dot(player.GetOrientation().forward, (enemyPos - player.transform.position).normalized);
+                    float dotOuterNormalized = Vector3.Dot(player.GetOrientation().forward, (enemyPosOuter - player.transform.position).normalized);
+                    if (distance < range)
                     {
-                        affectedEntities.Add(entity);
+                        //Debug.Log("Dot inner: " + dotInnerNormalized + "  Dot outer: " + dotOuterNormalized);
+                        if (
+                            (dotOuterNormalized > 1f - outerArc / 180f) ||
+                            (dotInnerNormalized > 0.2f && distance < innerRange)
+                        )
+                        {
+                            affectedEntities.Add(entity);
+                        }
                     }
                 }
-            }
-            if (affectedEntities.Count > 0)
-            {
-                AttackLand(affectedEntities);
+                if (affectedEntities.Count > 0)
+                {
+                    AttackLand(affectedEntities);
+                }
             }
         }
-    }
-
-    protected override void AttackLand(List<DamageTakingEntity> enemies)
-    {
-        base.AttackLand(enemies);
     }
 }

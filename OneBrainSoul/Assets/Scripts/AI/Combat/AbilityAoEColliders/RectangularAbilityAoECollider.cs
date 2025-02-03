@@ -115,5 +115,10 @@ namespace AI.Combat.AbilityAoEColliders
         {
             transform.rotation = _parentRotation * Quaternion.LookRotation(_direction, Vector3.up);
         }
+
+        protected override void OnTriggerEnter(Collider other)
+        {
+            base.OnTriggerEnter(other);
+        }
     }
 }

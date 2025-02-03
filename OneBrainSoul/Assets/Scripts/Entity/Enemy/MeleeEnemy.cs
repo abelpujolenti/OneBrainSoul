@@ -1,3 +1,4 @@
+using Player;
 using UnityEngine;
 
 public class MeleeEnemy : EnemyBase
@@ -41,7 +42,7 @@ public class MeleeEnemy : EnemyBase
     void Attack(PlayerCharacterController player)
     {
         if (Vector3.Distance(player.transform.position, transform.position) < attackRange) {
-            if (player.health.Damage(damage, gameObject))
+            //if (player.health.Damage(damage, gameObject))
             {
                 attackTime = attackCooldown;
                 AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyAttack, transform.position);

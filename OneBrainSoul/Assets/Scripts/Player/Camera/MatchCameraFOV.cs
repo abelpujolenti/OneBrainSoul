@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class MatchCameraFOV : MonoBehaviour
+namespace Player.Camera
 {
-    Camera cam;
-    [SerializeField] Camera camToMatch;
-    void Start()
+    public class MatchCameraFOV : MonoBehaviour
     {
-        cam = GetComponent<Camera>();
-    }
+        UnityEngine.Camera cam;
+        [SerializeField] UnityEngine.Camera camToMatch;
+        void Start()
+        {
+            cam = GetComponent<UnityEngine.Camera>();
+        }
 
-    void Update()
-    {
-        cam.fieldOfView = camToMatch.fieldOfView;
+        void Update()
+        {
+            cam.fieldOfView = camToMatch.fieldOfView;
+        }
     }
 }

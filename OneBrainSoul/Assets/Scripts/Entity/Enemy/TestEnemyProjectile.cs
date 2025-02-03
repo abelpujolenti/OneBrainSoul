@@ -1,3 +1,4 @@
+using Player;
 using UnityEngine;
 
 public class TestEnemyProjectile : MonoBehaviour
@@ -20,7 +21,7 @@ public class TestEnemyProjectile : MonoBehaviour
         PlayerCharacterController player = collision.gameObject.GetComponent<PlayerCharacterController>();
         if (player != null)
         {
-            player.health.Damage(damage, gameObject);
+            //player.health.Damage(damage, gameObject);
         }
         Destroy(gameObject);
     }

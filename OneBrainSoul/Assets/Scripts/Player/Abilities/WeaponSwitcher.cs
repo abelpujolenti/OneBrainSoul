@@ -1,13 +1,21 @@
+using Combat;
 using UnityEngine;
 
 namespace Player.Abilities
 {
     public class WeaponSwitcher : MonoBehaviour
     {
-        [SerializeField] Weapon[] weapons;
-        [SerializeField] float transitionDuration = 0.1f;
-        int currentWeapon = 0;
-        float transitionTime = 0f;
+        [SerializeField] private Weapon[] _weapons;
+        [SerializeField] private float _transitionDuration = 0.1f;
+        private int _currentWeapon = 0;
+        private float _transitionTime = 0f;
+
+        public void Setup(Weapon[] weapons, float transitionDuration)
+        {
+            _weapons = weapons;
+            _transitionDuration = transitionDuration;
+        }
+
         private void OnGUI()
         {
             Event e = Event.current;
@@ -33,18 +41,18 @@ namespace Player.Abilities
             }
             else if (e.isScrollWheel)
             {
-                int c = (currentWeapon - (int)Input.mouseScrollDelta.y + weapons.Length) % weapons.Length;
+                int c = (_currentWeapon - (int)Input.mouseScrollDelta.y + _weapons.Length) % _weapons.Length;
                 SwitchCommand(c);
             }
         }
 
         private void Update()
         {
-            if (transitionTime > 0f)
+            if (_transitionTime > 0f)
             {
                 TransitionUpdate();
             }
-            transitionTime = Mathf.Max(0f, transitionTime - Time.deltaTime);
+            _transitionTime = Mathf.Max(0f, _transitionTime - Time.deltaTime);
         }
 
         private void TransitionUpdate()
@@ -54,21 +62,21 @@ namespace Player.Abilities
 
         public void SwitchCommand(int id)
         {
-            if (id < 0 || id >= weapons.Length) return;
-            if (transitionTime > 0) return;
-            if (id == currentWeapon) return;
+            if (id < 0 || id >= _weapons.Length) return;
+            if (_transitionTime > 0) return;
+            if (id == _currentWeapon) return;
             Switch(id);
         }
 
         private void Switch(int id)
         {
-            transitionTime = transitionDuration;
-            PostProcessingManager.Instance.BraincellSwitchTransition(transitionDuration * 1.3f);
+            _transitionTime = _transitionDuration;
+            PostProcessingManager.Instance.BraincellSwitchTransition(_transitionDuration * 1.3f);
 
-            weapons[currentWeapon].Deactivate();
-            weapons[id].Activate();
+            _weapons[_currentWeapon].Deactivate();
+            _weapons[id].Activate();
 
-            currentWeapon = id;
+            _currentWeapon = id;
 
             AudioManager.instance.PlayOneShot(FMODEvents.instance.swap, transform.position);
         }

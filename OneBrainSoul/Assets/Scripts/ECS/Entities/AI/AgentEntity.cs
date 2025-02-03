@@ -14,7 +14,7 @@ namespace ECS.Entities.AI
 
         private TransformComponent _transformComponent;
 
-        protected SurroundingSlots _surroundingSlots;
+        private SurroundingSlots _surroundingSlots;
         protected AgentSlot _agentSlot;
 
         //[SerializeField] protected Material _material;
@@ -49,6 +49,8 @@ namespace ECS.Entities.AI
         {
             return _transformComponent;
         }
+
+        public abstract float GetRadius();
 
         #region Agent Slot
         

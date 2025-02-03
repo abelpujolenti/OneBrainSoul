@@ -8,7 +8,6 @@ using ECS.Entities.AI;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace AI.Combat.AbilityAoEColliders
 {
@@ -383,7 +382,7 @@ namespace AI.Combat.AbilityAoEColliders
             _actionOnTriggerEnter(agentEntity);
         }
 
-        protected void OnTriggerExit(Collider other)
+        protected virtual void OnTriggerExit(Collider other)
         {
             AgentEntity agentEntity = other.GetComponent<AgentEntity>();
             

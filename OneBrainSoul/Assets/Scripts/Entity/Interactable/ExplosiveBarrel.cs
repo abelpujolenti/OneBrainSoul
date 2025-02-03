@@ -1,3 +1,5 @@
+using Player;
+using Player.Movement;
 using UnityEngine;
 
 public class ExplosiveBarrel : DamageTakingEntity
@@ -32,9 +34,9 @@ public class ExplosiveBarrel : DamageTakingEntity
         receiver.AddForce(d.normalized * explosionPower * power, ForceMode.Acceleration);
         
         var player = receiver.GetComponent<PlayerCharacterController>();
-        if (player != null && player.movementHandler is GroundedMovementHandler)
+        if (player != null && player.GetMovementHandler() is GroundedMovementHandler)
         {
-            player.movementHandler = new AirborneMovementHandler();
+            player.ChangeMovementHandlerToAirborne();
         }
     }
 }

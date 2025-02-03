@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AI.Combat.Enemy;
+using ECS.Entities.AI;
 using ECS.Entities.AI.Combat;
 using Player;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace Managers
         [SerializeField] private GameObject _enemyRectangleAttackColliderPrefab;
         [SerializeField] private GameObject _enemyCircleAttackColliderPrefab;
 
-        private PlayerStatus _playerStatus;
+        private PlayerCharacter _playerCharacter;
         
         private Dictionary<uint, Triface> _trifaces = new Dictionary<uint, Triface>();
         private Dictionary<uint, LongArms> _longArms = new Dictionary<uint, LongArms>();
@@ -69,7 +70,7 @@ namespace Managers
 
         public bool CanSeePlayer(Vector3 position, float sightMaximumDistance)
         {
-            Vector3 playerPosition = _playerStatus.GetTransformComponent().GetPosition();
+            Vector3 playerPosition = _playerCharacter.GetTransformComponent().GetPosition();
 
             Vector3 vectorToPlayer = (playerPosition - position).normalized;
             float distanceToPlayer = (playerPosition - position).magnitude;
@@ -87,9 +88,9 @@ namespace Managers
 
         #region Add Combat Agent
 
-        public void AddPlayer(PlayerStatus playerStatus)
+        public void AddPlayer(PlayerCharacter playerCharacter)
         {
-            _playerStatus = playerStatus;
+            _playerCharacter = playerCharacter;
         }
 
         public void AddEnemy(Triface triface)
@@ -117,9 +118,25 @@ namespace Managers
 
         #region Requests
 
-        public PlayerStatus RequestPlayerStatus()
+        public PlayerCharacter RequestPlayer()
         {
-            return _playerStatus;
+            return _playerCharacter;
+        }
+
+        public List<AgentEntity> RequestAllEntities()
+        {
+            List<AgentEntity> enemies = new List<AgentEntity>();
+
+            enemies.AddRange(
+                ExecuteDelegate<List<Triface>, Dictionary<EnemyType, Delegate>>(_returnTheSameAgentsType, EnemyType.TRIFACE));
+            
+            enemies.AddRange(
+                ExecuteDelegate<List<LongArms>, Dictionary<EnemyType, Delegate>>(_returnTheSameAgentsType, EnemyType.LONG_ARMS));
+            
+            enemies.AddRange(
+                ExecuteDelegate<List<LongArmsBase>, Dictionary<EnemyType, Delegate>>(_returnTheSameAgentsType, EnemyType.LONG_ARMS_BASE));
+
+            return enemies;
         }
 
         #endregion
