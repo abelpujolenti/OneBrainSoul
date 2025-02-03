@@ -1,233 +1,456 @@
 using FMOD.Studio;
 using FMODUnity;
+using Player.Abilities;
+using Player.Camera;
+using Player.Effects;
+using Player.Movement;
 using TMPro;
 using UnityEngine;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
-public class PlayerCharacterController : MonoBehaviour
+namespace Player
 {
-    public Transform orientation;
-    public LayerMask groundMask;
-    public RaycastHit groundHit;
-
-    [Header("Properties")]
-    [Range(1,3)]
-    public int jumps = 1;
-    [Range(0,3)]
-    public float moveSpeedMultiplier = 1f;
-    public bool pressToHover = false;
-
-    [Header("Cooldowns")]
-    public float ability1Cooldown = 3f;
-    public float ability2Cooldown = 5f;
-
-    [Header("Vertical Forces")]
-    public float gravityStrength = 45f;
-    public float hoverHeight = 2f;
-    public float hoverStrength = 45f;
-    public float hoverDamp = 20f;
-
-    [Header("Rotation Correction")]
-    public float rotationCorrectionStrength = 100f;
-    public float rotationCorrectionDamp = 70f;
-
-    [Header("Switch Mode")]
-    public float switchModeSpeed = 30f;
-    public float switchModeFalloffPower = 3f;
-    public float switchModeYFactor = 0.3f;
-    public float switchModeRotationFactor = 2f;
-    public float switchModeMouseSpeed = .4f;
-
-    public Rigidbody rb { get; private set; }
-    public CapsuleCollider capsuleCollider { get; private set; }
-    public FirstPersonCamera cam { get; private set; }
-    public PlayerHealth health { get; private set; }
-    public Hitstop hitstop { get; private set; }
-    public bool onGround { get; private set; }
-    public float xInput { get; private set; }
-    public float yInput { get; private set; }
-    public bool jumpInput { get; private set; }
-    public bool ability1Input { get; private set; }
-    public bool ability2Input { get; private set; }
-    public bool switchModeInput { get; private set; }
-    public bool canSwitch { get; set; } = true;
-    public bool inCombat { get; private set; } = false;
-
-    public float ability1Time = 0f;
-    public float ability2Time = 0f;
-
-    public MovementHandler movementHandler;
-
-    public Transform hand;
-    public GameObject display;
-    public Canvas uiCanvas;
-    public Canvas hookCanvas;
-    private TextMeshProUGUI crosshair;
-    public SwitchModeUI switchModeUI;
-    public AllyIcon allyIcon;
-
-    public Camera switchModeCamera;
-
-    public float airTime = 0f;
-    public float switchModeTime = 0f;
-    Vector3 startPos;
-    private EventInstance footstepSound;
-
-    private void Start()
+    public class PlayerCharacterController : MonoBehaviour
     {
-        rb = GetComponent<Rigidbody>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
-        cam = GetComponentInChildren<FirstPersonCamera>();
-        cam.Setup();
-        display.SetActive(false);
-        allyIcon.gameObject.SetActive(false);
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
-        movementHandler = new GroundedMovementHandler();
-        uiCanvas.gameObject.SetActive(true);
-        hookCanvas.gameObject.SetActive(true);
-        crosshair = uiCanvas.GetComponentInChildren<TextMeshProUGUI>();
-        hitstop = GetComponent<Hitstop>();
-        health = GetComponent<PlayerHealth>();
-        startPos = transform.position;
+        [SerializeField] private Transform _orientation;
+        [SerializeField] private LayerMask _groundMask;
+        private RaycastHit _groundHit;
 
-        footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
-        footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
-    }
+        [Header("Properties")]
+        [Range(1,3)]
+        [SerializeField] private int _jumps;
+        [Range(0,3)]
+        [SerializeField] private float _moveSpeedMultiplier;
+        private bool pressToHover;
 
-    private void Update()
-    {
-        CheckGround();
-        CheckInput();
-        HandWobble();
-        CalculateAirTime();
-        CalculateCooldowns();
-    }
-    
-    private void FixedUpdate()
-    {        
-        if (movementHandler.ShouldGravityApply(this))
-        {
-            ApplyGravity();
-        }
+        [Header("Cooldowns")]
+        [SerializeField] private float _ability1Cooldown;
+        [SerializeField] private float _ability2Cooldown;
 
-        if (movementHandler.ShouldHoverApply(this))
-        {
-            Hover();
-        }
+        [Header("Vertical Forces")]
+        [SerializeField] private float _gravityStrength;
+        [SerializeField] private float _hoverHeight;
+        [SerializeField] private float _hoverStrength;
+        [SerializeField] private float _hoverDamp;
 
-        CorrectRotation();
+        [Header("Rotation Correction")]
+        [SerializeField] private float _rotationCorrectionStrength;
+        [SerializeField] private float _rotationCorrectionDamp;
+
+        [SerializeField] private Rigidbody _rigidbody;
+        [SerializeField] private CapsuleCollider _capsuleCollider;
+        [SerializeField] private FirstPersonCamera _camera;
         
-        movementHandler.Move(this);
-        VoidReturn();
+        private bool _onGround;
+        private float _xInput;
+        private float _yInput;
+        private bool _jumpInput;
+        private bool _ability1Input;
+        private bool _ability2Input;
+        private bool _inCombat;
 
-        SoundUpdate();
-    }
+        private float _ability1Time;
+        private float _ability2Time;
 
-    private void ApplyGravity()
-    {
-        float gravity = jumpInput && pressToHover && rb.velocity.y < -4f ? gravityStrength * 0.2f : gravityStrength;
-        rb.AddForce(Vector3.down * gravity , ForceMode.Acceleration);
-    }
+        private IMovementHandler _movementHandler;
 
-    private void Hover()
-    {
-        if (!onGround) return;
-        float heightDiff = groundHit.distance - hoverHeight;
-        rb.AddForce(Vector3.down * (heightDiff * hoverStrength + rb.velocity.y * hoverDamp), ForceMode.Acceleration);
-    }
+        private GroundedMovementHandler _groundedMovementHandler = new GroundedMovementHandler(); 
+        private AirborneMovementHandler _airborneMovementHandler = new AirborneMovementHandler();
+        private ChargeMovementHandler _chargeMovementHandler;
+        private DashMovementHandler _dashMovementHandler = new DashMovementHandler();
+        private HookMovementHandler _hookMovementHandler;
+        private WallClimbMovementHandler _wallClimbMovementHandler = new WallClimbMovementHandler();
 
-    private void CorrectRotation()
-    {
-        Quaternion correction = Quaternion.FromToRotation(transform.up, Vector3.up);
-        correction.ToAngleAxis(out float alpha, out Vector3 axis);
-        rb.AddTorque(axis.normalized * alpha * Mathf.Deg2Rad * rotationCorrectionStrength - rb.angularVelocity * rotationCorrectionDamp, ForceMode.Acceleration);
-        Quaternion correction2 = Quaternion.FromToRotation(transform.forward, Vector3.forward);
-        correction2.ToAngleAxis(out float alpha2, out Vector3 axis2);
-        rb.AddTorque(axis2.normalized * alpha2 * Mathf.Deg2Rad * rotationCorrectionStrength - rb.angularVelocity * rotationCorrectionDamp, ForceMode.Acceleration);
-    }
+        [SerializeField] private Transform _hand;
+        [SerializeField] private GameObject _display;
+        [SerializeField] private Canvas _uiCanvas;
+        [SerializeField] private Canvas _hookCanvas;
+        [SerializeField] private TextMeshProUGUI _crosshair;
 
-    private void VoidReturn()
-    {
-        if (transform.position.y < -30f)
+        [SerializeField] private float _airTime;
+        private Vector3 _startPos;
+        private EventInstance _footstepSound;
+
+        [SerializeField] private DashAbility _dashAbility;
+        [SerializeField] private ChargeAbility _chargeAbility;
+        [SerializeField] private WallClimbAbility _wallClimbAbility;
+        [SerializeField] private HookAbility _hookAbility;
+        [SerializeField] private LineRenderer _hookLineRenderer;
+
+        //TODO ADRI ELS DEIXO A TRUE, PER NO DONAR AL F1
+        private bool _isDashUnlocked = true;
+        private bool _isChargeUnlocked;
+        private bool _isHookUnlocked = true;
+        private bool _isWallClimbUnlocked = true;
+
+        private void Start()
         {
-            transform.position = startPos;
+            _camera.Setup();
+            _display.SetActive(false);
+            _movementHandler = new GroundedMovementHandler();
+            _uiCanvas.gameObject.SetActive(true);
+            _hookCanvas.gameObject.SetActive(true);
+            _startPos = transform.position;
+
+            _footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
+            _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+
+            _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
+            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer);
+            _hookAbility.Setup(_hookLineRenderer);
         }
-    }
 
-    private void ApplyTerminalVelocity()
-    {
-        float tv = 12.5f;
-        if (rb.velocity.y <= tv || rb.velocity.y > 0) return;
-        Vector3 terminalVelocity = rb.velocity;
-        terminalVelocity.y = tv;
-        rb.velocity = terminalVelocity;
-    }
-    private void CheckGround()
-    {
-        float raycastMargin = 0.5f;
-        onGround = Physics.Raycast(transform.position + Vector3.up * (raycastMargin + 0.05f), Vector3.down, out groundHit, hoverHeight * 5.0f, groundMask);
-        if (!onGround) groundHit.distance = float.PositiveInfinity;
-        onGround &= groundHit.distance < hoverHeight + raycastMargin && Vector3.Angle(groundHit.normal, Vector3.up) < 37.5f;
-    }
-
-    private void CheckInput()
-    {
-        xInput = Input.GetAxis("Horizontal");
-        yInput = Input.GetAxis("Vertical");
-        jumpInput = Input.GetButton("Jump");
-        ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Return);
-
-        switchModeInput = Input.GetMouseButton(1);
-    }
-
-    private void HandWobble()
-    {
-        if (!onGround) return;
-        Vector3 wandPos = new Vector3(Mathf.Sin(Time.time * 5f), Mathf.Sin(Time.time * 6f));
-        float wobbleMagnitude = Mathf.Clamp(rb.velocity.magnitude / 25f, 0f, 1f);
-        wandPos *= wobbleMagnitude * 0.05f;
-        hand.localPosition = wandPos;
-    }
-
-    private void CalculateAirTime()
-    {
-        if (!onGround)
+        private void Update()
         {
-            airTime += Time.deltaTime;
-            if (airTime > 5f)
+            CheckGround();
+            CheckInput();
+            HandWobble();
+            CalculateAirTime();
+            CalculateCooldowns();
+        }
+    
+        private void FixedUpdate()
+        {        
+            if (_movementHandler.ShouldGravityApply(this))
             {
+                ApplyGravity();
+            }
+
+            if (_movementHandler.ShouldHoverApply(this))
+            {
+                Hover();
+            }
+
+            CorrectRotation();
+        
+            _movementHandler.Move(this);
+            VoidReturn();
+
+            SoundUpdate();
+        }
+
+        private void ApplyGravity()
+        {
+            float gravity = _jumpInput && pressToHover && _rigidbody.velocity.y < -4f ? _gravityStrength * 0.2f : _gravityStrength;
+            _rigidbody.AddForce(Vector3.down * gravity , ForceMode.Acceleration);
+        }
+
+        private void Hover()
+        {
+            if (!_onGround) return;
+            float heightDiff = _groundHit.distance - _hoverHeight;
+            _rigidbody.AddForce(Vector3.down * (heightDiff * _hoverStrength + _rigidbody.velocity.y * _hoverDamp), ForceMode.Acceleration);
+        }
+
+        private void CorrectRotation()
+        {
+            Quaternion correction = Quaternion.FromToRotation(transform.up, Vector3.up);
+            correction.ToAngleAxis(out float alpha, out Vector3 axis);
+            
+            _rigidbody.AddTorque(
+                axis.normalized * (alpha * Mathf.Deg2Rad * _rotationCorrectionStrength) -
+                _rigidbody.angularVelocity * _rotationCorrectionDamp, ForceMode.Acceleration);
+            
+            Quaternion correction2 = Quaternion.FromToRotation(transform.forward, Vector3.forward);
+            correction2.ToAngleAxis(out float alpha2, out Vector3 axis2);
+            
+            _rigidbody.AddTorque(
+                axis2.normalized * (alpha2 * Mathf.Deg2Rad * _rotationCorrectionStrength) -
+                _rigidbody.angularVelocity * _rotationCorrectionDamp, ForceMode.Acceleration);
+        }
+
+        private void VoidReturn()
+        {
+            if (transform.position.y < -30f)
+            {
+                transform.position = _startPos;
             }
         }
-    }
 
-    private void CalculateCooldowns()
-    {
-        ability1Time = Mathf.Max(0f, ability1Time - Time.deltaTime);
-        ability2Time = Mathf.Max(0f, ability2Time - Time.deltaTime);
-    }
-
-    private void SoundUpdate()
-    {
-        //Walk sound
-        footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
-        PLAYBACK_STATE playbackState;
-        footstepSound.getPlaybackState(out playbackState);
-        if (onGround && (xInput != 0f || yInput != 0f) && rb.velocity != Vector3.zero)
+        private void ApplyTerminalVelocity()
         {
-            if (playbackState.Equals(PLAYBACK_STATE.STOPPED))
+            float tv = 12.5f;
+            if (_rigidbody.velocity.y <= tv || _rigidbody.velocity.y > 0) return;
+            Vector3 terminalVelocity = _rigidbody.velocity;
+            terminalVelocity.y = tv;
+            _rigidbody.velocity = terminalVelocity;
+        }
+        
+        private void CheckGround()
+        {
+            float raycastMargin = 0.5f;
+            
+            _onGround = Physics.Raycast(transform.position + Vector3.up * (raycastMargin + 0.05f), Vector3.down,
+                out _groundHit, _hoverHeight * 5.0f, _groundMask);
+            
+            if (!_onGround) _groundHit.distance = float.PositiveInfinity;
+            _onGround &= _groundHit.distance < _hoverHeight + raycastMargin && Vector3.Angle(_groundHit.normal, Vector3.up) < 37.5f;
+
+            if (!_onGround)
             {
-                footstepSound.start();
+                return;
+            }
+            
+            _dashAbility.ResetTimesDashed();
+        }
+
+        private void CheckInput()
+        {
+            //TODO ADRI AIXÓ HAURIA D'ANAR A ONGUI()
+            _xInput = Input.GetAxis("Horizontal");
+            _yInput = Input.GetAxis("Vertical");
+            _jumpInput = Input.GetButton("Jump");
+            _ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            _ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Return);
+
+            if (_isDashUnlocked)
+            {
+                _dashAbility.CheckDash(this, _ability1Input);
+            }
+
+            if (_isChargeUnlocked)
+            {
+                _chargeAbility.CheckCharge(this, _ability1Input);
+            }
+
+            if (_isHookUnlocked)
+            {
+                _hookAbility.FakeUpdate(this);
+            }
+
+            if (_isWallClimbUnlocked)
+            {
+                _wallClimbAbility.CheckWallClimb(this);
+            }
+            
+            //
+        }
+
+        private void HandWobble()
+        {
+            if (!_onGround) return;
+            Vector3 wandPos = new Vector3(Mathf.Sin(Time.time * 5f), Mathf.Sin(Time.time * 6f));
+            float wobbleMagnitude = Mathf.Clamp(_rigidbody.velocity.magnitude / 25f, 0f, 1f);
+            wandPos *= wobbleMagnitude * 0.05f;
+            _hand.localPosition = wandPos;
+        }
+
+        private void CalculateAirTime()
+        {
+            if (!_onGround)
+            {
+                _airTime += Time.deltaTime;
+                if (_airTime > 5f)
+                {
+                }
             }
         }
-        else if (playbackState.Equals(PLAYBACK_STATE.PLAYING))
-        {
-            footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
-        }
-    }
 
-    public void SetCrosshairColor(Color color)
-    {
-        crosshair.color = color;
+        private void CalculateCooldowns()
+        {
+            _ability1Time = Mathf.Max(0f, _ability1Time - Time.deltaTime);
+            _ability2Time = Mathf.Max(0f, _ability2Time - Time.deltaTime);
+        }
+
+        private void SoundUpdate()
+        {
+            //Walk sound
+            _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            PLAYBACK_STATE playbackState;
+            _footstepSound.getPlaybackState(out playbackState);
+            if (_onGround && (_xInput != 0f || _yInput != 0f) && _rigidbody.velocity != Vector3.zero)
+            {
+                if (playbackState.Equals(PLAYBACK_STATE.STOPPED))
+                {
+                    _footstepSound.start();
+                }
+            }
+            else if (playbackState.Equals(PLAYBACK_STATE.PLAYING))
+            {
+                _footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
+            }
+        }
+
+        public void SetCrosshairColor(Color color)
+        {
+            _crosshair.color = color;
+        }
+
+        public Rigidbody GetRigidbody()
+        {
+            return _rigidbody;
+        }
+
+        public Transform GetOrientation()
+        {
+            return _orientation;
+        }
+
+        public CapsuleCollider GetCapsuleCollider()
+        {
+            return _capsuleCollider;
+        }
+
+        public FirstPersonCamera GetCamera()
+        {
+            return _camera;
+        }
+
+        public float GetXInput()
+        {
+            return _xInput;
+        }
+
+        public float GetYInput()
+        {
+            return _yInput;
+        }
+
+        public float GetMoveSpeedMultiplier()
+        {
+            return _moveSpeedMultiplier;
+        }
+
+        public bool IsOnTheGround()
+        {
+            return _onGround;
+        }
+
+        public float GetGravityStrength()
+        {
+            return _gravityStrength;
+        }
+
+        public int GetJumps()
+        {
+            return _jumps;
+        }
+
+        public bool HasPressedJump()
+        {
+            return _jumpInput;
+        }
+
+        public RaycastHit GetGroundHit()
+        {
+            return _groundHit;
+        }
+
+        public float GetHoverHeight()
+        {
+            return _hoverHeight;
+        }
+
+        public float GetAbility1Time()
+        {
+            return _ability1Time;
+        }
+
+        public float GetAbility2Time()
+        {
+            return _ability2Time;
+        }
+
+        //TODO ADRI AIXÓ NO HAURIA D'ESTAR, NOMÉS ESTÀ PEL HOOK I ES TRIGGEREJA AMB UN INPUT AIXÍ QUE PASA_HO PER ONGUI()
+        public bool GetAbility2Input()
+        {
+            return _ability2Input;
+        }
+        //
+
+        public void ResetAbility1Cooldown()
+        {
+            _ability1Time = _ability1Cooldown;
+        }
+
+        public void ResetAbility2Cooldown()
+        {
+            _ability2Time = _ability2Cooldown;
+        }
+
+        public bool IsInCombat()
+        {
+            return _inCombat;
+        }
+
+        public void UnlockDash()
+        {
+            _isDashUnlocked = true;
+        }
+
+        public void UnlockCharge()
+        {
+            _isChargeUnlocked = true;
+        }
+
+        public void UnlockHook()
+        {
+            _isHookUnlocked = true;
+        }
+
+        public void UnlockWallClimb()
+        {
+            _isWallClimbUnlocked = true;
+        }
+
+        public void ChangeMovementHandlerToGrounded()
+        {
+            _groundedMovementHandler.ResetValues();
+            _movementHandler = _groundedMovementHandler;
+        }
+
+        public void ChangeMovementHandlerToAirborne()
+        {
+            _airborneMovementHandler.ResetValues();
+            _movementHandler = _airborneMovementHandler;
+            //_movementHandler = new AirborneMovementHandler();
+        }
+
+        public void SetHorizontalDrag(float drag)
+        {
+            _airborneMovementHandler.horizontalDrag = drag;
+        }
+
+        public void ChangeMovementHandlerToCharge()
+        {
+            _chargeMovementHandler.Setup(this, _orientation.forward);
+            _chargeMovementHandler.ResetValues();
+            _movementHandler = _chargeMovementHandler;
+        }
+
+        public void ChangeMovementHandlerToHook(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap)
+        {
+            _hookMovementHandler.Setup(startPos, endPos, endVisualPos, snap);
+            _hookMovementHandler.ResetValues();
+            _movementHandler = _hookMovementHandler;
+        }
+
+        public void ChangeMovementHandlerToDash(Vector3 dashDirection)
+        {
+            _dashMovementHandler.Setup(this, dashDirection);
+            _dashMovementHandler.ResetValues();
+            _movementHandler = _dashMovementHandler;
+        }
+
+        public void ChangeMovementHandlerToWallClimb()
+        {
+            _wallClimbMovementHandler.ResetValues();
+            _movementHandler = _wallClimbMovementHandler;
+        }
+
+        public IMovementHandler GetMovementHandler()
+        {
+            return _movementHandler;
+        }
+
+        public void SetJumpsAmount(int jumps)
+        {
+            _jumps = jumps;
+        }
+
+        public void SetMoveSpeedMultiplier(float moveSpeedMultiplier)
+        {
+            _moveSpeedMultiplier = moveSpeedMultiplier;
+        }
     }
 }

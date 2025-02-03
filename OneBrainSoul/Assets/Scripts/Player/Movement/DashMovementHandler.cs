@@ -1,76 +1,84 @@
 using Managers;
 using UnityEngine;
 
-public class DashMovementHandler : MovementHandler
+namespace Player.Movement
 {
-    public static float dashSpeed = 2700f;
-    public static float dashSpeedFalloff = 800f;
-    public static float dashSpeedFalloffPower = 2f;
-    public static float horizontalDrag = 35f;
-    public static float horizontalAirDrag = 25f;
-    public static float bobbingStrength = 0.6f;
-    public static float duration = .09f;
-
-    private float chargeTime = 0f;
-    private float bobbingCycle = 0f;
-    Vector3 dashDirection;
-
-    public DashMovementHandler(PlayerCharacterController player, Vector3 dashDirection)
+    public class DashMovementHandler : IMovementHandler
     {
-        this.dashDirection = dashDirection;
-        player.cam.FovWarp(.8f / duration, 1.22f);
-        //PostProcessingManager.Instance.ChargeRunEffect(duration);
-        player.canSwitch = false;
-    }
+        public static float dashSpeed = 2700f;
+        public static float dashSpeedFalloff = 800f;
+        public static float dashSpeedFalloffPower = 2f;
+        public static float horizontalDrag = 35f;
+        public static float horizontalAirDrag = 25f;
+        public static float bobbingStrength = 0.6f;
+        public static float duration = .09f;
 
-    public void Move(PlayerCharacterController player)
-    {
-        bobbingCycle += Time.fixedDeltaTime * player.rb.velocity.magnitude / 2f;
-        player.rb.AddTorque(Quaternion.Euler(0, 90, 0) * player.rb.velocity * bobbingStrength, ForceMode.Acceleration);
+        private float chargeTime = 0f;
+        private float bobbingCycle = 0f;
+        Vector3 dashDirection;
 
-        Quaternion groundNormalRotation = Quaternion.FromToRotation(Vector3.up, player.groundHit.normal);
-        Vector3 dashForwardDirection = (player.onGround ? groundNormalRotation : Quaternion.identity) * dashDirection;
-        float chargeSpeedWithFalloff = dashSpeed - Mathf.Pow(chargeTime / duration, 1f / dashSpeedFalloffPower) * dashSpeedFalloff;
-        player.rb.AddForce(dashForwardDirection * chargeSpeedWithFalloff, ForceMode.Acceleration);
-
-        chargeTime += Time.fixedDeltaTime;
-        if (chargeTime >= duration)
+        public void Setup(PlayerCharacterController playerCharacterController, Vector3 dashDirection)
         {
-            Exit(player);
-            return;
+            this.dashDirection = dashDirection;
+            playerCharacterController.GetCamera().FovWarp(.8f / duration, 1.22f);
         }
 
-        // Drag, opposite to current horizontal velocity
-        Vector3 horizontalVelocity = player.rb.velocity;
-        horizontalVelocity.y = 0;
-        player.rb.AddForce(-horizontalVelocity * (player.onGround ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
-
-        RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, dashForwardDirection, out hit, player.rb.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
+        public void ResetValues()
         {
-            DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
-            if (entity != null)
+            chargeTime = 0;
+            bobbingCycle = 0;
+        }
+
+        public void Move(PlayerCharacterController player)
+        {
+            Transform orientation = player.GetOrientation();
+            Rigidbody rigidbody = player.GetRigidbody();
+            
+            bobbingCycle += Time.fixedDeltaTime * rigidbody.velocity.magnitude / 2f;
+            rigidbody.AddTorque(Quaternion.Euler(0, 90, 0) * rigidbody.velocity * bobbingStrength, ForceMode.Acceleration);
+
+            Quaternion groundNormalRotation = Quaternion.FromToRotation(Vector3.up, player.GetGroundHit().normal);
+            Vector3 dashForwardDirection = (player.IsOnTheGround() ? groundNormalRotation : Quaternion.identity) * dashDirection;
+            float chargeSpeedWithFalloff = dashSpeed - Mathf.Pow(chargeTime / duration, 1f / dashSpeedFalloffPower) * dashSpeedFalloff;
+            rigidbody.AddForce(dashForwardDirection * chargeSpeedWithFalloff, ForceMode.Acceleration);
+
+            chargeTime += Time.fixedDeltaTime;
+            if (chargeTime >= duration)
             {
-                entity.Damage(player, hit.point, 1);
+                Exit(player);
+                return;
             }
 
-            bool damaged = entity != null;
-            Exit(player);
-            return;
-        }
-    }
+            // Drag, opposite to current horizontal velocity
+            Vector3 horizontalVelocity = rigidbody.velocity;
+            horizontalVelocity.y = 0;
+            rigidbody.AddForce(-horizontalVelocity * (player.IsOnTheGround() ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
 
-    private void Exit(PlayerCharacterController player)
-    {
-        player.canSwitch = true;
+            RaycastHit hit;
+            if (Physics.Raycast(player.transform.position, dashForwardDirection, out hit, rigidbody.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
+            {
+                DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
+                if (entity != null)
+                {
+                    entity.Damage(player, hit.point, 1);
+                }
 
-        if (!player.onGround)
-        {
-            player.movementHandler = new AirborneMovementHandler();
+                bool damaged = entity != null;
+                Exit(player);
+                return;
+            }
         }
-        else
+
+        private void Exit(PlayerCharacterController player)
         {
-            player.movementHandler = new GroundedMovementHandler();
+            if (!player.IsOnTheGround())
+            {
+                player.ChangeMovementHandlerToAirborne();
+            }
+            else
+            {
+                player.ChangeMovementHandlerToGrounded();
+            }
         }
     }
 }

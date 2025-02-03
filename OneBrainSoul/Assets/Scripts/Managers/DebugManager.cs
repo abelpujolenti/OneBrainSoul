@@ -1,34 +1,37 @@
-using Player.Abilities;
+using Player;
 using UnityEngine;
 
-public class DebugManager : Singleton<DebugManager>
+namespace Managers
 {
-    [SerializeField] PlayerCharacterController player;
-    [SerializeField] Vector3[] positions;
-    private void OnGUI()
+    public class DebugManager : Singleton<DebugManager>
     {
-        Event e = Event.current;
-        if ((e.type == EventType.KeyDown && e.isKey && e.character == '\0'))
+        [SerializeField] PlayerCharacterController player;
+        [SerializeField] Vector3[] positions;
+        private void OnGUI()
         {
-            switch(e.keyCode)
+            Event e = Event.current;
+            if ((e.type == EventType.KeyDown && e.isKey && e.character == '\0'))
             {
-                case KeyCode.F1:
-                    player.GetComponent<DashAbility>().enabled = true;
-                    player.GetComponent<HookAbility>().enabled = true;
-                    player.GetComponent<WallClimbAbility>().enabled = true;
-                    player.jumps = 2;
-                    break;
-                case KeyCode.F2:
-                    player.moveSpeedMultiplier = 5f;
-                    break;
+                switch(e.keyCode)
+                {
+                    case KeyCode.F1:
+                        player.UnlockDash();
+                        player.UnlockHook();
+                        player.UnlockWallClimb();
+                        player.SetJumpsAmount(2);
+                        break;
+                    case KeyCode.F2:
+                        player.SetMoveSpeedMultiplier(5f);
+                        break;
+                }
             }
         }
-    }
 
-    void SetPlayersPosition(int pos)
-    {
-        player.enabled = false;
-        player.transform.position = positions[pos];
-        player.enabled = true;
+        void SetPlayersPosition(int pos)
+        {
+            player.enabled = false;
+            player.transform.position = positions[pos];
+            player.enabled = true;
+        }
     }
 }

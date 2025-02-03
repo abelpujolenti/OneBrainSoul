@@ -82,7 +82,7 @@ namespace ECS.Entities.AI.Combat
             }
                 
             //TODO AGENT SLOTS
-            AgentSlotPosition agentSlotPosition = CombatManager.Instance.RequestPlayerStatus()
+            AgentSlotPosition agentSlotPosition = CombatManager.Instance.RequestPlayer()
                 .GetAgentSlotPosition(_context.GetVectorToTarget(), _context.GetRadius());
 
             if (agentSlotPosition == null)
@@ -112,13 +112,13 @@ namespace ECS.Entities.AI.Combat
         private void LookForPlayer()
         {
             ShowDebugMessages("Triface " + GetAgentID() + " Looking");
-            PlayerStatus playerStatus = CombatManager.Instance.RequestPlayerStatus();
+            PlayerCharacter playerCharacter = CombatManager.Instance.RequestPlayer();
             
-            SetTargetRadius(playerStatus.GetRadius());
-            SetTargetHeight(playerStatus.GetHeight());
-            SetTargetTransform(playerStatus.GetTransformComponent().GetTransform());
+            SetTargetRadius(playerCharacter.GetRadius());
+            SetTargetHeight(playerCharacter.GetHeight());
+            SetTargetTransform(playerCharacter.GetTransformComponent().GetTransform());
             
-            SetDestination(playerStatus.GetTransformComponent());
+            SetDestination(playerCharacter.GetTransformComponent());
         }
 
         private void GetCloserToPlayer()

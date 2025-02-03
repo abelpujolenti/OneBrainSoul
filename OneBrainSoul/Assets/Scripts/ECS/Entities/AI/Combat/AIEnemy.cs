@@ -327,5 +327,10 @@ namespace ECS.Entities.AI.Combat
             // TODO ?????
             return _context.GetEnemyType();
         }
+
+        public override float GetRadius()
+        {
+            return _context.GetRadius();
+        }
     }
 }
