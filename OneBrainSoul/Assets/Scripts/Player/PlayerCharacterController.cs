@@ -77,11 +77,10 @@ namespace Player
         [SerializeField] private HookAbility _hookAbility;
         [SerializeField] private LineRenderer _hookLineRenderer;
 
-        //TODO ADRI ELS DEIXO A TRUE, PER NO DONAR AL F1
-        private bool _isDashUnlocked = true;
-        private bool _isChargeUnlocked;
-        private bool _isHookUnlocked = true;
-        private bool _isWallClimbUnlocked = true;
+        public bool _isDashUnlocked = false;
+        public bool _isChargeUnlocked = false;
+        public bool _isHookUnlocked = false;
+        public bool _isWallClimbUnlocked = false;
 
         private void Start()
         {
@@ -89,7 +88,6 @@ namespace Player
             _display.SetActive(false);
             _movementHandler = new GroundedMovementHandler();
             _uiCanvas.gameObject.SetActive(true);
-            _hookCanvas.gameObject.SetActive(true);
             _startPos = transform.position;
 
             _footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
@@ -191,7 +189,11 @@ namespace Player
                 return;
             }
             
-            _dashAbility.ResetTimesDashed();
+            if (_dashAbility != null)
+            {
+                _dashAbility.ResetTimesDashed();
+            }
+
         }
 
         private void CheckInput()
@@ -386,6 +388,7 @@ namespace Player
         public void UnlockHook()
         {
             _isHookUnlocked = true;
+            _hookCanvas.gameObject.SetActive(true);
         }
 
         public void UnlockWallClimb()

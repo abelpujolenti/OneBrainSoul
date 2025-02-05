@@ -1,10 +1,12 @@
 using System.Collections;
+using ECS.Entities.AI;
+using ECS.Entities.AI.Combat;
 using Player;
 using UnityEngine;
 
 public class CombatRoom : MonoBehaviour
 {
-    [SerializeField] EnemyBase[] enemies;
+    [SerializeField] AgentEntity[] enemies;
     [SerializeField] GameObject[] walls;
     [SerializeField] float delay = .5f;
 

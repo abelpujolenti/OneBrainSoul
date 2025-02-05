@@ -658,7 +658,7 @@ GameObject:
   - component: {fileID: 7820339696052967221}
   - component: {fileID: 5799552778097444527}
   - component: {fileID: 8022381131504467490}
-  - component: {fileID: 6014076077791821045}
+  - component: {fileID: 8457788339951176688}
   - component: {fileID: 8879438813995703225}
   - component: {fileID: -2555739445945369257}
   - component: {fileID: 5004512723018151163}
@@ -877,11 +877,15 @@ MonoBehaviour:
   _hookCanvas: {fileID: 4624849087584893552}
   _crosshair: {fileID: 315589887326659704}
   _airTime: 0
-  _dashAbility: {fileID: 6014076077791821045}
+  _dashAbility: {fileID: 8457788339951176688}
   _chargeAbility: {fileID: 0}
   _wallClimbAbility: {fileID: 8879438813995703225}
   _hookAbility: {fileID: 8022381131504467490}
   _hookLineRenderer: {fileID: 3127817565339649075}
+  _isDashUnlocked: 0
+  _isChargeUnlocked: 0
+  _isHookUnlocked: 0
+  _isWallClimbUnlocked: 0
 --- !u!114 &5799552778097444527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,7 +924,7 @@ MonoBehaviour:
   _ledgeSnapDistance: 1
   _outOfCombatRechargeDuration: 2
   _inCombatRechargeDuration: 3
---- !u!114 &6014076077791821045
+--- !u!114 &8457788339951176688
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
