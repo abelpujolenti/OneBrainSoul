@@ -27,6 +27,10 @@ namespace AI.Combat.AbilityAoEColliders
         private List<Action<AgentEntity>> _actionsOnTriggerExit = new List<Action<AgentEntity>>();
 
         private Vector3 _relativePosition;
+        
+        private Quaternion _parentRotation;
+
+        private Vector3 _direction = Vector3.forward;
 
         private Action _actionAttaching;
         private Action _actionOnStartTrigger = () => { };
@@ -40,8 +44,14 @@ namespace AI.Combat.AbilityAoEColliders
         protected virtual void OnEnable()
         {
             _stopwatch.Start();
+            
             MoveToPosition(_relativePosition);
+            
             _actionAttaching();
+            
+            _parentRotation = _parentTransform.rotation;
+            
+            Rotate();
         }
 
         protected virtual void OnDisable()
@@ -160,7 +170,7 @@ namespace AI.Combat.AbilityAoEColliders
                 if (!abilityEffect.isSlowAttachedToEntity)
                 {
                     AddSlow(actionsList, abilityEffect.slowPercent);
-                    _actionsOnTriggerExit.Add(ReleaseFromSlow);
+                    _actionsOnTriggerExit.Insert(0, ReleaseFromSlow);
                 }
                 else
                 {
@@ -173,7 +183,13 @@ namespace AI.Combat.AbilityAoEColliders
             {
                 return;
             }
-            AddPush(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
+
+            if (abilityEffect.doesForceComesFromCenterOfTheArea)
+            {
+                AddPushFromCenter(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
+                return;
+            }
+            AddPushInADirection(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
         }
 
         public abstract void SetAbilityTargets(int targetsLayerMask);
@@ -226,7 +242,7 @@ namespace AI.Combat.AbilityAoEColliders
 
         private void Slow(ISlowable agent, uint slowPercent)
         {
-            agent.OnReceiveSlow(slowPercent);
+            agent.OnReceiveSlow((uint)gameObject.GetInstanceID(), slowPercent);
         }
 
         private void AddSlowOverTime(List<Action<AgentEntity>> actionsList, uint slowPercent, float duration, bool doesDecrease)
@@ -242,22 +258,35 @@ namespace AI.Combat.AbilityAoEColliders
 
         private void SlowOverTime(ISlowable agent, uint slowPercent, float duration)
         {
-            agent.OnReceiveSlowOverTime(slowPercent, duration);
+            agent.OnReceiveSlowOverTime((uint)gameObject.GetInstanceID(), slowPercent, duration);
         }
 
         private void DecreasingSlow(ISlowable agent, uint slowPercent, float duration)
         {
-            agent.OnReceiveDecreasingSlow(slowPercent, duration);
+            agent.OnReceiveDecreasingSlow((uint)gameObject.GetInstanceID(), slowPercent, duration);
         }
 
-        private void AddPush(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
+        private void AddPushFromCenter(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
         {
-            actionsList.Add(agentEntity => { Push(agentEntity, forceDirection, forceStrength); });
+            actionsList.Add(agentEntity => { PushFromCenter(agentEntity, forceDirection, forceStrength); });
         }
 
-        private void Push(IPushable agent, Vector3 forceDirection, float forceStrength)
+        private void PushFromCenter(IPushable agent, Vector3 forceDirection, float forceStrength)
         {
-            agent.OnReceivePush(forceDirection, forceStrength);
+            agent.OnReceivePushFromCenter(transform.position, forceDirection, forceStrength);
+        }
+
+        private void AddPushInADirection(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
+        {
+            actionsList.Add(agentEntity =>
+            {
+                PushInADirection(agentEntity, forceDirection, forceStrength);
+            });
+        }
+
+        private void PushInADirection(IPushable agent, Vector3 forceDirection, float forceStrength)
+        {
+            agent.OnReceivePushInADirection(transform.forward, forceDirection, forceStrength);
         }
 
         private void AddReleaseFromSlow(List<Action<AgentEntity>> actionsList)
@@ -267,7 +296,7 @@ namespace AI.Combat.AbilityAoEColliders
 
         private void ReleaseFromSlow(ISlowable agent)
         {
-            agent.OnReleaseFromSlow();
+            agent.OnReleaseFromSlow((uint)gameObject.GetInstanceID());
         }
 
         public void SetParent(Transform parentTransform)
@@ -285,6 +314,11 @@ namespace AI.Combat.AbilityAoEColliders
             _actionResizing(0);
             gameObject.SetActive(true);
             _abilityDurationCoroutine = StartCoroutine(AbilityDurationCoroutine());
+        }
+
+        private void Rotate()
+        {
+            transform.rotation = _parentRotation * Quaternion.LookRotation(_direction, Vector3.up);
         }
 
         private IEnumerator AbilityDurationCoroutine()

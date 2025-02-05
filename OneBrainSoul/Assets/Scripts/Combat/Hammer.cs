@@ -66,7 +66,7 @@ namespace Combat
         
             foreach (AgentEntity enemy in affectedEntities)
             {
-                enemy.OnReceivePush(pushVector, forceMagnitude);    
+                enemy.OnReceivePushFromCenter(transform.position, pushVector, forceMagnitude);    
             }
             //Does extra dmg and whatever
         }

@@ -7,17 +7,17 @@ using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat.Abilities;
+using ECS.Components.AI.Navigation;
 using Interfaces.AI.Combat;
 using Managers;
 using Player;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace ECS.Entities.AI.Combat
 {
     public class Triface : FreeMobilityEnemy<TrifaceContext, TrifaceAction>, INoProjectileAbility
     {
-        [FormerlySerializedAs("_trifaceSpecs")] [SerializeField] private TrifaceProperties trifaceProperties;
+        [SerializeField] private TrifaceProperties _trifaceProperties;
 
         private RectangularAbilityComponent _slamAbility;
         private RectangularAbilityAoECollider _slamAoECollider;
@@ -27,12 +27,12 @@ namespace ECS.Entities.AI.Combat
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
             
-            EnemySetup(radius, trifaceProperties);
+            EnemySetup(radius, _trifaceProperties);
 
             _utilityFunction = new TrifaceUtilityFunction();
 
-            _context = new TrifaceContext(trifaceProperties.totalHealth, radius, capsuleCollider.height,
-                trifaceProperties.sightMaximumDistance, transform, _slamAbility.GetCast());
+            _context = new TrifaceContext(_trifaceProperties.totalHealth, radius, capsuleCollider.height,
+                _trifaceProperties.sightMaximumDistance, transform, _slamAbility.GetCast());
             
             CombatManager.Instance.AddEnemy(this);
 
@@ -53,7 +53,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override void CreateAbilities()
         {
-            _slamAbility = new RectangularAbilityComponent(trifaceProperties.slamAbility);
+            _slamAbility = new RectangularAbilityComponent(_trifaceProperties.slamAbility);
             
             _slamAoECollider = InstantiateAbilityCollider<RectangularAbilityComponent, RectangularAbilityAoECollider>
                  (_slamAbility);
@@ -106,6 +106,9 @@ namespace ECS.Entities.AI.Combat
         private void Patrol()
         {
             ShowDebugMessages("Triface " + GetAgentID() + " Patrolling");
+            
+            //SetDestination(new VectorComponent(ReturnValidPositionInNavMesh()));
+
             //TODO TRIFACE PATROL
         }
 

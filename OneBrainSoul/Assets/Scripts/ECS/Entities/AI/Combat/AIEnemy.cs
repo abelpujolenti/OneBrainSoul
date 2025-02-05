@@ -24,6 +24,8 @@ namespace ECS.Entities.AI.Combat
         protected Dictionary<TAction, Action> _actions;
 
         private Coroutine _updateCoroutine;
+        
+        [SerializeField] protected Material _material;
 
         protected virtual void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties)
         {
@@ -248,7 +250,27 @@ namespace ECS.Entities.AI.Combat
 
         public override void OnReceiveHealOverTime(uint healValue, float duration)
         {
-            //TODO ENEMY HEAL OVER TIME
+            StartCoroutine(HealOverTimeCoroutine(healValue, duration));
+        }
+
+        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration)
+        {
+            float timer = 0;
+            float tickTimer = 0;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+                tickTimer += Time.deltaTime;
+
+                if (tickTimer >= _timeBetweenHealTicks)
+                {
+                    OnReceiveHeal(healValue);
+                    tickTimer = 0;
+                }
+                
+                yield return null;
+            }
         }
 
         #endregion
@@ -262,7 +284,9 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            base.OnReceiveDamage(damageValue, hitPosition);
+            DamageEffect(hitPosition);
+            
+            _material.SetColor("_DamageColor", new Color(1,0,0));
             
             SetHealth(_context.GetHealth() - damageValue);
 
@@ -275,24 +299,63 @@ namespace ECS.Entities.AI.Combat
             Destroy(gameObject);
         }
 
-        public override void OnReceiveSlow(uint slowPercent)
+        public override void OnReceiveDamageOverTime(uint damageValue, float duration)
+        {
+            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration));
+        }
+
+        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration)
+        {
+            float timer = 0;
+            float tickTimer = 0;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+                tickTimer += Time.deltaTime;
+
+                if (tickTimer >= _timeBetweenDamageTicks)
+                {
+                    OnReceiveDamage(damageValue, transform.position);
+                    tickTimer = 0;
+                }
+                
+                yield return null;
+            }
+        }
+
+        protected override IEnumerator DecreaseDamageCooldown()
+        {
+            base.DecreaseDamageCooldown();
+            
+            _material.SetColor("_DamageColor", new Color(1,1,1));
+            
+            yield break;
+        }
+
+        public override void OnReceiveSlow(uint slowID, uint slowPercent)
         {
             //TODO ENEMY SLOW
         }
 
-        public override void OnReceiveSlowOverTime(uint slowPercent, float duration)
+        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration)
         {
             //TODO ENEMY SLOW OVER TIME
         }
 
-        public override void OnReceiveDecreasingSlow(uint slowPercent, float duration)
+        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
         {
             //TODO ENEMY DECREASING SLOW
         }
 
-        public override void OnReceivePush(Vector3 forceDirection, float forceStrength)
+        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow)
         {
-            base.OnReceivePush(forceDirection, forceStrength);
+            throw new NotImplementedException();
         }
 
         protected virtual void OnDestroy()

@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Combat.Contexts;
+using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
 using AI.Combat.Steering;
 using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using Managers;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 using Utilities;
@@ -20,9 +22,15 @@ namespace ECS.Entities.AI.Combat
     {
         [SerializeField] protected NavMeshAgentSpecs _navMeshAgentSpecs;
 
+        [SerializeField] private NavMeshSurface _navMeshSurface;
+
         [SerializeField] protected NavMeshAgent _navMeshAgent;
         
         private NavMeshAgentComponent _navMeshAgentComponent;
+
+        [SerializeField] protected List<Vector3> _areaToPatrol;
+        
+        protected AgentSlot _agentSlot;
         
         protected VectorComponent _lastDestination;
         
@@ -153,6 +161,33 @@ namespace ECS.Entities.AI.Combat
             ContinueNavigation();
         }
 
+        protected Vector3 ReturnValidPositionInNavMesh()
+        {
+            Vector3 randomPosition = Vector3.down;
+            Vector3 sampledPosition;
+
+            do
+            {
+                
+                
+            } while (!SampleSurfacePosition(randomPosition, out sampledPosition));
+
+            return sampledPosition;
+        }
+
+        private bool SampleSurfacePosition(Vector3 position, out Vector3 sampledPosition)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(position, out hit, 2f, NavMesh.AllAreas))
+            {
+                sampledPosition = hit.position;
+                return true;
+            }
+
+            sampledPosition = Vector3.zero;
+            return false;
+        }
+
         public NavMeshAgentComponent GetNavMeshAgentComponent()
         {
             return _navMeshAgentComponent;
@@ -182,6 +217,13 @@ namespace ECS.Entities.AI.Combat
         {
             base.NotCastingAnAbility();
             StopNavigation();
+        }
+
+        public override void OnReceiveSlow(uint slowID, uint slowPercent)
+        {
+            base.OnReceiveSlow(slowID, slowPercent);
+            
+            //TODO SLOW FREE MOBILITY
         }
 
         protected override void OnDestroy()

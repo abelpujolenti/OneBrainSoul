@@ -1,4 +1,7 @@
-﻿using ECS.Entities.AI;
+﻿using System;
+using System.Collections;
+using AI.Combat.Position;
+using ECS.Entities.AI;
 using Managers;
 using Player.Camera;
 using UnityEngine;
@@ -9,11 +12,13 @@ namespace Player
     {
         [SerializeField] private FirstPersonCamera _camera;
 
-        [SerializeField] private float _maxHealth;
+        [SerializeField] private uint _maxHealth;
         [SerializeField] private float _agentsPositionRadius;
         [SerializeField] private float _damageEffectDuration;
+        
+        protected AgentSlot _agentSlot;
 
-        private float _health;
+        private uint _health;
         private float _height;
         private float _radius;
 
@@ -39,60 +44,177 @@ namespace Player
             }
             
             Debug.Log("Player Damage : " + damageValue);
+
+            _health -= damageValue;
+
+            if (_health == 0)
+            {
+                //TODO PLAYER DIE;
+                return;
+            }
             
-            base.OnReceiveDamage(damageValue, hitPosition);
+            DamageEffect(hitPosition);
             
             PostProcessingManager.Instance.DamageEffect(_damageEffectDuration);
             _camera.ScreenShake(_damageEffectDuration * .25f, 1f);
             
             StartCoroutine(DecreaseDamageCooldown());
-            //TODO MANAGE PLAYER HEALTH
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration)
         {
-            base.OnReceiveDamageOverTime(damageValue, duration);
-            
             Debug.Log("Player Damage Over Time: " + damageValue + " - Duration: " + duration);
+
+            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration));
+        }
+
+        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration)
+        {
+            float timer = 0;
+            float tickTimer = 0;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+                tickTimer += Time.deltaTime;
+
+                if (tickTimer >= _timeBetweenDamageTicks)
+                {
+                    OnReceiveDamage(damageValue, transform.position);
+                    tickTimer = 0;
+                }
+                
+                yield return null;
+            }
         }
 
         public override void OnReceiveHeal(uint healValue)
         {
-            Debug.Log("Player Heal: " + healValue);
+            _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
         }
 
         public override void OnReceiveHealOverTime(uint healValue, float duration)
         {
             Debug.Log("Player Heal Over Time: " + healValue + " - Duration: " + duration);
+
+            StartCoroutine(HealOverTimeCoroutine(healValue, duration));
         }
 
-        public override void OnReceiveSlow(uint slowPercent)
+        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration)
+        {
+            float timer = 0;
+            float tickTimer = 0;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+                tickTimer += Time.deltaTime;
+
+                if (tickTimer >= _timeBetweenHealTicks)
+                {
+                    OnReceiveHeal(healValue);
+                    tickTimer = 0;
+                }
+                
+                yield return null;
+            }
+        }
+
+        public override void OnReceiveSlow(uint slowID, uint slowPercent)
         {
             Debug.Log("Player Slow: " + slowPercent);
+
+            if (_slowSubscriptions.ContainsKey(slowID))
+            {
+                return;
+            }
+            
+            _slowSubscriptions.Add(slowID, _slowEffects.Count);
+            _slowEffects.Add(slowPercent);
         }
 
-        public override void OnReceiveSlowOverTime(uint slowPercent, float duration)
+        public override void OnReleaseFromSlow(uint slowID)
+        {
+            Debug.Log("Player Release From Slow");
+
+            _slowEffects.RemoveAt(_slowSubscriptions[slowID]);
+            _slowSubscriptions.Remove(slowID);
+        }
+
+        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration)
         {
             Debug.Log("Player Slow Over Time: " + slowPercent + " - Duration: " + duration);
+
+            if (_slowCoroutinesSubscriptions.ContainsKey(slowID))
+            {
+                StopCoroutine(_slowCoroutinesSubscriptions[slowID].Item2);
+                _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
+                
+                _slowCoroutinesSubscriptions[slowID] = new Tuple<int, Coroutine>(_slowEffects.Count,
+                    StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration)));
+                _slowEffects.Add(slowPercent);
+                return;
+            }
+
+            _slowCoroutinesSubscriptions.Add(slowID, new Tuple<int, Coroutine>(_slowEffects.Count,
+                StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration))));
+            _slowEffects.Add(slowPercent);
         }
 
-        public override void OnReceiveDecreasingSlow(uint slowPercent, float duration)
+        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration)
+        {
+            float timer = 0;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+
+                //TODO SLOW EFFECT
+                
+                yield return null;
+            }
+
+            _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
+            _slowCoroutinesSubscriptions.Remove(slowID);
+        }
+
+        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
         {
             Debug.Log("Player Decreasing Slow: " + slowPercent + " - Duration: " + duration);
+
+            if (_slowCoroutinesSubscriptions.ContainsKey(slowID))
+            {
+                StopCoroutine(_slowCoroutinesSubscriptions[slowID].Item2);
+                _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
+                
+                _slowCoroutinesSubscriptions[slowID] = new Tuple<int, Coroutine>(_slowEffects.Count,
+                    StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration)));
+                _slowEffects.Add(slowPercent);
+                return;
+            }
+
+            _slowCoroutinesSubscriptions.Add(slowID, new Tuple<int, Coroutine>(_slowEffects.Count,
+                StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration))));
+            _slowEffects.Add(slowPercent);
         }
 
-        public override void OnReleaseFromSlow()
+        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slot)
         {
-            base.OnReleaseFromSlow();
-            
-            Debug.Log("Player Release From Slow");
-        }
+            float timer = 0;
 
-        public override void OnReceivePush(Vector3 forceDirection, float forceStrength)
-        {
-            base.OnReceivePush(forceDirection, forceStrength);
-            
-            Debug.Log("Player Push: " + forceDirection + " - Strength: " + forceStrength);
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+
+                _slowEffects[slot] = Mathf.Lerp(slowPercent, 0, timer);
+                
+                //TODO DECREASE SLOW EFFECT
+                
+                yield return null;
+            }
+
+            _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
+            _slowCoroutinesSubscriptions.Remove(slowID);
         }
 
         public float GetHeight()
