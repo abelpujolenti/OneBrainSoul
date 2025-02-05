@@ -32,7 +32,7 @@ MonoBehaviour:
     doesExplodeOnVanishOverTime: 0
   abilityAoEType: 0
   abilityAoE:
-    duration: 3
+    duration: 0
     direction: {x: 0, y: 0, z: 1}
     height: 2
     width: 2
@@ -40,9 +40,9 @@ MonoBehaviour:
     radius: 0
     customMeshPrefab: {fileID: 0}
     scale: 0
-    doesHeightChangeOverTheTime: 1
-    doesWidthChangeOverTheTime: 1
-    doesLengthChangeOverTheTime: 1
+    doesHeightChangeOverTheTime: 0
+    doesWidthChangeOverTheTime: 0
+    doesLengthChangeOverTheTime: 0
     doesRadiusChangeOverTheTime: 0
     doesScaleChangeOverTheTime: 0
     heightChangeOverTime:
@@ -130,12 +130,12 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   abilityTrigger:
-    doesEffectOnStart: 0
+    doesEffectOnStart: 1
     doesEffectOnTheDuration: 0
     doesEffectOnEnd: 0
   abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
-    hasAnEffectOnHealth: 0
+    hasAnEffectOnHealth: 1
     healthModificationValue: 50
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
@@ -147,6 +147,7 @@ MonoBehaviour:
     doesApplyAForce: 0
     forceDirection: {x: 0, y: 1, z: 0}
     forceStrength: 5
+    doesForceComesFromCenterOfTheArea: 0
   doesItTriggerOnTriggerEnter: 0
   abilityEffectOnHealthTypeOnTheDuration: 0
   abilityEffectOnTheDuration:
@@ -162,6 +163,7 @@ MonoBehaviour:
     doesApplyAForce: 0
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
+    doesForceComesFromCenterOfTheArea: 0
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -176,4 +178,5 @@ MonoBehaviour:
     doesApplyAForce: 0
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
+    doesForceComesFromCenterOfTheArea: 0
   doesItTriggerOnTriggerExit: 0

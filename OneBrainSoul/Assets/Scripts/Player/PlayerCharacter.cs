@@ -5,6 +5,7 @@ using ECS.Entities.AI;
 using Managers;
 using Player.Camera;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Player
 {
@@ -24,6 +25,8 @@ namespace Player
 
         private void Start()
         {
+            _health = _maxHealth;
+
             _receiveDamageCooldown = GameManager.Instance.GetPlayerReceiveDamageCooldown();
 
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
@@ -45,10 +48,11 @@ namespace Player
             
             Debug.Log("Player Damage : " + damageValue);
 
-            _health -= damageValue;
+            _health = (uint)Mathf.Max(0f, _health - damageValue);
 
             if (_health == 0)
             {
+                SceneManager.LoadScene("ControllerTest", LoadSceneMode.Single);
                 //TODO PLAYER DIE;
                 return;
             }
