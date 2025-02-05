@@ -246,7 +246,10 @@ MonoBehaviour:
   _rigidbody: {fileID: 942404334494463323}
   _damageParticlePrefab: {fileID: 1782360678715371482, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
     type: 3}
+  _material: {fileID: 2100000, guid: aca85766c475a3541b409606e2da2b2e, type: 2}
   _showMessages: 0
   _navMeshAgentSpecs: {fileID: 11400000, guid: d537537af89fa8145ac55661ac62efa7, type: 2}
+  _navMeshSurface: {fileID: 0}
   _navMeshAgent: {fileID: 1709624107108510629}
-  _trifaceSpecs: {fileID: 11400000, guid: 1dc903e7e219eb4439de4613a464523d, type: 2}
+  _areaToPatrol: []
+  _trifaceProperties: {fileID: 11400000, guid: 1dc903e7e219eb4439de4613a464523d, type: 2}
