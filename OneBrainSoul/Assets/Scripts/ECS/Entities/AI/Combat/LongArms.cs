@@ -9,13 +9,12 @@ using ECS.Components.AI.Combat.Abilities;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace ECS.Entities.AI.Combat
 {
     public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>, INoProjectileAbility, IProjectileAbility
     {
-        [FormerlySerializedAs("_longArmsSpecs")] [SerializeField] private LongArmsProperties longArmsProperties;
+        [SerializeField] private LongArmsProperties _longArmsProperties;
         
         private void Start()
         {
@@ -24,14 +23,14 @@ namespace ECS.Entities.AI.Combat
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
 
-            _context = new LongArmsContext(longArmsProperties.totalHealth, radius, capsuleCollider.height,
-                longArmsProperties.sightMaximumDistance, transform);
+            _context = new LongArmsContext(_longArmsProperties.totalHealth, radius, capsuleCollider.height,
+                _longArmsProperties.sightMaximumDistance, transform);
             
             CombatManager.Instance.AddEnemy(this);
 
             _entityType = EntityType.LONG_ARMS;
             
-            EnemySetup(radius, longArmsProperties);
+            EnemySetup(radius, _longArmsProperties);
         }
 
         #region AI LOOP
@@ -137,5 +136,11 @@ namespace ECS.Entities.AI.Combat
             base.OnDestroy();
             CombatManager.Instance.OnEnemyDefeated(this);
         }
+
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        {}
+
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        {}
     }
 }

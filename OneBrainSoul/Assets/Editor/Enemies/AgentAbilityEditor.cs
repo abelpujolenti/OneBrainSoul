@@ -401,6 +401,8 @@ namespace Editor.Enemies
         {
             Vector3Field(ref abilityEffect.forceDirection, "Force Direction");
             FloatField(ref abilityEffect.forceStrength, 0, "Force Strength");
+            
+            ToggleField(ref abilityEffect.doesForceComesFromCenterOfTheArea, "Does Force Comes From The Center Of The Area");
         }
 
         private void AbilityProjectile(AbilityProjectile abilityProjectile)
