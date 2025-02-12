@@ -76,6 +76,17 @@ namespace Player
         [SerializeField] private WallClimbAbility _wallClimbAbility;
         [SerializeField] private HookAbility _hookAbility;
         [SerializeField] private LineRenderer _hookLineRenderer;
+        [SerializeField] HookUI _hookUI;
+
+        [Range(1, 7)]
+        [SerializeField] private int _maxHookCharges;
+        [Range(0.5f, 20f)]
+        [SerializeField] private float _outOfCombatRechargeDuration;
+        [Range(0.5f, 20f)]
+        [SerializeField] private float _inCombatRechargeDuration;
+
+        private int _hookCharges;
+        private float _rechargeTime;
 
         public bool _isDashUnlocked = false;
         public bool _isChargeUnlocked = false;
@@ -96,6 +107,9 @@ namespace Player
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
             _hookMovementHandler = new HookMovementHandler(_hookLineRenderer);
             _hookAbility.Setup(_hookLineRenderer);
+
+            _hookCharges = _maxHookCharges;
+            _hookUI.SetMaxCharges(_maxHookCharges);
         }
 
         private void Update()
@@ -105,6 +119,7 @@ namespace Player
             HandWobble();
             CalculateAirTime();
             CalculateCooldowns();
+            UpdateCharges();
         }
     
         private void FixedUpdate()
@@ -254,6 +269,26 @@ namespace Player
             _ability2Time = Mathf.Max(0f, _ability2Time - Time.deltaTime);
         }
 
+        private void UpdateCharges()
+        {
+            if (IsInCombat() &&
+                _rechargeTime > _inCombatRechargeDuration ||
+                !IsInCombat() &&
+                _rechargeTime > _outOfCombatRechargeDuration)
+            {
+                _hookCharges++;
+                _rechargeTime = 0f;
+            }
+
+            _hookUI.UpdateUI(_hookCharges, _rechargeTime,
+                IsInCombat() ? _inCombatRechargeDuration : _outOfCombatRechargeDuration);
+
+            if (_hookCharges < _maxHookCharges)
+            {
+                _rechargeTime += Time.deltaTime;
+            }
+        }
+
         private void SoundUpdate()
         {
             //Walk sound
@@ -378,6 +413,7 @@ namespace Player
         public void UnlockDash()
         {
             _isDashUnlocked = true;
+            _hookCanvas.gameObject.SetActive(true);
         }
 
         public void UnlockCharge()
@@ -421,9 +457,9 @@ namespace Player
             _movementHandler = _chargeMovementHandler;
         }
 
-        public void ChangeMovementHandlerToHook(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap)
+        public void ChangeMovementHandlerToHook(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
         {
-            _hookMovementHandler.Setup(startPos, endPos, endVisualPos, snap);
+            _hookMovementHandler.Setup(startPos, endPos, endVisualPos, snap, smash);
             _hookMovementHandler.ResetValues();
             _movementHandler = _hookMovementHandler;
         }
@@ -449,6 +485,16 @@ namespace Player
         public void SetJumpsAmount(int jumps)
         {
             _jumps = jumps;
+        }
+
+        public int GetCharges()
+        {
+            return _hookCharges;
+        }
+
+        public void ConsumeCharge()
+        {
+            _hookCharges--;
         }
 
         public void SetMoveSpeedMultiplier(float moveSpeedMultiplier)

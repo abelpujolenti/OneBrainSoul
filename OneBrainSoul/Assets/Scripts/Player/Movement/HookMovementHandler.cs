@@ -1,4 +1,5 @@
 using Managers;
+using Player.Effects;
 using UnityEngine;
 
 namespace Player.Movement
@@ -12,6 +13,7 @@ namespace Player.Movement
         public static float speedFalloffPower = 3f;
         public static float bobbingStrength = .65f;
         public static float snapDownwardsStrength = 6f;
+        public static float smashAdditionalSpeed = 90f;
 
         public static float delay = 0.2f;
         public static float delayHitImpact = 0.025f;
@@ -26,6 +28,7 @@ namespace Player.Movement
         float hookDistance;
         float delayTime = 0f;
         float bobbingCycle = 0f;
+        bool smash = false;
         Vector3 movementDirection = Vector3.zero;
         LineRenderer line;
 
@@ -34,12 +37,13 @@ namespace Player.Movement
             line = lineRenderer;
         }
 
-        public void Setup(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap)
+        public void Setup(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
         {
             this.startPos = startPos;
             this.endPos = endPos;
             this.endVisualPos = endVisualPos;
             this.snap = snap;
+            this.smash = smash;
             hookDistance = Vector3.Distance(this.endPos, this.startPos);
             line.enabled = true;
             line.positionCount = lineVertices;
@@ -86,6 +90,11 @@ namespace Player.Movement
                         hookDistance = Vector3.Distance(endPos, startPos);
                         player.GetCamera().FovWarp(2f * 60f / distanceToTarget, 2.5f);
                         player.GetRigidbody().AddForce(Mathf.Max(0f, -player.GetRigidbody().velocity.y) * Vector3.up, ForceMode.VelocityChange);
+
+                        if (smash)
+                        {
+                            PostProcessingManager.Instance.ChargeRunEffect(distanceToTarget * 7f / (speed + smashAdditionalSpeed));
+                        }
                     }
                 }
 
@@ -95,6 +104,7 @@ namespace Player.Movement
 
             float progress = 1f - Mathf.Min(1f, distanceToTarget / hookDistance);
             float speedWithFalloff = speed - Mathf.Pow(progress, 1f / speedFalloffPower) * speedFalloff;
+            speedWithFalloff = smash ? speedWithFalloff + smashAdditionalSpeed : speedWithFalloff;
             player.GetRigidbody().velocity = movementDirection * speedWithFalloff;
 
             bobbingCycle += Time.fixedDeltaTime * player.GetRigidbody().velocity.magnitude / 2f;
@@ -146,6 +156,11 @@ namespace Player.Movement
 
         private void Exit(PlayerCharacterController player)
         {
+            if (smash)
+            {
+                Smash(player);
+            }
+
             line.enabled = false;
             
             if (!player.IsOnTheGround())
@@ -156,6 +171,19 @@ namespace Player.Movement
             {
                 player.ChangeMovementHandlerToGrounded();
             }
+        }
+
+        private void Smash(PlayerCharacterController player)
+        {
+            player.GetCamera().ScreenShake(.2f, .8f);
+
+            Hitstop hitstop = player.GetComponent<Hitstop>();
+            bool damaged = false;
+
+
+            hitstop.Add(damaged ? .2f : .12f);
+            player.GetCamera().ScreenShake(damaged ? .25f : .2f, damaged ? 1.3f : .8f);
+            hitstop.AddAftershock(damaged ? .23f : .2f);
         }
 
         public bool ShouldGravityApply(PlayerCharacterController player)
