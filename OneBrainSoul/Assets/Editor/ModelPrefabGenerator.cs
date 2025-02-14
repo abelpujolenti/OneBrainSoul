@@ -67,6 +67,13 @@ public class ModelPrefabGenerator : UnityEditor.Editor
         Directory.CreateDirectory("Assets/Prefabs/" + outputPath + "/" + dir);
         string localPath = "Assets/Prefabs/" + outputPath + "/" + dir + "/" + prefab.name + ".prefab";
 
+        var a = AssetDatabase.LoadAssetAtPath<GameObject>(localPath);
+        if (a !=null)
+        {
+            a.GetComponent<MeshFilter>().sharedMesh = prefab.GetComponent<MeshFilter>().sharedMesh;
+            return;
+        }
+
         PrefabUtility.SaveAsPrefabAssetAndConnect(prefab, localPath, InteractionMode.UserAction);
     }
 
