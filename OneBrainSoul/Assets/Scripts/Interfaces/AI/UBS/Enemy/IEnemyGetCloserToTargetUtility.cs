@@ -1,7 +1,7 @@
-﻿using Interfaces.AI.UBS.BaseInterfaces.Get;
+﻿using Interfaces.AI.UBS.Enemy.Triface.BaseInterfaces;
 
 namespace Interfaces.AI.UBS.Enemy
 {
-    public interface IEnemyGetCloserToTargetUtility : IHasATarget, IIsAttacking, IGetDistanceToTarget
+    public interface IEnemyGetCloserToTargetUtility : ITrifaceHasATargetForSlam
     {}
 }

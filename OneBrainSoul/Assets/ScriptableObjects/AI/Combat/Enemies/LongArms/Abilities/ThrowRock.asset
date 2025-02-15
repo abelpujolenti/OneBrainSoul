@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2234727f8a9e4c4e84f55a4d8df693f9, type: 3}
+  m_Name: ThrowRock
+  m_EditorClassIdentifier: 
+  canAffectCaster: 0
+  abilityTarget: 1
+  abilityCast:
+    minimumRangeToCast: 0
+    maximumRangeToCast: 300
+    directionOfDetection: {x: 0, y: 0, z: 1}
+    minimumAngleToCast: 30
+    canCancelCast: 0
+    maximumAngleToCancelCast: 0
+    timeToCast: 0
+    cooldown: 0.2
+    duration: 0
+  abilityTrigger:
+    hasAnEffectOnStart: 1
+    hasAnEffectOnTheDuration: 0
+    hasAnEffectOnEnd: 0
+  abilityEffectOnHealthTypeOnStart: 0
+  abilityEffectOnStart:
+    hasAnEffectOnHealth: 1
+    healthModificationValue: 2
+    effectOnHealthDuration: 0
+    isEffectOnHealthAttachedToEntity: 0
+    doesSlow: 0
+    doesDecreaseOverTime: 0
+    slowPercent: 0
+    slowDuration: 0
+    isSlowAttachedToEntity: 0
+    doesApplyAForce: 0
+    forceDirection: {x: 0, y: 0, z: 0}
+    forceStrength: 0
+    doesForceComesFromCenterOfTheArea: 0
+  abilityEffectOnHealthTypeOnTheDuration: 0
+  abilityEffectOnTheDuration:
+    hasAnEffectOnHealth: 0
+    healthModificationValue: 0
+    effectOnHealthDuration: 0
+    isEffectOnHealthAttachedToEntity: 0
+    doesSlow: 0
+    doesDecreaseOverTime: 0
+    slowPercent: 0
+    slowDuration: 0
+    isSlowAttachedToEntity: 0
+    doesApplyAForce: 0
+    forceDirection: {x: 0, y: 0, z: 0}
+    forceStrength: 0
+    doesForceComesFromCenterOfTheArea: 0
+  abilityEffectOnHealthTypeOnEnd: 0
+  abilityEffectOnEnd:
+    hasAnEffectOnHealth: 0
+    healthModificationValue: 0
+    effectOnHealthDuration: 0
+    isEffectOnHealthAttachedToEntity: 0
+    doesSlow: 0
+    doesDecreaseOverTime: 0
+    slowPercent: 0
+    slowDuration: 0
+    isSlowAttachedToEntity: 0
+    doesApplyAForce: 0
+    forceDirection: {x: 0, y: 0, z: 0}
+    forceStrength: 0
+    doesForceComesFromCenterOfTheArea: 0
+  abilityAoEType: 1
+  abilityAoE:
+    isAttachedToCaster: 0
+    relativePositionToCaster: {x: 0, y: 0, z: 0}
+    duration: 4
+    direction: {x: 0, y: 0, z: 1}
+    height: 0
+    width: 0
+    length: 0
+    radius: 1
+    customMeshPrefab: {fileID: 0}
+    scale: 0
+    doesHeightChangeOverTheTime: 0
+    doesWidthChangeOverTheTime: 0
+    doesLengthChangeOverTheTime: 0
+    doesRadiusChangeOverTheTime: 0
+    doesScaleChangeOverTheTime: 0
+    doesXScaleChangeOverTheTime: 0
+    doesYScaleChangeOverTheTime: 0
+    doesZScaleChangeOverTheTime: 0
+    heightChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    widthChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    lengthChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    radiusChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    scaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    XScaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    YScaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ZScaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  doesItTriggerOnTriggerEnter: 0
+  doesItTriggerOnTriggerExit: 0
+  abilityProjectile:
+    projectilePrefab: {fileID: 5930364971465029039, guid: 61a7ac1bf6057534d8aab30f6f4b1fa1,
+      type: 3}
+    relativePositionToCaster: {x: 0, y: 2, z: 2}
+    makesParabola: 0
+    projectileSpeed: 500
+    instances: 30
+    maximumDispersion: 5
+    doesVanishOnImpact: 0
+    doesVanishOverTime: 0
+    timeToVanish: 0
+    doesExplodeOnVanishOverTime: 0

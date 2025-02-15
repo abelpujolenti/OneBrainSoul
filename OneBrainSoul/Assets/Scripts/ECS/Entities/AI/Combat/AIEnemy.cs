@@ -1,12 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AI.Combat.AbilityAoEColliders;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
-using AI.Combat.Enemy;
 using AI.Combat.ScriptableObjects;
-using ECS.Components.AI.Combat.Abilities;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
@@ -27,11 +24,24 @@ namespace ECS.Entities.AI.Combat
         
         [SerializeField] protected Material _material;
 
-        protected virtual void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties)
+        [SerializeField] protected Animator _animator;
+
+        [SerializeField] private bool _isMarked;
+
+        private Vector3 _directionToRotate;
+
+        protected float _normalRotationSpeed;
+        protected float _currentRotationSpeed;
+        
+        protected bool _isRotating;
+
+        protected virtual void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties, EntityType entityType)
         {
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
+
+            _currentRotationSpeed = aiEnemyProperties.normalRotationSpeed;
             
-            Setup(radius + aiEnemyProperties.agentsPositionRadius);
+            Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
             InitiateDictionaries();
             
@@ -39,71 +49,6 @@ namespace ECS.Entities.AI.Combat
         }
 
         protected abstract void CreateAbilities();
-
-        protected TAbilityCollider InstantiateAbilityCollider<TAbilityComponent, TAbilityCollider>
-            (TAbilityComponent abilityComponent)
-                where TAbilityCollider : AbilityAoECollider<TAbilityComponent>
-                where TAbilityComponent : AbilityComponent
-        {
-            GameObject colliderObject = Instantiate(ReturnPrefab(abilityComponent.GetAoEType()));
-            
-            TAbilityCollider abilityCollider = colliderObject.GetComponent<TAbilityCollider>();
-            
-            abilityCollider.SetAbilitySpecs(transform, abilityComponent);
-
-            switch (abilityComponent.GetTarget())
-            {
-                case AbilityTarget.PLAYER:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.PLAYER));
-                    break;
-                
-                case AbilityTarget.TRIFACE:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.TRIFACE));
-                    break;
-                
-                case AbilityTarget.LONG_ARMS:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.LONG_ARMS));
-                    break;
-                
-                case AbilityTarget.LONG_ARMS_BASE:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(EntityType.LONG_ARMS_BASE));
-                    break;
-                
-                case AbilityTarget.OTHER_ENEMY:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEnemyLayer());
-                    break;
-                
-                case AbilityTarget.OTHER_ENEMY_EQUAL_OF_MY_TYPE:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetEntityTypeLayer(_entityType));
-                    break;
-                
-                case AbilityTarget.OTHER_ENEMY_DIFFERENT_FROM_MY_TYPE:
-                    abilityCollider.SetAbilityTargets(GameManager.Instance.GetDifferentEnemiesLayerFromMyType(_entityType));
-                    break;
-            }
-            
-            colliderObject.SetActive(false);
-
-            return abilityCollider;
-        }
-
-        private GameObject ReturnPrefab(AbilityAoEType abilityAoEType)
-        {
-            switch (abilityAoEType)
-            {
-                case AbilityAoEType.RECTANGULAR:
-                    return CombatManager.Instance.GetRectanglePrefab();
-                
-                case AbilityAoEType.SPHERICAL:
-                    return CombatManager.Instance.GetCirclePrefab();
-                
-                case AbilityAoEType.CONICAL:
-                    //return _coneAbilityColliderPrefab;
-                    break;
-            }
-
-            return null;
-        }
         
         #region Context
         
@@ -117,31 +62,6 @@ namespace ECS.Entities.AI.Combat
         protected void SetHealth(uint health)
         {
             _context.SetHealth(health);
-        }
-
-        protected void SetTargetRadius(float rivalRadius)
-        {
-            _context.SetTargetRadius(rivalRadius);
-        }
-
-        protected void SetTargetHeight(float rivalHeight)
-        {
-            _context.SetTargetHeight(rivalHeight);
-        }
-
-        public void SetDistanceToTarget(float distanceToRival)
-        {
-            _context.SetDistanceToTarget(distanceToRival);
-        }
-
-        protected void SetIsSeeingATarget(bool isSeeingATarget)
-        {
-            _context.SetIsSeeingATarget(isSeeingATarget);
-        }
-
-        protected void SetHasATarget(bool hasATarget)
-        {
-            _context.SetHasATarget(hasATarget);
         }
 
         public void SetIsFighting(bool isFighting)
@@ -159,16 +79,6 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsAirborne(isAirborne);
         }
 
-        public void SetVectorToRival(Vector3 vectorToRival)
-        {
-            _context.SetVectorToTarget(vectorToRival);
-        }
-
-        protected void SetTargetTransform(Transform rivalTransform)
-        {
-            _context.SetTargetTransform(rivalTransform);
-        }
-
         protected virtual void CastingAnAbility()
         {
             _context.SetICastingAnAbility(true);
@@ -177,22 +87,6 @@ namespace ECS.Entities.AI.Combat
         protected virtual void NotCastingAnAbility()
         {
             _context.SetICastingAnAbility(false);
-        }
-
-        protected void UpdateVectorToTarget()
-        {
-            if (!_context.HasATarget())
-            {
-                return;
-            }
-
-            Vector3 rivalPosition = _context.GetTargetTransform().position;
-            Vector3 agentPosition = transform.position;
-            
-            rivalPosition.y -= _context.GetTargetHeight() / 2;
-            agentPosition.y -= _context.GetHeight() / 2;
-            
-            _context.SetVectorToTarget(rivalPosition - agentPosition);
         }
 
         #endregion
@@ -229,15 +123,41 @@ namespace ECS.Entities.AI.Combat
 
         protected abstract void UpdateVisibleTargets();
 
+        protected void Rotate()
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation,
+                Quaternion.LookRotation(GetDirectionToRotate()), _currentRotationSpeed * Time.deltaTime);
+        }
+
+        protected void SetDirectionToRotate(Vector3 directionToRotate)
+        {
+            directionToRotate.y = 0;
+            _directionToRotate = directionToRotate.normalized;
+        }
+
+        protected Vector3 GetDirectionToRotate()
+        {
+            return _directionToRotate;
+        }
+
         #endregion
 
         #region Abilities Managing
 
         #region Own Abilities
 
-        protected abstract void PutAbilityOnCooldown(AbilityComponent abilityComponent);
+        protected IEnumerator StartCooldownCoroutine(AbilityCast abilityCast)
+        {
+            abilityCast.StartCooldown();
+            
+            NotCastingAnAbility();
 
-        protected abstract IEnumerator StartCooldownCoroutine(AbilityComponent abilityComponent);
+            while (abilityCast.IsOnCooldown())
+            {
+                abilityCast.DecreaseCooldown();
+                yield return null;
+            }
+        }
 
         #endregion
 
@@ -326,11 +246,9 @@ namespace ECS.Entities.AI.Combat
 
         protected override IEnumerator DecreaseDamageCooldown()
         {
-            base.DecreaseDamageCooldown();
+            yield return base.DecreaseDamageCooldown();
             
             _material.SetColor("_DamageColor", new Color(1,1,1));
-            
-            yield break;
         }
 
         public override void OnReceiveSlow(uint slowID, uint slowPercent)
@@ -364,36 +282,88 @@ namespace ECS.Entities.AI.Combat
             {
                 EventsManager.OnAgentDefeated(GetAgentID());
             }
-            //TODO HEAL PLAYER IF MARKED
-        }
 
-        #endregion
-
-        #endregion
-        
-        ///////////////TODO ERASE
-        [SerializeField] private bool _showMessages;
-
-        protected void ShowDebugMessages(string message)
-        {
-            if (!_showMessages)
+            if (!_isMarked)
             {
                 return;
             }
             
-            Debug.Log(message);
+            CombatManager.Instance.HealPlayer();
         }
-        ///////////////
 
-        public EnemyType GetAIEnemyType()
-        {
-            // TODO ?????
-            return _context.GetEnemyType();
-        }
+        #endregion
+
+        #endregion
 
         public override float GetRadius()
         {
             return _context.GetRadius();
+        }
+
+        public override float GetHeight()
+        {
+            return _context.GetHeight();
+        }
+        
+        /////////////////////////DEBUG
+
+        [SerializeField] protected bool _showFov;
+        [SerializeField] protected Color _fovColor;
+
+        protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,
+            int segments)
+        {
+
+            float fovAngle = abilityCast.minimumAngleToCast;
+            
+            if (abilityCast.canCancelCast)
+            {
+                fovAngle = hasATarget ? abilityCast.maximumAngleToCancelCast : abilityCast.minimumAngleToCast;
+            }
+
+            float minimumRange = abilityCast.minimumRangeToCast;
+            float maximumRange = abilityCast.maximumRangeToCast;
+            
+            DrawCone(color, fovAngle, minimumRange, maximumRange, origin, direction, segments);
+        }
+
+        protected void DrawCone(Color color, float fovAngle, float minimumRange, float maximumRange, Vector3 origin, Vector3 direction, int segments)
+        {
+            Gizmos.color = color;
+
+            float maxRadius = Mathf.Tan(fovAngle * Mathf.Deg2Rad * 0.5f) * maximumRange;
+            float minRadius = Mathf.Tan(fovAngle * Mathf.Deg2Rad * 0.5f) * minimumRange;
+
+            Vector3 minBaseCenter = origin + direction * minimumRange;
+            Vector3 maxBaseCenter = origin + direction * maximumRange;
+
+            Vector3 prevMinPoint = Vector3.zero;
+            Vector3 prevMaxPoint = Vector3.zero;
+            float angleStep = 360f / segments;
+
+            Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = i * angleStep;
+                float rad = angle * Mathf.Deg2Rad;
+                Vector3 localOffsetMin = new Vector3(Mathf.Cos(rad) * minRadius, Mathf.Sin(rad) * minRadius, 0);
+                Vector3 localOffsetMax = new Vector3(Mathf.Cos(rad) * maxRadius, Mathf.Sin(rad) * maxRadius, 0);
+
+                Vector3 minPoint = minBaseCenter + rotation * localOffsetMin;
+                Vector3 maxPoint = maxBaseCenter + rotation * localOffsetMax;
+
+                Gizmos.DrawLine(minPoint, maxPoint);
+
+                if (i > 0)
+                {
+                    Gizmos.DrawLine(prevMinPoint, minPoint);
+                    Gizmos.DrawLine(prevMaxPoint, maxPoint);
+                }
+
+                prevMinPoint = minPoint;
+                prevMaxPoint = maxPoint;
+            }
         }
     }
 }

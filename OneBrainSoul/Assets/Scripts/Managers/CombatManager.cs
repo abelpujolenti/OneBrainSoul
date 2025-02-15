@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AI.Combat.Enemy;
+using ECS.Entities;
 using ECS.Entities.AI;
 using ECS.Entities.AI.Combat;
 using Player;
@@ -14,41 +14,49 @@ namespace Managers
 
         public static CombatManager Instance => _instance;
 
-        [SerializeField] private GameObject _enemyRectangleAttackColliderPrefab;
-        [SerializeField] private GameObject _enemyCircleAttackColliderPrefab;
+        private Dictionary<uint, Func<AgentEntity>> _returnAgent = new Dictionary<uint, Func<AgentEntity>>();
 
         private PlayerCharacter _playerCharacter;
-        
         private Dictionary<uint, Triface> _trifaces = new Dictionary<uint, Triface>();
         private Dictionary<uint, LongArms> _longArms = new Dictionary<uint, LongArms>();
         private Dictionary<uint, LongArmsBase> _longArmsBases = new Dictionary<uint, LongArmsBase>();
+        private Dictionary<uint, Sendatu> _sendatus = new Dictionary<uint, Sendatu>();
+
+        private HashSet<uint> _longArmsBasesFreeId = new HashSet<uint>();
         
-        private readonly Dictionary<EnemyType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<EnemyType, Delegate>
+        private readonly Dictionary<EntityType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<EntityType, Delegate>
         {
             {
-                EnemyType.TRIFACE, new Func<Dictionary<uint, Triface>>(() => _instance._trifaces)
+                EntityType.TRIFACE, new Func<Dictionary<uint, Triface>>(() => _instance._trifaces)
             },
             {
-                EnemyType.LONG_ARMS, new Func<Dictionary<uint, LongArms>>(() => _instance._longArms)
+                EntityType.LONG_ARMS, new Func<Dictionary<uint, LongArms>>(() => _instance._longArms)
             },
             {
-                EnemyType.LONG_ARMS_BASE, new Func<Dictionary<uint, LongArmsBase>>(() => _instance._longArmsBases)
+                EntityType.LONG_ARMS_BASE, new Func<Dictionary<uint, LongArmsBase>>(() => _instance._longArmsBases)
+            },
+            {
+                EntityType.SENDATU, new Func<Dictionary<uint, Sendatu>>(() => _instance._sendatus)
             }
         };
 
-        private readonly Dictionary<EnemyType, Delegate> _returnTheSameAgentsType = new Dictionary<EnemyType, Delegate>
+        private readonly Dictionary<EntityType, Delegate> _returnTheSameAgentsType = new Dictionary<EntityType, Delegate>
         {
             { 
-                EnemyType.TRIFACE, new Func<List<Triface>>(() => 
+                EntityType.TRIFACE, new Func<List<Triface>>(() => 
                 _instance.ReturnAllDictionaryValuesInAList<Triface>(_instance._trifaces)) 
             },
             { 
-                EnemyType.LONG_ARMS, new Func<List<LongArms>>(() => 
+                EntityType.LONG_ARMS, new Func<List<LongArms>>(() => 
                 _instance.ReturnAllDictionaryValuesInAList<LongArms>(_instance._longArms)) 
             },
             { 
-                EnemyType.LONG_ARMS_BASE, new Func<List<LongArmsBase>>(() => 
+                EntityType.LONG_ARMS_BASE, new Func<List<LongArmsBase>>(() => 
                 _instance.ReturnAllDictionaryValuesInAList<LongArmsBase>(_instance._longArmsBases)) 
+            },
+            { 
+                EntityType.SENDATU, new Func<List<Sendatu>>(() => 
+                _instance.ReturnAllDictionaryValuesInAList<Sendatu>(_instance._sendatus)) 
             }
         };
 
@@ -65,32 +73,14 @@ namespace Managers
 
             Destroy(gameObject);
         }
-
-        #region UBS
-
-        public bool CanSeePlayer(Vector3 position, float sightMaximumDistance)
-        {
-            Vector3 playerPosition = _playerCharacter.GetTransformComponent().GetPosition();
-
-            Vector3 vectorToPlayer = (playerPosition - position).normalized;
-            float distanceToPlayer = (playerPosition - position).magnitude;
-
-            if (distanceToPlayer > sightMaximumDistance)
-            {
-                return false;
-            }
-
-            return !Physics.Raycast(position, vectorToPlayer, distanceToPlayer, 
-                GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
-        }
-
-        #endregion
-
+        
         #region Add Combat Agent
 
         public void AddPlayer(PlayerCharacter playerCharacter)
         {
             _playerCharacter = playerCharacter;
+            
+            _returnAgent.Add(playerCharacter.GetAgentID(), () => _playerCharacter);
         }
 
         public void AddEnemy(Triface triface)
@@ -98,6 +88,7 @@ namespace Managers
             uint agentID = triface.GetAgentID();
             
             _trifaces.Add(agentID, triface);
+            _returnAgent.Add(agentID, () => _trifaces[agentID]);
         }
 
         public void AddEnemy(LongArms longArms)
@@ -105,39 +96,261 @@ namespace Managers
             uint agentID = longArms.GetAgentID();
             
             _longArms.Add(agentID, longArms);
+            _returnAgent.Add(agentID, () => _longArms[agentID]);
+            DecrementLongArmsBasesFree(longArms.CallLongArmsBaseIdFunc());
         }
 
         public void AddEnemy(LongArmsBase longArmsBase)
         {
-            uint agentID = (uint)longArmsBase.GetInstanceID();
+            uint agentID = longArmsBase.GetAgentID();
             
             _longArmsBases.Add(agentID, longArmsBase);
+            _returnAgent.Add(agentID, () => _longArmsBases[agentID]);
+            IncrementLongArmsBasesFree(agentID);
+        }
+
+        public void AddEnemy(Sendatu sendatu)
+        {
+            uint agentID = (uint)sendatu.GetInstanceID();
+            
+            _sendatus.Add(agentID, sendatu);
+            _returnAgent.Add(agentID, () => _sendatus[agentID]);
+        }
+
+        #endregion
+
+        #region UBS
+
+        public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, float sightMaximumDistance, 
+            Vector3 forward, float fov)
+        {
+            HashSet<uint> visibleTargets = new HashSet<uint>();
+
+            if ((target & EntityType.PLAYER) != 0)
+            {
+                if (CanSeeEntity(_playerCharacter.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
+                        forward, fov))
+                {
+                    visibleTargets.Add(_playerCharacter.GetAgentID());
+                }
+            }
+
+            if ((target & EntityType.TRIFACE) != 0)
+            {
+                List<Triface> allTrifaces = ReturnAllTrifaces();
+                foreach (Triface triface in allTrifaces)
+                {
+                    if (CanSeeEntity(triface.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
+                            forward, fov))
+                    {
+                        visibleTargets.Add(triface.GetAgentID());
+                    }
+                }
+            }
+
+            if ((target & EntityType.LONG_ARMS) != 0)
+            {
+                List<LongArms> allLongArms = ReturnAllLongArms();
+                foreach (LongArms longArms in allLongArms)
+                {
+                    if (CanSeeEntity(longArms.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
+                            forward, fov))
+                    {
+                        visibleTargets.Add(longArms.GetAgentID());
+                    }
+                }
+            }
+
+            if ((target & EntityType.LONG_ARMS_BASE) != 0)
+            {
+                List<LongArmsBase> allLongArmsBases = ReturnAllLongArmsBases();
+                foreach (LongArmsBase longArmsBase in allLongArmsBases)
+                {
+                    if (CanSeeEntity(longArmsBase.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
+                            forward, fov))
+                    {
+                        visibleTargets.Add(longArmsBase.GetAgentID());
+                    }
+                }
+            }
+
+            if ((target & EntityType.SENDATU) != 0)
+            {
+                List<Sendatu> allSendatus = RequestAllSendatus();
+                foreach (Sendatu sendatu in allSendatus)
+                {
+                    if (CanSeeEntity(sendatu.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
+                            forward, fov))
+                    {
+                        visibleTargets.Add(sendatu.GetAgentID());
+                    }
+                }
+            }
+
+            return visibleTargets;
+        }
+
+        private bool CanSeeEntity(Vector3 targetPosition, Vector3 position, float sightMaximumDistance, 
+            Vector3 forward, float fov)
+        {
+            Vector3 vectorToTarget = (targetPosition - position).normalized;
+            float distanceToTarget = (targetPosition - position).magnitude;
+
+            if (distanceToTarget > sightMaximumDistance || Vector3.Angle(forward, vectorToTarget) > fov)
+            {
+                return false;
+            }
+
+            return !Physics.Raycast(position, vectorToTarget, distanceToTarget, 
+                GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
+        }
+
+        public void AddFreeLongArmsBaseId(uint longArmsBaseId)
+        {
+            _longArmsBasesFreeId.Add(longArmsBaseId);
+        }
+
+        private void IncrementLongArmsBasesFree(uint longArmsBaseId)
+        {
+            AddFreeLongArmsBaseId(longArmsBaseId);
+            
+            List<LongArms> allLongArms = ReturnAllLongArms();
+
+            foreach (LongArms longArms in allLongArms)
+            {
+                longArms.IncrementLongArmsFreeBases();
+            }
+        }
+
+        public void RemoveFreeLongArmsBaseId(uint longArmsBaseId)
+        {
+            _longArmsBasesFreeId.Remove(longArmsBaseId);
+        }
+
+        private void DecrementLongArmsBasesFree(uint longArmsBaseId)
+        {
+            RemoveFreeLongArmsBaseId(longArmsBaseId);
+            
+            List<LongArms> allLongArms = ReturnAllLongArms();
+
+            foreach (LongArms longArms in allLongArms)
+            {
+                longArms.DecrementLongArmsFreeBases();
+            }
         }
 
         #endregion
 
         #region Requests
 
-        public PlayerCharacter RequestPlayer()
+        public AgentEntity ReturnAgentEntity(uint agentId)
+        {
+            return _returnAgent[agentId]();
+        }
+
+        public PlayerCharacter ReturnPlayer()
         {
             return _playerCharacter;
         }
 
-        public List<AgentEntity> RequestAllEntities()
+        private List<Triface> ReturnAllTrifaces()
+        {
+            return ExecuteDelegate<List<Triface>, Dictionary<EntityType, Delegate>>(_returnTheSameAgentsType,
+                EntityType.TRIFACE);
+        }
+
+        private List<LongArms> ReturnAllLongArms()
+        {
+            return ExecuteDelegate<List<LongArms>, Dictionary<EntityType, Delegate>>(_returnTheSameAgentsType,
+                EntityType.LONG_ARMS);
+        }
+
+        private List<LongArmsBase> ReturnAllLongArmsBases()
+        {
+            return ExecuteDelegate<List<LongArmsBase>, Dictionary<EntityType, Delegate>>(_returnTheSameAgentsType,
+                EntityType.LONG_ARMS_BASE);
+        }
+
+        private List<Sendatu> RequestAllSendatus()
+        {
+            return ExecuteDelegate<List<Sendatu>, Dictionary<EntityType, Delegate>>(_returnTheSameAgentsType,
+                EntityType.SENDATU);
+        }
+
+        public List<AgentEntity> ReturnAllEnemies()
         {
             List<AgentEntity> enemies = new List<AgentEntity>();
 
-            enemies.AddRange(
-                ExecuteDelegate<List<Triface>, Dictionary<EnemyType, Delegate>>(_returnTheSameAgentsType, EnemyType.TRIFACE));
+            enemies.AddRange(ReturnAllTrifaces());
             
-            enemies.AddRange(
-                ExecuteDelegate<List<LongArms>, Dictionary<EnemyType, Delegate>>(_returnTheSameAgentsType, EnemyType.LONG_ARMS));
+            enemies.AddRange(ReturnAllLongArms());
             
-            enemies.AddRange(
-                ExecuteDelegate<List<LongArmsBase>, Dictionary<EnemyType, Delegate>>(_returnTheSameAgentsType, EnemyType.LONG_ARMS_BASE));
+            enemies.AddRange(ReturnAllLongArmsBases());
+            
+            enemies.AddRange(RequestAllSendatus());
 
             return enemies;
         }
+
+        public AgentEntity ReturnClosestAgentEntity(Vector3 position, HashSet<uint> targetsId)
+        {
+            return ReturnClosestTargetAgent(position, targetsId, targetId => _returnAgent[targetId]());
+        }
+
+        public LongArmsBase ReturnClosestLongArmsBase(Vector3 position, HashSet<uint> longArmsBasesId)
+        {
+            return ReturnClosestTargetAgent(position, longArmsBasesId, longArmsBaseId => _longArmsBases[longArmsBaseId]);
+        }
+
+        private T ReturnClosestTargetAgent<T>(Vector3 position, HashSet<uint> targetsId, Func<uint, T> returnFunc)
+            where T : AgentEntity
+        {
+            T closestTarget = default;
+            T currentAgentEntity;
+
+            Vector3 targetPosition;
+
+            float closestDistance = Mathf.Infinity;
+            float currentDistance;
+            
+            foreach (uint targetId in targetsId)
+            {
+                currentAgentEntity = returnFunc(targetId);
+
+                targetPosition = currentAgentEntity.GetTransformComponent().GetPosition();
+                targetPosition.y -= currentAgentEntity.GetHeight() / 2;
+                
+                currentDistance = (position - targetPosition).sqrMagnitude;
+
+                if (closestDistance < currentDistance)
+                {
+                    continue;
+                }
+
+                closestTarget = currentAgentEntity;
+                closestDistance = currentDistance;
+            }
+
+            return closestTarget;
+        }
+
+        public float ReturnDistanceToTarget(Vector3 position, uint targetId)
+        {
+            return (_returnAgent[targetId]().GetTransformComponent().GetPosition() - position).magnitude;
+        }
+
+        #region Long Arms
+
+        public void RequestFleeToAnotherLongArmsBase(LongArms longArms)
+        {
+            LongArmsBase longArmsBase = ReturnClosestLongArmsBase(longArms.transform.position, _longArmsBasesFreeId);
+            
+            longArms.CallOnFleeAction();
+            
+            longArmsBase.SetLongArms(longArms);
+        }
+
+        #endregion
 
         #endregion
 
@@ -145,12 +358,33 @@ namespace Managers
 
         public void OnEnemyDefeated(Triface triface)
         {
+            _returnAgent.Remove(triface.GetAgentID());
             _trifaces.Remove(triface.GetAgentID());
         }
 
         public void OnEnemyDefeated(LongArms longArms)
         {
+            _returnAgent.Remove(longArms.GetAgentID());
             _longArms.Remove(longArms.GetAgentID());
+            IncrementLongArmsBasesFree(longArms.CallLongArmsBaseIdFunc());
+        }
+
+        public void OnEnemyDefeated(LongArmsBase longArmsBase)
+        {
+            _returnAgent.Remove(longArmsBase.GetAgentID());
+            _longArms.Remove(longArmsBase.GetAgentID());
+            DecrementLongArmsBasesFree(longArmsBase.GetAgentID());
+        }
+
+        public void OnEnemyDefeated(Sendatu sendatu)
+        {
+            _returnAgent.Remove(sendatu.GetAgentID());
+            _longArms.Remove(sendatu.GetAgentID());
+        }
+
+        public void HealPlayer()
+        {
+            _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath());
         }
 
         #endregion
@@ -215,52 +449,13 @@ namespace Managers
         
         #endregion
 
-        public GameObject GetRectanglePrefab()
-        {
-            return _enemyRectangleAttackColliderPrefab;
-        }
-
-        public GameObject GetCirclePrefab()
-        {
-            return _enemyCircleAttackColliderPrefab;
-        }
-
         #region Collections Methods
 
-        /*private Dictionary<uint, TAgent> ReturnAgentTypeDictionary<TAgent, TContext, TAction, TAbility>(AIEnemyType aiEnemyType)
-        
-            where TAgent : AIEnemy<TContext, TAction, TAbility>
-            where TContext : AIEnemyContext
-            where TAction : Enum
-            where TAbility : Enum
+        private Dictionary<uint, T> ReturnAgentTypeDictionary<T>(EntityType enemyType)
         {
-            return ExecuteDelegate<Dictionary<uint, TAgent>, Dictionary<AIEnemyType, Delegate>>
-                (_returnDictionaryOfTheSameType, aiEnemyType);
-        }*/
-
-        private Dictionary<uint, T> ReturnAgentTypeDictionary<T>(EnemyType enemyType)
-        {
-            return ExecuteDelegate<Dictionary<uint, T>, Dictionary<EnemyType, Delegate>>
+            return ExecuteDelegate<Dictionary<uint, T>, Dictionary<EntityType, Delegate>>
                 (_returnDictionaryOfTheSameType, enemyType);
         }
-
-        /*private List<TAgent> ReturnAllDictionaryValuesInAList<TAgent, TContext, TAction, TAbility>
-            (Dictionary<uint, TAgent> agentsDictionary)
-        
-            where TAgent : AIEnemy<TContext, TAction, TAbility>
-            where TContext : AIEnemyContext
-            where TAction : Enum
-            where TAbility : Enum
-        {
-            List<TAgent> agentsList = new List<TAgent>();
-
-            foreach (TAgent combatAgent in agentsDictionary.Values)
-            {
-                agentsList.Add(combatAgent);
-            }
-
-            return agentsList;
-        }*/
 
         private List<T> ReturnAllDictionaryValuesInAList<T>(Dictionary<uint, T> agentsDictionary)
         {
@@ -274,10 +469,10 @@ namespace Managers
             return agentsList;
         }
         
-        private TReturn ExecuteDelegate<TReturn, TCollection>(TCollection collection, EnemyType enemyType)
-            where TCollection : Dictionary<EnemyType, Delegate>
+        private TReturn ExecuteDelegate<TReturn, TCollection>(TCollection collection, EntityType entityType)
+            where TCollection : Dictionary<EntityType, Delegate>
         {
-            Delegate del = collection[enemyType];
+            Delegate del = collection[entityType];
             
             if (del is Func<TReturn> func)
             {

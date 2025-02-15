@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using AI.Combat.Enemy;
+using ECS.Entities;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.BaseInterfaces.Property;
 using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, ITargetRadius, 
-        IGetSightMaximumDistance, IDistanceToTarget, IIsSeeingATarget, ITarget, IFighting, IAttacking, IVectorToTarget, 
-        ITargetTransform, IGetAgentTransform
+    public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, IGetSightMaximumDistance, 
+        IHasATarget, IFighting, ICastingAnAbility, IGetAgentTransform
     {
-        private EnemyType _enemyType;
+        private EntityType _entityType;
         
         protected List<uint> _repeatableActions;
         private uint _lastActionIndex = 10;
@@ -21,37 +20,31 @@ namespace AI.Combat.Contexts
 
         private float _radius;
         private float _height;
-        private float _targetRadius;
-        private float _targetHeight;
         private float _sightMaximumDistance;
-        private float _distanceToTarget;
+        private float _fov;
 
-        private bool _isSeeingATarget;
-        private bool _hasATarget;
         private bool _isFighting;
         private bool _isCastingAnAbility;
         private bool _isAirborne;
 
-        private Vector3 _vectorToTarget;
-
         private Transform _agentTransform;
-        private Transform _targetTransform;
 
-        protected AIEnemyContext(EnemyType enemyType, uint totalHealth, float radius, float height, 
-            float sightMaximumDistance, Transform agentTransform)
+        protected AIEnemyContext(EntityType entityType, uint totalHealth, float radius, float height, 
+            float sightMaximumDistance, float fov, Transform agentTransform)
         {
-            _enemyType = enemyType;
+            _entityType = entityType;
             _totalHealth = totalHealth;
             _health = totalHealth;
             _radius = radius;
             _height = height;
             _sightMaximumDistance = sightMaximumDistance != 0 ? sightMaximumDistance : Mathf.Infinity;
+            _fov = fov;
             _agentTransform = agentTransform;
         }
 
-        public EnemyType GetEnemyType()
+        public EntityType GetEnemyType()
         {
-            return _enemyType;
+            return _entityType;
         }
 
         public List<uint> GetRepeatableActions()
@@ -94,59 +87,14 @@ namespace AI.Combat.Contexts
             return _height;
         }
 
-        public void SetTargetRadius(float rivalRadius)
-        {
-            _targetRadius = rivalRadius;
-        }
-
-        public float GetTargetRadius()
-        {
-            return _targetRadius;
-        }
-
-        public void SetTargetHeight(float rivalHeight)
-        {
-            _targetHeight = rivalHeight;
-        }
-
-        public float GetTargetHeight()
-        {
-            return _targetHeight;
-        }
-
         public float GetSightMaximumDistance()
         {
             return _sightMaximumDistance;
         }
 
-        public void SetDistanceToTarget(float distanceToTarget)
+        public float GetFov()
         {
-            _distanceToTarget = distanceToTarget;
-        }
-
-        public float GetDistanceToTarget()
-        {
-            return _distanceToTarget;
-        }
-
-        public void SetIsSeeingATarget(bool isSeeingATarget)
-        {
-            _isSeeingATarget = isSeeingATarget;
-        }
-
-        public bool IsSeeingATarget()
-        {
-            return _isSeeingATarget;
-        }
-
-        public void SetHasATarget(bool hasATarget)
-        {
-            _hasATarget = hasATarget;
-        }
-
-        public bool HasATarget()
-        {
-            return _hasATarget;
+            return _fov;
         }
 
         public void SetIsFighting(bool isFighting)
@@ -179,40 +127,11 @@ namespace AI.Combat.Contexts
             return _isAirborne;
         }
 
-        public void SetVectorToTarget(Vector3 vectorToRival)
-        {
-            _vectorToTarget = vectorToRival;
-            SetDistanceToTarget(_vectorToTarget.magnitude - _targetRadius);
-        }
-
-        public Vector3 GetVectorToTarget()
-        {
-            return _vectorToTarget;
-        }
-
-        public void SetTargetTransform(Transform targetTransform)
-        {
-            _targetTransform = targetTransform;
-
-            Vector3 targetPosition = _targetTransform.position;
-            targetPosition.y -= _targetHeight / 2;
-
-            Vector3 agentPosition = _agentTransform.position;
-            agentPosition.y -= _height / 2;
-            
-            SetVectorToTarget(targetPosition - agentPosition);
-
-            _hasATarget = true;
-        }
-
         public Transform GetAgentTransform()
         {
             return _agentTransform;
         }
 
-        public Transform GetTargetTransform()
-        {
-            return _targetTransform;
-        }
+        public abstract bool HasATarget();
     }
 }

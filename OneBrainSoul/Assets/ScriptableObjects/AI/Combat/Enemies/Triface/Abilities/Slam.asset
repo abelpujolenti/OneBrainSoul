@@ -9,147 +9,41 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f0b227231ee4815b8a65ffa5353fe2c, type: 3}
+  m_Script: {fileID: 11500000, guid: a211132dbc8a4efbaa02677f950039b1, type: 3}
   m_Name: Slam
   m_EditorClassIdentifier: 
+  canAffectCaster: 0
   abilityTarget: 1
-  abilityCastType: 1
   abilityCast:
     minimumRangeToCast: 0
     maximumRangeToCast: 6
-    doesSpawnInsideCaster: 1
-    relativeSpawnPosition: {x: 0, y: 0, z: 3.5}
-    isAttachedToCaster: 1
+    directionOfDetection: {x: 0, y: 0, z: 1}
+    minimumAngleFromForwardToCast: 0
+    canCancelCast: 0
+    maximumAngleFromForwardToCancelCast: 0
     timeToCast: 0.2
     cooldown: 4
     duration: 0
-  abilityProjectile:
-    projectilePrefab: {fileID: 0}
-    projectileSpeed: 0
-    doesVanishOnImpact: 0
-    doesVanishOverTime: 0
-    timeToVanish: 0
-    doesExplodeOnVanishOverTime: 0
-  abilityAoEType: 0
-  abilityAoE:
-    duration: 0
-    direction: {x: 0, y: 0, z: 1}
-    height: 2
-    width: 2
-    length: 7
-    radius: 0
-    customMeshPrefab: {fileID: 0}
-    scale: 0
-    doesHeightChangeOverTheTime: 0
-    doesWidthChangeOverTheTime: 0
-    doesLengthChangeOverTheTime: 0
-    doesRadiusChangeOverTheTime: 0
-    doesScaleChangeOverTheTime: 0
-    heightChangeOverTime:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 2
-        inSlope: 0.90588343
-        outSlope: 0.90588343
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 3
-        value: 4.9538803
-        inSlope: 0.90588343
-        outSlope: 0.90588343
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    widthChangeOverTime:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 2
-        inSlope: -9.054666
-        outSlope: -9.054666
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: -9.054666
-        outSlope: -9.054666
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    lengthChangeOverTime:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 7
-        inSlope: 4.0451307
-        outSlope: 4.0451307
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 3
-        value: 19.972984
-        inSlope: 4.0451307
-        outSlope: 4.0451307
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    radiusChangeOverTime:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    scaleChangeOverTime:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
   abilityTrigger:
-    doesEffectOnStart: 1
-    doesEffectOnTheDuration: 0
-    doesEffectOnEnd: 0
+    hasAnEffectOnStart: 1
+    hasAnEffectOnTheDuration: 0
+    hasAnEffectOnEnd: 0
   abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
     hasAnEffectOnHealth: 1
-    healthModificationValue: 50
+    healthModificationValue: 10
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
     doesDecreaseOverTime: 0
-    slowPercent: 20
+    slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 1
     doesApplyAForce: 0
-    forceDirection: {x: 0, y: 1, z: 0}
-    forceStrength: 5
+    forceDirection: {x: 0, y: 0, z: 0}
+    forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
-  doesItTriggerOnTriggerEnter: 0
-  abilityEffectOnHealthTypeOnTheDuration: 0
+  abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
     healthModificationValue: 0
@@ -179,4 +73,73 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+  abilityAoEType: 0
+  abilityAoE:
+    isAttachedToCaster: 0
+    relativePositionToCaster: {x: 0, y: 0, z: 0}
+    duration: 4
+    direction: {x: 0, y: 0, z: 1}
+    height: 2
+    width: 2
+    length: 7
+    radius: 0
+    customMeshPrefab: {fileID: 0}
+    scale: 0
+    doesHeightChangeOverTheTime: 0
+    doesWidthChangeOverTheTime: 0
+    doesLengthChangeOverTheTime: 0
+    doesRadiusChangeOverTheTime: 0
+    doesScaleChangeOverTheTime: 0
+    doesXScaleChangeOverTheTime: 0
+    doesYScaleChangeOverTheTime: 0
+    doesZScaleChangeOverTheTime: 0
+    heightChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    widthChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    lengthChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    radiusChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    scaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    XScaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    YScaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ZScaleChangeOverTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  doesItTriggerOnTriggerEnter: 1
   doesItTriggerOnTriggerExit: 0

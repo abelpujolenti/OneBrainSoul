@@ -6,29 +6,15 @@ namespace AI.Combat.AbilityAoEColliders
     public class RectangularAbilityAoECollider : AbilityAoECollider<RectangularAbilityComponent>
     {
         [SerializeField] private BoxCollider _boxCollider;
-        
-        private Quaternion _parentRotation;
-
-        private Vector3 _direction;
 
         private AnimationCurve _widthResizeCurve;
         private AnimationCurve _heightResizeCurve;
         private AnimationCurve _lengthResizeCurve;
 
-        protected override void OnEnable()
+        public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
+            RectangularAbilityComponent sphericalAbilityComponent)
         {
-            base.OnEnable();
-            
-            _parentRotation = _parentTransform.rotation;
-            
-            Rotate();
-        }
-
-        public override void SetAbilitySpecs(Transform parentTransform, RectangularAbilityComponent sphericalAbilityComponent)
-        {
-            base.SetAbilitySpecs(parentTransform, sphericalAbilityComponent);
-
-            _direction = sphericalAbilityComponent.GetDirection().normalized;
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, sphericalAbilityComponent);
             
             _boxCollider.size = new Vector3(
                 sphericalAbilityComponent.GetWidth(), 
@@ -103,22 +89,6 @@ namespace AI.Combat.AbilityAoEColliders
                 newSize.z = ReturnSizeOverTime(time, _lengthResizeCurve);
                 _boxCollider.size = newSize;
             };
-        }
-
-        public override void SetAbilityTargets(int targetsLayerMask)
-        {
-            _boxCollider.includeLayers = targetsLayerMask;
-            _boxCollider.excludeLayers = ~targetsLayerMask;
-        }
-
-        private void Rotate()
-        {
-            transform.rotation = _parentRotation * Quaternion.LookRotation(_direction, Vector3.up);
-        }
-
-        protected override void OnTriggerEnter(Collider other)
-        {
-            base.OnTriggerEnter(other);
         }
     }
 }

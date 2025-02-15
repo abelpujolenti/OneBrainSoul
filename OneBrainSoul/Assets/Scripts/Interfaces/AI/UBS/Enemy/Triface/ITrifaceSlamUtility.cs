@@ -1,14 +1,21 @@
-﻿using Interfaces.AI.UBS.BaseInterfaces.Get;
+﻿using AI.Combat.Contexts.Target;
+using Interfaces.AI.UBS.Enemy.Triface.BaseInterfaces;
+using UnityEngine;
 
 namespace Interfaces.AI.UBS.Enemy.Triface
 {
-    public interface ITrifaceSlamUtility : IHasATarget, IGetAgentTransform, IGetTargetTransform,
-        IGetVectorToTarget, IGetDistanceToTarget
+    public interface ITrifaceSlamUtility : ITrifaceHasATargetForSlam
     {
-        public float GetMinimumRangeToCast();
+        public bool IsSlamOnCooldown();
         
-        public float GetMaximumRangeToCast();
+        public float GetSlamMinimumRangeToCast();
         
-        public bool IsOnCooldown();
+        public float GetSlamMaximumRangeToCast();
+
+        public TargetContext GetSlamTargetContext();
+
+        public Vector3 GetDirectionOfSlamDetection();
+
+        public float GetMinimumAngleFromForwardToCastSlam();
     }
 }

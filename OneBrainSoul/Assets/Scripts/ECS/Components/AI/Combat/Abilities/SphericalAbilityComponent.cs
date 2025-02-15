@@ -2,13 +2,13 @@
 
 namespace ECS.Components.AI.Combat.Abilities
 {
-    public class SphericalAbilityComponent : AbilityComponent
+    public class SphericalAbilityComponent : AreaAbilityComponent
     {
         private float _radius;
 
-        public SphericalAbilityComponent(AgentAbility agentAbility) : base(agentAbility)
+        public SphericalAbilityComponent(AreaAbilityProperties areaBasicAbilityProperties) : base(areaBasicAbilityProperties)
         {
-            _radius = agentAbility.abilityAoE.radius;
+            _radius = areaBasicAbilityProperties.abilityAoE.radius;
         }
 
         public float GetRadius()

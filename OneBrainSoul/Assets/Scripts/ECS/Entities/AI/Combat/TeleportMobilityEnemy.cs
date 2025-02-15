@@ -7,6 +7,5 @@ namespace ECS.Entities.AI.Combat
         where TContext : AIEnemyContext
         where TAction : Enum
     {
-        
     }
 }

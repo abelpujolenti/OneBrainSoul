@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using AI.Combat.AbilitySpecs;
 using ECS.Components.AI.Combat.Abilities;
+using ECS.Entities;
 using ECS.Entities.AI;
 using Interfaces.AI.Combat;
 using Managers;
@@ -11,14 +12,16 @@ using UnityEngine;
 
 namespace AI.Combat.AbilityAoEColliders
 {
-    public abstract class AbilityAoECollider<TAbilityComponent> : MonoBehaviour
-        where TAbilityComponent : AbilityComponent
+    public abstract class AbilityAoECollider<TAreaAbilityComponent> : MonoBehaviour, IAbilityCollider 
+        where TAreaAbilityComponent : AreaAbilityComponent
     {
         private Coroutine _abilityDurationCoroutine;
 
-        protected Transform _parentTransform;
+        private Transform _parentTransform;
         
         private Stopwatch _stopwatch = new Stopwatch();
+
+        protected List<EntityType> _abilityTargets;
         
         private List<AgentEntity> _agentsInside = new List<AgentEntity>();
 
@@ -30,9 +33,9 @@ namespace AI.Combat.AbilityAoEColliders
         
         private Quaternion _parentRotation;
 
-        private Vector3 _direction = Vector3.forward;
+        private Vector3 _direction;
 
-        private Action _actionAttaching;
+        private Action _actionAttaching = () => { };
         private Action _actionOnStartTrigger = () => { };
         private Action<AgentEntity> _actionOnTriggerEnter = agentEntity => { };
         protected Action<float> _actionResizing = value => { };
@@ -41,47 +44,40 @@ namespace AI.Combat.AbilityAoEColliders
         private float _abilityDuration;
         private float _tickTimer;
 
-        protected virtual void OnEnable()
-        {
-            _stopwatch.Start();
-            
-            MoveToPosition(_relativePosition);
-            
-            _actionAttaching();
-            
-            _parentRotation = _parentTransform.rotation;
-            
-            Rotate();
-        }
-
         protected virtual void OnDisable()
         {
             _stopwatch.Reset();
         }
 
-        public virtual void SetAbilitySpecs(Transform parentTransform, TAbilityComponent abilityComponent)
+        public virtual void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
+            TAreaAbilityComponent areaAbilityComponent)
         {
             _parentTransform = parentTransform;
             
-            _abilityDuration = abilityComponent.GetAoE().duration;
+            _abilityDuration = areaAbilityComponent.GetAoE().duration;
             
-            _relativePosition = abilityComponent.GetCast().relativeSpawnPosition;
+            _relativePosition = areaAbilityComponent.GetAoE().relativePositionToCaster;
 
-            _actionAttaching = abilityComponent.GetCast().isAttachedToCaster
+            {
+                Vector3 direction = areaAbilityComponent.GetAoE().direction;
+
+                _direction = direction == Vector3.zero ? Vector3.forward : direction.normalized;
+            }
+
+            _actionAttaching = areaAbilityComponent.GetAoE().isAttachedToCaster
                 ? () => { }
                 : () =>
                 {
-                    SetParent(_parentTransform);
                     transform.parent = null;
                 };
 
-            AbilityTrigger abilityTrigger = abilityComponent.GetTrigger();
+            AbilityTrigger abilityTrigger = basicAbilityComponent.GetTrigger();
 
-            if (abilityTrigger.doesEffectOnStart)
+            if (abilityTrigger.hasAnEffectOnStart)
             {
-                SetupOnEnterExit(_actionsOnTriggerEnter, abilityComponent.GetEffectTypeOnStart(), abilityComponent.GetEffectOnStart());
+                SetupOnEnterExit(_actionsOnTriggerEnter, basicAbilityComponent.GetEffectTypeOnStart(), basicAbilityComponent.GetEffectOnStart());
 
-                if (abilityComponent.DoesItTriggerOnTriggerEnter())
+                if (areaAbilityComponent.DoesItTriggerOnTriggerEnter())
                 {
                     _actionOnTriggerEnter = TriggerOnEnterEffect;
                 }
@@ -91,19 +87,19 @@ namespace AI.Combat.AbilityAoEColliders
                 }
             }
 
-            if (abilityTrigger.doesEffectOnTheDuration)
+            if (abilityTrigger.hasAnEffectOnTheDuration)
             {
-                SetupOnStay(abilityComponent.GetEffectTypeOnTheDuration(), abilityComponent.GetEffectOnTheDuration());
+                SetupOnStay(basicAbilityComponent.GetEffectTypeOnTheDuration(), basicAbilityComponent.GetEffectOnTheDuration());
             }
 
-            if (!abilityTrigger.doesEffectOnEnd)
+            if (!abilityTrigger.hasAnEffectOnEnd)
             {
                 return;
             }
             
-            SetupOnEnterExit(_actionsOnTriggerExit, abilityComponent.GetEffectTypeOnEnd(), abilityComponent.GetEffectOnEnd());
+            SetupOnEnterExit(_actionsOnTriggerExit, basicAbilityComponent.GetEffectTypeOnEnd(), basicAbilityComponent.GetEffectOnEnd());
             
-            if (!abilityComponent.DoesItTriggerOnTriggerExit())
+            if (!areaAbilityComponent.DoesItTriggerOnTriggerExit())
             {
                 return;
             }
@@ -192,7 +188,10 @@ namespace AI.Combat.AbilityAoEColliders
             AddPushInADirection(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
         }
 
-        public abstract void SetAbilityTargets(int targetsLayerMask);
+        public void SetAbilityTargets(List<EntityType> abilityTargets)
+        {
+            _abilityTargets = abilityTargets;
+        }
 
         private void AddDamage(List<Action<AgentEntity>> actionsList, uint damageValue)
         {
@@ -278,10 +277,7 @@ namespace AI.Combat.AbilityAoEColliders
 
         private void AddPushInADirection(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
         {
-            actionsList.Add(agentEntity =>
-            {
-                PushInADirection(agentEntity, forceDirection, forceStrength);
-            });
+            actionsList.Add(agentEntity => { PushInADirection(agentEntity, forceDirection, forceStrength); });
         }
 
         private void PushInADirection(IPushable agent, Vector3 forceDirection, float forceStrength)
@@ -311,8 +307,17 @@ namespace AI.Combat.AbilityAoEColliders
 
         public void Activate()
         {
-            _actionResizing(0);
             gameObject.SetActive(true);
+            _stopwatch.Start();
+            _actionResizing(0);
+            
+            SetParent(_parentTransform);
+            MoveToPosition(_relativePosition);
+            _parentRotation = _parentTransform.rotation;
+            Rotate();
+            
+            _actionAttaching();
+            
             _abilityDurationCoroutine = StartCoroutine(AbilityDurationCoroutine());
         }
 
@@ -326,6 +331,7 @@ namespace AI.Combat.AbilityAoEColliders
             float timer = 0;
             float tickTimer = 0;
 
+            yield return null;
             yield return new WaitForFixedUpdate();
             
             _actionOnStartTrigger();
@@ -410,6 +416,24 @@ namespace AI.Combat.AbilityAoEColliders
         protected virtual void OnTriggerEnter(Collider other)
         {
             AgentEntity agentEntity = other.GetComponent<AgentEntity>();
+
+            if (!agentEntity)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _abilityTargets.Count; i++)
+            {
+                if (agentEntity.GetEntityType() == _abilityTargets[i])
+                {
+                    break;
+                }
+
+                if (i == _abilityTargets.Count - 1)
+                {
+                    return;
+                }
+            }
             
             _agentsInside.Add(agentEntity);
 
@@ -419,6 +443,24 @@ namespace AI.Combat.AbilityAoEColliders
         protected virtual void OnTriggerExit(Collider other)
         {
             AgentEntity agentEntity = other.GetComponent<AgentEntity>();
+
+            if (!agentEntity)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _abilityTargets.Count; i++)
+            {
+                if (agentEntity.GetEntityType() == _abilityTargets[i])
+                {
+                    break;
+                }
+
+                if (i == _abilityTargets.Count - 1)
+                {
+                    return;
+                }
+            }
             
             _agentsInside.Remove(agentEntity);
 

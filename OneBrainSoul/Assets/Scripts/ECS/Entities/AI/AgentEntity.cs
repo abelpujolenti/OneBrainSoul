@@ -9,11 +9,11 @@ using UnityEngine;
 
 namespace ECS.Entities.AI
 {
-    public abstract class AgentEntity : MonoBehaviour, IDamageable, IHealable, ISlowable, IPushable
+    public abstract class AgentEntity : MonoBehaviour, IDamageable, IHealable, ISlowable, IPushable, IVelocity
     {
         private uint _agentId;
 
-        protected EntityType _entityType;
+        private EntityType _entityType;
 
         private TransformComponent _transformComponent;
 
@@ -36,8 +36,10 @@ namespace ECS.Entities.AI
         protected float _timeBetweenDamageTicks;
         protected float _timeBetweenHealTicks;
 
-        protected void Setup(float agentsPositionRadius)
+        protected void Setup(float agentsPositionRadius, EntityType entityType)
         {
+            _entityType = entityType;
+            
             Transform ownTransform = transform;
             _agentId = (uint)gameObject.GetInstanceID();
             _transformComponent = new TransformComponent(ownTransform);
@@ -64,6 +66,7 @@ namespace ECS.Entities.AI
         }
 
         public abstract float GetRadius();
+        public abstract float GetHeight();
 
         #region Agent Slot
         
@@ -145,5 +148,29 @@ namespace ECS.Entities.AI
             
             _rigidbody.AddForce(rotation * forceDirection, ForceMode.Impulse);
         }
+
+        public Vector3 GetVelocity()
+        {
+            return _rigidbody.velocity;
+        }
+
+        public EntityType GetEntityType()
+        {
+            return _entityType;
+        }
+        
+        ///////////////TODO ERASE
+        [SerializeField] private bool _showMessages;
+
+        protected void ShowDebugMessages(string message)
+        {
+            if (!_showMessages)
+            {
+                return;
+            }
+            
+            Debug.Log(message);
+        }
+        ///////////////
     }
 }

@@ -7,32 +7,18 @@ namespace AI.Combat.AbilityAoEColliders
     {
         [SerializeField] private SphereCollider _sphereCollider;
         
-        private Quaternion _parentRotation;
-
-        private Vector3 _direction;
-        
         private AnimationCurve _heightResizeCurve;
         private AnimationCurve _radiusResizeCurve;
 
         private float _radius;
 
-        protected override void OnEnable()
+        public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
+            ConicalAbilityComponent conicalAbilityComponent)
         {
-            base.OnEnable();
-            
-            _parentRotation = _parentTransform.rotation;
-            
-            Rotate();
-        }
-
-        public override void SetAbilitySpecs(Transform parentTransform, ConicalAbilityComponent conicalAbilityComponent)
-        {
-            base.SetAbilitySpecs(parentTransform, conicalAbilityComponent);
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, conicalAbilityComponent);
             
             _sphereCollider.radius = conicalAbilityComponent.GetHeight();
             _radius = conicalAbilityComponent.GetRadius();
-
-            _direction = conicalAbilityComponent.GetDirection().normalized;
             
             if (conicalAbilityComponent.GetAoE().doesHeightChangeOverTheTime)
             {
@@ -63,17 +49,6 @@ namespace AI.Combat.AbilityAoEColliders
             {
                 _radius = ReturnSizeOverTime(time, _radiusResizeCurve);
             };
-        }
-
-        public override void SetAbilityTargets(int targetsLayerMask)
-        {
-            _sphereCollider.includeLayers = targetsLayerMask;
-            _sphereCollider.excludeLayers = ~targetsLayerMask;
-        }
-
-        private void Rotate()
-        {
-            transform.rotation = _parentRotation * Quaternion.LookRotation(_direction, Vector3.up);
         }
     }
 }

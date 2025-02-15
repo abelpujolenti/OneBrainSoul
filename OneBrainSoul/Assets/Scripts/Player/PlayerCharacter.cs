@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using AI.Combat.Position;
+using ECS.Entities;
 using ECS.Entities.AI;
 using Managers;
 using Player.Camera;
@@ -16,8 +16,6 @@ namespace Player
         [SerializeField] private uint _maxHealth;
         [SerializeField] private float _agentsPositionRadius;
         [SerializeField] private float _damageEffectDuration;
-        
-        protected AgentSlot _agentSlot;
 
         private uint _health;
         private float _height;
@@ -34,7 +32,7 @@ namespace Player
             _height = capsuleCollider.height;
             _radius = capsuleCollider.radius;
             
-            Setup(_radius + _agentsPositionRadius);
+            Setup(_radius + _agentsPositionRadius, EntityType.PLAYER);
             
             CombatManager.Instance.AddPlayer(this);
         }
@@ -46,14 +44,14 @@ namespace Player
                 return;
             }
             
-            Debug.Log("Player Damage : " + damageValue);
+            ShowDebugMessages("Player Damage : " + damageValue);
 
             _health = (uint)Mathf.Max(0f, _health - damageValue);
 
             if (_health == 0)
             {
                 SceneManager.LoadScene("ControllerTest", LoadSceneMode.Single);
-                //TODO PLAYER DIE;
+                //TODO PLAYER DIE
                 return;
             }
             
@@ -67,7 +65,7 @@ namespace Player
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration)
         {
-            Debug.Log("Player Damage Over Time: " + damageValue + " - Duration: " + duration);
+            ShowDebugMessages("Player Damage Over Time: " + damageValue + " - Duration: " + duration);
 
             StartCoroutine(DamageOverTimeCoroutine(damageValue, duration));
         }
@@ -99,7 +97,7 @@ namespace Player
 
         public override void OnReceiveHealOverTime(uint healValue, float duration)
         {
-            Debug.Log("Player Heal Over Time: " + healValue + " - Duration: " + duration);
+            ShowDebugMessages("Player Heal Over Time: " + healValue + " - Duration: " + duration);
 
             StartCoroutine(HealOverTimeCoroutine(healValue, duration));
         }
@@ -126,7 +124,7 @@ namespace Player
 
         public override void OnReceiveSlow(uint slowID, uint slowPercent)
         {
-            Debug.Log("Player Slow: " + slowPercent);
+            ShowDebugMessages("Player Slow: " + slowPercent);
 
             if (_slowSubscriptions.ContainsKey(slowID))
             {
@@ -139,7 +137,7 @@ namespace Player
 
         public override void OnReleaseFromSlow(uint slowID)
         {
-            Debug.Log("Player Release From Slow");
+            ShowDebugMessages("Player Release From Slow");
 
             _slowEffects.RemoveAt(_slowSubscriptions[slowID]);
             _slowSubscriptions.Remove(slowID);
@@ -147,7 +145,7 @@ namespace Player
 
         public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration)
         {
-            Debug.Log("Player Slow Over Time: " + slowPercent + " - Duration: " + duration);
+            ShowDebugMessages("Player Slow Over Time: " + slowPercent + " - Duration: " + duration);
 
             if (_slowCoroutinesSubscriptions.ContainsKey(slowID))
             {
@@ -184,7 +182,7 @@ namespace Player
 
         public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
         {
-            Debug.Log("Player Decreasing Slow: " + slowPercent + " - Duration: " + duration);
+            ShowDebugMessages("Player Decreasing Slow: " + slowPercent + " - Duration: " + duration);
 
             if (_slowCoroutinesSubscriptions.ContainsKey(slowID))
             {
@@ -221,7 +219,7 @@ namespace Player
             _slowCoroutinesSubscriptions.Remove(slowID);
         }
 
-        public float GetHeight()
+        public override float GetHeight()
         {
             return _height;
         }

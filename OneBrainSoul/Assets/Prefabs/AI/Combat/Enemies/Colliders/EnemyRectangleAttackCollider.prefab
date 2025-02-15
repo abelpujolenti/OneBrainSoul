@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7903118856236127394}
   - component: {fileID: 7750838240177269410}
   - component: {fileID: 4333159314480546225}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 2132112862409730761}
   - component: {fileID: 4959457087454717782}
   - component: {fileID: 404323999842329108}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: EnemyRectangleAttackCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

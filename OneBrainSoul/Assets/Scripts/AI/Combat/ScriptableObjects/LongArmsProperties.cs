@@ -1,15 +1,30 @@
-﻿using AI.Combat.AbilitySpecs;
+﻿using ECS.Entities;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace AI.Combat.ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "LongArms Properties", menuName = "ScriptableObjects/AI/Combat/Entity/LongArms Properties", order = 1)]
+    [CreateAssetMenu(fileName = "Long Arms Properties", menuName = "ScriptableObjects/AI/Combat/Entities/Long Arms Properties", order = 1)]
     public class LongArmsProperties : AIEnemyProperties
     {
-        [FormerlySerializedAs("abilityEffectType")] public AbilityEffectOnHealthType abilityEffectOnHealthType;
+        public float rotationSpeedWhileTurningAround;
+        
+        public float minimumTimeBeforeSettingNewDirection;
+        public float maximumTimeBeforeSettingNewDirection;
+        
+        public uint minimumDegreesToRotateDirection;
+        public uint maximumDegreesToRotateDirection;
+        
+        public float rotationSpeedWhenAcquiringATarget;
 
-        public AbilityEffect abilityEffect;
-
+        public uint minimumTimesSettingNewDirectionToTurnAround;
+        public uint maximumTimesSettingNewDirectionToTurnAround;
+        
+        public float radiusToFlee;
+        public EntityType entitiesToFleeFrom;
+        
+        public ProjectileAbilityProperties throwRockAbilityProperties;
+        public float rotationSpeedWhileCastingThrowRock;
+        
+        public AreaAbilityProperties clapAboveAbilityProperties;
     }
 }

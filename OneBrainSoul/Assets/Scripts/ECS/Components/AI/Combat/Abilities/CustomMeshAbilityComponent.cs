@@ -2,13 +2,13 @@
 
 namespace ECS.Components.AI.Combat.Abilities
 {
-    public class CustomMeshAbilityComponent : AbilityComponent
+    public class CustomMeshAbilityComponent : AreaAbilityComponent
     {
         private float _scale;
 
-        public CustomMeshAbilityComponent(AgentAbility agentAbility) : base(agentAbility)
+        public CustomMeshAbilityComponent(AreaAbilityProperties areaBasicAbilityProperties) : base(areaBasicAbilityProperties)
         {
-            _scale = agentAbility.abilityAoE.scale;
+            _scale = areaBasicAbilityProperties.abilityAoE.scale;
         }
 
         public float GetScale()

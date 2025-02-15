@@ -9,5 +9,9 @@ namespace AI.Combat.ScriptableObjects
         public float agentsPositionRadius;
 
         public float sightMaximumDistance;
+
+        public float fov;
+
+        public float normalRotationSpeed;
     }
 }

@@ -3,8 +3,8 @@
     public enum TrifaceAction : uint
     {
         PATROL,
-        LOOK_FOR_PLAYER,
-        GET_CLOSER_TO_PLAYER,
+        ACQUIRE_NEW_TARGET_FOR_SLAM,
+        GET_CLOSER_TO_TARGET_OF_SLAM,
         ROTATE,
         SLAM,
         ENUM_SIZE
