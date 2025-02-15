@@ -81,6 +81,25 @@ namespace Editor
             value = (T)EditorGUI.EnumPopup(rect, message, value);
         }
 
+        protected void EnumFlagsField<T>(ref T value, string message)
+            where T : Enum
+        {
+            value = (T)EditorGUI.EnumFlagsField(GetControlRect(), message, value);
+        }
+
+        protected void EnumFlagsField<T>(ref T value, float widthPercentage)
+            where T : Enum
+        {
+            Rect rect = GetControlRect();
+            float inspectorWidth = EditorGUIUtility.currentViewWidth;
+
+            float width = inspectorWidth * widthPercentage;
+            rect.x += rect.width - width;
+            rect.width = width;
+            
+            value = (T)EditorGUI.EnumFlagsField(rect, value);
+        }
+
         protected void UintField(ref uint value, uint min, string message)
         {
             int intValue = EditorGUI.IntField(GetControlRect(), message, (int)value);
@@ -139,6 +158,12 @@ namespace Editor
             animationCurve.keys = keys;
             
             animationCurve = EditorGUI.CurveField(GetControlRect(), message, animationCurve);
+        }
+
+        protected void ObjectField<T>(ref T value)
+            where T : Object
+        {
+            value = (T)EditorGUI.ObjectField(GetControlRect(), value, typeof(T), false);
         }
 
         protected void ObjectField<T>(ref T value, string message)

@@ -1,31 +1,25 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AI.Combat.AbilitySpecs
 {
-    public enum AbilityCastType
-    {
-        OMNIPRESENT,
-        NO_PROJECTILE,
-        PARABOLA_PROJECTILE,
-        STRAIGHT_LINE_PROJECTILE
-    }
-    
     [Serializable]
     public class AbilityCast
     {
         public AbilityCast()
         {}
 
-        public AbilityCast(float minimumRangeToCast, float maximumRangeToCast, bool doesSpawnInsideCaster, 
-            Vector3 relativeSpawnPosition, bool isAttachedToCaster, float timeToCast, float currentTimeToFinishCast, 
-            float cooldown, float currentCooldown)
+        public AbilityCast(float minimumRangeToCast, float maximumRangeToCast, Vector3 directionOfDetection, 
+            float minimumAngleToCast, bool canCancelCast, float maximumAngleToCancelCast, 
+            float timeToCast, float currentTimeToFinishCast, float cooldown, float currentCooldown)
         {
             this.minimumRangeToCast = minimumRangeToCast;
             this.maximumRangeToCast = maximumRangeToCast;
-            this.doesSpawnInsideCaster = doesSpawnInsideCaster;
-            this.isAttachedToCaster = isAttachedToCaster;
-            this.relativeSpawnPosition = relativeSpawnPosition;
+            this.directionOfDetection = directionOfDetection.normalized;
+            this.minimumAngleToCast = minimumAngleToCast;
+            this.canCancelCast = canCancelCast;
+            this.maximumAngleToCancelCast = maximumAngleToCancelCast;
             this.timeToCast = timeToCast;
             _currentTimeToFinishCast = currentTimeToFinishCast;
             this.cooldown = cooldown;
@@ -35,10 +29,11 @@ namespace AI.Combat.AbilitySpecs
         public float minimumRangeToCast;
         public float maximumRangeToCast;
 
-        public bool doesSpawnInsideCaster;
-        public Vector3 relativeSpawnPosition;
+        public Vector3 directionOfDetection;
+        [FormerlySerializedAs("minimumAngleFromForwardToCast")] public float minimumAngleToCast;
 
-        public bool isAttachedToCaster;
+        public bool canCancelCast;
+        [FormerlySerializedAs("maximumAngleFromForwardToCancelCast")] public float maximumAngleToCancelCast;
 
         public float timeToCast;
         private float _currentTimeToFinishCast;
@@ -56,6 +51,11 @@ namespace AI.Combat.AbilitySpecs
         public void DecreaseCurrentCastTime()
         {
             _currentTimeToFinishCast = Mathf.Max(0, _currentTimeToFinishCast - Time.deltaTime);
+        }
+
+        public void ResetCastTime()
+        {
+            _currentTimeToFinishCast = 0;
         }
 
         public bool IsCasting()
@@ -80,9 +80,8 @@ namespace AI.Combat.AbilitySpecs
 
         public AbilityCast DeepCopy()
         {
-            return new AbilityCast(minimumRangeToCast, maximumRangeToCast, doesSpawnInsideCaster,
-                relativeSpawnPosition, isAttachedToCaster, timeToCast, _currentTimeToFinishCast,
-                cooldown, _currentCooldown);
+            return new AbilityCast(minimumRangeToCast, maximumRangeToCast, directionOfDetection, minimumAngleToCast, 
+                canCancelCast, maximumAngleToCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown);
         }
     }
 }

@@ -36,25 +36,21 @@ namespace ECS.Entities.AI.Combat
         
         protected DirectionWeights[] _raysDirectionAndWeights;
         
-        protected float _rotationSpeed;
         protected float _raysOpeningAngle = 90f;
         protected float _raysDistance = 20f;
         
         protected uint _numberOfVicinityRays = 12;
 
         protected int _raysTargetsLayerMask;
-        
-        protected bool _isRotating;
 
-        protected override void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties)
+        protected override void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties, EntityType entityType)
         {
-            base.EnemySetup(radius, aiEnemyProperties);
+            base.EnemySetup(radius, aiEnemyProperties, entityType);
             
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
             _navMeshAgent.speed = _navMeshAgentSpecs.movementSpeed;
             _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent());
-            _rotationSpeed = _navMeshAgentSpecs.rotationSpeed;
             
             ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
         }
@@ -113,46 +109,41 @@ namespace ECS.Entities.AI.Combat
             _navMeshAgent.isStopped = true;
         }
 
-        protected void Rotate()
+        protected void RotateInSitu()
         {
-            Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(GetAgentID()).GetPosition();
+            Vector3 position = transform.position;
 
             List<Node> nodes = _navMeshAgentComponent.GetAStarPath().path;
-                    
+
             if (nodes.Count == 0)
             {
-                RotateToGivenPosition(destination);
-                return;
+                Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(GetAgentID()).GetPosition();
+                SetDirectionToRotate(destination - position);
             }
-            
-            RotateToGivenPosition(nodes[0].position);
-        }
+            else
+            {
+                SetDirectionToRotate(nodes[0].position - position);    
+            }
 
-        private void RotateToGivenPosition(Vector3 position)
-        {
             if (_isRotating)
             {
                 return;
             }
             
-            StopNavigation();
+            //TODO AQUI ROTATION
 
             _isRotating = true;
             
-            StartCoroutine(RotateToGivenPositionCoroutine(position));
+            StopNavigation();
+            
+            StartCoroutine(RotateToGivenPositionCoroutine());
         }
 
-        private IEnumerator RotateToGivenPositionCoroutine(Vector3 position)
+        private IEnumerator RotateToGivenPositionCoroutine()
         {
-            Transform ownTransform = transform;
-            
-            Vector3 vectorToPosition = position - ownTransform.position;
-            vectorToPosition.y = 0;
-
-            while (Vector3.Angle(ownTransform.forward, vectorToPosition) >= 5f)
+            while (Vector3.Angle(transform.forward, GetDirectionToRotate()) >= 5f)
             {
-                Quaternion rotation = Quaternion.LookRotation(vectorToPosition);
-                ownTransform.rotation = Quaternion.Slerp(ownTransform.rotation, rotation, _rotationSpeed * Time.deltaTime);
+                Rotate();
                 yield return null;
             }
             

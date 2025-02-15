@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using ECS.Entities;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Managers
 {
@@ -15,7 +12,6 @@ namespace Managers
         [Min(0f)] 
         [SerializeField] private float _playerReceiveDamageCooldown;
         
-        [FormerlySerializedAs("_enemiesReceiveDamageCooldown")]
         [Min(0f)] 
         [SerializeField] private float _enemyReceiveDamageCooldown;
         
@@ -25,18 +21,13 @@ namespace Managers
         [Min(0f)]
         [SerializeField] private float _timeBetweenHealTicks;
 
+        [SerializeField] private uint _healPerDeath;
+
         private int GROUND_LAYER = 6;
         private int INTERACTABLE_LAYER = 7;
-        private int ENEMY_ATTACK_ZONE_LAYER = 23;
-
-        private Dictionary<EntityType, int> _entitiesLayer = new Dictionary<EntityType, int>
-        {
-            { EntityType.PLAYER , (int)Math.Pow(2, 8)},
-            { EntityType.TRIFACE , (int)Math.Pow(2, 9)},
-            { EntityType.LONG_ARMS , (int)Math.Pow(2, 10)},
-            { EntityType.LONG_ARMS_BASE , (int)Math.Pow(2, 11)},
-            { EntityType.HEALER , (int)Math.Pow(2, 12)},
-        };
+        private int PLAYER_LAYER = 8;
+        private int ENEMY_LAYER = 9;
+        private int ENEMY_ATTACK_ZONE_LAYER = 10;
 
         private void Awake()
         {
@@ -72,6 +63,11 @@ namespace Managers
             return _timeBetweenHealTicks;
         }
 
+        public uint GetHealPerDeath()
+        {
+            return _healPerDeath;
+        }
+
         public int GetGroundLayer()
         {
             return (int)Math.Pow(2, GROUND_LAYER);
@@ -82,12 +78,14 @@ namespace Managers
             return (int)Math.Pow(2, INTERACTABLE_LAYER);
         }
 
+        public int GetPlayerLayer()
+        {
+            return (int)Math.Pow(2, PLAYER_LAYER);
+        }
+
         public int GetEnemyLayer()
         {
-            return _entitiesLayer[EntityType.TRIFACE] + 
-                   _entitiesLayer[EntityType.LONG_ARMS] +
-                   _entitiesLayer[EntityType.LONG_ARMS_BASE] +
-                   _entitiesLayer[EntityType.HEALER];
+            return (int)Math.Pow(2, ENEMY_LAYER);
         }
 
         public int GetEnemyAttackZoneLayer()
@@ -97,26 +95,12 @@ namespace Managers
 
         public int GetRaycastLayers()
         {
-            return GetInteractableLayer() + GetGroundLayer() + _entitiesLayer[EntityType.PLAYER] + GetEnemyLayer() + 1;
+            return GetInteractableLayer() + GetGroundLayer() + GetPlayerLayer() + GetEnemyLayer() + 1;
         }
         
         public int GetRaycastLayersWithoutAlly()
         {
             return GetInteractableLayer() + GetGroundLayer() + GetEnemyLayer() + 1;
-        }
-
-        public int GetEntityTypeLayer(EntityType entityType)
-        {
-            return _entitiesLayer[entityType];
-        }
-
-        public int GetDifferentEnemiesLayerFromMyType(EntityType entityType)
-        {
-            int layer = GetEnemyLayer();
-
-            layer -= _entitiesLayer[entityType];
-
-            return layer;
         }
     }
 }

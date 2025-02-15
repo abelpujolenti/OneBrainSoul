@@ -19,7 +19,7 @@ namespace Combat
 
             if (!attackLanded && animationTimer <= 1 - activeStart && animationTimer >= 1 - activeEnd)
             {
-                List<AgentEntity> entities = CombatManager.Instance.RequestAllEntities();
+                List<AgentEntity> entities = CombatManager.Instance.ReturnAllEnemies();
                 List<AgentEntity> affectedEntities = new List<AgentEntity>();
                 for (int i = 0; i < entities.Count; i++)
                 {

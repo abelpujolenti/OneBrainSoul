@@ -9,9 +9,10 @@ namespace AI.Combat.AbilityAoEColliders
 
         private AnimationCurve _radiusResizeCurve;
 
-        public override void SetAbilitySpecs(Transform parentTransform, SphericalAbilityComponent sphericalAbilityComponent)
+        public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
+            SphericalAbilityComponent sphericalAbilityComponent)
         {
-            base.SetAbilitySpecs(parentTransform, sphericalAbilityComponent);
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, sphericalAbilityComponent);
 
             _sphereCollider.radius = sphericalAbilityComponent.GetRadius();
 
@@ -25,12 +26,6 @@ namespace AI.Combat.AbilityAoEColliders
             {
                 _sphereCollider.radius = ReturnSizeOverTime(time, _radiusResizeCurve);
             };
-        }
-
-        public override void SetAbilityTargets(int targetsLayerMask)
-        {
-            _sphereCollider.includeLayers = targetsLayerMask;
-            _sphereCollider.excludeLayers = ~targetsLayerMask;
         }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections;
 using ECS.Entities.AI;
-using ECS.Entities.AI.Combat;
 using Player;
 using UnityEngine;
 

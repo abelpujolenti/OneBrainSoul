@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace ECS.Components.AI.Combat.Abilities
 {
-    public class RectangularAbilityComponent : AbilityComponent
+    public class RectangularAbilityComponent : AreaAbilityComponent
     {
         private Vector3 _direction;
         private float _heigth;
         private float _width;
         private float _length;
 
-        public RectangularAbilityComponent(AgentAbility agentAbility) : base(agentAbility)
+        public RectangularAbilityComponent(AreaAbilityProperties areaBasicAbilityProperties) : base(areaBasicAbilityProperties)
         {
-            AbilityAoE abilityAoE = agentAbility.abilityAoE;
+            AbilityAoE abilityAoE = areaBasicAbilityProperties.abilityAoE;
             
             _direction = abilityAoE.direction;
             _heigth = abilityAoE.height;

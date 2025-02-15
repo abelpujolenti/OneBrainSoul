@@ -7,8 +7,16 @@ namespace AI.Combat.AbilitySpecs
     public class AbilityProjectile
     {
         public GameObject projectilePrefab;
+
+        public Vector3 relativePositionToCaster;
+
+        public bool makesParabola;
         
         public float projectileSpeed;
+
+        public uint instances;
+
+        public float maximumDispersion;
 
         public bool doesVanishOnImpact;
         public bool doesVanishOverTime;

@@ -12,17 +12,20 @@ namespace Editor.Enemies
             base.OnInspectorGUI();
             
             TrifaceProperties trifaceProperties = (TrifaceProperties)target;
+
+            EditorGUI.indentLevel--;
             
             EditorGUILayout.Space();
-
-            EditorGUILayout.BeginHorizontal();
             
-            EditorGUILayout.LabelField("Slam Ability", EditorStyles.boldLabel);
+            LabelField("Abilities");
 
-            trifaceProperties.slamAbility =
-                (AgentAbility)EditorGUILayout.ObjectField(trifaceProperties.slamAbility, typeof(AgentAbility), false);
+            EditorGUI.indentLevel++;
             
-            EditorGUILayout.EndHorizontal();
+            ObjectField(ref trifaceProperties.slamAbilityProperties, "Slam Ability");
+            
+            FloatField(ref trifaceProperties.rotationSpeedWhileCastingSlam, 0, "Rotation Speed While Casting Slam");
+
+            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

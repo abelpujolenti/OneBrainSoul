@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace ECS.Components.AI.Combat.Abilities
 {
-    public class ConicalAbilityComponent : AbilityComponent
+    public class ConicalAbilityComponent : AreaAbilityComponent
     {
         private Vector3 _direction;
         private float _height;
         private float _radius;
 
-        public ConicalAbilityComponent(AgentAbility agentAbility) : base(agentAbility)
+        public ConicalAbilityComponent(AreaAbilityProperties areaBasicAbilityProperties) : base(areaBasicAbilityProperties)
         {
-            AbilityAoE abilityAoE = agentAbility.abilityAoE;
+            AbilityAoE abilityAoE = areaBasicAbilityProperties.abilityAoE;
             
             _direction = abilityAoE.direction;
             _height = abilityAoE.height;

@@ -12,8 +12,12 @@ namespace AI.Combat.AbilitySpecs
     }
     
     [Serializable]
-    public class AbilityAoE 
+    public class AbilityAoE
     {
+        public bool isAttachedToCaster;
+        
+        public Vector3 relativePositionToCaster;
+        
         public float duration;
         
         public Vector3 direction;
@@ -32,11 +36,17 @@ namespace AI.Combat.AbilitySpecs
         public bool doesLengthChangeOverTheTime;
         public bool doesRadiusChangeOverTheTime;
         public bool doesScaleChangeOverTheTime;
+        public bool doesXScaleChangeOverTheTime;
+        public bool doesYScaleChangeOverTheTime;
+        public bool doesZScaleChangeOverTheTime;
 
         public AnimationCurve heightChangeOverTime = new AnimationCurve();
         public AnimationCurve widthChangeOverTime = new AnimationCurve();
         public AnimationCurve lengthChangeOverTime = new AnimationCurve();
         public AnimationCurve radiusChangeOverTime = new AnimationCurve();
         public AnimationCurve scaleChangeOverTime = new AnimationCurve();
+        public AnimationCurve XScaleChangeOverTime = new AnimationCurve();
+        public AnimationCurve YScaleChangeOverTime = new AnimationCurve();
+        public AnimationCurve ZScaleChangeOverTime = new AnimationCurve();
     }
 }
