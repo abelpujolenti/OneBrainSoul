@@ -859,7 +859,7 @@ MonoBehaviour:
     m_Bits: 64
   _jumps: 2
   _moveSpeedMultiplier: 1.1
-  _ability1Cooldown: 0.9
+  _ability1Cooldown: 0.8
   _ability2Cooldown: 0.8
   _gravityStrength: 32
   _hoverHeight: 1.2
@@ -881,6 +881,10 @@ MonoBehaviour:
   _wallClimbAbility: {fileID: 8879438813995703225}
   _hookAbility: {fileID: 8022381131504467490}
   _hookLineRenderer: {fileID: 3127817565339649075}
+  _hookUI: {fileID: 2481377896329111756}
+  _maxHookCharges: 3
+  _outOfCombatRechargeDuration: 1.2
+  _inCombatRechargeDuration: 4
   _isDashUnlocked: 0
   _isChargeUnlocked: 0
   _isHookUnlocked: 0
@@ -912,17 +916,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47453108944ce024696249a9f531396e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hookUI: {fileID: 2481377896329111756}
   _hookShotChainMaterial: {fileID: 2100000, guid: f9c15ca6cd933e4478201f6cd861be45,
     type: 2}
   _range: 80
-  _maxHookCharges: 3
   _radius: 0.5
   _ledgeSnapLeniency: 8
   _ledgeSnapNormalThreshold: 0.5
   _ledgeSnapDistance: 1
-  _outOfCombatRechargeDuration: 2
-  _inCombatRechargeDuration: 3
+  _smashThreshold: 0.75
+  _smashNormalThreshold: 0.55
 --- !u!114 &8457788339951176688
 MonoBehaviour:
   m_ObjectHideFlags: 0
