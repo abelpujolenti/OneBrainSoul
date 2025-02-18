@@ -22,7 +22,7 @@ MonoBehaviour:
     canCancelCast: 0
     maximumAngleToCancelCast: 0
     timeToCast: 0
-    cooldown: 0.2
+    cooldown: 10
     duration: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
@@ -148,7 +148,7 @@ MonoBehaviour:
       type: 3}
     relativePositionToCaster: {x: 0, y: 2, z: 2}
     makesParabola: 0
-    projectileSpeed: 500
+    projectileSpeed: 20
     instances: 30
     maximumDispersion: 5
     doesVanishOnImpact: 0
