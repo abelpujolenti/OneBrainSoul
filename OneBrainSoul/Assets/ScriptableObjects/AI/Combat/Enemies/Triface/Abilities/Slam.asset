@@ -18,9 +18,9 @@ MonoBehaviour:
     minimumRangeToCast: 0
     maximumRangeToCast: 6
     directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleFromForwardToCast: 0
+    minimumAngleToCast: 180
     canCancelCast: 0
-    maximumAngleFromForwardToCancelCast: 0
+    maximumAngleToCancelCast: 0
     timeToCast: 0.2
     cooldown: 4
     duration: 0

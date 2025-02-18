@@ -146,7 +146,7 @@ namespace ECS.Entities.AI
 
             Quaternion rotation = Quaternion.LookRotation(colliderForwardVector, referenceVector);
             
-            _rigidbody.AddForce(rotation * forceDirection, ForceMode.Impulse);
+            _rigidbody.AddForce(rotation * forceDirection * forceStrength, ForceMode.Acceleration);
         }
 
         public Vector3 GetVelocity()

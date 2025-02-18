@@ -977,8 +977,10 @@ MonoBehaviour:
   _rigidbody: {fileID: 8142020339586624469}
   _damageParticlePrefab: {fileID: 1782360678715371482, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
     type: 3}
+  _showMessages: 0
   _camera: {fileID: 7644145240796908984}
-  _maxHealth: 5000
+  _playerCharacterController: {fileID: 7820339696052967221}
+  _maxHealth: 300
   _agentsPositionRadius: 2
   _damageEffectDuration: 0.35
 --- !u!1 &4680270387884578829

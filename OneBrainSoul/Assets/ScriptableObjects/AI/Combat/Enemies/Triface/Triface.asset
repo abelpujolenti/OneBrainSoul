@@ -15,5 +15,8 @@ MonoBehaviour:
   totalHealth: 10
   agentsPositionRadius: 5
   sightMaximumDistance: 0
+  fov: 360
+  normalRotationSpeed: 1
   slamAbilityProperties: {fileID: 11400000, guid: 3935a9b85f5fe7f4098c1ad70144227e,
     type: 2}
+  rotationSpeedWhileCastingSlam: 0
