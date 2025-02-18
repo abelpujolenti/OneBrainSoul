@@ -241,5 +241,14 @@ namespace Player
         {
             return _radius;
         }
+        public uint GetHealth()
+        {
+            return _health;
+        }
+
+        public uint GetMaxHealth()
+        {
+            return _maxHealth;
+        }
     }
 }
