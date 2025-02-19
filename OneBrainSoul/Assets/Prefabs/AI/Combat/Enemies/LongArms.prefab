@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3033667219593020291, guid: 27552b240b2ca954684eae7f798ddd3e, type: 3}
+  - {fileID: 2100000, guid: d3dcfd59f7b574647a2e953938b9ff08, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -167,6 +167,8 @@ MonoBehaviour:
   _colorOfDetectionAreaOfThrowRock: {r: 0, g: 0, b: 0, a: 0}
   _showDetectionAreaOfClapAbove: 0
   _colorOfDetectionAreaOfClapAbove: {r: 0, g: 0, b: 0, a: 0}
+  _showDetectionAreaOfFlee: 0
+  _colorOfDetectionAreaOfFlee: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &2491159063777725988
 GameObject:
   m_ObjectHideFlags: 0
@@ -229,7 +231,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3033667219593020291, guid: 4265650be36d8e14c87accc6ee7e57b4, type: 3}
+  - {fileID: 2100000, guid: d3dcfd59f7b574647a2e953938b9ff08, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
