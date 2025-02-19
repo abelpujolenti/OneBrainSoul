@@ -202,7 +202,7 @@ namespace Managers
             }
 
             return !Physics.Raycast(position, vectorToTarget, distanceToTarget, 
-                GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
+                GameManager.Instance.GetGroundLayer());
         }
 
         public void AddFreeLongArmsBaseId(uint longArmsBaseId)
