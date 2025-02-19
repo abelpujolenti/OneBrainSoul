@@ -9,22 +9,22 @@ namespace AI.Combat.Contexts.Target
         private float _distanceToTarget;
 
         private Vector3 _vectorToTarget;
+        private Vector3 _targetPosition;
+        private Vector3 _targetVelocity;
 
-        private Transform _targetTransform;
+        private bool _canSeeTarget;
+        private LoseSightOfTargetCause _loseSightOfTargetCause;
 
-        public void SetTargetRadius(float targetRadius)
+        public void SetTargetProperties(float targetRadius, float targetHeight)
         {
             _targetRadius = targetRadius;
+            _targetHeight = targetHeight;
+            _canSeeTarget = true;
         }
 
         public float GetTargetRadius()
         {
             return _targetRadius;
-        }
-
-        public void SetTargetHeight(float targetHeight)
-        {
-            _targetHeight = targetHeight;
         }
 
         public float GetTargetHeight()
@@ -44,8 +44,8 @@ namespace AI.Combat.Contexts.Target
 
         public void SetVectorToTarget(Vector3 vectorToTarget)
         {
-            _vectorToTarget = vectorToTarget;
-            SetDistanceToTarget(_vectorToTarget.magnitude - _targetRadius);
+            _vectorToTarget = vectorToTarget.normalized * (vectorToTarget.magnitude - _targetRadius);
+            SetDistanceToTarget(_vectorToTarget.magnitude);
         }
 
         public Vector3 GetVectorToTarget()
@@ -53,22 +53,40 @@ namespace AI.Combat.Contexts.Target
             return _vectorToTarget;
         }
 
-        public void SetTargetTransform(Transform targetTransform, Vector3 ownPosition, float ownHeight)
+        public void SetTargetState(Vector3 position, Vector3 velocity)
         {
-            _targetTransform = targetTransform;
-
-            Vector3 targetPosition = targetTransform.position;
-            targetPosition.y -= _targetHeight / 2;
-
-            Vector3 agentPosition = ownPosition;
-            agentPosition.y -= ownHeight / 2;
-            
-            SetVectorToTarget(targetPosition - agentPosition);
+            _targetPosition = position;
+            _targetVelocity = velocity;
         }
 
-        public Transform GetTargetTransform()
+        public Vector3 GetTargetPosition()
         {
-            return _targetTransform;
+            return _targetPosition;
+        }
+
+        public Vector3 GetTargetVelocity()
+        {
+            return _targetVelocity;
+        }
+
+        public bool CanSeeTarget()
+        {
+            return _canSeeTarget;
+        }
+
+        public void OnLoseSightOfTarget()
+        {
+            _canSeeTarget = false;
+        }
+
+        public void SetLoseSightOfTargetCause(LoseSightOfTargetCause loseSightOfTargetCause)
+        {
+            _loseSightOfTargetCause = loseSightOfTargetCause;
+        }
+
+        public LoseSightOfTargetCause GetLoseSightOfTargetCause()
+        {
+            return _loseSightOfTargetCause;
         }
     }
 }

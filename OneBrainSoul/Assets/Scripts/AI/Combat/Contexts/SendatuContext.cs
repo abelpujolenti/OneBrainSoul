@@ -5,18 +5,19 @@ using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public class SendatuContext : AIEnemyContext
+    public class SendatuContext : TeleportMobilityEnemyContext
     {
         private Dictionary<uint, float> _distancesToTargetsToFleeFrom;
         private float _radiusToFlee;
         
-        public SendatuContext(uint totalHealth, float radius, float height, float sightMaximumDistance, float fov,
-            Transform agentTransform, float radiusToFlee) : base(EntityType.SENDATU, totalHealth, radius, height, 
-            sightMaximumDistance, fov, agentTransform)
+        public SendatuContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
+            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, float radiusToFlee) : 
+            base(EntityType.SENDATU, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
+            fov, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {
-                (uint)LongArmsAction.OBSERVING,
+                (uint)LongArmsAction.OBSERVE,
                 (uint)LongArmsAction.THROW_ROCK
             };
 
@@ -55,6 +56,11 @@ namespace AI.Combat.Contexts
         public float GetRadiusToFlee()
         {
             return _radiusToFlee;
+        }
+
+        public override bool IsSeeingATarget()
+        {
+            return false;
         }
 
         public override bool HasATarget()

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
+using AI.Combat.Contexts.Target;
 using AI.Combat.Enemy.LongArms;
 using AI.Combat.ScriptableObjects;
 using Interfaces.AI.Combat;
@@ -20,22 +22,24 @@ namespace ECS.Entities.AI.Combat
         private IProjectileAbility _throwRockAbility;
         private HashSet<uint> _visibleTargetsForThrowRock;
         private Func<bool> _cancelThrowRockFunc = () => false;
+        private Stopwatch _timeElapsedSinceTheLastSeenOfThrowRockTarget = new Stopwatch();
 
         private IAreaAbility _clapAboveAbility;
         private HashSet<uint> _visibleTargetsForClapAbove;
         private Func<bool> _cancelClapAboveFunc = () => false;
+        private Stopwatch _timeElapsedSinceTheLastSeenOfClapAboveTarget = new Stopwatch();
 
         private HashSet<uint> _visibleTargetsToFleeFrom;
 
-        private float _rotationSpeedWhenAcquiringATarget;
-        private float _rotationSpeedWhileCastingThrowRock;
-        private float _rotationSpeedWhenTurningAround;
+        private float _bodyRotationSpeedWhenAcquiringATarget;
+        private float _bodyRotationSpeedWhileCastingThrowRock;
+        private float _bodyRotationSpeedWhenTurningAround;
 
         private float _minimumTimeBeforeSettingNewDirection;
         private float _maximumTimeBeforeSettingNewDirection;
 
-        private uint _minimumDegreesToRotate;
-        private uint _maximumDegreesToRotate;
+        private uint _bodyMinimumDegreesToRotate;
+        private uint _bodyMaximumDegreesToRotate;
 
         private uint _minimumTimesSettingNewDirectionToTurnAround;
         private uint _maximumTimesSettingNewDirectionToTurnAround;
@@ -55,26 +59,26 @@ namespace ECS.Entities.AI.Combat
 
             _utilityFunction = new LongArmsUtilityFunction();
 
-            _normalRotationSpeed = _longArmsProperties.normalRotationSpeed;
-            _rotationSpeedWhenAcquiringATarget = _longArmsProperties.rotationSpeedWhenAcquiringATarget;
-            _rotationSpeedWhileCastingThrowRock = _longArmsProperties.rotationSpeedWhileCastingThrowRock;
-            _rotationSpeedWhenTurningAround = _longArmsProperties.rotationSpeedWhileTurningAround;
-            _currentRotationSpeed = _normalRotationSpeed;
+            _bodyNormalRotationSpeed = _longArmsProperties.bodyNormalRotationSpeed;
+            _bodyRotationSpeedWhenAcquiringATarget = _longArmsProperties.bodyRotationSpeedWhenAcquiringATarget;
+            _bodyRotationSpeedWhileCastingThrowRock = _longArmsProperties.bodyNotationSpeedWhileCastingThrowRock;
+            _bodyRotationSpeedWhenTurningAround = _longArmsProperties.bodyRotationSpeedWhileTurningAround;
+            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
 
             _minimumTimeBeforeSettingNewDirection = _longArmsProperties.minimumTimeBeforeSettingNewDirection;
             _maximumTimeBeforeSettingNewDirection = _longArmsProperties.maximumTimeBeforeSettingNewDirection;
 
-            _minimumDegreesToRotate = _longArmsProperties.minimumDegreesToRotateDirection;
-            _maximumDegreesToRotate = _longArmsProperties.maximumDegreesToRotateDirection;
+            _bodyMinimumDegreesToRotate = _longArmsProperties.bodyMinimumDegreesToRotateDirection;
+            _bodyMaximumDegreesToRotate = _longArmsProperties.bodyMaximumDegreesToRotateDirection;
 
             _minimumTimesSettingNewDirectionToTurnAround = _longArmsProperties.minimumTimesSettingNewDirectionToTurnAround;
             _maximumTimesSettingNewDirectionToTurnAround = _longArmsProperties.maximumTimesSettingNewDirectionToTurnAround;
 
-            _context = new LongArmsContext(_longArmsProperties.totalHealth, radius, capsuleCollider.height,
-                _longArmsProperties.sightMaximumDistance, _longArmsProperties.fov, transform, _throwRockAbility.GetCast(), 
-                _clapAboveAbility.GetCast(), _longArmsProperties.radiusToFlee);
+            _context = new LongArmsContext(_longArmsProperties.totalHealth, _longArmsProperties.maximumHeadYawRotation, 
+                radius, capsuleCollider.height, _longArmsProperties.sightMaximumDistance, _longArmsProperties.fov, _headTransform, 
+                _bodyTransform, _throwRockAbility.GetCast(), _clapAboveAbility.GetCast(), _longArmsProperties.radiusToFlee);
             
-            SetDirectionToRotate(transform.forward);
+            SetDirectionToRotateBody(transform.forward);
             
             LongArmsBase longArmsBase = transform.parent.GetComponent<LongArmsBase>(); 
             
@@ -90,10 +94,10 @@ namespace ECS.Entities.AI.Combat
         {
             _actions = new Dictionary<LongArmsAction, Action>
             {
-                { LongArmsAction.OBSERVING , Observing },
-                { LongArmsAction.TURN_AROUND , TurnAround },
+                { LongArmsAction.OBSERVE , Observing },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK , AcquireNewTargetForThrowRock },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE , AcquireNewTargetForClapAbove },
+                { LongArmsAction.LOSE_TARGET , LoseTarget },
                 { LongArmsAction.THROW_ROCK , ThrowRock },
                 { LongArmsAction.CLAP_ABOVE , ClapAbove },
                 { LongArmsAction.FLEE , Flee }
@@ -112,7 +116,7 @@ namespace ECS.Entities.AI.Combat
                     AbilityCast abilityCast = _throwRockAbility.GetCast();
                     Vector3 vectorToTarget = _context.GetThrowRockTargetContext().GetVectorToTarget();
 
-                    return Vector3.Angle(transform.forward, vectorToTarget) > abilityCast.maximumAngleToCancelCast ||
+                    return Vector3.Angle(_context.GetDirectionOfThrowRockDetection(), vectorToTarget) > abilityCast.maximumAngleToCancelCast ||
                            vectorToTarget.sqrMagnitude > abilityCast.maximumRangeToCast * abilityCast.maximumRangeToCast;
                 };
             }
@@ -130,7 +134,7 @@ namespace ECS.Entities.AI.Combat
                 AbilityCast abilityCast = _clapAboveAbility.GetCast();
                 Vector3 vectorToTarget = _context.GetClapAboveTargetContext().GetVectorToTarget();
 
-                return Vector3.Angle(transform.forward, vectorToTarget) > abilityCast.maximumAngleToCancelCast ||
+                return Vector3.Angle(_context.GetDirectionOfClapAboveDetection(), vectorToTarget) > abilityCast.maximumAngleToCancelCast ||
                     vectorToTarget.sqrMagnitude > abilityCast.maximumRangeToCast * abilityCast.maximumRangeToCast;
             };
         }
@@ -143,12 +147,14 @@ namespace ECS.Entities.AI.Combat
             
             UpdateVectorsToTargets();
             
-            if (_context.IsCastingAnAbility())
+            if (_context.IsFSMBlocked())
             {
                 return;
             }
             
-            Rotate();
+            //RotateHead();
+            
+            RotateBody();
             
             CalculateBestAction();
         }
@@ -184,47 +190,81 @@ namespace ECS.Entities.AI.Combat
 
         private void UpdateVectorsToTargets()
         {
-            Vector3 targetPosition;
             Vector3 agentPosition = transform.position;
+
+            Vector3 targetPosition;
+            Vector3 targetVelocity;
+            Vector3 vectorToTarget;
 
             foreach (uint targetId in _visibleTargetsToFleeFrom)
             {
                 _context.SetDistanceToTargetToFleeFrom(targetId,
                     CombatManager.Instance.ReturnDistanceToTarget(agentPosition, targetId));
             }
-
-            if (!_context.HasATarget())
-            {
-                //_currentRotationSpeed = _normalRotationSpeed;
-            }
             
             if (_context.HasATargetForThrowRock())
             {
-                targetPosition = _context.GetThrowRockTargetContext().GetTargetTransform().position;
-                agentPosition = transform.position;
+                if (!_visibleTargetsForThrowRock.Contains(_throwRockAbility.GetTargetId()))
+                {
+                    _context.GetThrowRockTargetContext().OnLoseSightOfTarget();
+                }
+                else
+                {
+                    {
+                        AgentEntity target = CombatManager.Instance.ReturnAgentEntity(_throwRockAbility.GetTargetId());
+                        targetPosition = target.GetTransformComponent().GetPosition();
+                        targetVelocity = target.GetVelocity();
+                    }
             
-                targetPosition.y -= _context.GetThrowRockTargetContext().GetTargetHeight() / 2;
-                agentPosition.y -= _context.GetHeight() / 2;
+                    _context.GetThrowRockTargetContext().SetTargetState(targetPosition, targetVelocity);
+                    
+                    agentPosition = transform.position;
+            
+                    targetPosition.y -= _context.GetThrowRockTargetContext().GetTargetHeight() / 2;
+                    agentPosition.y -= _context.GetHeight() / 2;
 
-                Vector3 vectorToTarget = targetPosition - agentPosition;
-                
-                SetDirectionToRotate(vectorToTarget);
+                    vectorToTarget = targetPosition - agentPosition;
             
-                _context.GetThrowRockTargetContext().SetVectorToTarget(vectorToTarget);
+                    _context.GetThrowRockTargetContext().SetVectorToTarget(vectorToTarget);
+                    
+                    SetDirectionToRotateBody(vectorToTarget);
+                }
             }
 
             if (!_context.HasATargetForClapAbove())
             {
                 return;
             }
+
+            if (!_visibleTargetsForClapAbove.Contains(_clapAboveAbility.GetTargetId()))
+            {
+                _context.GetClapAboveTargetContext().OnLoseSightOfTarget();
+                return;
+            }
+
+            {
+                AgentEntity target = CombatManager.Instance.ReturnAgentEntity(_clapAboveAbility.GetTargetId());
+                targetPosition = target.GetTransformComponent().GetPosition();
+                targetVelocity = target.GetVelocity();
+            }
             
-            targetPosition = _context.GetClapAboveTargetContext().GetTargetTransform().position;
+            _context.GetClapAboveTargetContext().SetTargetState(targetPosition, targetVelocity);
+            
             agentPosition = transform.position;
             
             targetPosition.y -= _context.GetClapAboveTargetContext().GetTargetHeight() / 2;
             agentPosition.y -= _context.GetHeight() / 2;
+
+            vectorToTarget = targetPosition - agentPosition;
             
-            _context.GetClapAboveTargetContext().SetVectorToTarget(targetPosition - agentPosition);
+            _context.GetClapAboveTargetContext().SetVectorToTarget(vectorToTarget);
+
+            if (_context.HasATargetForThrowRock())
+            {
+                return;
+            }
+            
+            SetDirectionToRotateBody(vectorToTarget);
         }
 
         #endregion
@@ -235,7 +275,7 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Long Arms " + GetAgentID() + " Observing");
 
-            if (_isSettingNewDirectionToRotate || transform.forward != GetDirectionToRotate())
+            if (_isSettingNewDirectionToRotate || transform.forward != GetDirectionToRotateBody())
             {
                 return;
             }
@@ -256,15 +296,22 @@ namespace ECS.Entities.AI.Combat
             
             _isSettingNewDirectionToRotate = false;
 
+            if (_context.IsSeeingATarget())
+            {
+                yield break;
+            }
+
             if (_timesSettingNewDirection != 0)
             {
-                float degrees = Random.Range(_minimumDegreesToRotate, _maximumDegreesToRotate) * (Random.Range(0, 2) * 2 - 1);
+                float degrees = Random.Range(_bodyMinimumDegreesToRotate, _bodyMaximumDegreesToRotate) * (Random.Range(0, 2) * 2 - 1);
 
-                SetDirectionToRotate(MathUtil.RotateVector(GetDirectionToRotate(), Vector3.up, degrees));
+                SetDirectionToRotateBody(MathUtil.RotateVector(GetDirectionToRotateBody(), Vector3.up, degrees));
 
                 _timesSettingNewDirection--;
                 yield break;
             }
+            
+            BlockFSM();
             
             TurnAround();
         }
@@ -273,24 +320,27 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Long Arms " + GetAgentID() + " Turning Around");
 
-            SetDirectionToRotate(transform.forward * -1);
+            SetDirectionToRotateBody(transform.forward * -1);
 
-            _currentRotationSpeed = _rotationSpeedWhenTurningAround;
+            _bodyCurrentRotationSpeed = _bodyRotationSpeedWhenTurningAround;
 
             StartCoroutine(BackToNormalRotationSpeed());
         }
 
         private IEnumerator BackToNormalRotationSpeed()
         {
-            while (!_context.IsSeeingATarget() && transform.forward != GetDirectionToRotate())
+            while (!_context.IsSeeingATarget() && transform.forward != GetDirectionToRotateBody())
             {
+                RotateBody();
                 yield return null;
             }
 
             _timesSettingNewDirection = (uint)Random.Range(_minimumTimesSettingNewDirectionToTurnAround,
                 _maximumTimesSettingNewDirectionToTurnAround);
 
-            _currentRotationSpeed = _normalRotationSpeed;
+            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
+            
+            UnblockFSM();
         }
 
         private void AcquireNewTargetForThrowRock()
@@ -302,9 +352,9 @@ namespace ECS.Entities.AI.Combat
             
             AgentEntity target = CombatManager.Instance.ReturnClosestAgentEntity(position, _visibleTargetsForThrowRock);
 
-            _currentRotationSpeed = _rotationSpeedWhenAcquiringATarget;
+            _bodyCurrentRotationSpeed = _bodyRotationSpeedWhenAcquiringATarget;
             
-            _context.SetThrowRockTarget(target);
+            _context.SetThrowRockTargetProperties(target.GetRadius(), target.GetHeight());
             
             _throwRockAbility.SetTargetId(target.GetAgentID());
         }
@@ -318,11 +368,68 @@ namespace ECS.Entities.AI.Combat
             
             AgentEntity target = CombatManager.Instance.ReturnClosestAgentEntity(position, _visibleTargetsForClapAbove);
 
-            _currentRotationSpeed = _rotationSpeedWhenAcquiringATarget;
+            _bodyCurrentRotationSpeed = _bodyRotationSpeedWhenAcquiringATarget;
             
-            _context.SetClapAboveTarget(target);
+            _context.SetClapAboveTargetProperties(target.GetRadius(), target.GetHeight());
             
             _clapAboveAbility.SetTargetId(target.GetAgentID());
+        }
+
+        private void LoseTarget()
+        {
+            ShowDebugMessages("Long Arms " + GetAgentID() + " Target Lost");
+
+            bool throwRockTargetLost = false;
+
+            if (!_context.CanSeeTargetOfThrowRock())
+            {
+                if (_context.IsSeeingATargetForThrowRock())
+                {
+                    AcquireNewTargetForClapAbove();
+                }
+                else
+                {
+                    throwRockTargetLost = true;
+                    _context.LoseThrowRockTarget();
+                }
+            }
+
+            if (!_context.CanSeeTargetOfClapAbove())
+            {
+                if (_context.IsSeeingATargetForThrowRock())
+                {
+                    AcquireNewTargetForClapAbove();
+                    return;
+                }
+                _context.LoseClapAboveTarget();
+            }
+            
+            if (_context.IsSeeingATarget())
+            {
+                return;
+            }
+            
+            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
+
+            TargetContext targetContext;
+
+            if (throwRockTargetLost)
+            {
+                targetContext = _context.GetThrowRockTargetContext();
+                
+                OnLoseSightOfTarget(targetContext.GetTargetPosition(), targetContext.GetTargetVelocity(),
+                    _timeElapsedSinceTheLastSeenOfThrowRockTarget.ElapsedMilliseconds / 100);
+                
+                _timeElapsedSinceTheLastSeenOfThrowRockTarget.Reset();
+                return;
+            }
+
+            targetContext = _context.GetClapAboveTargetContext();
+            
+            OnLoseSightOfTarget(targetContext.GetTargetPosition(), targetContext.GetTargetVelocity(),
+                _timeElapsedSinceTheLastSeenOfClapAboveTarget.ElapsedMilliseconds / 1000);
+                
+            _timeElapsedSinceTheLastSeenOfClapAboveTarget.Reset();
         }
 
         private void ThrowRock()
@@ -343,7 +450,7 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Long Arms " + GetAgentID() + " Fleeing");
             
-            CastingAnAbility();
+            BlockFSM();
             
             //_animator.
             
@@ -356,7 +463,7 @@ namespace ECS.Entities.AI.Combat
             
             //_animator.
             
-            NotCastingAnAbility();
+            UnblockFSM();
         }
 
         #endregion
@@ -382,9 +489,9 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingThrowRock(IProjectileAbility projectileAbility)
         {
-            _currentRotationSpeed = _rotationSpeedWhileCastingThrowRock;
+            _bodyCurrentRotationSpeed = _bodyRotationSpeedWhileCastingThrowRock;
             
-            CastingAnAbility();
+            BlockFSM();
             
             projectileAbility.Activate();
             
@@ -401,12 +508,12 @@ namespace ECS.Entities.AI.Combat
             {
                 abilityCast.DecreaseCurrentCastTime();
                 
-                Rotate();
+                RotateBody();
                 
                 if (_cancelThrowRockFunc())
                 {
                     abilityCast.ResetCastTime();
-                    NotCastingAnAbility();
+                    UnblockFSM();
                     yield break;
                 }
                 yield return null;
@@ -414,7 +521,7 @@ namespace ECS.Entities.AI.Combat
 
             if (!projectileAbility.FIREEEEEEEEEEEEEE())
             {
-                NotCastingAnAbility();
+                UnblockFSM();
                 yield break;
             }
             StartCoroutine(StartCooldownCoroutine(projectileAbility.GetCast()));
@@ -426,7 +533,7 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingClapAbove(IAreaAbility areaAbility) 
         {
-            CastingAnAbility();
+            BlockFSM();
             
             StartCoroutine(StartClapAboveCastTimeCoroutine(areaAbility));
         }
@@ -441,12 +548,12 @@ namespace ECS.Entities.AI.Combat
             {
                 abilityCast.DecreaseCurrentCastTime();
                 
-                Rotate();
+                RotateBody();
                 
                 if (_cancelClapAboveFunc())
                 {
                     abilityCast.ResetCastTime();
-                    NotCastingAnAbility();
+                    UnblockFSM();
                     yield break;
                 }
                 yield return null;
@@ -496,8 +603,6 @@ namespace ECS.Entities.AI.Combat
         public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
         {}
         
-        
-        
         /////////////////////////DEBUG
 
         [SerializeField] private bool _showDetectionAreaOfThrowRock;
@@ -507,12 +612,12 @@ namespace ECS.Entities.AI.Combat
         
         private void OnDrawGizmos()
         {
-            Vector3 origin = transform.position;
+            Vector3 origin = _headTransform.position;
             int segments = 20;
 
             if (_showFov)
             {
-                DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, transform.forward, segments);
+                DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
             }
             
             if (_showDetectionAreaOfThrowRock)

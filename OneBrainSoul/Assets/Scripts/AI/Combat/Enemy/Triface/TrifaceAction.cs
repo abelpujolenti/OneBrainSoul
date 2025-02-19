@@ -2,10 +2,12 @@
 {
     public enum TrifaceAction : uint
     {
-        PATROL,
-        ACQUIRE_NEW_TARGET_FOR_SLAM,
-        GET_CLOSER_TO_TARGET_OF_SLAM,
+        CONTINUE_NAVIGATION,
         ROTATE,
+        PATROL,
+        INVESTIGATE_AREA,
+        ACQUIRE_NEW_TARGET_FOR_SLAM,
+        LOSE_TARGET,
         SLAM,
         ENUM_SIZE
     }

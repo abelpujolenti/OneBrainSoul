@@ -13,18 +13,24 @@ namespace Editor.Enemies
             
             LongArmsProperties longArmsProperties = (LongArmsProperties)target;
             
+            LabelField("Rotation");
+
+            EditorGUI.indentLevel++;
+            
+            FloatField(ref longArmsProperties.bodyNormalRotationSpeed, 1, "Body Normal Rotation Speed");
+            
             FloatField(ref longArmsProperties.minimumTimeBeforeSettingNewDirection, 0, "Minimum Time Before Setting New Direction");
             
             FloatField(ref longArmsProperties.maximumTimeBeforeSettingNewDirection, 
                 longArmsProperties.minimumTimeBeforeSettingNewDirection, "Maximum Time Before Setting New Direction");
             
-            UintField(ref longArmsProperties.minimumDegreesToRotateDirection, 0, "Minimum Degrees To Rotate Direction At Once");
+            UintField(ref longArmsProperties.bodyMinimumDegreesToRotateDirection, 0, "Body Minimum Degrees To Rotate Direction At Once");
             
-            UintField(ref longArmsProperties.maximumDegreesToRotateDirection, longArmsProperties.minimumDegreesToRotateDirection, 
-                "Maximum Degrees To Rotate Direction At Once");
+            UintField(ref longArmsProperties.bodyMaximumDegreesToRotateDirection, longArmsProperties.bodyMinimumDegreesToRotateDirection, 
+                "Body Maximum Degrees To Rotate Direction At Once");
             
-            FloatField(ref longArmsProperties.rotationSpeedWhenAcquiringATarget, longArmsProperties.normalRotationSpeed, 
-                "Rotation Speed When Acquiring a Target");
+            FloatField(ref longArmsProperties.bodyRotationSpeedWhenAcquiringATarget, longArmsProperties.bodyNormalRotationSpeed, 
+                "Body Rotation Speed When Acquiring a Target");
 
             EditorGUI.indentLevel--;
             
@@ -39,8 +45,8 @@ namespace Editor.Enemies
             UintField(ref longArmsProperties.maximumTimesSettingNewDirectionToTurnAround, longArmsProperties.minimumTimesSettingNewDirectionToTurnAround, 
                 "Maximum Times Setting New Direction To Turn Around");
             
-            FloatField(ref longArmsProperties.rotationSpeedWhileTurningAround, longArmsProperties.normalRotationSpeed, 
-                "Rotation Speed While Turning Around");
+            FloatField(ref longArmsProperties.bodyRotationSpeedWhileTurningAround, longArmsProperties.bodyNormalRotationSpeed, 
+                "Body Rotation Speed While Turning Around");
 
             EditorGUI.indentLevel--;
             
@@ -64,7 +70,7 @@ namespace Editor.Enemies
             
             ObjectField(ref longArmsProperties.throwRockAbilityProperties, "Throw Rock Ability");
             
-            FloatField(ref longArmsProperties.rotationSpeedWhileCastingThrowRock, 0.1f, "Rotation Speed While Casting Throw Rock");
+            FloatField(ref longArmsProperties.bodyNotationSpeedWhileCastingThrowRock, 0.1f, "Rotation Speed While Casting Throw Rock");
             
             EditorGUILayout.Space();
             

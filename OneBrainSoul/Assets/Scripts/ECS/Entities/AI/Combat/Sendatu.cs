@@ -26,13 +26,14 @@ namespace ECS.Entities.AI.Combat
 
             _utilityFunction = new SendatuUtilityFunction();
 
-            _normalRotationSpeed = _sendatuProperties.normalRotationSpeed;
-            _currentRotationSpeed = _normalRotationSpeed;
+            _bodyNormalRotationSpeed = _sendatuProperties.bodyNormalRotationSpeed;
+            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
 
-            _context = new SendatuContext(_sendatuProperties.totalHealth, radius, capsuleCollider.height,
-                _sendatuProperties.sightMaximumDistance, _sendatuProperties.fov, transform, _sendatuProperties.radiusToFlee);
+            _context = new SendatuContext(_sendatuProperties.totalHealth, _sendatuProperties.maximumHeadYawRotation, 
+                radius, capsuleCollider.height, _sendatuProperties.sightMaximumDistance, _sendatuProperties.fov, _headTransform, 
+                _bodyTransform, _sendatuProperties.radiusToFlee);
             
-            SetDirectionToRotate(transform.forward);
+            SetDirectionToRotateBody(transform.forward);
             
             CombatManager.Instance.AddEnemy(this);
         }
@@ -88,12 +89,12 @@ namespace ECS.Entities.AI.Combat
             
             UpdateVectorsToTargets();
             
-            if (_context.IsCastingAnAbility())
+            if (_context.IsFSMBlocked())
             {
                 return;
             }
             
-            Rotate();
+            RotateBody();
             
             CalculateBestAction();
         }
@@ -168,7 +169,7 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingThrowRock(IProjectileAbility projectileAbility)
         {
-            CastingAnAbility();
+            BlockFSM();
             
             projectileAbility.Activate();
             
@@ -185,23 +186,23 @@ namespace ECS.Entities.AI.Combat
             {
                 abilityCast.DecreaseCurrentCastTime();
                 
-                Rotate();
+                RotateBody();
                 
                 //if (_cancelThrowRockFunc())
                 {
                     abilityCast.ResetCastTime();
-                    _currentRotationSpeed = _normalRotationSpeed;
-                    NotCastingAnAbility();
+                    _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
+                    UnblockFSM();
                     yield break;
                 }
                 yield return null;
             }
 
-            _currentRotationSpeed = _normalRotationSpeed;
+            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
 
             if (!projectileAbility.FIREEEEEEEEEEEEEE())
             {
-                NotCastingAnAbility();
+                UnblockFSM();
                 yield break;
             }
             StartCoroutine(StartCooldownCoroutine(projectileAbility.GetCast()));
@@ -213,7 +214,7 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingClapAbove(IAreaAbility areaAbility) 
         {
-            CastingAnAbility();
+            BlockFSM();
             
             StartCoroutine(StartClapAboveCastTimeCoroutine(areaAbility));
         }
@@ -228,12 +229,12 @@ namespace ECS.Entities.AI.Combat
             {
                 abilityCast.DecreaseCurrentCastTime();
                 
-                Rotate();
+                RotateBody();
                 
                 //if (_cancelClapAboveFunc())
                 {
                     abilityCast.ResetCastTime();
-                    NotCastingAnAbility();
+                    UnblockFSM();
                     yield break;
                 }
                 yield return null;
