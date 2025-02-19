@@ -38,7 +38,7 @@ namespace Player
             CombatManager.Instance.AddPlayer(this);
         }
 
-        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
+        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
         {
             if (_currentReceiveDamageCooldown > 0f)
             {
@@ -64,14 +64,14 @@ namespace Player
             StartCoroutine(DecreaseDamageCooldown());
         }
 
-        public override void OnReceiveDamageOverTime(uint damageValue, float duration)
+        public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)
         {
             ShowDebugMessages("Player Damage Over Time: " + damageValue + " - Duration: " + duration);
 
-            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration));
+            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration, sourcePosition));
         }
 
-        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration)
+        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
             float tickTimer = 0;
@@ -83,7 +83,7 @@ namespace Player
 
                 if (tickTimer >= _timeBetweenDamageTicks)
                 {
-                    OnReceiveDamage(damageValue, transform.position);
+                    OnReceiveDamage(damageValue, transform.position, sourcePosition);
                     tickTimer = 0;
                 }
                 
@@ -91,19 +91,19 @@ namespace Player
             }
         }
 
-        public override void OnReceiveHeal(uint healValue)
+        public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
         }
 
-        public override void OnReceiveHealOverTime(uint healValue, float duration)
+        public override void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition)
         {
             ShowDebugMessages("Player Heal Over Time: " + healValue + " - Duration: " + duration);
 
-            StartCoroutine(HealOverTimeCoroutine(healValue, duration));
+            StartCoroutine(HealOverTimeCoroutine(healValue, duration, sourcePosition));
         }
 
-        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration)
+        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
             float tickTimer = 0;
@@ -115,7 +115,7 @@ namespace Player
 
                 if (tickTimer >= _timeBetweenHealTicks)
                 {
-                    OnReceiveHeal(healValue);
+                    OnReceiveHeal(healValue, sourcePosition);
                     tickTimer = 0;
                 }
                 
@@ -123,7 +123,7 @@ namespace Player
             }
         }
 
-        public override void OnReceiveSlow(uint slowID, uint slowPercent)
+        public override void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition)
         {
             ShowDebugMessages("Player Slow: " + slowPercent);
 
@@ -144,7 +144,7 @@ namespace Player
             _slowSubscriptions.Remove(slowID);
         }
 
-        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration)
+        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             ShowDebugMessages("Player Slow Over Time: " + slowPercent + " - Duration: " + duration);
 
@@ -154,17 +154,17 @@ namespace Player
                 _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
                 
                 _slowCoroutinesSubscriptions[slowID] = new Tuple<int, Coroutine>(_slowEffects.Count,
-                    StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration)));
+                    StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration, sourcePosition)));
                 _slowEffects.Add(slowPercent);
                 return;
             }
 
             _slowCoroutinesSubscriptions.Add(slowID, new Tuple<int, Coroutine>(_slowEffects.Count,
-                StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration))));
+                StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration, sourcePosition))));
             _slowEffects.Add(slowPercent);
         }
 
-        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration)
+        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
 
@@ -181,7 +181,7 @@ namespace Player
             _slowCoroutinesSubscriptions.Remove(slowID);
         }
 
-        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
+        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             ShowDebugMessages("Player Decreasing Slow: " + slowPercent + " - Duration: " + duration);
 
@@ -191,17 +191,17 @@ namespace Player
                 _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
                 
                 _slowCoroutinesSubscriptions[slowID] = new Tuple<int, Coroutine>(_slowEffects.Count,
-                    StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration)));
+                    StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration, sourcePosition)));
                 _slowEffects.Add(slowPercent);
                 return;
             }
 
             _slowCoroutinesSubscriptions.Add(slowID, new Tuple<int, Coroutine>(_slowEffects.Count,
-                StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration))));
+                StartCoroutine(SlowOverTimeCoroutine(slowID, slowPercent, duration, sourcePosition))));
             _slowEffects.Add(slowPercent);
         }
 
-        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slot)
+        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slot, Vector3 sourcePosition)
         {
             float timer = 0;
 
@@ -220,15 +220,15 @@ namespace Player
             _slowCoroutinesSubscriptions.Remove(slowID);
         }
 
-        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {
-            base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength);
+            base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength, sourcePosition);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {
-            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength);
+            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength, sourcePosition);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 

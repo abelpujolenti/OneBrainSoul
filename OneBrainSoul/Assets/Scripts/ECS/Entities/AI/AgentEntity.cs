@@ -82,7 +82,7 @@ namespace ECS.Entities.AI
 
         #endregion
 
-        public abstract void OnReceiveDamage(uint damageValue, Vector3 hitPosition);
+        public abstract void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition);
 
         protected void DamageEffect(Vector3 hitPosition)
         {
@@ -92,9 +92,9 @@ namespace ECS.Entities.AI
             AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
         }
 
-        public abstract void OnReceiveDamageOverTime(uint damageValue, float duration);
+        public abstract void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition);
 
-        protected abstract IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration);
+        protected abstract IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration, Vector3 sourcePosition);
 
         protected virtual IEnumerator DecreaseDamageCooldown()
         {
@@ -107,35 +107,39 @@ namespace ECS.Entities.AI
             }
         }
 
-        public abstract void OnReceiveHeal(uint healValue);
+        public abstract void OnReceiveHeal(uint healValue, Vector3 sourcePosition);
 
-        public abstract void OnReceiveHealOverTime(uint healValue, float duration);
+        public abstract void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition);
 
-        protected abstract IEnumerator HealOverTimeCoroutine(uint healValue, float duration);
+        protected abstract IEnumerator HealOverTimeCoroutine(uint healValue, float duration, Vector3 casterToTargetDirection);
 
-        public abstract void OnReceiveSlow(uint slowID, uint slowPercent);
+        public abstract void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition);
 
-        public abstract void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration);
+        public abstract void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition);
         
-        protected abstract IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration);
+        protected abstract IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration, 
+            Vector3 casterToTargetDirection);
 
-        public abstract void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration);
+        public abstract void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition);
 
-        protected abstract IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow);
+        protected abstract IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow, 
+            Vector3 casterToTargetDirection);
 
         public virtual void OnReleaseFromSlow(uint slowID)
         {
             //TODO ON RELEASE FROM SLOW
         }
 
-        public virtual void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        public virtual void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
+            Vector3 casterToTargetDirection)
         {
             Vector3 centerToMe = (transform.position - centerPosition).normalized;
             
-            OnReceivePushInADirection(centerToMe, forceDirection, forceStrength);
+            OnReceivePushInADirection(centerToMe, forceDirection, forceStrength, casterToTargetDirection);
         }
 
-        public virtual void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        public virtual void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, 
+            Vector3 casterToTargetDirection)
         {
             Vector3 referenceVector = Vector3.up;
             

@@ -188,6 +188,17 @@ namespace ECS.Entities.AI.Combat
                 position, sightMaximumDistance, forward, fov);
         }
 
+        private void UpdateDistancesToTargetsToFleeFrom()
+        {
+            Vector3 agentPosition = transform.position;
+            
+            foreach (uint targetId in _visibleTargetsToFleeFrom)
+            {
+                _context.SetDistanceToTargetToFleeFrom(targetId,
+                    CombatManager.Instance.ReturnDistanceToTarget(agentPosition, targetId));
+            }
+        }
+
         private void UpdateVectorsToTargets()
         {
             Vector3 agentPosition = transform.position;
@@ -195,12 +206,8 @@ namespace ECS.Entities.AI.Combat
             Vector3 targetPosition;
             Vector3 targetVelocity;
             Vector3 vectorToTarget;
-
-            foreach (uint targetId in _visibleTargetsToFleeFrom)
-            {
-                _context.SetDistanceToTargetToFleeFrom(targetId,
-                    CombatManager.Instance.ReturnDistanceToTarget(agentPosition, targetId));
-            }
+            
+            UpdateDistancesToTargetsToFleeFrom();
             
             if (_context.HasATargetForThrowRock())
             {
@@ -275,7 +282,7 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Long Arms " + GetAgentID() + " Observing");
 
-            if (_isSettingNewDirectionToRotate || transform.forward != GetDirectionToRotateBody())
+            if (_isSettingNewDirectionToRotate || Vector3.Dot(transform.forward, GetDirectionToRotateBody()) < 0.95f)
             {
                 return;
             }
@@ -461,6 +468,8 @@ namespace ECS.Entities.AI.Combat
         {
             CombatManager.Instance.RequestFleeToAnotherLongArmsBase(this);
             
+            UpdateDistancesToTargetsToFleeFrom();
+            
             //_animator.
             
             UnblockFSM();
@@ -580,7 +589,7 @@ namespace ECS.Entities.AI.Combat
             _onFlee();
         }
 
-        public void SetOnDieAction(Func<uint> longArmsBaseIdFunc)
+        public void SetLongArmsBaseIdFunc(Func<uint> longArmsBaseIdFunc)
         {
             _longArmsBaseIdFunc = longArmsBaseIdFunc;
         }
@@ -597,10 +606,10 @@ namespace ECS.Entities.AI.Combat
             CombatManager.Instance.OnEnemyDefeated(this);
         }
 
-        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {}
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {}
         
         /////////////////////////DEBUG
@@ -609,6 +618,8 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] private Color _colorOfDetectionAreaOfThrowRock;
         [SerializeField] private bool _showDetectionAreaOfClapAbove;
         [SerializeField] private Color _colorOfDetectionAreaOfClapAbove;
+        [SerializeField] private bool _showDetectionAreaOfFlee;
+        [SerializeField] private Color _colorOfDetectionAreaOfFlee;
         
         private void OnDrawGizmos()
         {
@@ -630,6 +641,12 @@ namespace ECS.Entities.AI.Combat
             {
                 DrawAbilityCone(_colorOfDetectionAreaOfClapAbove, _context.HasATargetForClapAbove(), _clapAboveAbility.GetCast(), origin,
                     _context.GetDirectionOfClapAboveDetection(), segments);
+            }
+
+            if (_showDetectionAreaOfFlee)
+            {
+                Gizmos.color = _colorOfDetectionAreaOfFlee;
+                Gizmos.DrawSphere(_bodyTransform.position, _context.GetRadiusToFlee());
             }
         }
     }

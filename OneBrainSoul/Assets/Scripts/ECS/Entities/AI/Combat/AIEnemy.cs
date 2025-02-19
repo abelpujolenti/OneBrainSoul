@@ -221,13 +221,11 @@ namespace ECS.Entities.AI.Combat
             
             if (IsInsideSightRange(_headTransform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
             {
-                Debug.Log("Inside");
                 SetDirectionToRotateHead(_headTransform.position - estimatedTargetPosition);
                 InvestigateArea();
                 return;
             }
             
-            Debug.Log("Outside");
             GoToArea(estimatedTargetPosition);
         }
 
@@ -246,9 +244,6 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void InvestigateArea()
         {
-            Debug.Log("Investigate");
-            Debug.Log(_headTransform.forward);
-            Debug.Log(GetDirectionToRotateHead());
             StartCoroutine(InvestigateAreaCoroutine());
         }
 
@@ -329,17 +324,17 @@ namespace ECS.Entities.AI.Combat
 
         #region Ally Abilities
 
-        public override void OnReceiveHeal(uint healValue)
+        public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             SetHealth(_context.GetHealth() + healValue);
         }
 
-        public override void OnReceiveHealOverTime(uint healValue, float duration)
+        public override void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition)
         {
-            StartCoroutine(HealOverTimeCoroutine(healValue, duration));
+            StartCoroutine(HealOverTimeCoroutine(healValue, duration, sourcePosition));
         }
 
-        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration)
+        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
             float tickTimer = 0;
@@ -351,7 +346,7 @@ namespace ECS.Entities.AI.Combat
 
                 if (tickTimer >= _timeBetweenHealTicks)
                 {
-                    OnReceiveHeal(healValue);
+                    OnReceiveHeal(healValue, sourcePosition);
                     tickTimer = 0;
                 }
                 
@@ -363,7 +358,7 @@ namespace ECS.Entities.AI.Combat
 
         #region Rival Abilities
 
-        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
+        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
         {
             if (_currentReceiveDamageCooldown > 0f)
             {
@@ -385,12 +380,12 @@ namespace ECS.Entities.AI.Combat
             Destroy(gameObject);
         }
 
-        public override void OnReceiveDamageOverTime(uint damageValue, float duration)
+        public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)
         {
-            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration));
+            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration, sourcePosition));
         }
 
-        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration)
+        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
             float tickTimer = 0;
@@ -402,7 +397,7 @@ namespace ECS.Entities.AI.Combat
 
                 if (tickTimer >= _timeBetweenDamageTicks)
                 {
-                    OnReceiveDamage(damageValue, transform.position);
+                    OnReceiveDamage(damageValue, transform.position, sourcePosition);
                     tickTimer = 0;
                 }
                 
@@ -417,28 +412,28 @@ namespace ECS.Entities.AI.Combat
             _material.SetColor("_DamageColor", new Color(1,1,1));
         }
 
-        public override void OnReceiveSlow(uint slowID, uint slowPercent)
+        public override void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition)
         {
             //TODO ENEMY SLOW
         }
 
-        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration)
+        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             //TODO ENEMY SLOW OVER TIME
         }
 
-        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration)
+        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             //TODO ENEMY SLOW OVER TIME COROUTINE
             yield break;
         }
 
-        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
+        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             //TODO ENEMY DECREASING SLOW
         }
 
-        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow)
+        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow, Vector3 sourcePosition)
         {
             //TODO ENEMY DECREASING SLOW COROUTINE
             yield break;

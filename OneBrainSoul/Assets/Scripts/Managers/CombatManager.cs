@@ -97,7 +97,11 @@ namespace Managers
             
             _longArms.Add(agentID, longArms);
             _returnAgent.Add(agentID, () => _longArms[agentID]);
-            DecrementLongArmsBasesFree(longArms.CallLongArmsBaseIdFunc());
+
+            for (int i = 0; i < _longArmsBasesFreeId.Count; i++)
+            {
+                longArms.IncrementLongArmsFreeBases();
+            }
         }
 
         public void AddEnemy(LongArmsBase longArmsBase)
@@ -384,7 +388,7 @@ namespace Managers
 
         public void HealPlayer()
         {
-            _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath());
+            _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath(), _playerCharacter.transform.position);
         }
 
         #endregion

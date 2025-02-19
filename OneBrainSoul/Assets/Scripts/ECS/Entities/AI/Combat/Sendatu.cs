@@ -257,10 +257,12 @@ namespace ECS.Entities.AI.Combat
             CombatManager.Instance.OnEnemyDefeated(this);
         }
 
-        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition)
         {}
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition)
         {}
     }
 }

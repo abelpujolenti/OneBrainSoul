@@ -73,9 +73,12 @@ namespace AI.Combat.AbilityAoEColliders
 
             AbilityTrigger abilityTrigger = basicAbilityComponent.GetTrigger();
 
+            bool comesFromCaster = areaAbilityComponent.GetAoE().duration == 0;
+
             if (abilityTrigger.hasAnEffectOnStart)
             {
-                SetupOnEnterExit(_actionsOnTriggerEnter, basicAbilityComponent.GetEffectTypeOnStart(), basicAbilityComponent.GetEffectOnStart());
+                SetupOnEnterExit(_actionsOnTriggerEnter, basicAbilityComponent.GetEffectTypeOnStart(), 
+                    basicAbilityComponent.GetEffectOnStart(), comesFromCaster);
 
                 if (areaAbilityComponent.DoesItTriggerOnTriggerEnter())
                 {
@@ -89,7 +92,7 @@ namespace AI.Combat.AbilityAoEColliders
 
             if (abilityTrigger.hasAnEffectOnTheDuration)
             {
-                SetupOnStay(basicAbilityComponent.GetEffectTypeOnTheDuration(), basicAbilityComponent.GetEffectOnTheDuration());
+                SetupOnStay(basicAbilityComponent.GetEffectTypeOnTheDuration(), basicAbilityComponent.GetEffectOnTheDuration(), comesFromCaster);
             }
 
             if (!abilityTrigger.hasAnEffectOnEnd)
@@ -97,7 +100,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
             
-            SetupOnEnterExit(_actionsOnTriggerExit, basicAbilityComponent.GetEffectTypeOnEnd(), basicAbilityComponent.GetEffectOnEnd());
+            SetupOnEnterExit(_actionsOnTriggerExit, basicAbilityComponent.GetEffectTypeOnEnd(), basicAbilityComponent.GetEffectOnEnd(), comesFromCaster);
             
             if (!areaAbilityComponent.DoesItTriggerOnTriggerExit())
             {
@@ -107,7 +110,7 @@ namespace AI.Combat.AbilityAoEColliders
         }
 
         private void SetupOnEnterExit(List<Action<AgentEntity>> actionsList, AbilityEffectOnHealthType abilityEffectOnHealthType, 
-            AbilityEffect abilityEffect)
+            AbilityEffect abilityEffect, bool comesFromCaster)
         {
             if (abilityEffect.hasAnEffectOnHealth)
             {
@@ -116,62 +119,63 @@ namespace AI.Combat.AbilityAoEColliders
                     case AbilityEffectOnHealthType.DAMAGE:
                         if (abilityEffect.isEffectOnHealthAttachedToEntity)
                         {
-                            AddDamageOverTime(actionsList, abilityEffect.healthModificationValue, abilityEffect.effectOnHealthDuration);
+                            AddDamageOverTime(actionsList, abilityEffect.healthModificationValue, abilityEffect.effectOnHealthDuration, comesFromCaster);
                             break;
                         }
-                        AddDamage(actionsList, abilityEffect.healthModificationValue);
+                        AddDamage(actionsList, abilityEffect.healthModificationValue, comesFromCaster);
                         break;
                 
                     case AbilityEffectOnHealthType.HEAL:
                         if (abilityEffect.isEffectOnHealthAttachedToEntity)
                         {
-                            AddHealOverTime(actionsList, abilityEffect.healthModificationValue, abilityEffect.effectOnHealthDuration);
+                            AddHealOverTime(actionsList, abilityEffect.healthModificationValue, 
+                                abilityEffect.effectOnHealthDuration, comesFromCaster);
                             break;
                         }
                     
-                        AddHeal(actionsList, abilityEffect.healthModificationValue);
+                        AddHeal(actionsList, abilityEffect.healthModificationValue, comesFromCaster);
                         break;
                 }
             }
             
-            SetupSlowAndForce(actionsList, abilityEffect);
+            SetupSlowAndForce(actionsList, abilityEffect, comesFromCaster);
         }
 
-        private void SetupOnStay(AbilityEffectOnHealthType abilityEffectOnHealthType, AbilityEffect abilityEffect)
+        private void SetupOnStay(AbilityEffectOnHealthType abilityEffectOnHealthType, AbilityEffect abilityEffect, bool comesFromCaster)
         {
             if (abilityEffect.hasAnEffectOnHealth)
             {
                 switch (abilityEffectOnHealthType)
                 {
                     case AbilityEffectOnHealthType.DAMAGE:
-                        AddDamage(_actionsOnTriggerStay, abilityEffect.healthModificationValue);
+                        AddDamage(_actionsOnTriggerStay, abilityEffect.healthModificationValue, comesFromCaster);
                         _tickTimer = GameManager.Instance.GetTimeBetweenDamageTicks();
                         break;
                 
                     
                     case AbilityEffectOnHealthType.HEAL:
-                        AddHeal(_actionsOnTriggerStay, abilityEffect.healthModificationValue);
+                        AddHeal(_actionsOnTriggerStay, abilityEffect.healthModificationValue, comesFromCaster);
                         _tickTimer = GameManager.Instance.GetTimeBetweenHealTicks();
                         break;
                 }
             }
             
-            SetupSlowAndForce(_actionsOnTriggerStay, abilityEffect);
+            SetupSlowAndForce(_actionsOnTriggerStay, abilityEffect, comesFromCaster);
         }
 
-        private void SetupSlowAndForce(List<Action<AgentEntity>> actionsList, AbilityEffect abilityEffect)
+        private void SetupSlowAndForce(List<Action<AgentEntity>> actionsList, AbilityEffect abilityEffect, bool comesFromCaster)
         {
             if (abilityEffect.doesSlow)
             {
                 if (!abilityEffect.isSlowAttachedToEntity)
                 {
-                    AddSlow(actionsList, abilityEffect.slowPercent);
+                    AddSlow(actionsList, abilityEffect.slowPercent, comesFromCaster);
                     _actionsOnTriggerExit.Insert(0, ReleaseFromSlow);
                 }
                 else
                 {
                     AddSlowOverTime(actionsList, abilityEffect.slowPercent, abilityEffect.slowDuration, 
-                        abilityEffect.doesDecreaseOverTime);
+                        abilityEffect.doesDecreaseOverTime, comesFromCaster);
                 }
             }
 
@@ -182,10 +186,10 @@ namespace AI.Combat.AbilityAoEColliders
 
             if (abilityEffect.doesForceComesFromCenterOfTheArea)
             {
-                AddPushFromCenter(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
+                AddPushFromCenter(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength, comesFromCaster);
                 return;
             }
-            AddPushInADirection(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength);
+            AddPushInADirection(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength, comesFromCaster);
         }
 
         public void SetAbilityTargets(List<EntityType> abilityTargets)
@@ -193,96 +197,149 @@ namespace AI.Combat.AbilityAoEColliders
             _abilityTargets = abilityTargets;
         }
 
-        private void AddDamage(List<Action<AgentEntity>> actionsList, uint damageValue)
+        private void AddDamage(List<Action<AgentEntity>> actionsList, uint damageValue, bool comesFromCaster)
         {
             //TODO HIT POSITION
-            actionsList.Add(agentEntity => Damage(agentEntity, damageValue, Vector3.zero));
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+            
+            actionsList.Add(agentEntity => Damage(agentEntity, damageValue, Vector3.zero, source.position));
         }
 
-        private void Damage(IDamageable agent, uint damageValue, Vector3 hitPosition)
+        private void Damage(IDamageable agent, uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
         {
-            agent.OnReceiveDamage(damageValue, hitPosition);
+            agent.OnReceiveDamage(damageValue, hitPosition, sourcePosition);
         }
 
-        private void AddDamageOverTime(List<Action<AgentEntity>> actionsList, uint damageValue, float duration)
+        private void AddDamageOverTime(List<Action<AgentEntity>> actionsList, uint damageValue, float duration, bool comesFromCaster)
         {
-            actionsList.Add(agentEntity => { DamageOverTime(agentEntity, damageValue, duration); });
+            Transform source = transform;
+            actionsList.Add(agentEntity => DamageOverTime(agentEntity, damageValue, duration, source.position));
         }
 
-        private void DamageOverTime(IDamageable agent, uint damageValue, float duration)
+        private void DamageOverTime(IDamageable agent, uint damageValue, float duration, Vector3 sourcePosition)
         {
-            agent.OnReceiveDamageOverTime(damageValue, duration);
+            agent.OnReceiveDamageOverTime(damageValue, duration, sourcePosition);
         }
 
-        private void AddHeal(List<Action<AgentEntity>> actionsList, uint healValue)
+        private void AddHeal(List<Action<AgentEntity>> actionsList, uint healValue, bool comesFromCaster)
         {
-            actionsList.Add(agentEntity => { Heal(agentEntity, healValue); });
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+
+            actionsList.Add(agentEntity => Heal(agentEntity, healValue, source.position));
         }
 
-        private void Heal(IHealable agent, uint healValue)
+        private void Heal(IHealable agent, uint healValue, Vector3 sourcePosition)
         {
-            agent.OnReceiveHeal(healValue);
+            agent.OnReceiveHeal(healValue, sourcePosition);
         }
 
-        private void AddHealOverTime(List<Action<AgentEntity>> actionsList, uint healValue, float duration)
+        private void AddHealOverTime(List<Action<AgentEntity>> actionsList, uint healValue, float duration, bool comesFromCaster)
         {
-            actionsList.Add(agentEntity => { HealOverTime(agentEntity, healValue, duration); });
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+
+            actionsList.Add(agentEntity => HealOverTime(agentEntity, healValue, duration, source.position));
         }
 
-        private void HealOverTime(IHealable agent, uint healValue, float duration)
+        private void HealOverTime(IHealable agent, uint healValue, float duration, Vector3 sourcePosition)
         {
-            agent.OnReceiveHealOverTime(healValue, duration);
+            agent.OnReceiveHealOverTime(healValue, duration, sourcePosition);
         }
 
-        private void AddSlow(List<Action<AgentEntity>> actionsList, uint slowPercent)
+        private void AddSlow(List<Action<AgentEntity>> actionsList, uint slowPercent, bool comesFromCaster)
         {
-            actionsList.Add(agentEntity => { Slow(agentEntity, slowPercent); });
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+
+            actionsList.Add(agentEntity => Slow(agentEntity, slowPercent, source.position));
         }
 
-        private void Slow(ISlowable agent, uint slowPercent)
+        private void Slow(ISlowable agent, uint slowPercent, Vector3 sourcePosition)
         {
-            agent.OnReceiveSlow((uint)gameObject.GetInstanceID(), slowPercent);
+            agent.OnReceiveSlow((uint)gameObject.GetInstanceID(), slowPercent, sourcePosition);
         }
 
-        private void AddSlowOverTime(List<Action<AgentEntity>> actionsList, uint slowPercent, float duration, bool doesDecrease)
+        private void AddSlowOverTime(List<Action<AgentEntity>> actionsList, uint slowPercent, float duration, bool doesDecrease, 
+            bool comesFromCaster)
         {
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+            
             if (doesDecrease)
             {
-                actionsList.Add(agentEntity => { SlowOverTime(agentEntity, slowPercent, duration); });
+                actionsList.Add(agentEntity => SlowOverTime(agentEntity, slowPercent, duration, source.position));
                 return;
             }
             
-            actionsList.Add(agentEntity => { DecreasingSlow(agentEntity, slowPercent, duration); });
+            actionsList.Add(agentEntity => DecreasingSlow(agentEntity, slowPercent, duration, source.position));
         }
 
-        private void SlowOverTime(ISlowable agent, uint slowPercent, float duration)
+        private void SlowOverTime(ISlowable agent, uint slowPercent, float duration, Vector3 sourcePosition)
         {
-            agent.OnReceiveSlowOverTime((uint)gameObject.GetInstanceID(), slowPercent, duration);
+            agent.OnReceiveSlowOverTime((uint)gameObject.GetInstanceID(), slowPercent, duration, sourcePosition);
         }
 
-        private void DecreasingSlow(ISlowable agent, uint slowPercent, float duration)
+        private void DecreasingSlow(ISlowable agent, uint slowPercent, float duration, Vector3 sourcePosition)
         {
-            agent.OnReceiveDecreasingSlow((uint)gameObject.GetInstanceID(), slowPercent, duration);
+            agent.OnReceiveDecreasingSlow((uint)gameObject.GetInstanceID(), slowPercent, duration, sourcePosition);
         }
 
-        private void AddPushFromCenter(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
+        private void AddPushFromCenter(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength, 
+            bool comesFromCaster)
         {
-            actionsList.Add(agentEntity => { PushFromCenter(agentEntity, forceDirection, forceStrength); });
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+
+            actionsList.Add(agentEntity => PushFromCenter(agentEntity, forceDirection, forceStrength, source.position));
         }
 
-        private void PushFromCenter(IPushable agent, Vector3 forceDirection, float forceStrength)
+        private void PushFromCenter(IPushable agent, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {
-            agent.OnReceivePushFromCenter(transform.position, forceDirection, forceStrength);
+            agent.OnReceivePushFromCenter(transform.position, forceDirection, forceStrength, sourcePosition);
         }
 
-        private void AddPushInADirection(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength)
+        private void AddPushInADirection(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength, 
+            bool comesFromCaster)
         {
-            actionsList.Add(agentEntity => { PushInADirection(agentEntity, forceDirection, forceStrength); });
+            Transform source = transform;
+
+            if (comesFromCaster)
+            {
+                source = _parentTransform;
+            }
+
+            actionsList.Add(agentEntity => PushInADirection(agentEntity, forceDirection, forceStrength, source.position));
         }
 
-        private void PushInADirection(IPushable agent, Vector3 forceDirection, float forceStrength)
+        private void PushInADirection(IPushable agent, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {
-            agent.OnReceivePushInADirection(transform.forward, forceDirection, forceStrength);
+            agent.OnReceivePushInADirection(transform.forward, forceDirection, forceStrength, sourcePosition);
         }
 
         private void AddReleaseFromSlow(List<Action<AgentEntity>> actionsList)

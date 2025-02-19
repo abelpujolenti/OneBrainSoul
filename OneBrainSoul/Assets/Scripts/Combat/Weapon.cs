@@ -98,7 +98,8 @@ namespace Combat
             effectedEntity.OnReceiveDamage(baseDamage, 
                 player.GetCamera().transform.position +
                 (effectedEntity.transform.position - player.GetCamera().transform.position).normalized *
-                ((effectedEntity.transform.position - player.GetCamera().transform.position).magnitude - effectedEntity.GetRadius()));
+                ((effectedEntity.transform.position - player.GetCamera().transform.position).magnitude - effectedEntity.GetRadius()), 
+                transform.position);
         }
 
         protected virtual void AttackCommand()
