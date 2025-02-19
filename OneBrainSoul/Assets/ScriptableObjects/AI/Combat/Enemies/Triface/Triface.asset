@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: Triface
   m_EditorClassIdentifier: 
-  totalHealth: 10
+  totalHealth: 9
   agentsPositionRadius: 5
   sightMaximumDistance: 0
-  fov: 360
-  normalRotationSpeed: 1
+  fov: 45
+  minimumTimeInvestigatingArea: 5
+  maximumTimeInvestigatingArea: 7
+  minimumTimeInvestigatingAtEstimatedPosition: 5
+  maximumTimeInvestigatingAtEstimatedPosition: 7
+  maximumHeadYawRotation: 45
+  maximumHeadPitchRotation: 30
+  minimumHeadPitchRotation: 10
+  bodyNormalRotationSpeed: 3
   slamAbilityProperties: {fileID: 11400000, guid: 3935a9b85f5fe7f4098c1ad70144227e,
     type: 2}
   rotationSpeedWhileCastingSlam: 0

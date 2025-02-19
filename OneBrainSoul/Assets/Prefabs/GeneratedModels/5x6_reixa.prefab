@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6300607038880520989}
   - component: {fileID: 2178512096945166316}
   - component: {fileID: -4996819322480072816}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 5x6_reixa
   m_TagString: Untagged
   m_Icon: {fileID: 0}

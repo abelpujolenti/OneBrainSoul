@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2200176267921715963}
   - component: {fileID: 5311007484656972950}
   - component: {fileID: 5859013161781758583}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 5x3_bordillo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
