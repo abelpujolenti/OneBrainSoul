@@ -37,11 +37,11 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] protected Transform _headTransform; 
         [SerializeField] protected Transform _bodyTransform;
-        
-        
 
         private float _yawHeadRotation;
         private float _pitchHeadRotation;
+
+        private float _headRotationSpeed;
 
         protected float _bodyNormalRotationSpeed;
         protected float _bodyCurrentRotationSpeed;
@@ -54,16 +54,18 @@ namespace ECS.Entities.AI.Combat
 
         protected float _timeInvestigating;
 
-        private uint _maximumHeadPitchRotation;
-        private uint _minimumHeadPitchRotation;
+        private uint _maximumHeadPitchUpRotation;
+        private uint _maximumHeadPitchDownRotation;
         
         protected bool _isRotating;
 
         protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType)
         {
-            SetDirectionToRotateHead(_headTransform.forward);
+            SetDirectionToRotateHead(Vector3.forward);
             
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
+
+            _headRotationSpeed = aiEnemyProperties.headRotationSpeed;
 
             _bodyNormalRotationSpeed = aiEnemyProperties.bodyNormalRotationSpeed;
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
@@ -77,8 +79,8 @@ namespace ECS.Entities.AI.Combat
             _maximumTimeInvestigatingAtEstimatedPosition =
                 aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition;
 
-            _maximumHeadPitchRotation = aiEnemyProperties.maximumHeadPitchRotation;
-            _minimumHeadPitchRotation = aiEnemyProperties.minimumHeadPitchRotation;
+            _maximumHeadPitchUpRotation = aiEnemyProperties.maximumHeadPitchUpRotation;
+            _maximumHeadPitchDownRotation = aiEnemyProperties.maximumHeadPitchDownRotation;
             
             Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
@@ -164,20 +166,20 @@ namespace ECS.Entities.AI.Combat
 
         protected void RotateBody()
         {
-            _bodyTransform.rotation = Quaternion.RotateTowards(_bodyTransform.rotation,
+            _bodyTransform.rotation = Quaternion.Slerp(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
         }
 
         protected void RotateHead()
         {
-            Debug.Log(_bodyTransform.rotation * GetDirectionToRotateHead());
-            
-            _headTransform.rotation = Quaternion.RotateTowards(_headTransform.rotation,
-                Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _bodyCurrentRotationSpeed * Time.deltaTime);
+            _headTransform.rotation = Quaternion.Slerp(_headTransform.rotation,
+                Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _headRotationSpeed * Time.deltaTime);
         }
 
         protected void SetDirectionToRotateHead(Vector3 directionToRotate)
         {
+            directionToRotate = directionToRotate.normalized;
+            directionToRotate.z = 1;
             _directionToRotateHead = directionToRotate.normalized;
         }
 
@@ -217,13 +219,15 @@ namespace ECS.Entities.AI.Combat
             _timeInvestigating = Random.Range(_minimumTimeInvestigatingAtEstimatedPosition,
                 _maximumTimeInvestigatingAtEstimatedPosition);
             
-            if (IsInsideSightRange(transform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
+            if (IsInsideSightRange(_headTransform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
             {
-                SetDirectionToRotateHead(transform.position - estimatedTargetPosition);
+                Debug.Log("Inside");
+                SetDirectionToRotateHead(_headTransform.position - estimatedTargetPosition);
                 InvestigateArea();
                 return;
             }
             
+            Debug.Log("Outside");
             GoToArea(estimatedTargetPosition);
         }
 
@@ -242,6 +246,9 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void InvestigateArea()
         {
+            Debug.Log("Investigate");
+            Debug.Log(_headTransform.forward);
+            Debug.Log(GetDirectionToRotateHead());
             StartCoroutine(InvestigateAreaCoroutine());
         }
 
@@ -264,34 +271,21 @@ namespace ECS.Entities.AI.Combat
                 timeDeltaTime = Time.deltaTime;
                 timer += timeDeltaTime;
 
-                /*if (Vector3.Dot(_bodyTransform.forward, GetDirectionToRotateBody()) > 0.95f)
+                if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateHead()) > 0.95f)
                 {
                     timerLookingAtTheSameDirection += timeDeltaTime;
 
                     if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
                     {
                         uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
-                        SetDirectionToRotateBody(new Vector3(0, Random.Range(-maximumHeadYawRotation - _yawHeadRotation, maximumHeadYawRotation - _yawHeadRotation), 0));
-
-                        timerLookingAtTheSameDirection = 0;
-                    }
-                }*/
-
-                /*if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateHead()) > 0.95f)
-                {
-                    timerLookingAtTheSameDirection += timeDeltaTime;
-
-                    if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
-                    {
-                        uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
-                        _yawHeadRotation = Random.Range(-maximumHeadYawRotation - _yawHeadRotation, maximumHeadYawRotation - _yawHeadRotation);
-                        _pitchHeadRotation = Random.Range(-_minimumHeadPitchRotation - _pitchHeadRotation, _maximumHeadPitchRotation - _pitchHeadRotation);
+                        float yawHeadRotation = Random.Range(-maximumHeadYawRotation, maximumHeadYawRotation);
+                        float pitchHeadRotation = Random.Range(-_maximumHeadPitchDownRotation, _maximumHeadPitchUpRotation);
                         
-                        SetDirectionToRotateHead(Quaternion.Euler(_pitchHeadRotation, _yawHeadRotation, 0) * Vector3.forward);
+                        SetDirectionToRotateHead(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
 
                         timerLookingAtTheSameDirection = 0;
                     }
-                }*/
+                }
                 
                 yield return null;
             }
@@ -303,12 +297,12 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnEndInvestigation()
         {
-            //SetDirectionToRotateHead(_bodyTransform.forward);
+            SetDirectionToRotateHead(Vector3.forward);
         }
 
         private bool IsThereAnyObstacleInBetween(Vector3 position, Vector3 direction, float distance)
         {
-            return !Physics.Raycast(position, direction, distance,
+            return Physics.Raycast(position, direction, distance,
                 GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
         }
 

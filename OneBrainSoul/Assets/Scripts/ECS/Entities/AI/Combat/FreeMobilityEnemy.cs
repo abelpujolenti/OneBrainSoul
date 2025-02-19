@@ -187,6 +187,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override void OnEndInvestigation()
         {
+            base.OnEndInvestigation();
             //TODO FREE MOBILITY ENEMY CHOOSE NEW POINT TO PATROL
         }
 

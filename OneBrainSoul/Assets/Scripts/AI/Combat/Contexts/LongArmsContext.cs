@@ -27,7 +27,7 @@ namespace AI.Combat.Contexts
         private TargetContext _clapAboveTarget = new TargetContext();
         
         public LongArmsContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, 
+            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, 
             AbilityCast throwRockCast, AbilityCast clapAboveCast, float radiusToFlee) : base(EntityType.LONG_ARMS, 
             totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, fov, headAgentTransform, bodyAgentTransform)
         {

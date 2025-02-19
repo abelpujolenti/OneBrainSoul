@@ -92,9 +92,9 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            RotateBody();
+            //RotateBody();
             
-            //RotateHead();
+            RotateHead();
                 
             //LaunchRaycasts();
             

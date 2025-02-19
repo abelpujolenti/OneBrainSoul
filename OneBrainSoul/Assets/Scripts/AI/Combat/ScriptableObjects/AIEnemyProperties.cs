@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AI.Combat.ScriptableObjects
 {
@@ -10,7 +11,7 @@ namespace AI.Combat.ScriptableObjects
 
         public float sightMaximumDistance;
 
-        public float fov;
+        public uint fov;
 
         public float minimumTimeInvestigatingArea;
         
@@ -22,9 +23,11 @@ namespace AI.Combat.ScriptableObjects
 
         public uint maximumHeadYawRotation;
         
-        public uint maximumHeadPitchRotation;
+        public uint maximumHeadPitchUpRotation;
         
-        public uint minimumHeadPitchRotation;
+        public uint maximumHeadPitchDownRotation;
+
+        public float headRotationSpeed;
 
         public float bodyNormalRotationSpeed;
     }

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, IGetSightMaximumDistance, 
-        IHasATarget, IFighting, ICastingAnAbility, IGetAgentTransform, IEnemyRotationUtility
+        IHasATarget, IFighting, ICastingAnAbility, IGetAgentBodyTransform, IEnemyRotationUtility
     {
         private EntityType _entityType;
         
@@ -23,7 +23,7 @@ namespace AI.Combat.Contexts
         private float _radius;
         private float _height;
         private float _sightMaximumDistance;
-        private float _fov;
+        private uint _fov;
 
         private bool _isFighting;
         private bool _isFSMBlocked;
@@ -33,7 +33,7 @@ namespace AI.Combat.Contexts
         private Transform _bodyAgentTransform;
 
         protected AIEnemyContext(EntityType entityType, uint totalHealth, uint maximumHeadYawRotation, 
-            float radius, float height, float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform)
+            float radius, float height, float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform)
         {
             _entityType = entityType;
             _totalHealth = totalHealth;
@@ -42,7 +42,7 @@ namespace AI.Combat.Contexts
             _radius = radius;
             _height = height;
             _sightMaximumDistance = sightMaximumDistance != 0 ? sightMaximumDistance : Mathf.Infinity;
-            _fov = fov;
+            _fov = fov / 2;
             _headAgentTransform = headAgentTransform;
             _bodyAgentTransform = bodyAgentTransform;
         }

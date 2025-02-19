@@ -17,7 +17,7 @@ namespace AI.Combat.Contexts
         private TargetContext _slamTarget = new TargetContext();
         
         public TrifaceContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
+            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
             base(EntityType.TRIFACE, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
                 fov, headAgentTransform, bodyAgentTransform)
         {
