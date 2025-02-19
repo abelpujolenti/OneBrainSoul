@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using ECS.Entities;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.BaseInterfaces.Property;
+using Interfaces.AI.UBS.Enemy;
 using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
     public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, IGetSightMaximumDistance, 
-        IHasATarget, IFighting, ICastingAnAbility, IGetAgentTransform
+        IHasATarget, IFighting, ICastingAnAbility, IGetAgentTransform, IEnemyRotationUtility
     {
         private EntityType _entityType;
         
@@ -17,6 +18,7 @@ namespace AI.Combat.Contexts
 
         private uint _totalHealth;
         private uint _health;
+        private uint _maximumHeadYawRotation;
 
         private float _radius;
         private float _height;
@@ -24,22 +26,25 @@ namespace AI.Combat.Contexts
         private float _fov;
 
         private bool _isFighting;
-        private bool _isCastingAnAbility;
+        private bool _isFSMBlocked;
         private bool _isAirborne;
 
-        private Transform _agentTransform;
+        private Transform _headAgentTransform;
+        private Transform _bodyAgentTransform;
 
-        protected AIEnemyContext(EntityType entityType, uint totalHealth, float radius, float height, 
-            float sightMaximumDistance, float fov, Transform agentTransform)
+        protected AIEnemyContext(EntityType entityType, uint totalHealth, uint maximumHeadYawRotation, 
+            float radius, float height, float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform)
         {
             _entityType = entityType;
             _totalHealth = totalHealth;
             _health = totalHealth;
+            _maximumHeadYawRotation = maximumHeadYawRotation;
             _radius = radius;
             _height = height;
             _sightMaximumDistance = sightMaximumDistance != 0 ? sightMaximumDistance : Mathf.Infinity;
             _fov = fov;
-            _agentTransform = agentTransform;
+            _headAgentTransform = headAgentTransform;
+            _bodyAgentTransform = bodyAgentTransform;
         }
 
         public EntityType GetEnemyType()
@@ -107,14 +112,14 @@ namespace AI.Combat.Contexts
             return _isFighting;
         }
 
-        public void SetICastingAnAbility(bool isCastingAnAbility)
+        public void SetIsFSMBlocked(bool isFSMBlocked)
         {
-            _isCastingAnAbility = isCastingAnAbility;
+            _isFSMBlocked = isFSMBlocked;
         }
 
-        public bool IsCastingAnAbility()
+        public bool IsFSMBlocked()
         {
-            return _isCastingAnAbility;
+            return _isFSMBlocked;
         }
 
         public void SetIsAirborne(bool isAirborne)
@@ -127,11 +132,28 @@ namespace AI.Combat.Contexts
             return _isAirborne;
         }
 
-        public Transform GetAgentTransform()
+        public Transform GetAgentHeadTransform()
         {
-            return _agentTransform;
+            return _headAgentTransform;
         }
 
+        public Transform GetAgentBodyTransform()
+        {
+            return _bodyAgentTransform;
+        }
+
+        public abstract bool IsSeeingATarget();
+
         public abstract bool HasATarget();
+        
+        public Vector3 GetVectorToDestination()
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint GetMaximumHeadYawRotation()
+        {
+            return _maximumHeadYawRotation;
+        }
     }
 }

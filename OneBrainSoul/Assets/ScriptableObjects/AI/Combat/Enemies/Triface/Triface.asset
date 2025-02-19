@@ -14,6 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 10
   agentsPositionRadius: 5
-  sightMaximumDistance: 0
+  sightMaximumDistance: 20
+  fov: 25
+  minimumTimeInvestigatingArea: 5
+  maximumTimeInvestigatingArea: 7
+  minimumTimeInvestigatingAtEstimatedPosition: 5
+  maximumTimeInvestigatingAtEstimatedPosition: 7
+  maximumHeadYawRotation: 30
+  maximumHeadPitchRotation: 20
+  minimumHeadPitchRotation: 5
+  bodyNormalRotationSpeed: 40
   slamAbilityProperties: {fileID: 11400000, guid: 3935a9b85f5fe7f4098c1ad70144227e,
     type: 2}
+  rotationSpeedWhileCastingSlam: 10

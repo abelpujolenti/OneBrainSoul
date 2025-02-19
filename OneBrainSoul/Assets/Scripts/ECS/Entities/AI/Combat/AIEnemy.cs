@@ -7,10 +7,12 @@ using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
 {
-    public abstract class AIEnemy<TContext, TAction> : AgentEntity
+    public abstract class AIEnemy<TEnemyProperties, TContext, TAction> : AgentEntity
+        where TEnemyProperties : AIEnemyProperties
         where TContext : AIEnemyContext
         where TAction : Enum
     {
@@ -28,18 +30,55 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private bool _isMarked;
 
-        private Vector3 _directionToRotate;
+        protected Vector3 _directionOfSight;
 
-        protected float _normalRotationSpeed;
-        protected float _currentRotationSpeed;
+        private Vector3 _directionToRotateHead;
+        private Vector3 _directionToRotateBody;
+
+        [SerializeField] protected Transform _headTransform; 
+        [SerializeField] protected Transform _bodyTransform;
+        
+        
+
+        private float _yawHeadRotation;
+        private float _pitchHeadRotation;
+
+        protected float _bodyNormalRotationSpeed;
+        protected float _bodyCurrentRotationSpeed;
+
+        protected float _minimumTimeInvestigatingArea;
+        protected float _maximumTimeInvestigatingArea;
+
+        protected float _minimumTimeInvestigatingAtEstimatedPosition;
+        protected float _maximumTimeInvestigatingAtEstimatedPosition;
+
+        protected float _timeInvestigating;
+
+        private uint _maximumHeadPitchRotation;
+        private uint _minimumHeadPitchRotation;
         
         protected bool _isRotating;
 
-        protected virtual void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties, EntityType entityType)
+        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType)
         {
+            SetDirectionToRotateHead(_headTransform.forward);
+            
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
 
-            _currentRotationSpeed = aiEnemyProperties.normalRotationSpeed;
+            _bodyNormalRotationSpeed = aiEnemyProperties.bodyNormalRotationSpeed;
+            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
+
+            _minimumTimeInvestigatingArea = aiEnemyProperties.minimumTimeInvestigatingArea;
+            _maximumTimeInvestigatingArea = aiEnemyProperties.maximumTimeInvestigatingArea;
+
+            _minimumTimeInvestigatingAtEstimatedPosition =
+                aiEnemyProperties.minimumTimeInvestigatingAtEstimatedPosition;
+
+            _maximumTimeInvestigatingAtEstimatedPosition =
+                aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition;
+
+            _maximumHeadPitchRotation = aiEnemyProperties.maximumHeadPitchRotation;
+            _minimumHeadPitchRotation = aiEnemyProperties.minimumHeadPitchRotation;
             
             Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
@@ -69,9 +108,9 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsFighting(isFighting);
         }
 
-        public void SetIsCastingAnAbility(bool isAttacking)
+        public void SetIsFSMBlocked(bool isAttacking)
         {
-            _context.SetICastingAnAbility(isAttacking);
+            _context.SetIsFSMBlocked(isAttacking);
         }
 
         public void SetIsAirborne(bool isAirborne)
@@ -79,14 +118,14 @@ namespace ECS.Entities.AI.Combat
             _context.SetIsAirborne(isAirborne);
         }
 
-        protected virtual void CastingAnAbility()
+        protected virtual void BlockFSM()
         {
-            _context.SetICastingAnAbility(true);
+            _context.SetIsFSMBlocked(true);
         }
 
-        protected virtual void NotCastingAnAbility()
+        protected virtual void UnblockFSM()
         {
-            _context.SetICastingAnAbility(false);
+            _context.SetIsFSMBlocked(false);
         }
 
         #endregion
@@ -123,21 +162,154 @@ namespace ECS.Entities.AI.Combat
 
         protected abstract void UpdateVisibleTargets();
 
-        protected void Rotate()
+        protected void RotateBody()
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation,
-                Quaternion.LookRotation(GetDirectionToRotate()), _currentRotationSpeed * Time.deltaTime);
+            _bodyTransform.rotation = Quaternion.RotateTowards(_bodyTransform.rotation,
+                Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
         }
 
-        protected void SetDirectionToRotate(Vector3 directionToRotate)
+        protected void RotateHead()
         {
+            Debug.Log(_bodyTransform.rotation * GetDirectionToRotateHead());
+            
+            _headTransform.rotation = Quaternion.RotateTowards(_headTransform.rotation,
+                Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _bodyCurrentRotationSpeed * Time.deltaTime);
+        }
+
+        protected void SetDirectionToRotateHead(Vector3 directionToRotate)
+        {
+            _directionToRotateHead = directionToRotate.normalized;
+        }
+
+        protected Vector3 GetDirectionToRotateHead()
+        {
+            return _directionToRotateHead;
+        }
+
+        protected Vector3 ReturnDirectionToRotate(float yaw, float pitch)
+        {
+            float yawRad = Mathf.Deg2Rad * yaw;
+            float pitchRad = Mathf.Deg2Rad * pitch;
+
+            return new Vector3(
+                Mathf.Cos(pitchRad) * Mathf.Sin(yawRad),
+                Mathf.Sin(pitchRad),                   
+                Mathf.Cos(pitchRad) * Mathf.Cos(yawRad)
+            ).normalized;
+        }
+
+        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
+        {
+            directionToRotate = directionToRotate.normalized;
             directionToRotate.y = 0;
-            _directionToRotate = directionToRotate.normalized;
+            _directionToRotateBody = directionToRotate.normalized;
         }
 
-        protected Vector3 GetDirectionToRotate()
+        protected Vector3 GetDirectionToRotateBody()
         {
-            return _directionToRotate;
+            return _directionToRotateBody;
+        }
+
+        protected void OnLoseSightOfTarget(Vector3 lastKnownPosition, Vector3 lastKnownVelocity, float timeElapsed)
+        {
+            Vector3 estimatedTargetPosition = lastKnownPosition + lastKnownVelocity * timeElapsed;
+            
+            _timeInvestigating = Random.Range(_minimumTimeInvestigatingAtEstimatedPosition,
+                _maximumTimeInvestigatingAtEstimatedPosition);
+            
+            if (IsInsideSightRange(transform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
+            {
+                SetDirectionToRotateHead(transform.position - estimatedTargetPosition);
+                InvestigateArea();
+                return;
+            }
+            
+            GoToArea(estimatedTargetPosition);
+        }
+
+        private bool IsInsideSightRange(Vector3 position, Vector3 targetPosition, float sightDistance)
+        {
+            Vector3 vectorToTarget = targetPosition - position;
+            float distanceToTarget = vectorToTarget.sqrMagnitude;
+
+            if (IsThereAnyObstacleInBetween(position, vectorToTarget.normalized, Mathf.Sqrt(distanceToTarget)))
+            {
+                return false;
+            }
+
+            return !(distanceToTarget > sightDistance * sightDistance);
+        }
+
+        protected virtual void InvestigateArea()
+        {
+            StartCoroutine(InvestigateAreaCoroutine());
+        }
+
+        private IEnumerator InvestigateAreaCoroutine()
+        {
+            float timeLookingAtTheSameDirection = 0.5f;
+            
+            float timer = 0;
+            float timerLookingAtTheSameDirection = 0;
+
+            float timeDeltaTime;
+
+            while (timer < _timeInvestigating)
+            {
+                if (_context.IsSeeingATarget())
+                {
+                    break;
+                }
+                
+                timeDeltaTime = Time.deltaTime;
+                timer += timeDeltaTime;
+
+                /*if (Vector3.Dot(_bodyTransform.forward, GetDirectionToRotateBody()) > 0.95f)
+                {
+                    timerLookingAtTheSameDirection += timeDeltaTime;
+
+                    if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
+                    {
+                        uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
+                        SetDirectionToRotateBody(new Vector3(0, Random.Range(-maximumHeadYawRotation - _yawHeadRotation, maximumHeadYawRotation - _yawHeadRotation), 0));
+
+                        timerLookingAtTheSameDirection = 0;
+                    }
+                }*/
+
+                /*if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateHead()) > 0.95f)
+                {
+                    timerLookingAtTheSameDirection += timeDeltaTime;
+
+                    if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
+                    {
+                        uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
+                        _yawHeadRotation = Random.Range(-maximumHeadYawRotation - _yawHeadRotation, maximumHeadYawRotation - _yawHeadRotation);
+                        _pitchHeadRotation = Random.Range(-_minimumHeadPitchRotation - _pitchHeadRotation, _maximumHeadPitchRotation - _pitchHeadRotation);
+                        
+                        SetDirectionToRotateHead(Quaternion.Euler(_pitchHeadRotation, _yawHeadRotation, 0) * Vector3.forward);
+
+                        timerLookingAtTheSameDirection = 0;
+                    }
+                }*/
+                
+                yield return null;
+            }
+            
+            OnEndInvestigation();
+        }
+
+        protected abstract void GoToArea(Vector3 estimatedPosition);
+
+        protected virtual void OnEndInvestigation()
+        {
+            //SetDirectionToRotateHead(_bodyTransform.forward);
+        }
+
+        private bool IsThereAnyObstacleInBetween(Vector3 position, Vector3 direction, float distance)
+        {
+            return !Physics.Raycast(position, direction, distance,
+                GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
         }
 
         #endregion
@@ -150,7 +322,7 @@ namespace ECS.Entities.AI.Combat
         {
             abilityCast.StartCooldown();
             
-            NotCastingAnAbility();
+            UnblockFSM();
 
             while (abilityCast.IsOnCooldown())
             {
@@ -263,7 +435,8 @@ namespace ECS.Entities.AI.Combat
 
         protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration)
         {
-            throw new NotImplementedException();
+            //TODO ENEMY SLOW OVER TIME COROUTINE
+            yield break;
         }
 
         public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
@@ -273,7 +446,8 @@ namespace ECS.Entities.AI.Combat
 
         protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow)
         {
-            throw new NotImplementedException();
+            //TODO ENEMY DECREASING SLOW COROUTINE
+            yield break;
         }
 
         protected virtual void OnDestroy()
@@ -313,7 +487,6 @@ namespace ECS.Entities.AI.Combat
         protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,
             int segments)
         {
-
             float fovAngle = abilityCast.minimumAngleToCast;
             
             if (abilityCast.canCancelCast)
@@ -331,8 +504,8 @@ namespace ECS.Entities.AI.Combat
         {
             Gizmos.color = color;
 
-            float maxRadius = Mathf.Tan(fovAngle * Mathf.Deg2Rad * 0.5f) * maximumRange;
-            float minRadius = Mathf.Tan(fovAngle * Mathf.Deg2Rad * 0.5f) * minimumRange;
+            float maxRadius = Mathf.Tan(fovAngle * 2 * Mathf.Deg2Rad * 0.5f) * maximumRange;
+            float minRadius = Mathf.Tan(fovAngle * 2 * Mathf.Deg2Rad * 0.5f) * minimumRange;
 
             Vector3 minBaseCenter = origin + direction * minimumRange;
             Vector3 maxBaseCenter = origin + direction * maximumRange;

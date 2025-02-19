@@ -128,8 +128,8 @@ namespace Managers
 
             if ((target & EntityType.PLAYER) != 0)
             {
-                if (CanSeeEntity(_playerCharacter.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
-                        forward, fov))
+                if (CanSeeEntity(_playerCharacter.GetTransformComponent().GetPosition(), _playerCharacter.GetRadius(), 
+                        position, sightMaximumDistance, forward, fov))
                 {
                     visibleTargets.Add(_playerCharacter.GetAgentID());
                 }
@@ -140,8 +140,8 @@ namespace Managers
                 List<Triface> allTrifaces = ReturnAllTrifaces();
                 foreach (Triface triface in allTrifaces)
                 {
-                    if (CanSeeEntity(triface.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
-                            forward, fov))
+                    if (CanSeeEntity(triface.GetTransformComponent().GetPosition(), triface.GetRadius(), position, 
+                            sightMaximumDistance, forward, fov))
                     {
                         visibleTargets.Add(triface.GetAgentID());
                     }
@@ -153,8 +153,8 @@ namespace Managers
                 List<LongArms> allLongArms = ReturnAllLongArms();
                 foreach (LongArms longArms in allLongArms)
                 {
-                    if (CanSeeEntity(longArms.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
-                            forward, fov))
+                    if (CanSeeEntity(longArms.GetTransformComponent().GetPosition(), longArms.GetRadius(), position, 
+                            sightMaximumDistance, forward, fov))
                     {
                         visibleTargets.Add(longArms.GetAgentID());
                     }
@@ -166,8 +166,8 @@ namespace Managers
                 List<LongArmsBase> allLongArmsBases = ReturnAllLongArmsBases();
                 foreach (LongArmsBase longArmsBase in allLongArmsBases)
                 {
-                    if (CanSeeEntity(longArmsBase.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
-                            forward, fov))
+                    if (CanSeeEntity(longArmsBase.GetTransformComponent().GetPosition(), longArmsBase.GetRadius(), position, 
+                            sightMaximumDistance, forward, fov))
                     {
                         visibleTargets.Add(longArmsBase.GetAgentID());
                     }
@@ -179,8 +179,8 @@ namespace Managers
                 List<Sendatu> allSendatus = RequestAllSendatus();
                 foreach (Sendatu sendatu in allSendatus)
                 {
-                    if (CanSeeEntity(sendatu.GetTransformComponent().GetPosition(), position, sightMaximumDistance, 
-                            forward, fov))
+                    if (CanSeeEntity(sendatu.GetTransformComponent().GetPosition(), sendatu.GetRadius(), position, 
+                            sightMaximumDistance, forward, fov))
                     {
                         visibleTargets.Add(sendatu.GetAgentID());
                     }
@@ -190,11 +190,11 @@ namespace Managers
             return visibleTargets;
         }
 
-        private bool CanSeeEntity(Vector3 targetPosition, Vector3 position, float sightMaximumDistance, 
+        private bool CanSeeEntity(Vector3 targetPosition, float targetRadius, Vector3 position, float sightMaximumDistance, 
             Vector3 forward, float fov)
         {
             Vector3 vectorToTarget = (targetPosition - position).normalized;
-            float distanceToTarget = (targetPosition - position).magnitude;
+            float distanceToTarget = (targetPosition - position).magnitude - targetRadius;
 
             if (distanceToTarget > sightMaximumDistance || Vector3.Angle(forward, vectorToTarget) > fov)
             {

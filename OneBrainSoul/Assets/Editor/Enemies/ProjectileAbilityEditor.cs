@@ -73,7 +73,7 @@ namespace Editor.Enemies
                 FloatField(ref projectileAbilityProperties.abilityCast.maximumRangeToCast, 
                     projectileAbilityProperties.abilityCast.minimumRangeToCast, "Maximum Range To Cast");
                 
-                Vector3Field(ref projectileAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Forward)");
+                Vector3Field(ref projectileAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Head's Forward)");
                 
                 FloatField(ref projectileAbilityProperties.abilityCast.minimumAngleToCast, 0, 360, "Minimum Angle To Cast");
 

@@ -15,20 +15,27 @@ MonoBehaviour:
   totalHealth: 10
   agentsPositionRadius: 5
   sightMaximumDistance: 300
-  fov: 45
-  normalRotationSpeed: 30
-  rotationSpeedWhileTurningAround: 150
+  fov: 30
+  minimumTimeInvestigatingArea: 0
+  maximumTimeInvestigatingArea: 0
+  minimumTimeInvestigatingAtEstimatedPosition: 0
+  maximumTimeInvestigatingAtEstimatedPosition: 0
+  maximumHeadYawRotation: 0
+  maximumHeadPitchRotation: 0
+  minimumHeadPitchRotation: 0
+  bodyNormalRotationSpeed: 30
+  bodyRotationSpeedWhileTurningAround: 150
   minimumTimeBeforeSettingNewDirection: 1
   maximumTimeBeforeSettingNewDirection: 3
-  minimumDegreesToRotateDirection: 40
-  maximumDegreesToRotateDirection: 60
-  rotationSpeedWhenAcquiringATarget: 50
+  bodyMinimumDegreesToRotateDirection: 40
+  bodyMaximumDegreesToRotateDirection: 60
+  bodyRotationSpeedWhenAcquiringATarget: 50
   minimumTimesSettingNewDirectionToTurnAround: 3
   maximumTimesSettingNewDirectionToTurnAround: 5
   radiusToFlee: 10
   entitiesToFleeFrom: 1
   throwRockAbilityProperties: {fileID: 11400000, guid: fb231cca83e6ed247a19a07c0fd85909,
     type: 2}
-  rotationSpeedWhileCastingThrowRock: 20
+  bodyNotationSpeedWhileCastingThrowRock: 20
   clapAboveAbilityProperties: {fileID: 11400000, guid: 5f32477bb97c515479f1a389fe3b17f9,
     type: 2}

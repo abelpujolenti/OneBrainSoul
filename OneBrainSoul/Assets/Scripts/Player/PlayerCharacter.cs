@@ -12,6 +12,7 @@ namespace Player
     public class PlayerCharacter : AgentEntity
     {
         [SerializeField] private FirstPersonCamera _camera;
+        [SerializeField] private PlayerCharacterController _playerCharacterController;
 
         [SerializeField] private uint _maxHealth;
         [SerializeField] private float _agentsPositionRadius;
@@ -217,6 +218,18 @@ namespace Player
 
             _slowEffects.RemoveAt(_slowCoroutinesSubscriptions[slowID].Item1);
             _slowCoroutinesSubscriptions.Remove(slowID);
+        }
+
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        {
+            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength);
+            _playerCharacterController.ChangeMovementHandlerToAirborne();
+        }
+
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        {
+            base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength);
+            _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 
         public override float GetHeight()

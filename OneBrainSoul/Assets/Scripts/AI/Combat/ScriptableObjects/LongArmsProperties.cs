@@ -4,17 +4,17 @@ using UnityEngine;
 namespace AI.Combat.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "Long Arms Properties", menuName = "ScriptableObjects/AI/Combat/Entities/Long Arms Properties", order = 1)]
-    public class LongArmsProperties : AIEnemyProperties
+    public class LongArmsProperties : TeleportMobilityEnemyProperties
     {
-        public float rotationSpeedWhileTurningAround;
+        public float bodyRotationSpeedWhileTurningAround;
         
         public float minimumTimeBeforeSettingNewDirection;
         public float maximumTimeBeforeSettingNewDirection;
         
-        public uint minimumDegreesToRotateDirection;
-        public uint maximumDegreesToRotateDirection;
+        public uint bodyMinimumDegreesToRotateDirection;
+        public uint bodyMaximumDegreesToRotateDirection;
         
-        public float rotationSpeedWhenAcquiringATarget;
+        public float bodyRotationSpeedWhenAcquiringATarget;
 
         public uint minimumTimesSettingNewDirectionToTurnAround;
         public uint maximumTimesSettingNewDirectionToTurnAround;
@@ -23,7 +23,7 @@ namespace AI.Combat.ScriptableObjects
         public EntityType entitiesToFleeFrom;
         
         public ProjectileAbilityProperties throwRockAbilityProperties;
-        public float rotationSpeedWhileCastingThrowRock;
+        public float bodyNotationSpeedWhileCastingThrowRock;
         
         public AreaAbilityProperties clapAboveAbilityProperties;
     }

@@ -12,6 +12,12 @@ namespace Editor.Enemies
             base.OnInspectorGUI();
             
             TrifaceProperties trifaceProperties = (TrifaceProperties)target;
+            
+            LabelField("Rotation");
+
+            EditorGUI.indentLevel++;
+            
+            FloatField(ref trifaceProperties.bodyNormalRotationSpeed, 1, "Body Normal Rotation Speed");
 
             EditorGUI.indentLevel--;
             

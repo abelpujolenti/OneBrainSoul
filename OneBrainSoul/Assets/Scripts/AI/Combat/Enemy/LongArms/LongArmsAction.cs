@@ -2,10 +2,11 @@
 {
     public enum LongArmsAction : uint
     {
-        OBSERVING,
-        TURN_AROUND,
+        OBSERVE,
+        INVESTIGATE_AREA,
         ACQUIRE_NEW_TARGET_FOR_THROW_ROCK,
         ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE,
+        LOSE_TARGET,
         THROW_ROCK,
         CLAP_ABOVE,
         FLEE,

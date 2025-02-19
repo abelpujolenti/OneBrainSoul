@@ -13,11 +13,12 @@ using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 using Utilities;
+using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
 {
-    public abstract class FreeMobilityEnemy<TContext, TAction> : AIEnemy<TContext, TAction>
-        where TContext : AIEnemyContext
+    public abstract class FreeMobilityEnemy<TContext, TAction> : AIEnemy<FreeMobilityEnemyProperties, TContext, TAction>
+        where TContext : FreeMobilityEnemyContext
         where TAction : Enum
     {
         [SerializeField] protected NavMeshAgentSpecs _navMeshAgentSpecs;
@@ -28,7 +29,7 @@ namespace ECS.Entities.AI.Combat
         
         private NavMeshAgentComponent _navMeshAgentComponent;
 
-        [SerializeField] protected List<Vector3> _areaToPatrol;
+        [SerializeField] protected List<Vector3> _pointsToPatrol;
         
         protected AgentSlot _agentSlot;
         
@@ -43,9 +44,9 @@ namespace ECS.Entities.AI.Combat
 
         protected int _raysTargetsLayerMask;
 
-        protected override void EnemySetup(float radius, AIEnemyProperties aiEnemyProperties, EntityType entityType)
+        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, EntityType entityType)
         {
-            base.EnemySetup(radius, aiEnemyProperties, entityType);
+            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType);
             
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
@@ -118,11 +119,11 @@ namespace ECS.Entities.AI.Combat
             if (nodes.Count == 0)
             {
                 Vector3 destination = ECSNavigationManager.Instance.GetNavMeshAgentDestination(GetAgentID()).GetPosition();
-                SetDirectionToRotate(destination - position);
+                SetDirectionToRotateBody(destination - position);
             }
             else
             {
-                SetDirectionToRotate(nodes[0].position - position);    
+                SetDirectionToRotateBody(nodes[0].position - position);    
             }
 
             if (_isRotating)
@@ -141,9 +142,9 @@ namespace ECS.Entities.AI.Combat
 
         private IEnumerator RotateToGivenPositionCoroutine()
         {
-            while (Vector3.Angle(transform.forward, GetDirectionToRotate()) >= 5f)
+            while (Vector3.Angle(transform.forward, GetDirectionToRotateBody()) >= 5f)
             {
-                Rotate();
+                RotateBody();
                 yield return null;
             }
             
@@ -179,6 +180,16 @@ namespace ECS.Entities.AI.Combat
             return false;
         }
 
+        protected override void GoToArea(Vector3 estimatedPosition)
+        {
+            SetDestination(new VectorComponent(estimatedPosition));
+        }
+
+        protected override void OnEndInvestigation()
+        {
+            //TODO FREE MOBILITY ENEMY CHOOSE NEW POINT TO PATROL
+        }
+
         public NavMeshAgentComponent GetNavMeshAgentComponent()
         {
             return _navMeshAgentComponent;
@@ -186,29 +197,47 @@ namespace ECS.Entities.AI.Combat
 
         public void SetDestination(TransformComponent transformComponent)
         {
+            _navMeshAgentComponent.GetAStarPath().OnSetNewDestination();
             _lastDestination = null;
             ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), transformComponent);
         }
 
         public void SetDestination(VectorComponent vectorComponent)
         {
+            _navMeshAgentComponent.GetAStarPath().OnSetNewDestination();
             _lastDestination = vectorComponent;
             ECSNavigationManager.Instance.UpdateNavMeshAgentDestination(GetAgentID(), _lastDestination);
         }
 
         #endregion
 
-        protected override void CastingAnAbility()
+        #region FSM
+        
+        protected void GoToDestination()
         {
-            base.CastingAnAbility();
+            ShowDebugMessages("Triface " + GetAgentID() + " Going To Destination");
+            
             ContinueNavigation();
         }
 
-        protected override void NotCastingAnAbility()
+        protected void Patrol()
         {
-            base.NotCastingAnAbility();
-            StopNavigation();
+            ShowDebugMessages("Triface " + GetAgentID() + " Patrolling");
+            
+            //SetDestination(new VectorComponent(ReturnValidPositionInNavMesh()));
+
+            //TODO TRIFACE PATROL
         }
+
+        protected override void InvestigateArea()
+        {
+            SetDirectionToRotateBody(transform.forward);
+            _timeInvestigating = Random.Range(_minimumTimeInvestigatingArea, _maximumTimeInvestigatingArea);
+            
+            base.InvestigateArea();
+        }
+        
+        #endregion
 
         public override void OnReceiveSlow(uint slowID, uint slowPercent)
         {

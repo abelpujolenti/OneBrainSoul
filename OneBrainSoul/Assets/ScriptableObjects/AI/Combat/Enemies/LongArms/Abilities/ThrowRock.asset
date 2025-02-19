@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ThrowRock
   m_EditorClassIdentifier: 
   canAffectCaster: 0
-  abilityTarget: 1
+  abilityTarget: 4
   abilityCast:
     minimumRangeToCast: 0
     maximumRangeToCast: 300
@@ -22,16 +22,16 @@ MonoBehaviour:
     canCancelCast: 0
     maximumAngleToCancelCast: 0
     timeToCast: 0
-    cooldown: 0.2
+    cooldown: 3
     duration: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 0
     hasAnEffectOnEnd: 0
-  abilityEffectOnHealthTypeOnStart: 0
+  abilityEffectOnHealthTypeOnStart: 1
   abilityEffectOnStart:
     hasAnEffectOnHealth: 1
-    healthModificationValue: 2
+    healthModificationValue: 4
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
@@ -40,8 +40,8 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 0
     doesApplyAForce: 0
-    forceDirection: {x: 0, y: 0, z: 0}
-    forceStrength: 0
+    forceDirection: {x: 0, y: 1, z: 0}
+    forceStrength: 20
     doesForceComesFromCenterOfTheArea: 0
   abilityEffectOnHealthTypeOnTheDuration: 0
   abilityEffectOnTheDuration:
@@ -148,7 +148,7 @@ MonoBehaviour:
       type: 3}
     relativePositionToCaster: {x: 0, y: 2, z: 2}
     makesParabola: 0
-    projectileSpeed: 500
+    projectileSpeed: 60
     instances: 30
     maximumDispersion: 5
     doesVanishOnImpact: 0
