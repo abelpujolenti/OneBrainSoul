@@ -107,8 +107,8 @@ namespace Player.Movement
             AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
 
             player.GetCamera().StopFovWarp();
-            _hitstop.Add(damaged ? .12f : .2f);
-            player.GetCamera().ScreenShake(damaged ? .2f : .25f, damaged ? .8f : 1.3f);
+            _hitstop.Add(damaged ? .2f : .12f);
+            player.GetCamera().ScreenShake(damaged ? .25f : .2f, damaged ? 1.3f : .8f);
             _hitstop.AddAftershock(damaged ? .23f : .2f);
             rigidbody.velocity = Vector3.zero;
             rigidbody.AddForce(

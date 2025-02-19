@@ -220,15 +220,15 @@ namespace Player
             _slowCoroutinesSubscriptions.Remove(slowID);
         }
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
-        {
-            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength);
-            _playerCharacterController.ChangeMovementHandlerToAirborne();
-        }
-
         public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
         {
             base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength);
+            _playerCharacterController.ChangeMovementHandlerToAirborne();
+        }
+
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        {
+            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 
@@ -240,6 +240,15 @@ namespace Player
         public override float GetRadius()
         {
             return _radius;
+        }
+        public uint GetHealth()
+        {
+            return _health;
+        }
+
+        public uint GetMaxHealth()
+        {
+            return _maxHealth;
         }
     }
 }

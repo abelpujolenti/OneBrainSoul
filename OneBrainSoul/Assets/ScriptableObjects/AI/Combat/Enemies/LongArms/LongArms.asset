@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7bb48592f074430b3b10e52e0706acc, type: 3}
   m_Name: LongArms
   m_EditorClassIdentifier: 
-  totalHealth: 10
+  totalHealth: 9
   agentsPositionRadius: 5
   sightMaximumDistance: 300
   fov: 30
-  minimumTimeInvestigatingArea: 0
-  maximumTimeInvestigatingArea: 0
-  minimumTimeInvestigatingAtEstimatedPosition: 0
-  maximumTimeInvestigatingAtEstimatedPosition: 0
-  maximumHeadYawRotation: 0
-  maximumHeadPitchRotation: 0
-  minimumHeadPitchRotation: 0
+  minimumTimeInvestigatingArea: 5
+  maximumTimeInvestigatingArea: 7
+  minimumTimeInvestigatingAtEstimatedPosition: 5
+  maximumTimeInvestigatingAtEstimatedPosition: 7
+  maximumHeadYawRotation: 45
+  maximumHeadPitchRotation: 30
+  minimumHeadPitchRotation: 10
   bodyNormalRotationSpeed: 30
   bodyRotationSpeedWhileTurningAround: 150
   minimumTimeBeforeSettingNewDirection: 1

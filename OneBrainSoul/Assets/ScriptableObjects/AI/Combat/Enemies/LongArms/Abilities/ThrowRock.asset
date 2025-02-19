@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ThrowRock
   m_EditorClassIdentifier: 
   canAffectCaster: 0
-  abilityTarget: 4
+  abilityTarget: 1
   abilityCast:
     minimumRangeToCast: 0
     maximumRangeToCast: 300
@@ -28,7 +28,7 @@ MonoBehaviour:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 0
     hasAnEffectOnEnd: 0
-  abilityEffectOnHealthTypeOnStart: 1
+  abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
     hasAnEffectOnHealth: 1
     healthModificationValue: 4
@@ -146,7 +146,7 @@ MonoBehaviour:
   abilityProjectile:
     projectilePrefab: {fileID: 5930364971465029039, guid: 61a7ac1bf6057534d8aab30f6f4b1fa1,
       type: 3}
-    relativePositionToCaster: {x: 0, y: 2, z: 2}
+    relativePositionToCaster: {x: 0, y: 2, z: 5}
     makesParabola: 0
     projectileSpeed: 60
     instances: 30

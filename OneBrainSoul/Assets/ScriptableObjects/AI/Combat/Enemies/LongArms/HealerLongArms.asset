@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7bb48592f074430b3b10e52e0706acc, type: 3}
+  m_Name: HealerLongArms
+  m_EditorClassIdentifier: 
+  totalHealth: 9
+  agentsPositionRadius: 5
+  sightMaximumDistance: 300
+  fov: 75
+  minimumTimeInvestigatingArea: 5
+  maximumTimeInvestigatingArea: 7
+  minimumTimeInvestigatingAtEstimatedPosition: 5
+  maximumTimeInvestigatingAtEstimatedPosition: 7
+  maximumHeadYawRotation: 45
+  maximumHeadPitchRotation: 30
+  minimumHeadPitchRotation: 10
+  bodyNormalRotationSpeed: 30
+  bodyRotationSpeedWhileTurningAround: 150
+  minimumTimeBeforeSettingNewDirection: 1
+  maximumTimeBeforeSettingNewDirection: 3
+  bodyMinimumDegreesToRotateDirection: 40
+  bodyMaximumDegreesToRotateDirection: 60
+  bodyRotationSpeedWhenAcquiringATarget: 50
+  minimumTimesSettingNewDirectionToTurnAround: 3
+  maximumTimesSettingNewDirectionToTurnAround: 5
+  radiusToFlee: 10
+  entitiesToFleeFrom: 1
+  throwRockAbilityProperties: {fileID: 11400000, guid: 5bf36493723017945b600cb6062a077d,
+    type: 2}
+  bodyNotationSpeedWhileCastingThrowRock: 20
+  clapAboveAbilityProperties: {fileID: 11400000, guid: 5f32477bb97c515479f1a389fe3b17f9,
+    type: 2}

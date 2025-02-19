@@ -24,6 +24,7 @@ namespace Combat
                 for (int i = 0; i < entities.Count; i++)
                 {
                     AgentEntity entity = entities[i];
+                    if (entity == null) continue;
                     Vector3 enemyPos = entity.transform.position;
                     Vector3 enemyPosOuter = entity.transform.position + (player.transform.position - entity.transform.position).normalized * entity.GetRadius();
                     float distance = Vector3.Distance(player.transform.position, enemyPosOuter);

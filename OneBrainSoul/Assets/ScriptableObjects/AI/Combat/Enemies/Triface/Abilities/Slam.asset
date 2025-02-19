@@ -19,9 +19,9 @@ MonoBehaviour:
     maximumRangeToCast: 6
     directionOfDetection: {x: 0, y: 0, z: 1}
     minimumAngleToCast: 15
-    canCancelCast: 1
-    maximumAngleToCancelCast: 25
-    timeToCast: 2
+    canCancelCast: 0
+    maximumAngleToCancelCast: 0
+    timeToCast: 0.2
     cooldown: 4
     duration: 0
   abilityTrigger:
@@ -75,9 +75,9 @@ MonoBehaviour:
     doesForceComesFromCenterOfTheArea: 0
   abilityAoEType: 0
   abilityAoE:
-    isAttachedToCaster: 1
-    relativePositionToCaster: {x: 0, y: 0, z: 3.5}
-    duration: 4
+    isAttachedToCaster: 0
+    relativePositionToCaster: {x: 0, y: 0, z: 4}
+    duration: 0.5
     direction: {x: 0, y: 0, z: 1}
     height: 2
     width: 2
@@ -141,5 +141,5 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  doesItTriggerOnTriggerEnter: 1
+  doesItTriggerOnTriggerEnter: 0
   doesItTriggerOnTriggerExit: 0

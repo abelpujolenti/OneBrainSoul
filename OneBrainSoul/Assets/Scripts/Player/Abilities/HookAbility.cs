@@ -6,12 +6,9 @@ namespace Player.Abilities
 {
     public class HookAbility : MonoBehaviour
     {
-        [SerializeField] HookUI _hookUI;
         [SerializeField] Material _hookShotChainMaterial;
         [Range(1f, 1000f)]
         [SerializeField] private float _range;
-        [Range(1, 7)]
-        [SerializeField] private int _maxHookCharges;
         [Range(0f, 3f)]
         [SerializeField] private float _radius;
         [Range(1f, 10f)]
@@ -20,24 +17,19 @@ namespace Player.Abilities
         [SerializeField] private float _ledgeSnapNormalThreshold;
         [Range(0f, 3f)]
         [SerializeField] private float _ledgeSnapDistance;
-
-        [Range(0.5f, 20f)]
-        [SerializeField] private float _outOfCombatRechargeDuration;
-        [Range(0.5f, 20f)]
-        [SerializeField] private float _inCombatRechargeDuration;
+        [Range(0f,1f)]
+        [SerializeField] private float _smashThreshold;
+        [Range(0f, 1f)]
+        [SerializeField] private float _smashNormalThreshold;
 
         private RaycastHit _hit;
 
-        private int _hookCharges;
-        private float _rechargeTime;
 
         public void Setup(LineRenderer lineRenderer)
         {
             lineRenderer.startWidth = 0.4f;
             lineRenderer.endWidth = 0.3f;
             lineRenderer.material = _hookShotChainMaterial;
-            _hookCharges = _maxHookCharges;
-            _hookUI.SetMaxCharges(_maxHookCharges);
         }
         
         //TODO ADRI PASA-HO PER ONGUI(), I LES COSES QUE FACI AQUEST UPDATE MENTRES ESTA EN HOOK PASA-HO PER UNA COROUTINE 
@@ -71,7 +63,7 @@ namespace Player.Abilities
             }
 
 
-            if (_hookCharges > 0 && playerCharacterController.GetAbility2Input() && playerCharacterController.GetAbility2Time() == 0f && landed)
+            if (playerCharacterController.GetCharges() > 0 && playerCharacterController.GetAbility2Input() && playerCharacterController.GetAbility2Time() == 0f && landed)
             {
                 RaycastHit ledgeHit;
                 _ledgeSnapLeniency = 4f;
@@ -90,29 +82,14 @@ namespace Player.Abilities
                     endPos = ledgeHit.point + new Vector3(0f, .65f, 0f) + (ledgeHitDir + ledgeHit.normal).normalized * _ledgeSnapDistance;
                 }
 
-                playerCharacterController.ChangeMovementHandlerToHook(startPos, endPos, ledgeFound ? ledgeHit.point: _hit.point, ledgeFound);
+                bool smash = dir.y <= -_smashThreshold && _hit.normal.y >= _ledgeSnapNormalThreshold;
+
+                playerCharacterController.ChangeMovementHandlerToHook(startPos, endPos, ledgeFound ? ledgeHit.point: _hit.point, ledgeFound, smash);
                 playerCharacterController.ResetAbility2Cooldown();
 
                 AudioManager.instance.PlayOneShot(FMODEvents.instance.hookThrow, transform.position);
 
-                _hookCharges--;
-            }
-
-            if (playerCharacterController.IsInCombat() && 
-                _rechargeTime > _inCombatRechargeDuration || 
-                !playerCharacterController.IsInCombat() && 
-                _rechargeTime > _outOfCombatRechargeDuration)
-            {
-                _hookCharges++;
-                _rechargeTime = 0f;
-            }
-
-            _hookUI.UpdateUI(_hookCharges, _rechargeTime, 
-                playerCharacterController.IsInCombat() ? _inCombatRechargeDuration : _outOfCombatRechargeDuration);
-
-            if (_hookCharges < _maxHookCharges)
-            {
-                _rechargeTime += Time.deltaTime;
+                playerCharacterController.ConsumeCharge();
             }
         }
     }

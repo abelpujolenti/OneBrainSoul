@@ -15,7 +15,9 @@ namespace Player.Abilities
             if (ability1Input && 
                 playerCharacterController.GetAbility1Time() == 0f && 
                 playerCharacterController.GetMovementHandler() is not HookMovementHandler && 
-                _timesDashed < _airDashes)
+                _timesDashed < _airDashes &&
+                playerCharacterController.GetCharges() > 0
+                )
             {
                 Dash(playerCharacterController);
             }
@@ -32,6 +34,8 @@ namespace Player.Abilities
             playerCharacterController.ResetAbility1Cooldown();
 
             _timesDashed++;
+            playerCharacterController.ConsumeCharge();
+
             AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
         }
 
