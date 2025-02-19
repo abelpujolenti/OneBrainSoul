@@ -75,7 +75,7 @@ namespace Editor.Enemies
                 FloatField(ref areaAbilityProperties.abilityCast.maximumRangeToCast, 
                     areaAbilityProperties.abilityCast.minimumRangeToCast, "Maximum Range To Cast");
                 
-                Vector3Field(ref areaAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Forward)");
+                Vector3Field(ref areaAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Head's Forward)");
                 
                 FloatField(ref areaAbilityProperties.abilityCast.minimumAngleToCast, 0, 360, "Minimum Angle To Cast");
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace AI.Combat.AbilitySpecs
 {
@@ -30,10 +29,10 @@ namespace AI.Combat.AbilitySpecs
         public float maximumRangeToCast;
 
         public Vector3 directionOfDetection;
-        [FormerlySerializedAs("minimumAngleFromForwardToCast")] public float minimumAngleToCast;
+        public float minimumAngleToCast;
 
         public bool canCancelCast;
-        [FormerlySerializedAs("maximumAngleFromForwardToCancelCast")] public float maximumAngleToCancelCast;
+        public float maximumAngleToCancelCast;
 
         public float timeToCast;
         private float _currentTimeToFinishCast;

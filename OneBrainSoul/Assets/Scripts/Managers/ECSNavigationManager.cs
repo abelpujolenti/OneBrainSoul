@@ -96,6 +96,7 @@ namespace Managers
                 
                 if (path.Count == 0)
                 {
+                    navMeshAgentComponent.GetAStarPath().OnReachDestination();
                     continue;
                 }
                 

@@ -2,6 +2,6 @@
 {
     public interface IIsCastingAnAbility
     {
-        public bool IsCastingAnAbility();
+        public bool IsFSMBlocked();
     }
 }

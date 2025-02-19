@@ -2,7 +2,7 @@ using System;
 using AI.Combat.Contexts;
 using AI.Combat.Contexts.Target;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
-using Interfaces.AI.UBS.Enemy.LongArms;
+using Interfaces.AI.UBS.Enemy.TeleportMobilityEnemy.LongArms;
 using Vector3 = UnityEngine.Vector3;
 
 namespace AI.Combat.Enemy.LongArms
@@ -13,9 +13,10 @@ namespace AI.Combat.Enemy.LongArms
         {
             AICombatAgentAction<LongArmsAction>[] actions = new[]
             {
-                new AICombatAgentAction<LongArmsAction>(LongArmsAction.OBSERVING),
+                new AICombatAgentAction<LongArmsAction>(LongArmsAction.OBSERVE),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE),
+                new AICombatAgentAction<LongArmsAction>(LongArmsAction.LOSE_TARGET),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.THROW_ROCK),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.CLAP_ABOVE),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.FLEE)
@@ -24,9 +25,10 @@ namespace AI.Combat.Enemy.LongArms
             actions[0].utilityScore = CalculateObservingUtility(context);
             actions[1].utilityScore = CalculateAcquireNewTargetForThrowRockUtility(context);
             actions[2].utilityScore = CalculateAcquireNewTargetForClapAboveUtility(context);
-            actions[3].utilityScore = CalculateThrowRockUtility(context);
-            actions[4].utilityScore = CalculateClapAboveUtility(context);
-            actions[5].utilityScore = CalculateFleeUtility(context);
+            actions[3].utilityScore = CalculateLoseTargetUtility(context);
+            actions[4].utilityScore = CalculateThrowRockUtility(context);
+            actions[5].utilityScore = CalculateClapAboveUtility(context);
+            actions[6].utilityScore = CalculateFleeUtility(context);
 
             uint index = 0;
 
@@ -62,6 +64,15 @@ namespace AI.Combat.Enemy.LongArms
                                    !longArmsAcquireNewTargetForClapAboveUtility.HasATargetForClapAbove());
         }
 
+        private static float CalculateLoseTargetUtility(ILongArmsLoseTargetUtility longArmsLoseTargetUtility)
+        {
+            return Convert.ToInt16(
+                longArmsLoseTargetUtility.HasATargetForThrowRock() &&
+                !longArmsLoseTargetUtility.CanSeeTargetOfThrowRock() ||
+                longArmsLoseTargetUtility.HasATargetForClapAbove() &&
+                !longArmsLoseTargetUtility.CanSeeTargetOfClapAbove());
+        }
+
         private static float CalculateThrowRockUtility(ILongArmsThrowRockUtility longArmsThrowRockUtility)
         {
             if (longArmsThrowRockUtility.IsThrowRockOnCooldown() || !longArmsThrowRockUtility.HasATargetForThrowRock())
@@ -77,9 +88,9 @@ namespace AI.Combat.Enemy.LongArms
                 longArmsThrowRockUtility.GetThrowRockMinimRangeToCast() < distanceToTarget &&
                 longArmsThrowRockUtility.GetThrowRockMaximRangeToCast() > distanceToTarget &&
                 Vector3.Angle(longArmsThrowRockUtility.GetDirectionOfThrowRockDetection(), throwRockTargetContext.GetVectorToTarget()) <
-                longArmsThrowRockUtility.GetMinimumAngleFromForwardToCastThrowRock()) * 0.8f;
+                longArmsThrowRockUtility.GetMinimumAngleFromForwardToCastThrowRock()) * 0.7f;
         }
-        
+
         private static float CalculateClapAboveUtility(ILongArmsClapAboveUtility longArmsClapAboveUtility)
         {
             if (longArmsClapAboveUtility.IsClapAboveOnCooldown() || !longArmsClapAboveUtility.HasATargetForClapAbove())
@@ -95,7 +106,7 @@ namespace AI.Combat.Enemy.LongArms
                 longArmsClapAboveUtility.GetClapAboveMinimRangeToCast() < distanceToTarget &&
                 longArmsClapAboveUtility.GetClapAboveMaximRangeToCast() > distanceToTarget &&
                 Vector3.Angle(longArmsClapAboveUtility.GetDirectionOfClapAboveDetection(), clapAboveTargetContext.GetVectorToTarget()) <
-                longArmsClapAboveUtility.GetMinimumAngleFromForwardToCastClapAbove());
+                longArmsClapAboveUtility.GetMinimumAngleFromForwardToCastClapAbove() * 0.9f);
         }
         
         private static float CalculateFleeUtility(ILongArmsFleeUtility longArmsFleeUtility)  
@@ -105,12 +116,8 @@ namespace AI.Combat.Enemy.LongArms
                 return 0;
             }
 
-            if (longArmsFleeUtility.GetDistanceToClosestTargetToFleeFrom() <= longArmsFleeUtility.GetRadiusToFlee())
-            {
-                return 0.9f;
-            }    
-            
-            return 0;
+            return Convert.ToInt16(longArmsFleeUtility.GetDistanceToClosestTargetToFleeFrom() <=
+                                   longArmsFleeUtility.GetRadiusToFlee()) * 0.8f;
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface ISetIsCastingAnAbility
     {
-        public void SetICastingAnAbility(bool isCastingAnAbility);
+        public void SetIsFSMBlocked(bool isFSMBlocked);
     }
 }

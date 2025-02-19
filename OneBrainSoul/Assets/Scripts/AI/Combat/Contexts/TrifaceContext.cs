@@ -3,28 +3,28 @@ using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts.Target;
 using AI.Combat.Enemy.Triface;
 using ECS.Entities;
-using ECS.Entities.AI;
-using Interfaces.AI.UBS.Enemy.Triface;
+using Interfaces.AI.UBS.Enemy.FreeMobilityEnemy.Triface;
 using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public class TrifaceContext : AIEnemyContext, ITrifaceIdleUtility, ITrifaceAcquireNewTargetForSlamForSlamForSlamUtility,
-        ITrifaceGetCloserToTargetOfSlamUtility, ITrifaceSlamUtility
+    public class TrifaceContext : FreeMobilityEnemyContext, ITrifaceIdleUtility, 
+        ITrifaceAcquireNewTargetForSlamUtility, ITrifaceLoseTargetUtility, ITrifaceSlamUtility
     {
         private bool _isSeeingATargetForSlam;
         private bool _slamAbilityHasATarget;
         private AbilityCast _slamCast;
         private TargetContext _slamTarget = new TargetContext();
         
-        public TrifaceContext(uint totalHealth, float radius, float height, float sightMaximumDistance, float fov,
-            Transform agentTransform, AbilityCast slamCast) : base(EntityType.TRIFACE, totalHealth, radius, height, 
-            sightMaximumDistance, fov, agentTransform)
+        public TrifaceContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
+            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
+            base(EntityType.TRIFACE, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
+                fov, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {
-                (uint)TrifaceAction.PATROL,
-                (uint)TrifaceAction.ROTATE
+                (uint)TrifaceAction.ROTATE,
+                (uint)TrifaceAction.PATROL
             };
 
             _slamCast = slamCast;
@@ -40,14 +40,14 @@ namespace AI.Combat.Contexts
             return _isSeeingATargetForSlam;
         }
 
-        public void SetHasATargetForSlam(bool hasATarget)
-        {
-            _slamAbilityHasATarget = hasATarget;
-        }
-
         public bool HasATargetForSlam()
         {
             return _slamAbilityHasATarget;
+        }
+
+        public bool CanSeeTargetOfSlam()
+        {
+            return _slamTarget.CanSeeTarget();
         }
 
         public float GetSlamMinimumRangeToCast()
@@ -74,7 +74,7 @@ namespace AI.Combat.Contexts
         {
             Vector3 direction = _slamCast.directionOfDetection;
 
-            direction = GetAgentTransform().rotation * direction;
+            direction = GetAgentHeadTransform().rotation * direction;
             
             return direction;
         }
@@ -84,17 +84,20 @@ namespace AI.Combat.Contexts
             return _slamCast.minimumAngleToCast;
         }
 
-        public void SetSlamTarget(AgentEntity target)
+        public void LoseSlamTarget()
         {
-            _slamTarget.SetTargetRadius(target.GetRadius());
-            _slamTarget.SetTargetHeight(target.GetHeight());
-            _slamTarget.SetTargetTransform(target.GetTransformComponent().GetTransform(), GetAgentTransform().position, 
-                GetHeight());
+            _slamAbilityHasATarget = false;
+        }
+
+        public void SetSlamTargetProperties(float targetRadius, float targetHeight)
+        {
+            SetIsFighting(true);
+            _slamTarget.SetTargetProperties(targetRadius, targetHeight);
 
             _slamAbilityHasATarget = true;
         }
 
-        public bool IsSeeingATarget()
+        public override bool IsSeeingATarget()
         {
             return IsSeeingATargetForSlam();
         }

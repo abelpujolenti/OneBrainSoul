@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using AI.Combat.CombatNavigation;
 using Interfaces.AI.Navigation;
@@ -17,6 +18,8 @@ namespace AI.Navigation
         public Vector3 origin;
         public Vector3 destination;
         public List<Vector3> dynamicObstaclesPositions = new List<Vector3>();
+
+        private Action<bool> _hasReachDestinationAction;
 
         private Mutex _mutex = new Mutex();
 
@@ -50,6 +53,21 @@ namespace AI.Navigation
         public void ReleaseMutex()
         {
             _mutex.ReleaseMutex();
+        }
+
+        public void SetOnReachDestination(Action<bool> hasReachDestinationAction)
+        {
+            _hasReachDestinationAction = hasReachDestinationAction;
+        }
+
+        public void OnSetNewDestination()
+        {
+            _hasReachDestinationAction(false);
+        }
+
+        public void OnReachDestination()
+        {
+            _hasReachDestinationAction(true);
         }
     }
 }
