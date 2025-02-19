@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2817292714914678878
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1050,7 +1050,8 @@ MonoBehaviour:
   _camera: {fileID: 7644145240796908984}
   _hand: {fileID: 301469152948751642}
   _display: {fileID: 4680270387884578829}
-  _uiCanvas: {fileID: 6518029982840348272}
+  _uiCanvas: {fileID: 4986101136898283551}
+  _uiCrosshairCanvas: {fileID: 6518029982840348272}
   _hookCanvas: {fileID: 4624849087584893552}
   _crosshair: {fileID: 315589887326659704}
   _airTime: 0
@@ -2328,7 +2329,7 @@ GameObject:
   - component: {fileID: 5013835759179681323}
   - component: {fileID: 254727464900120472}
   m_Layer: 8
-  m_Name: Canvas
+  m_Name: CrosshairCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

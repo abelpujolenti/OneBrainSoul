@@ -17,6 +17,6 @@ MonoBehaviour:
   sightMaximumDistance: 0
   fov: 45
   normalRotationSpeed: 3
-  slamAbilityProperties: {fileID: 11400000, guid: 85537e7caa4d50f4cbb5d2b823d55410,
+  slamAbilityProperties: {fileID: 11400000, guid: cc264d5ab5bcc1b48a6836399912b54f,
     type: 2}
   rotationSpeedWhileCastingSlam: 0

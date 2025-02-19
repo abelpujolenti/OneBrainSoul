@@ -64,6 +64,7 @@ namespace Player
         [SerializeField] private Transform _hand;
         [SerializeField] private GameObject _display;
         [SerializeField] private Canvas _uiCanvas;
+        [SerializeField] private Canvas _uiCrosshairCanvas;
         [SerializeField] private Canvas _hookCanvas;
         [SerializeField] private TextMeshProUGUI _crosshair;
 
@@ -98,6 +99,7 @@ namespace Player
             _camera.Setup();
             _display.SetActive(false);
             _movementHandler = new GroundedMovementHandler();
+            _uiCrosshairCanvas.gameObject.SetActive(true);
             _uiCanvas.gameObject.SetActive(true);
             _startPos = transform.position;
 

@@ -76,7 +76,7 @@ MonoBehaviour:
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
-    relativePositionToCaster: {x: 0, y: 0, z: 2}
+    relativePositionToCaster: {x: 0, y: 0, z: 0}
     duration: 4
     direction: {x: 0, y: 0, z: 1}
     height: 0

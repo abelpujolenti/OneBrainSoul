@@ -295,12 +295,14 @@ namespace ECS.Entities.AI.Combat
 
         private void AcquireNewTargetForThrowRock()
         {
-            ShowDebugMessages("Long Arms " + GetAgentID() + " Acquiring New Target For Throw Rock");
             
             Vector3 position = transform.position;
             position.y -= GetHeight() / 2;
             
             AgentEntity target = CombatManager.Instance.ReturnClosestAgentEntity(position, _visibleTargetsForThrowRock);
+
+
+            ShowDebugMessages("Long Arms " + GetAgentID() + " Acquiring New Target For Throw Rock " + target.name);
 
             _currentRotationSpeed = _rotationSpeedWhenAcquiringATarget;
             
