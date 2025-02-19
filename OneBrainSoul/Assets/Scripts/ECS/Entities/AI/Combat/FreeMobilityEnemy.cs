@@ -240,9 +240,9 @@ namespace ECS.Entities.AI.Combat
         
         #endregion
 
-        public override void OnReceiveSlow(uint slowID, uint slowPercent)
+        public override void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition)
         {
-            base.OnReceiveSlow(slowID, slowPercent);
+            base.OnReceiveSlow(slowID, slowPercent, sourcePosition);
             
             //TODO SLOW FREE MOBILITY
         }
