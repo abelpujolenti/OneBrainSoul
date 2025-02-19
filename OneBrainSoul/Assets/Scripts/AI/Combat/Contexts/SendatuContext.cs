@@ -11,7 +11,7 @@ namespace AI.Combat.Contexts
         private float _radiusToFlee;
         
         public SendatuContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, float radiusToFlee) : 
+            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, float radiusToFlee) : 
             base(EntityType.SENDATU, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
             fov, headAgentTransform, bodyAgentTransform)
         {

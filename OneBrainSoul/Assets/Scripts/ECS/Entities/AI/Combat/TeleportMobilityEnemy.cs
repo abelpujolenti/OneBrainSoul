@@ -21,6 +21,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override void OnEndInvestigation()
         {
+            base.OnEndInvestigation();
             //TODO TELEPORT MOBILITY ENEMY CHOOSE NEW DESTINATION
         }
     }

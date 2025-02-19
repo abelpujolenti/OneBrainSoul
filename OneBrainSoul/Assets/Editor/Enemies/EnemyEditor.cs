@@ -23,7 +23,7 @@ namespace Editor.Enemies
             
             FloatField(ref aiEnemyProperties.sightMaximumDistance, 0, "Sight Maximum Distance");
             
-            FloatField(ref aiEnemyProperties.fov, 0, 360, "FOV");
+            UintField(ref aiEnemyProperties.fov, 0, 360, "FOV");
             
             FloatField(ref aiEnemyProperties.minimumTimeInvestigatingArea, 0, "Minimum Time Investigating Area");
             
@@ -34,12 +34,6 @@ namespace Editor.Enemies
             
             FloatField(ref aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition, 
                 aiEnemyProperties.maximumTimeInvestigatingArea, "Maximum Time Investigating At Estimated Position");
-            
-            UintField(ref aiEnemyProperties.maximumHeadYawRotation, 0, "Maximum Head Yaw Rotation");
-            
-            UintField(ref aiEnemyProperties.maximumHeadPitchRotation, 0, "Maximum Head Pitch Rotation");
-            
-            UintField(ref aiEnemyProperties.minimumHeadPitchRotation, 0, "Minimum Head Pitch Rotation");
             
             EditorGUI.indentLevel--;
             

@@ -2,7 +2,7 @@
 
 namespace Interfaces.AI.UBS.BaseInterfaces.Get
 {
-    public interface IGetAgentTransform
+    public interface IGetAgentBodyTransform
     {
         public Transform GetAgentBodyTransform();
     }
