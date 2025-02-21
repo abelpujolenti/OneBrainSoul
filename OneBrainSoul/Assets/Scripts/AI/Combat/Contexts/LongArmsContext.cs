@@ -9,8 +9,7 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public class LongArmsContext : TeleportMobilityEnemyContext, ILongArmsIdleUtility, ILongArmsAcquireNewTargetForThrowRockUtility, 
-        ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsLoseTargetUtility, ILongArmsThrowRockUtility, 
-        ILongArmsClapAboveUtility, ILongArmsFleeUtility
+        ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsThrowRockUtility, ILongArmsClapAboveUtility, ILongArmsFleeUtility
     {
         private Dictionary<uint, float> _distancesToTargetsToFleeFrom;
         private uint _longArmsBasesFree;
@@ -58,11 +57,6 @@ namespace AI.Combat.Contexts
             return _throwRockAbilityHasATarget;
         }
 
-        public bool CanSeeTargetOfThrowRock()
-        {
-            return _throwRockTarget.CanSeeTarget();
-        }
-
         public float GetThrowRockMinimRangeToCast()
         {
             return _throwRockCast.minimumRangeToCast;
@@ -97,11 +91,6 @@ namespace AI.Combat.Contexts
             return _throwRockCast.minimumAngleToCast;
         }
 
-        public void LoseThrowRockTarget()
-        {
-            _throwRockAbilityHasATarget = false;
-        }
-
         public void SetThrowRockTargetProperties(float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
@@ -123,11 +112,6 @@ namespace AI.Combat.Contexts
         public bool HasATargetForClapAbove()
         {
             return _clapAboveAbilityHasATarget;
-        }
-
-        public bool CanSeeTargetOfClapAbove()
-        {
-            return _clapAboveTarget.CanSeeTarget();
         }
 
         public float GetClapAboveMinimRangeToCast()
@@ -162,11 +146,6 @@ namespace AI.Combat.Contexts
         public float GetMinimumAngleFromForwardToCastClapAbove()
         {
             return _clapAboveCast.minimumAngleToCast;
-        }
-
-        public void LoseClapAboveTarget()
-        {
-            _clapAboveAbilityHasATarget = false;
         }
 
         public void SetClapAboveTargetProperties(float targetRadius, float targetHeight)

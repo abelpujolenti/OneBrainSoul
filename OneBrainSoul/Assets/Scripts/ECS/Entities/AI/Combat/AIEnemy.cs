@@ -30,6 +30,8 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private bool _isMarked;
 
+        [SerializeField] private uint _areaNumber;
+
         protected Vector3 _directionOfSight;
 
         private Vector3 _directionToRotateHead;
@@ -61,7 +63,8 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType)
         {
-            SetDirectionToRotateHead(Vector3.forward);
+            //SetDirectionToRotateHead(Vector3.forward);
+            SetDirectionToRotateBody(Vector3.forward);
             
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
 
@@ -212,36 +215,6 @@ namespace ECS.Entities.AI.Combat
             return _directionToRotateBody;
         }
 
-        protected void OnLoseSightOfTarget(Vector3 lastKnownPosition, Vector3 lastKnownVelocity, float timeElapsed)
-        {
-            Vector3 estimatedTargetPosition = lastKnownPosition + lastKnownVelocity * timeElapsed;
-            
-            _timeInvestigating = Random.Range(_minimumTimeInvestigatingAtEstimatedPosition,
-                _maximumTimeInvestigatingAtEstimatedPosition);
-            
-            if (IsInsideSightRange(_headTransform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
-            {
-                SetDirectionToRotateHead(_headTransform.position - estimatedTargetPosition);
-                InvestigateArea();
-                return;
-            }
-            
-            GoToArea(estimatedTargetPosition);
-        }
-
-        private bool IsInsideSightRange(Vector3 position, Vector3 targetPosition, float sightDistance)
-        {
-            Vector3 vectorToTarget = targetPosition - position;
-            float distanceToTarget = vectorToTarget.sqrMagnitude;
-
-            if (IsThereAnyObstacleInBetween(position, vectorToTarget.normalized, Mathf.Sqrt(distanceToTarget)))
-            {
-                return false;
-            }
-
-            return !(distanceToTarget > sightDistance * sightDistance);
-        }
-
         protected virtual void InvestigateArea()
         {
             StartCoroutine(InvestigateAreaCoroutine());
@@ -266,7 +239,7 @@ namespace ECS.Entities.AI.Combat
                 timeDeltaTime = Time.deltaTime;
                 timer += timeDeltaTime;
 
-                if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateHead()) > 0.95f)
+                if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateBody()) > 0.95f)
                 {
                     timerLookingAtTheSameDirection += timeDeltaTime;
 
@@ -276,7 +249,7 @@ namespace ECS.Entities.AI.Combat
                         float yawHeadRotation = Random.Range(-maximumHeadYawRotation, maximumHeadYawRotation);
                         float pitchHeadRotation = Random.Range(-_maximumHeadPitchDownRotation, _maximumHeadPitchUpRotation);
                         
-                        SetDirectionToRotateHead(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
+                        SetDirectionToRotateBody(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
 
                         timerLookingAtTheSameDirection = 0;
                     }
@@ -292,7 +265,7 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnEndInvestigation()
         {
-            SetDirectionToRotateHead(Vector3.forward);
+            SetDirectionToRotateBody(Vector3.forward);
         }
 
         private bool IsThereAnyObstacleInBetween(Vector3 position, Vector3 direction, float distance)
@@ -467,7 +440,12 @@ namespace ECS.Entities.AI.Combat
         {
             return _context.GetHeight();
         }
-        
+
+        public uint GetAreaNumber()
+        {
+            return _areaNumber;
+        }
+
         /////////////////////////DEBUG
 
         [SerializeField] protected bool _showFov;

@@ -21,7 +21,6 @@ namespace ECS.Entities.AI.Combat
         private IAreaAbility _slamAbility;
         private HashSet<uint> _visibleTargetsForSlamAbility;
         private Func<bool> _cancelSlamFunc = () => false;
-        private Stopwatch _timeElapsedSinceTheLastSeenOfSlamTarget = new Stopwatch();
 
         private float _rotationSpeedWhenCastingSlam;
         
@@ -54,7 +53,6 @@ namespace ECS.Entities.AI.Combat
                 { TrifaceAction.PATROL , Patrol },
                 { TrifaceAction.INVESTIGATE_AREA , InvestigateArea },
                 { TrifaceAction.ACQUIRE_NEW_TARGET_FOR_SLAM , AcquireNewTargetForSlam },
-                { TrifaceAction.LOSE_TARGET , LoseTarget },
                 { TrifaceAction.SLAM , Slam }
             };
         }
@@ -92,9 +90,9 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            //RotateBody();
+            RotateBody();
             
-            RotateHead();
+            //RotateHead();
                 
             //LaunchRaycasts();
             
@@ -136,13 +134,6 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
-            if (!_visibleTargetsForSlamAbility.Contains(_slamAbility.GetTargetId()))
-            {
-                _timeElapsedSinceTheLastSeenOfSlamTarget.Start();
-                _context.GetSlamTargetContext().OnLoseSightOfTarget();
-                return;
-            }
-
             Vector3 targetPosition;
             Vector3 targetVelocity;
 
@@ -180,30 +171,6 @@ namespace ECS.Entities.AI.Combat
             _slamAbility.SetTargetId(target.GetAgentID());
             
             SetDestination(target.GetTransformComponent());
-        }
-
-        private void LoseTarget()
-        {
-            ShowDebugMessages("Triface " + GetAgentID() + " Target Lost");
-            
-            //ContinueNavigation();
-
-            if (_context.IsSeeingATargetForSlam())
-            {
-                AcquireNewTargetForSlam();
-                return;
-            }
-            
-            _context.LoseSlamTarget();
-            
-            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
-
-            TargetContext targetContext = _context.GetSlamTargetContext();
-
-            OnLoseSightOfTarget(targetContext.GetTargetPosition(), targetContext.GetTargetVelocity(),
-                _timeElapsedSinceTheLastSeenOfSlamTarget.ElapsedMilliseconds / 1000);
-            
-            _timeElapsedSinceTheLastSeenOfSlamTarget.Reset();
         }
 
         private void Slam()

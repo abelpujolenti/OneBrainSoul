@@ -22,12 +22,10 @@ namespace ECS.Entities.AI.Combat
         private IProjectileAbility _throwRockAbility;
         private HashSet<uint> _visibleTargetsForThrowRock;
         private Func<bool> _cancelThrowRockFunc = () => false;
-        private Stopwatch _timeElapsedSinceTheLastSeenOfThrowRockTarget = new Stopwatch();
 
         private IAreaAbility _clapAboveAbility;
         private HashSet<uint> _visibleTargetsForClapAbove;
         private Func<bool> _cancelClapAboveFunc = () => false;
-        private Stopwatch _timeElapsedSinceTheLastSeenOfClapAboveTarget = new Stopwatch();
 
         private HashSet<uint> _visibleTargetsToFleeFrom;
 
@@ -97,7 +95,6 @@ namespace ECS.Entities.AI.Combat
                 { LongArmsAction.OBSERVE , Observing },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK , AcquireNewTargetForThrowRock },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE , AcquireNewTargetForClapAbove },
-                { LongArmsAction.LOSE_TARGET , LoseTarget },
                 { LongArmsAction.THROW_ROCK , ThrowRock },
                 { LongArmsAction.CLAP_ABOVE , ClapAbove },
                 { LongArmsAction.FLEE , Flee }
@@ -211,41 +208,28 @@ namespace ECS.Entities.AI.Combat
             
             if (_context.HasATargetForThrowRock())
             {
-                if (!_visibleTargetsForThrowRock.Contains(_throwRockAbility.GetTargetId()))
                 {
-                    _context.GetThrowRockTargetContext().OnLoseSightOfTarget();
+                    AgentEntity target = CombatManager.Instance.ReturnAgentEntity(_throwRockAbility.GetTargetId());
+                    targetPosition = target.GetTransformComponent().GetPosition();
+                    targetVelocity = target.GetVelocity();
                 }
-                else
-                {
-                    {
-                        AgentEntity target = CombatManager.Instance.ReturnAgentEntity(_throwRockAbility.GetTargetId());
-                        targetPosition = target.GetTransformComponent().GetPosition();
-                        targetVelocity = target.GetVelocity();
-                    }
             
-                    _context.GetThrowRockTargetContext().SetTargetState(targetPosition, targetVelocity);
+                _context.GetThrowRockTargetContext().SetTargetState(targetPosition, targetVelocity);
                     
-                    agentPosition = transform.position;
+                agentPosition = transform.position;
             
-                    targetPosition.y -= _context.GetThrowRockTargetContext().GetTargetHeight() / 2;
-                    agentPosition.y -= _context.GetHeight() / 2;
+                targetPosition.y -= _context.GetThrowRockTargetContext().GetTargetHeight() / 2;
+                agentPosition.y -= _context.GetHeight() / 2;
 
-                    vectorToTarget = targetPosition - agentPosition;
+                vectorToTarget = targetPosition - agentPosition;
             
-                    _context.GetThrowRockTargetContext().SetVectorToTarget(vectorToTarget);
+                _context.GetThrowRockTargetContext().SetVectorToTarget(vectorToTarget);
                     
-                    SetDirectionToRotateBody(vectorToTarget);
-                }
+                SetDirectionToRotateBody(vectorToTarget);
             }
 
             if (!_context.HasATargetForClapAbove())
             {
-                return;
-            }
-
-            if (!_visibleTargetsForClapAbove.Contains(_clapAboveAbility.GetTargetId()))
-            {
-                _context.GetClapAboveTargetContext().OnLoseSightOfTarget();
                 return;
             }
 
@@ -380,63 +364,6 @@ namespace ECS.Entities.AI.Combat
             _context.SetClapAboveTargetProperties(target.GetRadius(), target.GetHeight());
             
             _clapAboveAbility.SetTargetId(target.GetAgentID());
-        }
-
-        private void LoseTarget()
-        {
-            ShowDebugMessages("Long Arms " + GetAgentID() + " Target Lost");
-
-            bool throwRockTargetLost = false;
-
-            if (!_context.CanSeeTargetOfThrowRock())
-            {
-                if (_context.IsSeeingATargetForThrowRock())
-                {
-                    AcquireNewTargetForClapAbove();
-                }
-                else
-                {
-                    throwRockTargetLost = true;
-                    _context.LoseThrowRockTarget();
-                }
-            }
-
-            if (!_context.CanSeeTargetOfClapAbove())
-            {
-                if (_context.IsSeeingATargetForThrowRock())
-                {
-                    AcquireNewTargetForClapAbove();
-                    return;
-                }
-                _context.LoseClapAboveTarget();
-            }
-            
-            if (_context.IsSeeingATarget())
-            {
-                return;
-            }
-            
-            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
-
-            TargetContext targetContext;
-
-            if (throwRockTargetLost)
-            {
-                targetContext = _context.GetThrowRockTargetContext();
-                
-                OnLoseSightOfTarget(targetContext.GetTargetPosition(), targetContext.GetTargetVelocity(),
-                    _timeElapsedSinceTheLastSeenOfThrowRockTarget.ElapsedMilliseconds / 100);
-                
-                _timeElapsedSinceTheLastSeenOfThrowRockTarget.Reset();
-                return;
-            }
-
-            targetContext = _context.GetClapAboveTargetContext();
-            
-            OnLoseSightOfTarget(targetContext.GetTargetPosition(), targetContext.GetTargetVelocity(),
-                _timeElapsedSinceTheLastSeenOfClapAboveTarget.ElapsedMilliseconds / 1000);
-                
-            _timeElapsedSinceTheLastSeenOfClapAboveTarget.Reset();
         }
 
         private void ThrowRock()

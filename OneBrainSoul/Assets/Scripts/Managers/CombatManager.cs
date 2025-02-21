@@ -23,6 +23,8 @@ namespace Managers
         private Dictionary<uint, Sendatu> _sendatus = new Dictionary<uint, Sendatu>();
 
         private HashSet<uint> _longArmsBasesFreeId = new HashSet<uint>();
+
+        private Dictionary<uint, HashSet<uint>> _enemiesInsideSameArea = new Dictionary<uint, HashSet<uint>>();
         
         private readonly Dictionary<EntityType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<EntityType, Delegate>
         {
@@ -89,6 +91,8 @@ namespace Managers
             
             _trifaces.Add(agentID, triface);
             _returnAgent.Add(agentID, () => _trifaces[agentID]);
+
+            AddAgentToAreaNumber(triface.GetAreaNumber(), agentID);
         }
 
         public void AddEnemy(LongArms longArms)
@@ -102,6 +106,8 @@ namespace Managers
             {
                 longArms.IncrementLongArmsFreeBases();
             }
+
+            AddAgentToAreaNumber(longArms.GetAreaNumber(), agentID);
         }
 
         public void AddEnemy(LongArmsBase longArmsBase)
@@ -119,6 +125,22 @@ namespace Managers
             
             _sendatus.Add(agentID, sendatu);
             _returnAgent.Add(agentID, () => _sendatus[agentID]);
+
+            AddAgentToAreaNumber(sendatu.GetAreaNumber(), agentID);
+        }
+
+        private void AddAgentToAreaNumber(uint areaNumber, uint agentId)
+        {
+            if (_enemiesInsideSameArea.ContainsKey(areaNumber))
+            {
+                _enemiesInsideSameArea[areaNumber].Add(agentId);    
+                return;
+            }
+            
+            _enemiesInsideSameArea.Add(areaNumber, new HashSet<uint>
+            {
+                agentId
+            });
         }
 
         #endregion

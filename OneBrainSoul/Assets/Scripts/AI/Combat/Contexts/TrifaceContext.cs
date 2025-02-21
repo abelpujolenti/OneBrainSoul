@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public class TrifaceContext : FreeMobilityEnemyContext, ITrifaceIdleUtility, 
-        ITrifaceAcquireNewTargetForSlamUtility, ITrifaceLoseTargetUtility, ITrifaceSlamUtility
+    public class TrifaceContext : FreeMobilityEnemyContext, ITrifaceIdleUtility, ITrifaceAcquireNewTargetForSlamUtility, 
+        ITrifaceSlamUtility
     {
         private bool _isSeeingATargetForSlam;
         private bool _slamAbilityHasATarget;
@@ -45,11 +45,6 @@ namespace AI.Combat.Contexts
             return _slamAbilityHasATarget;
         }
 
-        public bool CanSeeTargetOfSlam()
-        {
-            return _slamTarget.CanSeeTarget();
-        }
-
         public float GetSlamMinimumRangeToCast()
         {
             return _slamCast.minimumRangeToCast;
@@ -82,11 +77,6 @@ namespace AI.Combat.Contexts
         public float GetMinimumAngleFromForwardToCastSlam()
         {
             return _slamCast.minimumAngleToCast;
-        }
-
-        public void LoseSlamTarget()
-        {
-            _slamAbilityHasATarget = false;
         }
 
         public void SetSlamTargetProperties(float targetRadius, float targetHeight)

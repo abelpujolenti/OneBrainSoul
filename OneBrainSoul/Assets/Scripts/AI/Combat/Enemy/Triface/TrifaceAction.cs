@@ -7,7 +7,6 @@
         PATROL,
         INVESTIGATE_AREA,
         ACQUIRE_NEW_TARGET_FOR_SLAM,
-        LOSE_TARGET,
         SLAM,
         ENUM_SIZE
     }
