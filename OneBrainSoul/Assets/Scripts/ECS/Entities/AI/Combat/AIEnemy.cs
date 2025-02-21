@@ -22,7 +22,8 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
-        private Coroutine _updateCoroutine;
+        protected Dictionary<EntityType, HashSet<uint>> _targetsInsideVisionArea =
+            new Dictionary<EntityType, HashSet<uint>>();
         
         [SerializeField] protected Material _material;
 
@@ -431,6 +432,50 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        #region Vision Area
+
+        protected abstract EntityType GetTargetEntities();
+
+        private void OnTriggerEnter(Collider other)
+        {
+            AgentEntity agentEntity = other.GetComponent<AgentEntity>();
+
+            if (!agentEntity)
+            {
+                return;
+            }
+
+            EntityType agentEntityType = agentEntity.GetEntityType();
+
+            if ((GetTargetEntities() & agentEntityType) == 0)
+            {
+                return;
+            }
+
+            _targetsInsideVisionArea[agentEntityType].Add(agentEntity.GetAgentID());
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            AgentEntity agentEntity = other.GetComponent<AgentEntity>();
+
+            if (!agentEntity)
+            {
+                return;
+            }
+
+            EntityType agentEntityType = agentEntity.GetEntityType();
+
+            if ((GetTargetEntities() & agentEntityType) == 0)
+            {
+                return;
+            }
+
+            _targetsInsideVisionArea[agentEntityType].Remove(agentEntity.GetAgentID());
+        }
+
+        #endregion
+
         public override float GetRadius()
         {
             return _context.GetRadius();
@@ -450,6 +495,23 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] protected bool _showFov;
         [SerializeField] protected Color _fovColor;
+
+        protected virtual void OnDrawGizmos()
+        {
+            if (_showFov)
+            {
+                Gizmos.color = _fovColor;
+                BoxCollider boxCollider = GetComponent<BoxCollider>();
+                Vector3 center = transform.position + transform.rotation * boxCollider.center;
+                Matrix4x4 oldMatrix = Gizmos.matrix;
+                Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
+                Gizmos.DrawCube(Vector3.zero, boxCollider.size);
+                Gizmos.matrix = oldMatrix;
+                SphereCollider sphereCollider = GetComponent<SphereCollider>();
+                Gizmos.DrawSphere(transform.position, sphereCollider.radius);
+                //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
+            }
+        }
 
         protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,
             int segments)

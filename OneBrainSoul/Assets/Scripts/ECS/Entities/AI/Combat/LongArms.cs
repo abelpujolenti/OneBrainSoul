@@ -170,19 +170,17 @@ namespace ECS.Entities.AI.Combat
             float fov = _context.GetFov();
             
             _visibleTargetsForThrowRock = CombatManager.Instance.ReturnVisibleTargets(
-                    _longArmsProperties.throwRockAbilityProperties.abilityTarget, position, sightMaximumDistance, 
-                    forward, fov);
+                    _longArmsProperties.throwRockAbilityProperties.abilityTarget, position, _targetsInsideVisionArea);
             
             _context.SetIsSeeingATargetForThrowRock(_visibleTargetsForThrowRock.Count != 0);
 
             _visibleTargetsForClapAbove = CombatManager.Instance.ReturnVisibleTargets(
-                    _longArmsProperties.clapAboveAbilityProperties.abilityTarget, position, sightMaximumDistance, 
-                    forward, fov);
+                    _longArmsProperties.clapAboveAbilityProperties.abilityTarget, position, _targetsInsideVisionArea);
             
             _context.SetIsSeeingATargetForClapAbove(_visibleTargetsForClapAbove.Count != 0);
 
             _visibleTargetsToFleeFrom = CombatManager.Instance.ReturnVisibleTargets(_longArmsProperties.entitiesToFleeFrom, 
-                position, sightMaximumDistance, forward, fov);
+                position, _targetsInsideVisionArea);
         }
 
         private void UpdateDistancesToTargetsToFleeFrom()
@@ -506,6 +504,12 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        protected override EntityType GetTargetEntities()
+        {
+            return _longArmsProperties.throwRockAbilityProperties.abilityTarget |
+                   _longArmsProperties.clapAboveAbilityProperties.abilityTarget;
+        }
+
         public void SetOnFleeAction(Action onFlee)
         {
             _onFlee = onFlee;
@@ -552,11 +556,8 @@ namespace ECS.Entities.AI.Combat
         {
             Vector3 origin = _headTransform.position;
             int segments = 20;
-
-            if (_showFov)
-            {
-                DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
-            }
+            
+            base.OnDrawGizmos();
             
             if (_showDetectionAreaOfThrowRock)
             {

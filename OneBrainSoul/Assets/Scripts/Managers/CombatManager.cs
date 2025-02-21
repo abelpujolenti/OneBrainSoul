@@ -147,68 +147,25 @@ namespace Managers
 
         #region UBS
 
-        public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, float sightMaximumDistance, 
-            Vector3 forward, float fov)
+        public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, 
+            Dictionary<EntityType, HashSet<uint>> targetsInsideVisionArea)
         {
             HashSet<uint> visibleTargets = new HashSet<uint>();
 
-            if ((target & EntityType.PLAYER) != 0)
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
             {
-                if (CanSeeEntity(_playerCharacter.GetTransformComponent().GetPosition(), _playerCharacter.GetRadius(), 
-                        position, sightMaximumDistance, forward, fov))
+                if ((target & i) == 0 || !targetsInsideVisionArea.ContainsKey(i))
                 {
-                    visibleTargets.Add(_playerCharacter.GetAgentID());
+                    continue;
                 }
-            }
-
-            if ((target & EntityType.TRIFACE) != 0)
-            {
-                List<Triface> allTrifaces = ReturnAllTrifaces();
-                foreach (Triface triface in allTrifaces)
+                    
+                foreach (uint targetId in targetsInsideVisionArea[i])
                 {
-                    if (CanSeeEntity(triface.GetTransformComponent().GetPosition(), triface.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
+                    AgentEntity agentEntity = _returnAgent[targetId]();
+                        
+                    if (CanSeeEntity(agentEntity.GetTransformComponent().GetPosition(), agentEntity.GetRadius(), position))
                     {
-                        visibleTargets.Add(triface.GetAgentID());
-                    }
-                }
-            }
-
-            if ((target & EntityType.LONG_ARMS) != 0)
-            {
-                List<LongArms> allLongArms = ReturnAllLongArms();
-                foreach (LongArms longArms in allLongArms)
-                {
-                    if (CanSeeEntity(longArms.GetTransformComponent().GetPosition(), longArms.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
-                    {
-                        visibleTargets.Add(longArms.GetAgentID());
-                    }
-                }
-            }
-
-            if ((target & EntityType.LONG_ARMS_BASE) != 0)
-            {
-                List<LongArmsBase> allLongArmsBases = ReturnAllLongArmsBases();
-                foreach (LongArmsBase longArmsBase in allLongArmsBases)
-                {
-                    if (CanSeeEntity(longArmsBase.GetTransformComponent().GetPosition(), longArmsBase.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
-                    {
-                        visibleTargets.Add(longArmsBase.GetAgentID());
-                    }
-                }
-            }
-
-            if ((target & EntityType.SENDATU) != 0)
-            {
-                List<Sendatu> allSendatus = RequestAllSendatus();
-                foreach (Sendatu sendatu in allSendatus)
-                {
-                    if (CanSeeEntity(sendatu.GetTransformComponent().GetPosition(), sendatu.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
-                    {
-                        visibleTargets.Add(sendatu.GetAgentID());
+                        visibleTargets.Add(agentEntity.GetAgentID());
                     }
                 }
             }
@@ -216,16 +173,10 @@ namespace Managers
             return visibleTargets;
         }
 
-        private bool CanSeeEntity(Vector3 targetPosition, float targetRadius, Vector3 position, float sightMaximumDistance, 
-            Vector3 forward, float fov)
+        private bool CanSeeEntity(Vector3 targetPosition, float targetRadius, Vector3 position)
         {
             Vector3 vectorToTarget = (targetPosition - position).normalized;
             float distanceToTarget = (targetPosition - position).magnitude - targetRadius;
-
-            if (distanceToTarget > sightMaximumDistance || Vector3.Angle(forward, vectorToTarget) > fov)
-            {
-                return false;
-            }
 
             return !Physics.Raycast(position, vectorToTarget, distanceToTarget, 
                 GameManager.Instance.GetGroundLayer());

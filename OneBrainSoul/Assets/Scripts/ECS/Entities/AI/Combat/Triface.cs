@@ -17,7 +17,7 @@ namespace ECS.Entities.AI.Combat
     public class Triface : FreeMobilityEnemy<TrifaceContext, TrifaceAction>
     {
         [SerializeField] private TrifaceProperties _trifaceProperties;
-
+        
         private IAreaAbility _slamAbility;
         private HashSet<uint> _visibleTargetsForSlamAbility;
         private Func<bool> _cancelSlamFunc = () => false;
@@ -59,6 +59,16 @@ namespace ECS.Entities.AI.Combat
 
         protected override void CreateAbilities()
         {
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((_trifaceProperties.slamAbilityProperties.abilityTarget & i) == 0)
+                {
+                    continue;
+                }   
+                
+                _targetsInsideVisionArea.Add(i, new HashSet<uint>());
+            }
+            
             _slamAbility = AbilityManager.Instance.ReturnAreaAbility(_trifaceProperties.slamAbilityProperties,
                 transform);
 
@@ -90,7 +100,7 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            RotateBody();
+            //RotateBody();
             
             //RotateHead();
                 
@@ -122,7 +132,7 @@ namespace ECS.Entities.AI.Combat
             
             _visibleTargetsForSlamAbility = CombatManager.Instance.ReturnVisibleTargets(
                 _trifaceProperties.slamAbilityProperties.abilityTarget, ownTransform.position, 
-                _context.GetSightMaximumDistance(), ownTransform.forward, _context.GetFov());
+                _targetsInsideVisionArea);
             
             _context.SetIsSeeingATargetForSlam(_visibleTargetsForSlamAbility.Count != 0);
         }
@@ -239,27 +249,28 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        protected override EntityType GetTargetEntities()
+        {
+            return _trifaceProperties.slamAbilityProperties.abilityTarget;
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
             CombatManager.Instance.OnEnemyDefeated(this);
         }
         
-        
         /////////////////////////DEBUG
         
         [SerializeField] private bool _showDetectionAreaOfSlam;
         [SerializeField] private Color _colorOfDetectionAreaOfSlam;
 
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
-            Vector3 origin = _headTransform.position;
+            Vector3 origin = _bodyTransform.position;
             int segments = 20;
-
-            if (_showFov)
-            {
-                DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
-            }
+            
+            base.OnDrawGizmos();
             
             if (_showDetectionAreaOfSlam)
             {
@@ -268,4 +279,4 @@ namespace ECS.Entities.AI.Combat
             }
         }
     }
-}
+} 

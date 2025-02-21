@@ -251,6 +251,12 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        protected override EntityType GetTargetEntities()
+        {
+            //return _sendatuProperties.
+            return EntityType.SENDATU;
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
