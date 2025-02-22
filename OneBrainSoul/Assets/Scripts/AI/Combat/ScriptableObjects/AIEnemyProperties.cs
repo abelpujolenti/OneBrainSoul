@@ -16,10 +16,6 @@ namespace AI.Combat.ScriptableObjects
         
         public float maximumTimeInvestigatingArea;
 
-        public float minimumTimeInvestigatingAtEstimatedPosition;
-        
-        public float maximumTimeInvestigatingAtEstimatedPosition;
-
         public uint maximumHeadYawRotation;
         
         public uint maximumHeadPitchUpRotation;

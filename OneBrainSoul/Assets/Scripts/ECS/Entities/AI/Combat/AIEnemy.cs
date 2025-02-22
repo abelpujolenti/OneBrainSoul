@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
+using AI.Combat.Enemy;
 using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
@@ -22,6 +23,8 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
+        [SerializeField] private VisionArea[] _visionAreas;
+
         protected Dictionary<EntityType, HashSet<uint>> _targetsInsideVisionArea =
             new Dictionary<EntityType, HashSet<uint>>();
         
@@ -32,8 +35,6 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] private bool _isMarked;
 
         [SerializeField] private uint _areaNumber;
-
-        protected Vector3 _directionOfSight;
 
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
@@ -52,9 +53,6 @@ namespace ECS.Entities.AI.Combat
         protected float _minimumTimeInvestigatingArea;
         protected float _maximumTimeInvestigatingArea;
 
-        protected float _minimumTimeInvestigatingAtEstimatedPosition;
-        protected float _maximumTimeInvestigatingAtEstimatedPosition;
-
         protected float _timeInvestigating;
 
         private uint _maximumHeadPitchUpRotation;
@@ -62,7 +60,8 @@ namespace ECS.Entities.AI.Combat
         
         protected bool _isRotating;
 
-        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType)
+        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType, 
+            EntityType targetEntities)
         {
             //SetDirectionToRotateHead(Vector3.forward);
             SetDirectionToRotateBody(Vector3.forward);
@@ -77,12 +76,6 @@ namespace ECS.Entities.AI.Combat
             _minimumTimeInvestigatingArea = aiEnemyProperties.minimumTimeInvestigatingArea;
             _maximumTimeInvestigatingArea = aiEnemyProperties.maximumTimeInvestigatingArea;
 
-            _minimumTimeInvestigatingAtEstimatedPosition =
-                aiEnemyProperties.minimumTimeInvestigatingAtEstimatedPosition;
-
-            _maximumTimeInvestigatingAtEstimatedPosition =
-                aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition;
-
             _maximumHeadPitchUpRotation = aiEnemyProperties.maximumHeadPitchUpRotation;
             _maximumHeadPitchDownRotation = aiEnemyProperties.maximumHeadPitchDownRotation;
             
@@ -91,6 +84,11 @@ namespace ECS.Entities.AI.Combat
             InitiateDictionaries();
             
             CreateAbilities();
+
+            foreach (VisionArea visionArea in _visionAreas)
+            {
+                visionArea.Setup(targetEntities, AddTargetInsideArea, RemoveTargetInsideArea);
+            }
         }
 
         protected abstract void CreateAbilities();
@@ -432,49 +430,15 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        #region Vision Area
-
-        protected abstract EntityType GetTargetEntities();
-
-        private void OnTriggerEnter(Collider other)
+        private void AddTargetInsideArea(EntityType entityType, uint targetId)
         {
-            AgentEntity agentEntity = other.GetComponent<AgentEntity>();
-
-            if (!agentEntity)
-            {
-                return;
-            }
-
-            EntityType agentEntityType = agentEntity.GetEntityType();
-
-            if ((GetTargetEntities() & agentEntityType) == 0)
-            {
-                return;
-            }
-
-            _targetsInsideVisionArea[agentEntityType].Add(agentEntity.GetAgentID());
+            _targetsInsideVisionArea[entityType].Add(targetId);
         }
 
-        private void OnTriggerExit(Collider other)
+        private void RemoveTargetInsideArea(EntityType entityType, uint targetId)
         {
-            AgentEntity agentEntity = other.GetComponent<AgentEntity>();
-
-            if (!agentEntity)
-            {
-                return;
-            }
-
-            EntityType agentEntityType = agentEntity.GetEntityType();
-
-            if ((GetTargetEntities() & agentEntityType) == 0)
-            {
-                return;
-            }
-
-            _targetsInsideVisionArea[agentEntityType].Remove(agentEntity.GetAgentID());
+            _targetsInsideVisionArea[entityType].Remove(targetId);
         }
-
-        #endregion
 
         public override float GetRadius()
         {
@@ -501,13 +465,13 @@ namespace ECS.Entities.AI.Combat
             if (_showFov)
             {
                 Gizmos.color = _fovColor;
-                BoxCollider boxCollider = GetComponent<BoxCollider>();
+                BoxCollider boxCollider = _visionAreas[0].GetComponent<BoxCollider>();
                 Vector3 center = transform.position + transform.rotation * boxCollider.center;
                 Matrix4x4 oldMatrix = Gizmos.matrix;
                 Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
                 Gizmos.DrawCube(Vector3.zero, boxCollider.size);
                 Gizmos.matrix = oldMatrix;
-                SphereCollider sphereCollider = GetComponent<SphereCollider>();
+                SphereCollider sphereCollider = _visionAreas[1].GetComponent<SphereCollider>();
                 Gizmos.DrawSphere(transform.position, sphereCollider.radius);
                 //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
             }

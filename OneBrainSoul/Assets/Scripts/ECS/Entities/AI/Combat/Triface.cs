@@ -29,7 +29,7 @@ namespace ECS.Entities.AI.Combat
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
             
-            EnemySetup(radius, _trifaceProperties, EntityType.TRIFACE);
+            EnemySetup(radius, _trifaceProperties, EntityType.TRIFACE, _trifaceProperties.slamAbilityProperties.abilityTarget);
 
             _utilityFunction = new TrifaceUtilityFunction();
 
@@ -248,11 +248,6 @@ namespace ECS.Entities.AI.Combat
         #endregion
 
         #endregion
-
-        protected override EntityType GetTargetEntities()
-        {
-            return _trifaceProperties.slamAbilityProperties.abilityTarget;
-        }
 
         protected override void OnDestroy()
         {

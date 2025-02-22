@@ -52,8 +52,10 @@ namespace ECS.Entities.AI.Combat
         {
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
-            
-            EnemySetup(radius, _longArmsProperties, EntityType.LONG_ARMS);
+
+            EnemySetup(radius, _longArmsProperties, EntityType.LONG_ARMS,
+                _longArmsProperties.throwRockAbilityProperties.abilityTarget |
+                _longArmsProperties.clapAboveAbilityProperties.abilityTarget);
 
             _utilityFunction = new LongArmsUtilityFunction();
 
@@ -503,12 +505,6 @@ namespace ECS.Entities.AI.Combat
         #endregion
 
         #endregion
-
-        protected override EntityType GetTargetEntities()
-        {
-            return _longArmsProperties.throwRockAbilityProperties.abilityTarget |
-                   _longArmsProperties.clapAboveAbilityProperties.abilityTarget;
-        }
 
         public void SetOnFleeAction(Action onFlee)
         {

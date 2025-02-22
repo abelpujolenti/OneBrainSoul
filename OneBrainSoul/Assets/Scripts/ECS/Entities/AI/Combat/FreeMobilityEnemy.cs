@@ -44,9 +44,10 @@ namespace ECS.Entities.AI.Combat
 
         protected int _raysTargetsLayerMask;
 
-        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, EntityType entityType)
+        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, 
+            EntityType entityType, EntityType targetEntities)
         {
-            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType);
+            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType, targetEntities);
             
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
