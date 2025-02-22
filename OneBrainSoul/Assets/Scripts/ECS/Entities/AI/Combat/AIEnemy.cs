@@ -23,6 +23,8 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
+        private EntityType _targetEntities;
+
         [SerializeField] private VisionArea[] _visionAreas;
 
         protected Dictionary<EntityType, HashSet<uint>> _targetsInsideVisionArea =
@@ -34,7 +36,7 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private bool _isMarked;
 
-        [SerializeField] private uint _areaNumber;
+        [SerializeField] protected uint _areaNumber;
 
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
@@ -87,8 +89,10 @@ namespace ECS.Entities.AI.Combat
 
             foreach (VisionArea visionArea in _visionAreas)
             {
-                visionArea.Setup(targetEntities, AddTargetInsideArea, RemoveTargetInsideArea);
+                visionArea.Setup(AddTargetInsideArea, RemoveTargetInsideArea);
             }
+
+            _targetEntities = targetEntities;
         }
 
         protected abstract void CreateAbilities();
@@ -430,13 +434,33 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        public EntityType GetTarget()
+        {
+            return _targetEntities;
+        }
+
+        private bool IsADesiredTargetEntity(EntityType entityType)
+        {
+            return (_targetEntities & entityType) != 0;
+        }
+
         private void AddTargetInsideArea(EntityType entityType, uint targetId)
         {
+            if (!IsADesiredTargetEntity(entityType))
+            {
+                return;
+            }
+            
             _targetsInsideVisionArea[entityType].Add(targetId);
         }
 
         private void RemoveTargetInsideArea(EntityType entityType, uint targetId)
         {
+            if (!IsADesiredTargetEntity(entityType))
+            {
+                return;
+            }
+            
             _targetsInsideVisionArea[entityType].Remove(targetId);
         }
 
@@ -462,19 +486,21 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnDrawGizmos()
         {
-            if (_showFov)
+            if (!_showFov)
             {
-                Gizmos.color = _fovColor;
-                BoxCollider boxCollider = _visionAreas[0].GetComponent<BoxCollider>();
-                Vector3 center = transform.position + transform.rotation * boxCollider.center;
-                Matrix4x4 oldMatrix = Gizmos.matrix;
-                Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
-                Gizmos.DrawCube(Vector3.zero, boxCollider.size);
-                Gizmos.matrix = oldMatrix;
-                SphereCollider sphereCollider = _visionAreas[1].GetComponent<SphereCollider>();
-                Gizmos.DrawSphere(transform.position, sphereCollider.radius);
-                //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
+                return;
             }
+            
+            Gizmos.color = _fovColor;
+            BoxCollider boxCollider = _visionAreas[0].GetComponent<BoxCollider>();
+            Vector3 center = transform.position + transform.rotation * boxCollider.center;
+            Matrix4x4 oldMatrix = Gizmos.matrix;
+            Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
+            Gizmos.DrawCube(Vector3.zero, boxCollider.size);
+            Gizmos.matrix = oldMatrix;
+            SphereCollider sphereCollider = _visionAreas[1].GetComponent<SphereCollider>();
+            Gizmos.DrawSphere(transform.position, sphereCollider.radius);
+            //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
         }
 
         protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,

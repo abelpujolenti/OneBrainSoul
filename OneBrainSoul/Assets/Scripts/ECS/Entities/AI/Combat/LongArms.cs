@@ -172,17 +172,17 @@ namespace ECS.Entities.AI.Combat
             float fov = _context.GetFov();
             
             _visibleTargetsForThrowRock = CombatManager.Instance.ReturnVisibleTargets(
-                    _longArmsProperties.throwRockAbilityProperties.abilityTarget, position, _targetsInsideVisionArea);
+                    _longArmsProperties.throwRockAbilityProperties.abilityTarget, position, _targetsInsideVisionArea, _areaNumber);
             
             _context.SetIsSeeingATargetForThrowRock(_visibleTargetsForThrowRock.Count != 0);
 
             _visibleTargetsForClapAbove = CombatManager.Instance.ReturnVisibleTargets(
-                    _longArmsProperties.clapAboveAbilityProperties.abilityTarget, position, _targetsInsideVisionArea);
+                    _longArmsProperties.clapAboveAbilityProperties.abilityTarget, position, _targetsInsideVisionArea, _areaNumber);
             
             _context.SetIsSeeingATargetForClapAbove(_visibleTargetsForClapAbove.Count != 0);
 
             _visibleTargetsToFleeFrom = CombatManager.Instance.ReturnVisibleTargets(_longArmsProperties.entitiesToFleeFrom, 
-                position, _targetsInsideVisionArea);
+                position, _targetsInsideVisionArea, _areaNumber);
         }
 
         private void UpdateDistancesToTargetsToFleeFrom()
@@ -530,7 +530,7 @@ namespace ECS.Entities.AI.Combat
         {
             base.OnDestroy();
             _onFlee();
-            CombatManager.Instance.OnEnemyDefeated(this);
+            CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
 
         public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)

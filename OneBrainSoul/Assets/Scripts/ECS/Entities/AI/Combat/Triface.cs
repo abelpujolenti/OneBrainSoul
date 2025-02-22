@@ -132,7 +132,7 @@ namespace ECS.Entities.AI.Combat
             
             _visibleTargetsForSlamAbility = CombatManager.Instance.ReturnVisibleTargets(
                 _trifaceProperties.slamAbilityProperties.abilityTarget, ownTransform.position, 
-                _targetsInsideVisionArea);
+                _targetsInsideVisionArea, _areaNumber);
             
             _context.SetIsSeeingATargetForSlam(_visibleTargetsForSlamAbility.Count != 0);
         }
@@ -252,7 +252,7 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            CombatManager.Instance.OnEnemyDefeated(this);
+            CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
         
         /////////////////////////DEBUG

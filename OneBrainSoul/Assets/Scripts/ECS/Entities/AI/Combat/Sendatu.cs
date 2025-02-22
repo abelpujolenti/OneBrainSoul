@@ -254,7 +254,7 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            CombatManager.Instance.OnEnemyDefeated(this);
+            CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
 
         public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
