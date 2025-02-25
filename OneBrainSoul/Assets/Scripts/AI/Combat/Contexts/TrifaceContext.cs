@@ -24,7 +24,8 @@ namespace AI.Combat.Contexts
             _repeatableActions = new List<uint>
             {
                 (uint)TrifaceAction.ROTATE,
-                (uint)TrifaceAction.PATROL
+                (uint)TrifaceAction.PATROL,
+                (uint)TrifaceAction.GO_TO_CLOSEST_SIGHTED_TARGET,
             };
 
             _slamCast = slamCast;

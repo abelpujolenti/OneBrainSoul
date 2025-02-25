@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
+using AI.Combat.Area;
 using AI.Combat.Contexts;
-using AI.Combat.Enemy;
 using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
@@ -29,6 +29,8 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<EntityType, HashSet<uint>> _targetsInsideVisionArea =
             new Dictionary<EntityType, HashSet<uint>>();
+
+        protected HashSet<uint> _targetsSightedInsideCombatArea = new HashSet<uint>();
         
         [SerializeField] protected Material _material;
 
@@ -84,19 +86,30 @@ namespace ECS.Entities.AI.Combat
             Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
             InitiateDictionaries();
+
+            _targetEntities = targetEntities;
             
             CreateAbilities();
 
             foreach (VisionArea visionArea in _visionAreas)
             {
-                visionArea.Setup(AddTargetInsideArea, RemoveTargetInsideArea);
+                visionArea.Setup(AddTargetInsideVisionArea, RemoveTargetInsideVisionArea);
             }
-
-            _targetEntities = targetEntities;
         }
 
-        protected abstract void CreateAbilities();
-        
+        protected virtual void CreateAbilities()
+        {
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((_targetEntities & i) == 0)
+                {
+                    continue;
+                }   
+                
+                _targetsInsideVisionArea.Add(i, new HashSet<uint>());
+            }
+        }
+
         #region Context
         
         public abstract TContext GetContext();
@@ -168,12 +181,32 @@ namespace ECS.Entities.AI.Combat
         
         #region FSM
 
+        protected void UpdatePositionsOfSightedTargets()
+        {
+            _targetsSightedInsideCombatArea =
+                CombatManager.Instance.ReturnPositionOfRelevantSightedTargetsInsideCombatArea(_areaNumber, _targetEntities);
+            
+            _context.SetHasAnyTargetBeenSightedInsideCombatArea(_targetsSightedInsideCombatArea.Count != 0);
+        }
+
         protected abstract void UpdateVisibleTargets();
 
         protected void RotateBody()
         {
             _bodyTransform.rotation = Quaternion.Slerp(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
+        }
+
+        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
+        {
+            directionToRotate = directionToRotate.normalized;
+            directionToRotate.y = 0;
+            _directionToRotateBody = directionToRotate.normalized;
+        }
+
+        protected Vector3 GetDirectionToRotateBody()
+        {
+            return _directionToRotateBody;
         }
 
         protected void RotateHead()
@@ -204,18 +237,6 @@ namespace ECS.Entities.AI.Combat
                 Mathf.Sin(pitchRad),                   
                 Mathf.Cos(pitchRad) * Mathf.Cos(yawRad)
             ).normalized;
-        }
-
-        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
-        {
-            directionToRotate = directionToRotate.normalized;
-            directionToRotate.y = 0;
-            _directionToRotateBody = directionToRotate.normalized;
-        }
-
-        protected Vector3 GetDirectionToRotateBody()
-        {
-            return _directionToRotateBody;
         }
 
         protected virtual void InvestigateArea()
@@ -444,7 +465,7 @@ namespace ECS.Entities.AI.Combat
             return (_targetEntities & entityType) != 0;
         }
 
-        private void AddTargetInsideArea(EntityType entityType, uint targetId)
+        private void AddTargetInsideVisionArea(EntityType entityType, uint targetId)
         {
             if (!IsADesiredTargetEntity(entityType))
             {
@@ -454,7 +475,7 @@ namespace ECS.Entities.AI.Combat
             _targetsInsideVisionArea[entityType].Add(targetId);
         }
 
-        private void RemoveTargetInsideArea(EntityType entityType, uint targetId)
+        private void RemoveTargetInsideVisionArea(EntityType entityType, uint targetId)
         {
             if (!IsADesiredTargetEntity(entityType))
             {

@@ -33,6 +33,7 @@ namespace AI.Combat.Contexts
             _repeatableActions = new List<uint>
             {
                 (uint)LongArmsAction.OBSERVE,
+                (uint)LongArmsAction.GO_TO_CLOSEST_SIGHTED_TARGET,
                 (uint)LongArmsAction.THROW_ROCK
             };
 

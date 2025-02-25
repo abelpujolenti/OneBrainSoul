@@ -160,6 +160,11 @@ namespace ECS.Entities.AI.Combat
             _isFree = true;
         }
 
+        public bool IsFree()
+        {
+            return _isFree;
+        }
+
         private void OnDestroy()
         {
             CombatManager.Instance.OnEnemyDefeated(this);

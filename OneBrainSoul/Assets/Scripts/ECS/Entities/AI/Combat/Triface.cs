@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
-using AI.Combat.Contexts.Target;
 using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
@@ -52,6 +50,7 @@ namespace ECS.Entities.AI.Combat
                 { TrifaceAction.ROTATE , RotateInSitu },
                 { TrifaceAction.PATROL , Patrol },
                 { TrifaceAction.INVESTIGATE_AREA , InvestigateArea },
+                { TrifaceAction.GO_TO_CLOSEST_SIGHTED_TARGET , GoToClosestSightedTarget },
                 { TrifaceAction.ACQUIRE_NEW_TARGET_FOR_SLAM , AcquireNewTargetForSlam },
                 { TrifaceAction.SLAM , Slam }
             };
@@ -59,15 +58,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override void CreateAbilities()
         {
-            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
-            {
-                if ((_trifaceProperties.slamAbilityProperties.abilityTarget & i) == 0)
-                {
-                    continue;
-                }   
-                
-                _targetsInsideVisionArea.Add(i, new HashSet<uint>());
-            }
+            base.CreateAbilities();
             
             _slamAbility = AbilityManager.Instance.ReturnAreaAbility(_trifaceProperties.slamAbilityProperties,
                 transform);
@@ -91,6 +82,8 @@ namespace ECS.Entities.AI.Combat
 
         private void Update()
         {
+            UpdatePositionsOfSightedTargets();
+            
             UpdateVisibleTargets();
             
             UpdateVectorToTargets();

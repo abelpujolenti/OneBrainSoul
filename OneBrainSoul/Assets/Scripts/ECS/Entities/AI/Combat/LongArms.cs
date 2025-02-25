@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
-using AI.Combat.Contexts.Target;
 using AI.Combat.Enemy.LongArms;
 using AI.Combat.ScriptableObjects;
 using Interfaces.AI.Combat;
@@ -95,6 +94,7 @@ namespace ECS.Entities.AI.Combat
             _actions = new Dictionary<LongArmsAction, Action>
             {
                 { LongArmsAction.OBSERVE , Observing },
+                { LongArmsAction.GO_TO_CLOSEST_SIGHTED_TARGET , GoToClosestTargetSighted },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK , AcquireNewTargetForThrowRock },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE , AcquireNewTargetForClapAbove },
                 { LongArmsAction.THROW_ROCK , ThrowRock },
@@ -105,6 +105,8 @@ namespace ECS.Entities.AI.Combat
         
         protected override void CreateAbilities()
         {
+            base.CreateAbilities();
+            
             _throwRockAbility = AbilityManager.Instance.ReturnProjectileAbility(_longArmsProperties.throwRockAbilityProperties,
                 transform);
 
@@ -142,6 +144,8 @@ namespace ECS.Entities.AI.Combat
 
         private void Update()
         {
+            UpdatePositionsOfSightedTargets();
+            
             UpdateVisibleTargets();
             
             UpdateVectorsToTargets();
@@ -266,6 +270,15 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Long Arms " + GetAgentID() + " Observing");
 
+            if (_targetsSightedInsideCombatArea.Any())
+            {
+                Vector3 position = transform.position;
+
+                SetDirectionToRotateBody(CombatManager.Instance.ReturnClosestAgentEntity(position, _targetsSightedInsideCombatArea)
+                    .GetTransformComponent().GetPosition() - position);
+                return;
+            }
+
             if (_isSettingNewDirectionToRotate || Vector3.Dot(transform.forward, GetDirectionToRotateBody()) < 0.95f)
             {
                 return;
@@ -332,6 +345,11 @@ namespace ECS.Entities.AI.Combat
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
             
             UnblockFSM();
+        }
+
+        private void GoToClosestTargetSighted()
+        {
+            
         }
 
         private void AcquireNewTargetForThrowRock()

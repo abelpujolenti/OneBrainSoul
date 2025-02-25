@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using ECS.Components.AI.Navigation;
 using ECS.Entities;
 using ECS.Entities.AI;
 using Managers;
@@ -11,19 +11,30 @@ namespace AI.Combat.Area
     public class CombatArea : MonoBehaviour
     {
         [SerializeField] private uint _combatAreaNumber;
+        
         private HashSet<uint> _enemiesInsideArea = new HashSet<uint>();
 
         private Dictionary<EntityType, HashSet<uint>> _targetEntitiesInsideArea =
             new Dictionary<EntityType, HashSet<uint>>();
 
-        private void Start()
+        private Dictionary<EntityType, HashSet<uint>> _targetEntitiesSightedInsideArea =
+            new Dictionary<EntityType, HashSet<uint>>();
+
+        public uint GetCombatAreaNumber()
         {
-            CombatManager.Instance.AddCombatArea(this, _combatAreaNumber);
+            return _combatAreaNumber;
         }
 
-        public void AddEnemy(uint enemyId)
+        public void AddEnemy(uint enemyId, EntityType entityType)
         {
             _enemiesInsideArea.Add(enemyId);
+
+            if (!_targetEntitiesInsideArea.ContainsKey(entityType))
+            {
+                return;
+            }
+
+            _targetEntitiesInsideArea[entityType].Add(enemyId);
         }
         
         public void RemoveEnemy(uint enemyId)
@@ -44,6 +55,7 @@ namespace AI.Combat.Area
             }
             
             _targetEntitiesInsideArea.Add(entityType, new HashSet<uint>());
+            _targetEntitiesSightedInsideArea.Add(entityType, new HashSet<uint>());
         }
 
         private void AddTarget(EntityType entityType, uint targetId)
@@ -56,9 +68,34 @@ namespace AI.Combat.Area
             _targetEntitiesInsideArea[entityType].Remove(targetId);
         }
 
+        public void AddSightedTarget(EntityType entityType, uint targetId)
+        {
+            if (_targetEntitiesSightedInsideArea[entityType].Contains(targetId))
+            {
+                return;
+            }
+            
+            _targetEntitiesSightedInsideArea[entityType].Add(targetId);
+        }
+
+        private void RemoveSightedTarget(EntityType entityType, uint targetId)
+        {
+            _targetEntitiesSightedInsideArea[entityType].Remove(targetId);
+        }
+
+        public HashSet<uint> GetEnemiesInside()
+        {
+            return _enemiesInsideArea;
+        }
+
         public HashSet<uint> GetEntityTypeTargets(EntityType entityType)
         {
             return _targetEntitiesInsideArea[entityType];
+        }
+
+        public HashSet<uint> GetEntityTypeTargetsSighted(EntityType entityType)
+        {
+            return _targetEntitiesSightedInsideArea[entityType];
         }
 
         private void OnTriggerEnter(Collider other)
@@ -95,8 +132,12 @@ namespace AI.Combat.Area
             {
                 return;
             }
+
+            uint agentId = agentEntity.GetAgentID();
             
-            RemoveTarget(entityType, agentEntity.GetAgentID());
+            RemoveTarget(entityType, agentId);
+            
+            RemoveSightedTarget(entityType, agentId);
         }
     }
 }

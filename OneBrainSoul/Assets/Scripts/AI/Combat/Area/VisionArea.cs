@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using ECS.Entities;
 using ECS.Entities.AI;
 using UnityEngine;
 
-namespace AI.Combat.Enemy
+namespace AI.Combat.Area
 {
     public class VisionArea : MonoBehaviour
     {

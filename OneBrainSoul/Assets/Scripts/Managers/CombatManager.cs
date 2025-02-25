@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using AI.Combat.Area;
+using AI.Combat.Contexts;
+using AI.Combat.ScriptableObjects;
 using ECS.Entities;
 using ECS.Entities.AI;
 using ECS.Entities.AI.Combat;
 using Player;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Managers
@@ -24,6 +27,8 @@ namespace Managers
         private Dictionary<uint, Sendatu> _sendatus = new Dictionary<uint, Sendatu>();
 
         private HashSet<uint> _longArmsBasesFreeId = new HashSet<uint>();
+
+        [SerializeField] private List<CombatArea> _fuckYouUnity = new List<CombatArea>();
 
         private Dictionary<uint, CombatArea> _combatAreas = new Dictionary<uint, CombatArea>();
         
@@ -69,6 +74,13 @@ namespace Managers
             {
                 _instance = this;
 
+                foreach (CombatArea combatArea in _fuckYouUnity)
+                {
+                    _combatAreas.Add(combatArea.GetCombatAreaNumber(), combatArea);
+                }
+
+                _fuckYouUnity = null;
+
                 DontDestroyOnLoad(gameObject);
 
                 return;
@@ -93,7 +105,7 @@ namespace Managers
             _trifaces.Add(agentID, triface);
             _returnAgent.Add(agentID, () => _trifaces[agentID]);
 
-            AddEnemyToAreaNumber(triface.GetAreaNumber(), agentID, triface.GetTarget());
+            AddEnemyToAreaNumber(triface.GetAreaNumber(), agentID, EntityType.TRIFACE, triface.GetTarget());
         }
 
         public void AddEnemy(LongArms longArms)
@@ -108,7 +120,7 @@ namespace Managers
                 longArms.IncrementLongArmsFreeBases();
             }
 
-            AddEnemyToAreaNumber(longArms.GetAreaNumber(), agentID, longArms.GetTarget());
+            AddEnemyToAreaNumber(longArms.GetAreaNumber(), agentID, EntityType.LONG_ARMS, longArms.GetTarget());
         }
 
         public void AddEnemy(LongArmsBase longArmsBase)
@@ -117,6 +129,12 @@ namespace Managers
             
             _longArmsBases.Add(agentID, longArmsBase);
             _returnAgent.Add(agentID, () => _longArmsBases[agentID]);
+
+            if (!longArmsBase.IsFree())
+            {
+                return;
+            }
+            
             IncrementLongArmsBasesFree(agentID);
         }
 
@@ -127,7 +145,7 @@ namespace Managers
             _sendatus.Add(agentID, sendatu);
             _returnAgent.Add(agentID, () => _sendatus[agentID]);
 
-            AddEnemyToAreaNumber(sendatu.GetAreaNumber(), agentID, sendatu.GetTarget());
+            AddEnemyToAreaNumber(sendatu.GetAreaNumber(), agentID, EntityType.SENDATU, sendatu.GetTarget());
         }
 
         #endregion
@@ -139,11 +157,11 @@ namespace Managers
             _combatAreas.Add(areaNumber, combatArea);
         }
 
-        private void AddEnemyToAreaNumber(uint areaNumber, uint enemyId, EntityType target)
+        private void AddEnemyToAreaNumber(uint areaNumber, uint enemyId, EntityType enemyEntityType, EntityType target)
         {
             CombatArea combatArea = _combatAreas[areaNumber];
             
-            combatArea.AddEnemy(enemyId);
+            combatArea.AddEnemy(enemyId, enemyEntityType);
 
             for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
             {
@@ -159,6 +177,24 @@ namespace Managers
         #endregion
 
         #region UBS
+
+        public HashSet<uint> ReturnPositionOfRelevantSightedTargetsInsideCombatArea(uint areaNumber, 
+            EntityType target)
+        {
+            HashSet<uint> targets = new HashSet<uint>();
+
+            for (EntityType i = (EntityType)1; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((target & i) == 0)
+                {
+                    continue;
+                }
+                
+                targets.AddRange(_combatAreas[areaNumber].GetEntityTypeTargetsSighted(i));
+            }
+
+            return targets;
+        }
 
         public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, 
             Dictionary<EntityType, HashSet<uint>> targetsInsideVisionArea, uint areaNumber)
@@ -192,7 +228,9 @@ namespace Managers
                     {
                         continue;
                     }
-                    visibleTargets.Add(agentEntity.GetAgentID());
+                    
+                    visibleTargets.Add(targetId);
+                    _combatAreas[areaNumber].AddSightedTarget(i, targetId);
                 }
             }
 
@@ -249,6 +287,18 @@ namespace Managers
         public AgentEntity ReturnAgentEntity(uint agentId)
         {
             return _returnAgent[agentId]();
+        }
+
+        public List<AgentEntity> ReturnAgentEntities(HashSet<uint> agentsId)
+        {
+            List<AgentEntity> agentEntities = new List<AgentEntity>();
+
+            foreach (uint agentId in agentsId)
+            {
+                agentEntities.Add(_returnAgent[agentId]());
+            }
+
+            return agentEntities;
         }
 
         public PlayerCharacter ReturnPlayer()

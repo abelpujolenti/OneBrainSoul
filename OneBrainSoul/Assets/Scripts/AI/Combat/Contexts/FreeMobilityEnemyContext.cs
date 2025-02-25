@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public abstract class FreeMobilityEnemyContext : AIEnemyContext, IFreeMobilityEnemyPatrolUtility, IFreeMobilityEnemyInvestigateAreaUtility
+    public abstract class FreeMobilityEnemyContext : AIEnemyContext, IFreeMobilityEnemyPatrolUtility, 
+        IFreeMobilityEnemyInvestigateAreaUtility
     {
         private bool _hasReachedDestination;
         
