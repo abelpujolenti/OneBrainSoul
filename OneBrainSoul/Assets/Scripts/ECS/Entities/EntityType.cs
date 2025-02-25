@@ -10,6 +10,7 @@ namespace ECS.Entities
         TRIFACE = 1 << 1,
         LONG_ARMS = 1 << 2,
         LONG_ARMS_BASE = 1 << 3,
-        SENDATU = 1 << 4
+        SENDATU = 1 << 4,
+        ENUM_SIZE
     }
 }

@@ -9,9 +9,10 @@ namespace ECS.Entities.AI.Combat
         where TContext : TeleportMobilityEnemyContext
         where TAction : Enum
     {
-        protected override void EnemySetup(float radius, TeleportMobilityEnemyProperties teleportMobilityEnemyProperties, EntityType entityType)
+        protected override void EnemySetup(float radius, TeleportMobilityEnemyProperties teleportMobilityEnemyProperties, 
+            EntityType entityType, EntityType targetEntities)
         {
-            base.EnemySetup(radius, teleportMobilityEnemyProperties, entityType);
+            base.EnemySetup(radius, teleportMobilityEnemyProperties, entityType, targetEntities);
         }
 
         protected override void GoToArea(Vector3 estimatedPosition)

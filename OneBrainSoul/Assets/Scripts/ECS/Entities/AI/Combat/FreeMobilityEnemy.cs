@@ -23,8 +23,6 @@ namespace ECS.Entities.AI.Combat
     {
         [SerializeField] protected NavMeshAgentSpecs _navMeshAgentSpecs;
 
-        [SerializeField] private NavMeshSurface _navMeshSurface;
-
         [SerializeField] protected NavMeshAgent _navMeshAgent;
         
         private NavMeshAgentComponent _navMeshAgentComponent;
@@ -44,9 +42,10 @@ namespace ECS.Entities.AI.Combat
 
         protected int _raysTargetsLayerMask;
 
-        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, EntityType entityType)
+        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, 
+            EntityType entityType, EntityType targetEntities)
         {
-            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType);
+            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType, targetEntities);
             
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
@@ -153,20 +152,6 @@ namespace ECS.Entities.AI.Combat
             ContinueNavigation();
         }
 
-        protected Vector3 ReturnValidPositionInNavMesh()
-        {
-            Vector3 randomPosition = Vector3.down;
-            Vector3 sampledPosition;
-
-            do
-            {
-                
-                
-            } while (!SampleSurfacePosition(randomPosition, out sampledPosition));
-
-            return sampledPosition;
-        }
-
         private bool SampleSurfacePosition(Vector3 position, out Vector3 sampledPosition)
         {
             NavMeshHit hit;
@@ -225,9 +210,7 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Triface " + GetAgentID() + " Patrolling");
             
-            //SetDestination(new VectorComponent(ReturnValidPositionInNavMesh()));
-
-            //TODO TRIFACE PATROL
+            //TODO TRIFACE PATROL, TODO POINTS OF PATROL
         }
 
         protected override void InvestigateArea()
@@ -237,7 +220,15 @@ namespace ECS.Entities.AI.Combat
             
             base.InvestigateArea();
         }
-        
+
+        protected void GoToClosestSightedTarget()
+        {
+            ShowDebugMessages("Triface " + GetAgentID() + " Going To Closest Sighted Target");
+            
+            SetDestination(CombatManager.Instance.ReturnClosestAgentEntity(transform.position, _targetsSightedInsideCombatArea)
+                .GetTransformComponent());
+        }
+
         #endregion
 
         public override void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition)

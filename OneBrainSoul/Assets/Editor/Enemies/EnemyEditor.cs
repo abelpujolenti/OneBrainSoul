@@ -21,19 +21,13 @@ namespace Editor.Enemies
             
             EditorGUI.indentLevel++;
             
-            FloatField(ref aiEnemyProperties.sightMaximumDistance, 0, "Sight Maximum Distance");
+            /*FloatField(ref aiEnemyProperties.sightMaximumDistance, 0, "Sight Maximum Distance");
             
-            UintField(ref aiEnemyProperties.fov, 0, 360, "FOV");
+            UintField(ref aiEnemyProperties.fov, 0, 360, "FOV");*/
             
             FloatField(ref aiEnemyProperties.minimumTimeInvestigatingArea, 0, "Minimum Time Investigating Area");
             
             FloatField(ref aiEnemyProperties.maximumTimeInvestigatingArea, 0, "Maximum Time Investigating Area");
-            
-            FloatField(ref aiEnemyProperties.minimumTimeInvestigatingAtEstimatedPosition, 
-                aiEnemyProperties.minimumTimeInvestigatingArea, "Minimum Time Investigating At Estimated Position");
-            
-            FloatField(ref aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition, 
-                aiEnemyProperties.maximumTimeInvestigatingArea, "Maximum Time Investigating At Estimated Position");
             
             EditorGUI.indentLevel--;
             

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, IGetSightMaximumDistance, 
-        IHasATarget, IFighting, ICastingAnAbility, IGetAgentBodyTransform, IEnemyRotationUtility
+        IHasATarget, IFighting, ICastingAnAbility, IGetAgentBodyTransform, IEnemyRotationUtility, IEnemyGoToClosestSightedTarget
     {
         private EntityType _entityType;
         
@@ -28,6 +28,7 @@ namespace AI.Combat.Contexts
         private bool _isFighting;
         private bool _isFSMBlocked;
         private bool _isAirborne;
+        private bool _hasAnyTargetBeenSightedInsideCombatArea;
 
         private Transform _headAgentTransform;
         private Transform _bodyAgentTransform;
@@ -130,6 +131,16 @@ namespace AI.Combat.Contexts
         public bool IsAirborne()
         {
             return _isAirborne;
+        }
+
+        public void SetHasAnyTargetBeenSightedInsideCombatArea(bool hasAnyTargetBeenSightedInsideCombatArea)
+        {
+            _hasAnyTargetBeenSightedInsideCombatArea = hasAnyTargetBeenSightedInsideCombatArea;
+        }
+
+        public bool HasAnyTargetBeenSightedInsideCombatArea()
+        {
+            return _hasAnyTargetBeenSightedInsideCombatArea;
         }
 
         public Transform GetAgentHeadTransform()

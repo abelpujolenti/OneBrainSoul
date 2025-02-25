@@ -12,14 +12,10 @@ namespace AI.Combat.Contexts.Target
         private Vector3 _targetPosition;
         private Vector3 _targetVelocity;
 
-        private bool _canSeeTarget;
-        private LoseSightOfTargetCause _loseSightOfTargetCause;
-
         public void SetTargetProperties(float targetRadius, float targetHeight)
         {
             _targetRadius = targetRadius;
             _targetHeight = targetHeight;
-            _canSeeTarget = true;
         }
 
         public float GetTargetRadius()
@@ -67,26 +63,6 @@ namespace AI.Combat.Contexts.Target
         public Vector3 GetTargetVelocity()
         {
             return _targetVelocity;
-        }
-
-        public bool CanSeeTarget()
-        {
-            return _canSeeTarget;
-        }
-
-        public void OnLoseSightOfTarget()
-        {
-            _canSeeTarget = false;
-        }
-
-        public void SetLoseSightOfTargetCause(LoseSightOfTargetCause loseSightOfTargetCause)
-        {
-            _loseSightOfTargetCause = loseSightOfTargetCause;
-        }
-
-        public LoseSightOfTargetCause GetLoseSightOfTargetCause()
-        {
-            return _loseSightOfTargetCause;
         }
     }
 }

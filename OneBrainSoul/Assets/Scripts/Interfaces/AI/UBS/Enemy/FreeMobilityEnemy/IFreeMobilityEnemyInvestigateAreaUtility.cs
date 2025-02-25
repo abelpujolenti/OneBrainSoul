@@ -3,7 +3,5 @@
 namespace Interfaces.AI.UBS.Enemy.FreeMobilityEnemy
 {
     public interface IFreeMobilityEnemyInvestigateAreaUtility : IIsSeeingATarget, IHasReachedDestination
-    {
-        
-    }
+    {}
 }

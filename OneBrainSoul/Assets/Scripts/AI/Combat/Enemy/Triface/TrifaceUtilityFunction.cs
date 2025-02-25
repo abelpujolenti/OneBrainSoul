@@ -19,8 +19,8 @@ namespace AI.Combat.Enemy.Triface
                 new AICombatAgentAction<TrifaceAction>(TrifaceAction.ROTATE),
                 new AICombatAgentAction<TrifaceAction>(TrifaceAction.PATROL),
                 new AICombatAgentAction<TrifaceAction>(TrifaceAction.INVESTIGATE_AREA),
+                new AICombatAgentAction<TrifaceAction>(TrifaceAction.GO_TO_CLOSEST_SIGHTED_TARGET),
                 new AICombatAgentAction<TrifaceAction>(TrifaceAction.ACQUIRE_NEW_TARGET_FOR_SLAM),
-                new AICombatAgentAction<TrifaceAction>(TrifaceAction.LOSE_TARGET),
                 new AICombatAgentAction<TrifaceAction>(TrifaceAction.SLAM)
             };
 
@@ -28,8 +28,8 @@ namespace AI.Combat.Enemy.Triface
             actions[1].utilityScore = CalculateRotateUtility(context);
             actions[2].utilityScore = CalculatePatrolUtility(context);
             actions[3].utilityScore = CalculateInvestigateAreaUtility(context);
-            actions[4].utilityScore = CalculateAcquireNewTargetForSlam(context);
-            actions[5].utilityScore = CalculateLoseTargetUtility(context);
+            actions[4].utilityScore = CalculateGoToClosestSightedTarget(context);
+            actions[5].utilityScore = CalculateAcquireNewTargetForSlam(context);
             actions[6].utilityScore = CalculateSlamUtility(context);
 
             uint index = 0;
@@ -63,16 +63,18 @@ namespace AI.Combat.Enemy.Triface
                                    freeMobilityEnemyInvestigateAreaUtility.HasReachedDestination()) * 0.8f;
         }
 
+        private static float CalculateGoToClosestSightedTarget(
+            IEnemyGoToClosestSightedTarget enemyGoToClosestSightedTargetUtility)
+        {
+            return Convert.ToInt16(!enemyGoToClosestSightedTargetUtility.HasATarget() && 
+                                   enemyGoToClosestSightedTargetUtility.HasAnyTargetBeenSightedInsideCombatArea()) * 0.9f;
+        }
+
         private static float CalculateAcquireNewTargetForSlam(
             ITrifaceAcquireNewTargetForSlamUtility trifaceAcquireNewTargetForSlamUtility)
         {
             return Convert.ToInt16(trifaceAcquireNewTargetForSlamUtility.IsSeeingATargetForSlam() && 
                                    !trifaceAcquireNewTargetForSlamUtility.HasATargetForSlam());
-        }
-
-        private static float CalculateLoseTargetUtility(ITrifaceLoseTargetUtility trifaceLoseTargetUtility)
-        {
-            return Convert.ToInt16(trifaceLoseTargetUtility.HasATargetForSlam() && !trifaceLoseTargetUtility.CanSeeTargetOfSlam());
         }
 
         private static float CalculateSlamUtility(ITrifaceSlamUtility trifaceSlamUtility)

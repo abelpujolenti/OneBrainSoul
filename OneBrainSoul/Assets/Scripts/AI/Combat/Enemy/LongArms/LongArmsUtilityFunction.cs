@@ -16,7 +16,6 @@ namespace AI.Combat.Enemy.LongArms
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.OBSERVE),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE),
-                new AICombatAgentAction<LongArmsAction>(LongArmsAction.LOSE_TARGET),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.THROW_ROCK),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.CLAP_ABOVE),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.FLEE)
@@ -25,10 +24,9 @@ namespace AI.Combat.Enemy.LongArms
             actions[0].utilityScore = CalculateObservingUtility(context);
             actions[1].utilityScore = CalculateAcquireNewTargetForThrowRockUtility(context);
             actions[2].utilityScore = CalculateAcquireNewTargetForClapAboveUtility(context);
-            actions[3].utilityScore = CalculateLoseTargetUtility(context);
-            actions[4].utilityScore = CalculateThrowRockUtility(context);
-            actions[5].utilityScore = CalculateClapAboveUtility(context);
-            actions[6].utilityScore = CalculateFleeUtility(context);
+            actions[3].utilityScore = CalculateThrowRockUtility(context);
+            actions[4].utilityScore = CalculateClapAboveUtility(context);
+            actions[5].utilityScore = CalculateFleeUtility(context);
 
             uint index = 0;
 
@@ -62,15 +60,6 @@ namespace AI.Combat.Enemy.LongArms
         {
             return Convert.ToInt16(longArmsAcquireNewTargetForClapAboveUtility.IsSeeingATargetForClapAbove() &&
                                    !longArmsAcquireNewTargetForClapAboveUtility.HasATargetForClapAbove());
-        }
-
-        private static float CalculateLoseTargetUtility(ILongArmsLoseTargetUtility longArmsLoseTargetUtility)
-        {
-            return Convert.ToInt16(
-                longArmsLoseTargetUtility.HasATargetForThrowRock() &&
-                !longArmsLoseTargetUtility.CanSeeTargetOfThrowRock() ||
-                longArmsLoseTargetUtility.HasATargetForClapAbove() &&
-                !longArmsLoseTargetUtility.CanSeeTargetOfClapAbove());
         }
 
         private static float CalculateThrowRockUtility(ILongArmsThrowRockUtility longArmsThrowRockUtility)

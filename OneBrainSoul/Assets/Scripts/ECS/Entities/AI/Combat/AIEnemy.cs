@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
+using AI.Combat.Area;
 using AI.Combat.Contexts;
 using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
@@ -22,7 +23,14 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
-        private Coroutine _updateCoroutine;
+        private EntityType _targetEntities;
+
+        [SerializeField] private VisionArea[] _visionAreas;
+
+        protected Dictionary<EntityType, HashSet<uint>> _targetsInsideVisionArea =
+            new Dictionary<EntityType, HashSet<uint>>();
+
+        protected HashSet<uint> _targetsSightedInsideCombatArea = new HashSet<uint>();
         
         [SerializeField] protected Material _material;
 
@@ -30,7 +38,7 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private bool _isMarked;
 
-        protected Vector3 _directionOfSight;
+        [SerializeField] protected uint _areaNumber;
 
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
@@ -49,9 +57,6 @@ namespace ECS.Entities.AI.Combat
         protected float _minimumTimeInvestigatingArea;
         protected float _maximumTimeInvestigatingArea;
 
-        protected float _minimumTimeInvestigatingAtEstimatedPosition;
-        protected float _maximumTimeInvestigatingAtEstimatedPosition;
-
         protected float _timeInvestigating;
 
         private uint _maximumHeadPitchUpRotation;
@@ -59,9 +64,11 @@ namespace ECS.Entities.AI.Combat
         
         protected bool _isRotating;
 
-        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType)
+        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType, 
+            EntityType targetEntities)
         {
-            SetDirectionToRotateHead(Vector3.forward);
+            //SetDirectionToRotateHead(Vector3.forward);
+            SetDirectionToRotateBody(Vector3.forward);
             
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
 
@@ -73,24 +80,36 @@ namespace ECS.Entities.AI.Combat
             _minimumTimeInvestigatingArea = aiEnemyProperties.minimumTimeInvestigatingArea;
             _maximumTimeInvestigatingArea = aiEnemyProperties.maximumTimeInvestigatingArea;
 
-            _minimumTimeInvestigatingAtEstimatedPosition =
-                aiEnemyProperties.minimumTimeInvestigatingAtEstimatedPosition;
-
-            _maximumTimeInvestigatingAtEstimatedPosition =
-                aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition;
-
             _maximumHeadPitchUpRotation = aiEnemyProperties.maximumHeadPitchUpRotation;
             _maximumHeadPitchDownRotation = aiEnemyProperties.maximumHeadPitchDownRotation;
             
             Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
             InitiateDictionaries();
+
+            _targetEntities = targetEntities;
             
             CreateAbilities();
+
+            foreach (VisionArea visionArea in _visionAreas)
+            {
+                visionArea.Setup(AddTargetInsideVisionArea, RemoveTargetInsideVisionArea);
+            }
         }
 
-        protected abstract void CreateAbilities();
-        
+        protected virtual void CreateAbilities()
+        {
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((_targetEntities & i) == 0)
+                {
+                    continue;
+                }   
+                
+                _targetsInsideVisionArea.Add(i, new HashSet<uint>());
+            }
+        }
+
         #region Context
         
         public abstract TContext GetContext();
@@ -162,12 +181,32 @@ namespace ECS.Entities.AI.Combat
         
         #region FSM
 
+        protected void UpdatePositionsOfSightedTargets()
+        {
+            _targetsSightedInsideCombatArea =
+                CombatManager.Instance.ReturnPositionOfRelevantSightedTargetsInsideCombatArea(_areaNumber, _targetEntities);
+            
+            _context.SetHasAnyTargetBeenSightedInsideCombatArea(_targetsSightedInsideCombatArea.Count != 0);
+        }
+
         protected abstract void UpdateVisibleTargets();
 
         protected void RotateBody()
         {
             _bodyTransform.rotation = Quaternion.Slerp(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
+        }
+
+        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
+        {
+            directionToRotate = directionToRotate.normalized;
+            directionToRotate.y = 0;
+            _directionToRotateBody = directionToRotate.normalized;
+        }
+
+        protected Vector3 GetDirectionToRotateBody()
+        {
+            return _directionToRotateBody;
         }
 
         protected void RotateHead()
@@ -200,48 +239,6 @@ namespace ECS.Entities.AI.Combat
             ).normalized;
         }
 
-        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
-        {
-            directionToRotate = directionToRotate.normalized;
-            directionToRotate.y = 0;
-            _directionToRotateBody = directionToRotate.normalized;
-        }
-
-        protected Vector3 GetDirectionToRotateBody()
-        {
-            return _directionToRotateBody;
-        }
-
-        protected void OnLoseSightOfTarget(Vector3 lastKnownPosition, Vector3 lastKnownVelocity, float timeElapsed)
-        {
-            Vector3 estimatedTargetPosition = lastKnownPosition + lastKnownVelocity * timeElapsed;
-            
-            _timeInvestigating = Random.Range(_minimumTimeInvestigatingAtEstimatedPosition,
-                _maximumTimeInvestigatingAtEstimatedPosition);
-            
-            if (IsInsideSightRange(_headTransform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
-            {
-                SetDirectionToRotateHead(_headTransform.position - estimatedTargetPosition);
-                InvestigateArea();
-                return;
-            }
-            
-            GoToArea(estimatedTargetPosition);
-        }
-
-        private bool IsInsideSightRange(Vector3 position, Vector3 targetPosition, float sightDistance)
-        {
-            Vector3 vectorToTarget = targetPosition - position;
-            float distanceToTarget = vectorToTarget.sqrMagnitude;
-
-            if (IsThereAnyObstacleInBetween(position, vectorToTarget.normalized, Mathf.Sqrt(distanceToTarget)))
-            {
-                return false;
-            }
-
-            return !(distanceToTarget > sightDistance * sightDistance);
-        }
-
         protected virtual void InvestigateArea()
         {
             StartCoroutine(InvestigateAreaCoroutine());
@@ -266,7 +263,7 @@ namespace ECS.Entities.AI.Combat
                 timeDeltaTime = Time.deltaTime;
                 timer += timeDeltaTime;
 
-                if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateHead()) > 0.95f)
+                if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateBody()) > 0.95f)
                 {
                     timerLookingAtTheSameDirection += timeDeltaTime;
 
@@ -276,7 +273,7 @@ namespace ECS.Entities.AI.Combat
                         float yawHeadRotation = Random.Range(-maximumHeadYawRotation, maximumHeadYawRotation);
                         float pitchHeadRotation = Random.Range(-_maximumHeadPitchDownRotation, _maximumHeadPitchUpRotation);
                         
-                        SetDirectionToRotateHead(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
+                        SetDirectionToRotateBody(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
 
                         timerLookingAtTheSameDirection = 0;
                     }
@@ -292,7 +289,7 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnEndInvestigation()
         {
-            SetDirectionToRotateHead(Vector3.forward);
+            SetDirectionToRotateBody(Vector3.forward);
         }
 
         private bool IsThereAnyObstacleInBetween(Vector3 position, Vector3 direction, float distance)
@@ -458,6 +455,36 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        public EntityType GetTarget()
+        {
+            return _targetEntities;
+        }
+
+        private bool IsADesiredTargetEntity(EntityType entityType)
+        {
+            return (_targetEntities & entityType) != 0;
+        }
+
+        private void AddTargetInsideVisionArea(EntityType entityType, uint targetId)
+        {
+            if (!IsADesiredTargetEntity(entityType))
+            {
+                return;
+            }
+            
+            _targetsInsideVisionArea[entityType].Add(targetId);
+        }
+
+        private void RemoveTargetInsideVisionArea(EntityType entityType, uint targetId)
+        {
+            if (!IsADesiredTargetEntity(entityType))
+            {
+                return;
+            }
+            
+            _targetsInsideVisionArea[entityType].Remove(targetId);
+        }
+
         public override float GetRadius()
         {
             return _context.GetRadius();
@@ -467,11 +494,35 @@ namespace ECS.Entities.AI.Combat
         {
             return _context.GetHeight();
         }
-        
+
+        public uint GetAreaNumber()
+        {
+            return _areaNumber;
+        }
+
         /////////////////////////DEBUG
 
         [SerializeField] protected bool _showFov;
         [SerializeField] protected Color _fovColor;
+
+        protected virtual void OnDrawGizmos()
+        {
+            if (!_showFov)
+            {
+                return;
+            }
+            
+            Gizmos.color = _fovColor;
+            BoxCollider boxCollider = _visionAreas[0].GetComponent<BoxCollider>();
+            Vector3 center = transform.position + transform.rotation * boxCollider.center;
+            Matrix4x4 oldMatrix = Gizmos.matrix;
+            Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
+            Gizmos.DrawCube(Vector3.zero, boxCollider.size);
+            Gizmos.matrix = oldMatrix;
+            SphereCollider sphereCollider = _visionAreas[1].GetComponent<SphereCollider>();
+            Gizmos.DrawSphere(transform.position, sphereCollider.radius);
+            //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
+        }
 
         protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,
             int segments)
