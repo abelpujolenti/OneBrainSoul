@@ -193,7 +193,8 @@ namespace ECS.Entities.AI.Combat
 
         protected void RotateBody()
         {
-            _bodyTransform.rotation = Quaternion.Slerp(_bodyTransform.rotation,
+            Debug.Log(_bodyCurrentRotationSpeed);
+            _bodyTransform.rotation = Quaternion.RotateTowards(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
         }
 
@@ -211,7 +212,7 @@ namespace ECS.Entities.AI.Combat
 
         protected void RotateHead()
         {
-            _headTransform.rotation = Quaternion.Slerp(_headTransform.rotation,
+            _headTransform.rotation = Quaternion.RotateTowards(_headTransform.rotation,
                 Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _headRotationSpeed * Time.deltaTime);
         }
 

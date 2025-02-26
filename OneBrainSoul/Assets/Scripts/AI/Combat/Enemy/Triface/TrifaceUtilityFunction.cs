@@ -47,9 +47,9 @@ namespace AI.Combat.Enemy.Triface
             return actions[index].GetAIAction();
         }
 
-        private static float CalculateRotateUtility(IEnemyRotationUtility enemyRotationUtility)
+        private static float CalculateRotateUtility(IFreeMobilityEnemyRotateInSituUtility freeMobilityEnemyRotateInSituUtility)
         {
-            return 0f;
+            return Convert.ToInt16(freeMobilityEnemyRotateInSituUtility.HasStopped()) * 0.75f;
         }
 
         private static float CalculatePatrolUtility(IFreeMobilityEnemyPatrolUtility freeMobilityEnemyPatrolUtility)
