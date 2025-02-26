@@ -107,7 +107,7 @@ namespace Player
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
 
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
-            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer);
+            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, GetComponent<Hitstop>());
             _hookAbility.Setup(_hookLineRenderer);
 
             _hookCharges = _maxHookCharges;
@@ -176,7 +176,7 @@ namespace Player
 
         private void VoidReturn()
         {
-            if (transform.position.y < -30f)
+            if (transform.position.y < -100f)
             {
                 transform.position = _startPos;
             }
