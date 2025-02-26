@@ -9,7 +9,7 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, IGetSightMaximumDistance, 
-        IHasATarget, IFighting, ICastingAnAbility, IGetAgentBodyTransform, IEnemyRotationUtility, IEnemyGoToClosestSightedTarget
+        IHasATarget, IFighting, ICastingAnAbility, IGetAgentBodyTransform, IEnemyGoToClosestSightedTarget
     {
         private EntityType _entityType;
         

@@ -50,7 +50,7 @@ namespace ECS.Entities.AI.Combat
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
             _navMeshAgent.speed = _navMeshAgentSpecs.movementSpeed;
-            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent());
+            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent(), RotateBody);
             
             ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
         }
@@ -102,11 +102,13 @@ namespace ECS.Entities.AI.Combat
         protected void ContinueNavigation()
         {
             _navMeshAgent.isStopped = false;
+            _context.SetHasStopped(false);
         }
 
         protected void StopNavigation()
         {
             _navMeshAgent.isStopped = true;
+            _context.SetHasStopped(true);
         }
 
         protected void RotateInSitu()
@@ -134,6 +136,8 @@ namespace ECS.Entities.AI.Combat
 
             _isRotating = true;
             
+            BlockFSM();
+            
             StopNavigation();
             
             StartCoroutine(RotateToGivenPositionCoroutine());
@@ -141,13 +145,15 @@ namespace ECS.Entities.AI.Combat
 
         private IEnumerator RotateToGivenPositionCoroutine()
         {
-            while (Vector3.Angle(transform.forward, GetDirectionToRotateBody()) >= 5f)
+            while (Vector3.Dot(transform.forward, GetDirectionToRotateBody()) < 0.99f)
             {
                 RotateBody();
                 yield return null;
             }
             
             _isRotating = false;
+            
+            UnblockFSM();
             
             ContinueNavigation();
         }
@@ -244,7 +250,7 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
         }
 
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
             if (ECSNavigationManager.Instance == null)
             {
@@ -293,7 +299,7 @@ namespace ECS.Entities.AI.Combat
 
         private Vector3 Up(Vector3 position)
         {
-            return new Vector3(position.x, position.y + 0, position.z);
+            return new Vector3(position.x, position.y + 5, position.z);
         }
     }
 }

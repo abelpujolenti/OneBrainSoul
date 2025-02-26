@@ -21,6 +21,9 @@ namespace ECS.Entities.AI.Combat
         private Func<bool> _cancelSlamFunc = () => false;
 
         private float _rotationSpeedWhenCastingSlam;
+
+        private GameObject _testDestination;
+        private GameObject _testRotateDestination;
         
         private void Start()
         {
@@ -40,6 +43,9 @@ namespace ECS.Entities.AI.Combat
             GetNavMeshAgentComponent().GetAStarPath().SetOnReachDestination(_context.SetHasReachedDestination);
             
             CombatManager.Instance.AddEnemy(this);
+
+            _testDestination = new GameObject("TEST_DESTINATION");
+            _testRotateDestination = new GameObject("TEST_ROTATION_DESTINATION");
         }
 
         protected override void InitiateDictionaries()
@@ -105,18 +111,26 @@ namespace ECS.Entities.AI.Combat
             {
                 return;
             }
+            
+            Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
                 
-            //TODO AGENT SLOTS
+            //TODO AQUI AGENT SLOTS WHEN NEAR
             AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
-                .GetAgentSlotPosition(_context.GetSlamTargetContext().GetVectorToTarget(), _context.GetRadius());
+                .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
 
             if (agentSlotPosition == null)
             {
+                StopNavigation();
+                SetDirectionToRotateBody(vectorToTarget);
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
+                _testDestination.transform.position = GetNavMeshAgentComponent().GetAStarPath().destination;
+                _testRotateDestination.transform.position = transform.position + GetDirectionToRotateBody() * 3;
                 return;
             }
-
+            
             _agentSlot = agentSlotPosition.agentSlot;
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
+            _testDestination.transform.position = GetNavMeshAgentComponent().GetAStarPath().destination;
         }
 
         protected override void UpdateVisibleTargets()
@@ -152,8 +166,12 @@ namespace ECS.Entities.AI.Combat
             
             targetPosition.y -= _context.GetSlamTargetContext().GetTargetHeight() / 2;
             agentPosition.y -= _context.GetHeight() / 2;
+
+            Vector3 vectorToTarget = targetPosition - agentPosition;
             
-            _context.GetSlamTargetContext().SetVectorToTarget(targetPosition - agentPosition);
+            _context.GetSlamTargetContext().SetVectorToTarget(vectorToTarget);
+            
+            SetDirectionToRotateBody(vectorToTarget);
         }
 
         #endregion
@@ -199,6 +217,8 @@ namespace ECS.Entities.AI.Combat
             BlockFSM();
             
             StopNavigation();
+            
+            Debug.Log("Set Rotation Speed");
 
             _bodyCurrentRotationSpeed = _rotationSpeedWhenCastingSlam;
             
@@ -233,7 +253,7 @@ namespace ECS.Entities.AI.Combat
             
             areaAbility.Activate();
             
-            //ContinueNavigation();
+            ContinueNavigation();
             
             StartCoroutine(StartCooldownCoroutine(areaAbility.GetCast()));
         }
