@@ -220,7 +220,7 @@ namespace Player
             _yInput = Input.GetAxis("Vertical");
             _jumpInput = Input.GetButton("Jump");
             _ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            _ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Return);
+            _ability2Input = Input.GetMouseButton(1) || Input.GetKey(KeyCode.Return);
 
             if (_isDashUnlocked)
             {
