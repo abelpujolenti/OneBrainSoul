@@ -1,11 +1,15 @@
 using Managers;
 using Player.Effects;
 using UnityEngine;
+using ECS.Entities.AI;
+using UnityEngine.ProBuilder;
 
 namespace Player.Movement
 {
     public class HookMovementHandler : IMovementHandler
     {
+        private Hitstop _hitstop;
+
         public static float speed = 120f;
         public static float jumpStrength = 14f;
         public static float endDistance = 1.5f;
@@ -14,9 +18,14 @@ namespace Player.Movement
         public static float bobbingStrength = .65f;
         public static float snapDownwardsStrength = 6f;
         public static float smashAdditionalSpeed = 90f;
+        public static uint smashDamage = 5;
+
+        public static float bounceStrength = 1900f;
+        public static float bounceVerticalRatio = .45f;
 
         public static float delay = 0.2f;
         public static float delayHitImpact = 0.025f;
+
 
         public static int lineVertices = 2;
 
@@ -32,9 +41,10 @@ namespace Player.Movement
         Vector3 movementDirection = Vector3.zero;
         LineRenderer line;
 
-        public HookMovementHandler(LineRenderer lineRenderer)
+        public HookMovementHandler(LineRenderer lineRenderer, Hitstop hitstop)
         {
             line = lineRenderer;
+            _hitstop = hitstop;
         }
 
         public void Setup(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
@@ -132,13 +142,32 @@ namespace Player.Movement
                 Exit(player);
             }
 
+            RaycastHit hit;
             CapsuleCollider playerCollider = player.GetCapsuleCollider();
             Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * (-playerCollider.height * 0.5f);
             Vector3 p2 = p1 + Vector3.up * playerCollider.height;
-            if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.GetRigidbody().velocity.normalized, 
+            if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.GetRigidbody().velocity.normalized, out hit, 
                     player.GetRigidbody().velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), 
                     QueryTriggerInteraction.Ignore))
             {
+                if (smash)
+                {
+                    DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
+                    bool hitTerrain = destructibleTerrain != null;
+                    if (hitTerrain)
+                    {
+                        destructibleTerrain.Break(hit.point);
+                    }
+                    AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
+                    if (entity != null)
+                    {
+                        entity.OnReceiveDamage(smashDamage, hit.point, player.transform.position);
+                    }
+
+                    bool damaged = hitTerrain || entity != null;
+
+                    Smash(player,hit);
+                }
                 Exit(player);
             }
 
@@ -156,11 +185,6 @@ namespace Player.Movement
 
         private void Exit(PlayerCharacterController player)
         {
-            if (smash)
-            {
-                Smash(player);
-            }
-
             line.enabled = false;
             
             if (!player.IsOnTheGround())
@@ -173,17 +197,25 @@ namespace Player.Movement
             }
         }
 
-        private void Smash(PlayerCharacterController player)
+        private void Smash(PlayerCharacterController player, RaycastHit hit)
         {
             player.GetCamera().ScreenShake(.2f, .8f);
 
-            Hitstop hitstop = player.GetComponent<Hitstop>();
             bool damaged = false;
 
+            PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
 
-            hitstop.Add(damaged ? .2f : .12f);
+            player.GetCamera().StopFovWarp();
+            _hitstop.Add(damaged ? .2f : .12f);
             player.GetCamera().ScreenShake(damaged ? .25f : .2f, damaged ? 1.3f : .8f);
-            hitstop.AddAftershock(damaged ? .23f : .2f);
+            _hitstop.AddAftershock(damaged ? .23f : .2f);
+            player.GetRigidbody().velocity = Vector3.zero;
+            player.GetRigidbody().AddForce(
+                (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
+                 new Vector3(0f, bounceVerticalRatio * (damaged ? 1.2f : 1f), 0f)).normalized *
+                (bounceStrength * (damaged ? 1.4f : 1f)), ForceMode.Acceleration);
         }
 
         public bool ShouldGravityApply(PlayerCharacterController player)

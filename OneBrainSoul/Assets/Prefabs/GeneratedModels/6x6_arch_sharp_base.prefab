@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8993833781879829670}
   - component: {fileID: 5052964898196994203}
   - component: {fileID: 6328662967227799927}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: 6x6_arch_sharp_base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bc6bdec1627ac964fbba8d0738411698, type: 2}
+  - {fileID: 2100000, guid: 94aeb6935d079d94780606842fdc68c0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
