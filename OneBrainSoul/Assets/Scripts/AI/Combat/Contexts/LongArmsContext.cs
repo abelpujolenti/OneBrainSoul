@@ -100,6 +100,13 @@ namespace AI.Combat.Contexts
             _throwRockAbilityHasATarget = true;
         }
 
+        public void LoseThrowRockTarget()
+        {
+            SetIsFighting(HasATarget());
+            
+            _throwRockAbilityHasATarget = false;
+        }
+
         public void SetIsSeeingATargetForClapAbove(bool isSeeingATarget)
         {
             _isSeeingATargetForClapAbove = isSeeingATarget;
@@ -155,6 +162,13 @@ namespace AI.Combat.Contexts
             _clapAboveTarget.SetTargetProperties(targetRadius, targetHeight);
 
             _clapAboveAbilityHasATarget = true;
+        }
+
+        public void LoseClapAboveTarget()
+        {
+            SetIsFighting(HasATarget());
+            
+            _clapAboveAbilityHasATarget = false;
         }
 
         public void IncrementLongArmsBasesFree()

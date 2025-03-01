@@ -18,6 +18,9 @@ namespace Player
         [SerializeField] private float _agentsPositionRadius;
         [SerializeField] private float _damageEffectDuration;
 
+        private bool _isInCombat;
+        private uint _areasDetecting = 0;
+
         private uint _health;
         private float _height;
         private float _radius;
@@ -230,6 +233,24 @@ namespace Player
         {
             base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength, sourcePosition);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
+        }
+
+        public void WhenDetected()
+        {
+            _isInCombat = true;
+            _areasDetecting++;
+        }
+
+        public void WhenDetectionLost()
+        {
+            _areasDetecting--;
+
+            if (_areasDetecting != 0)
+            {
+                return;
+            }
+            
+            _isInCombat = false;
         }
 
         public override float GetHeight()

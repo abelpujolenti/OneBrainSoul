@@ -17,7 +17,7 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private float _agentPositionRadius;
 
-        private bool _isFree;
+        private bool _isFree = true;
         
         private void Start()
         {

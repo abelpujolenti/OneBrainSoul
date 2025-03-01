@@ -144,7 +144,7 @@ namespace ECS.Entities.AI.Combat
 
         private void Update()
         {
-            UpdatePositionsOfSightedTargets();
+            UpdateSightedTargetsInsideCombatArea();
             
             UpdateVisibleTargets();
             
@@ -160,6 +160,23 @@ namespace ECS.Entities.AI.Combat
             RotateBody();
             
             CalculateBestAction();
+        }
+
+        protected override void UpdateSightedTargetsInsideCombatArea()
+        {
+            base.UpdateSightedTargetsInsideCombatArea();
+
+            if (_context.HasATargetForThrowRock() && !_targetsSightedInsideCombatArea.Contains(_throwRockAbility.GetTargetId()))
+            {
+                _context.LoseThrowRockTarget();
+            }
+
+            if (!_context.HasATargetForClapAbove() || _targetsSightedInsideCombatArea.Contains(_clapAboveAbility.GetTargetId()))
+            {
+                return;
+            }
+            
+            _context.LoseClapAboveTarget();
         }
 
         protected override void UpdateVisibleTargets()

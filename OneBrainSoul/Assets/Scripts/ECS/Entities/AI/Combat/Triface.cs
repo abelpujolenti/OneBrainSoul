@@ -6,6 +6,7 @@ using AI.Combat.Contexts;
 using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
+using ECS.Components.AI.Navigation;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
@@ -46,6 +47,8 @@ namespace ECS.Entities.AI.Combat
 
             _testDestination = new GameObject("TEST_DESTINATION");
             _testRotateDestination = new GameObject("TEST_ROTATION_DESTINATION");
+
+            _startPosition = transform.position;
         }
 
         protected override void InitiateDictionaries()
@@ -88,7 +91,7 @@ namespace ECS.Entities.AI.Combat
 
         private void Update()
         {
-            UpdatePositionsOfSightedTargets();
+            UpdateSightedTargetsInsideCombatArea();
             
             UpdateVisibleTargets();
             
@@ -131,6 +134,24 @@ namespace ECS.Entities.AI.Combat
             _agentSlot = agentSlotPosition.agentSlot;
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
             _testDestination.transform.position = GetNavMeshAgentComponent().GetAStarPath().destination;
+        }
+
+        private Vector3 _startPosition;
+
+        protected override void UpdateSightedTargetsInsideCombatArea()
+        {
+            base.UpdateSightedTargetsInsideCombatArea();
+            
+            if (!_context.HasATargetForSlam() || _targetsSightedInsideCombatArea.Contains(_slamAbility.GetTargetId()))
+            {
+                return;
+            }
+            
+            ShowDebugMessages("Triface " + GetAgentID() + " Losing Target");
+            
+            _context.LoseSlamTarget();
+            
+            SetDestination(new VectorComponent(_startPosition));
         }
 
         protected override void UpdateVisibleTargets()
@@ -217,8 +238,6 @@ namespace ECS.Entities.AI.Combat
             BlockFSM();
             
             StopNavigation();
-            
-            Debug.Log("Set Rotation Speed");
 
             _bodyCurrentRotationSpeed = _rotationSpeedWhenCastingSlam;
             
