@@ -478,6 +478,11 @@ namespace Managers
             _longArms.Remove(sendatuId);
         }
 
+        public void RechargeAChargeOfPlayer()
+        {
+            _playerCharacter.RechargeHookCharge();
+        }
+
         public void HealPlayer()
         {
             _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath(), _playerCharacter.transform.position);

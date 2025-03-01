@@ -41,6 +41,11 @@ namespace Player
             CombatManager.Instance.AddPlayer(this);
         }
 
+        public void RechargeHookCharge()
+        {
+            _playerCharacterController.AddHookCharge();
+        }
+
         public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
         {
             if (_currentReceiveDamageCooldown > 0f)

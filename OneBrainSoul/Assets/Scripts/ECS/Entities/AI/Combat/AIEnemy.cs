@@ -8,6 +8,7 @@ using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
@@ -36,7 +37,8 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] protected Animator _animator;
 
-        [SerializeField] private bool _isMarked;
+        [SerializeField] private bool _doesRestoreHealthOfPlayer;
+        [FormerlySerializedAs("_doesRestoreStacksOfPlayer")] [SerializeField] private bool _doesRestoreAChargeOfPlayer;
 
         [SerializeField] protected uint _areaNumber;
 
@@ -445,7 +447,12 @@ namespace ECS.Entities.AI.Combat
                 EventsManager.OnAgentDefeated(GetAgentID());
             }
 
-            if (!_isMarked)
+            if (_doesRestoreAChargeOfPlayer)
+            {
+                CombatManager.Instance.RechargeAChargeOfPlayer();
+            }
+
+            if (!_doesRestoreHealthOfPlayer)
             {
                 return;
             }
