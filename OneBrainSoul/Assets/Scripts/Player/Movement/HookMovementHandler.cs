@@ -1,8 +1,7 @@
+using ECS.Entities.AI;
 using Managers;
 using Player.Effects;
 using UnityEngine;
-using ECS.Entities.AI;
-using UnityEngine.ProBuilder;
 
 namespace Player.Movement
 {
