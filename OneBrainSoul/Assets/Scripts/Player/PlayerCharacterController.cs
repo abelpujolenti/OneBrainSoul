@@ -1,3 +1,4 @@
+using System;
 using FMOD.Studio;
 using FMODUnity;
 using Player.Abilities;
@@ -269,6 +270,11 @@ namespace Player
         {
             _ability1Time = Mathf.Max(0f, _ability1Time - Time.deltaTime);
             _ability2Time = Mathf.Max(0f, _ability2Time - Time.deltaTime);
+        }
+
+        public void AddHookCharge()
+        {
+            _hookCharges = Math.Min(_hookCharges + 1, _maxHookCharges);
         }
 
         private void UpdateCharges()
