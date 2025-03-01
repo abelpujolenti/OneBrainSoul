@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using AI.Combat.Area;
-using AI.Combat.Contexts;
-using AI.Combat.ScriptableObjects;
 using ECS.Entities;
 using ECS.Entities.AI;
 using ECS.Entities.AI.Combat;
@@ -94,8 +92,15 @@ namespace Managers
         public void AddPlayer(PlayerCharacter playerCharacter)
         {
             _playerCharacter = playerCharacter;
+
+            uint agentId = playerCharacter.GetAgentID();
             
-            _returnAgent.Add(playerCharacter.GetAgentID(), () => _playerCharacter);
+            _returnAgent.Add(agentId, () => _playerCharacter);
+
+            foreach (CombatArea combatArea in _combatAreas.Values)
+            {
+                combatArea.SetPlayerId(agentId);
+            }
         }
 
         public void AddEnemy(Triface triface)
@@ -304,6 +309,16 @@ namespace Managers
         public PlayerCharacter ReturnPlayer()
         {
             return _playerCharacter;
+        }
+
+        public void OnPlayerDetection()
+        {
+            _playerCharacter.WhenDetected();
+        }
+
+        public void OnLosePlayerDetection()
+        {
+            _playerCharacter.WhenDetectionLost();
         }
 
         private List<Triface> ReturnAllTrifaces()

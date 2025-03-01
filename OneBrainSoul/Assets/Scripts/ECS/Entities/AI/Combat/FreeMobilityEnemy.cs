@@ -9,7 +9,6 @@ using AI.Combat.Steering;
 using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using Managers;
-using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 using Utilities;

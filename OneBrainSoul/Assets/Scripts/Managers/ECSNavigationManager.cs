@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -7,10 +6,8 @@ using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
-using Threads;
 using UnityEngine;
 using UnityEngine.AI;
-using Debug = UnityEngine.Debug;
 
 namespace Managers
 {

@@ -181,7 +181,7 @@ namespace ECS.Entities.AI.Combat
         
         #region FSM
 
-        protected void UpdatePositionsOfSightedTargets()
+        protected virtual void UpdateSightedTargetsInsideCombatArea()
         {
             _targetsSightedInsideCombatArea =
                 CombatManager.Instance.ReturnPositionOfRelevantSightedTargetsInsideCombatArea(_areaNumber, _targetEntities);
@@ -193,7 +193,8 @@ namespace ECS.Entities.AI.Combat
 
         protected void RotateBody()
         {
-            Debug.Log(_bodyCurrentRotationSpeed);
+            ShowDebugMessages("Rotation Speed " + _bodyCurrentRotationSpeed);
+            
             _bodyTransform.rotation = Quaternion.RotateTowards(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
         }

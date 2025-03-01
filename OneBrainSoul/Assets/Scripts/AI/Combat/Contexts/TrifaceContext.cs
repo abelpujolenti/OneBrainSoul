@@ -88,6 +88,12 @@ namespace AI.Combat.Contexts
             _slamAbilityHasATarget = true;
         }
 
+        public void LoseSlamTarget()
+        {
+            SetIsFighting(false);
+            _slamAbilityHasATarget = false;
+        }
+
         public override bool IsSeeingATarget()
         {
             return IsSeeingATargetForSlam();

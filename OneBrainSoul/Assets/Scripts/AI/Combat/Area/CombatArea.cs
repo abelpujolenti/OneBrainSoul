@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ECS.Entities;
 using ECS.Entities.AI;
 using Managers;
@@ -19,6 +17,13 @@ namespace AI.Combat.Area
 
         private Dictionary<EntityType, HashSet<uint>> _targetEntitiesSightedInsideArea =
             new Dictionary<EntityType, HashSet<uint>>();
+
+        private uint _playerId;
+
+        public void SetPlayerId(uint playerId)
+        {
+            _playerId = playerId;
+        }
 
         public uint GetCombatAreaNumber()
         {
@@ -76,11 +81,25 @@ namespace AI.Combat.Area
             }
             
             _targetEntitiesSightedInsideArea[entityType].Add(targetId);
+
+            if (targetId != _playerId)
+            {
+                return;
+            }
+            
+            CombatManager.Instance.OnPlayerDetection();
         }
 
         private void RemoveSightedTarget(EntityType entityType, uint targetId)
         {
             _targetEntitiesSightedInsideArea[entityType].Remove(targetId);
+
+            if (targetId != _playerId)
+            {
+                return;
+            }
+            
+            CombatManager.Instance.OnLosePlayerDetection();
         }
 
         public HashSet<uint> GetEnemiesInside()

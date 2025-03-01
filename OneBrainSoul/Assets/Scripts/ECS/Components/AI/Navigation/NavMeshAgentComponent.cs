@@ -1,9 +1,7 @@
 using System;
 using AI.Navigation;
 using Interfaces.AI.Navigation;
-using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
 
 namespace ECS.Components.AI.Navigation
 {

@@ -18,13 +18,11 @@ MonoBehaviour:
   fov: 45
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  minimumTimeInvestigatingAtEstimatedPosition: 5
-  maximumTimeInvestigatingAtEstimatedPosition: 7
   maximumHeadYawRotation: 45
   maximumHeadPitchUpRotation: 0
   maximumHeadPitchDownRotation: 0
   headRotationSpeed: 1
-  bodyNormalRotationSpeed: 10
+  bodyNormalRotationSpeed: 45
   slamAbilityProperties: {fileID: 11400000, guid: 645d62defe1275a47922e69eba7a5022,
     type: 2}
   rotationSpeedWhileCastingSlam: 0
