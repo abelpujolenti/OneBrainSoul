@@ -272,9 +272,9 @@ namespace Player
             _ability2Time = Mathf.Max(0f, _ability2Time - Time.deltaTime);
         }
 
-        public void AddHookCharge()
+        public void AddHookCharge(int amount = 1)
         {
-            _hookCharges = Math.Min(_hookCharges + 1, _maxHookCharges);
+            _hookCharges = Math.Min(_hookCharges + amount, _maxHookCharges);
         }
 
         private void UpdateCharges()
@@ -413,6 +413,10 @@ namespace Player
             _ability2Time = _ability2Cooldown;
         }
 
+        public void SetInCombat(bool c)
+        {
+            _inCombat = c;
+        }
         public bool IsInCombat()
         {
             return _inCombat;

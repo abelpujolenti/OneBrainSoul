@@ -18,7 +18,6 @@ namespace Player
         [SerializeField] private float _agentsPositionRadius;
         [SerializeField] private float _damageEffectDuration;
 
-        private bool _isInCombat;
         private uint _areasDetecting = 0;
 
         private uint _health;
@@ -242,7 +241,7 @@ namespace Player
 
         public void WhenDetected()
         {
-            _isInCombat = true;
+            _playerCharacterController.SetInCombat(true);
             _areasDetecting++;
         }
 
@@ -254,8 +253,8 @@ namespace Player
             {
                 return;
             }
-            
-            _isInCombat = false;
+
+            _playerCharacterController.SetInCombat(false);
         }
 
         public override float GetHeight()
