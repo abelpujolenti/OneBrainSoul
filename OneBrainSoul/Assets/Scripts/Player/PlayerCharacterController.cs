@@ -228,10 +228,10 @@ namespace Player
                 _dashAbility.CheckDash(this, _ability1Input);
             }
 
-            if (_isChargeUnlocked)
+            /*if (_isChargeUnlocked)
             {
                 _chargeAbility.CheckCharge(this, _ability1Input);
-            }
+            }*/
 
             if (_isHookUnlocked)
             {

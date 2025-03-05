@@ -17,7 +17,7 @@ public class CombatRoom : MonoBehaviour
     {
         for (int i = 0; i < enemies.Length; i++)
         {
-            enemies[i].gameObject.SetActive(false);
+            //enemies[i].gameObject.SetActive(false);
         }
         for (int i = 0; i < walls.Length; i++)
         {
