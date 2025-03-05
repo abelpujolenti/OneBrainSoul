@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2913095492844988399}
   - component: {fileID: 2125262769461474574}
   - component: {fileID: 5734307539578577425}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 2x3_bordillo_corner_in
   m_TagString: Untagged
   m_Icon: {fileID: 0}
