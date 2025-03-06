@@ -158,6 +158,16 @@ public class ModelPrefabGenerator : UnityEditor.Editor
         Directory.CreateDirectory("Assets/Materials/" + textureOutputPath + "/" + dir);
         string localPath = "Assets/Materials/" + textureOutputPath + "/" + dir + "/" + mat.name + ".mat";
 
+        var a = AssetDatabase.LoadAssetAtPath<Material>(localPath);
+        if (a != null)
+        {
+            a.SetTexture("_MainTex", mat.GetTexture("_MainTex"));
+            a.SetTexture("_BumpMap", mat.GetTexture("_BumpMap"));
+            a.SetTexture("_MetallicGlossMap", mat.GetTexture("_MetallicGlossMap"));
+            a.SetTexture("_SpecGlossMap", mat.GetTexture("_SpecGlossMap"));
+            return;
+        }
+
         AssetDatabase.CreateAsset(mat, localPath);
     }
 
