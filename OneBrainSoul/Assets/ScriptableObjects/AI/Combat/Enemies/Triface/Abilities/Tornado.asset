@@ -27,7 +27,7 @@ MonoBehaviour:
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 1
-    hasAnEffectOnEnd: 0
+    hasAnEffectOnEnd: 1
   abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
     hasAnEffectOnHealth: 0
@@ -60,8 +60,8 @@ MonoBehaviour:
     doesForceComesFromCenterOfTheArea: 1
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
-    hasAnEffectOnHealth: 0
-    healthModificationValue: 0
+    hasAnEffectOnHealth: 1
+    healthModificationValue: 3
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
@@ -69,10 +69,10 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 0
-    doesApplyAForce: 0
-    forceDirection: {x: 0, y: 0, z: 0}
-    forceStrength: 0
-    doesForceComesFromCenterOfTheArea: 0
+    doesApplyAForce: 1
+    forceDirection: {x: 1, y: 0.5, z: 0}
+    forceStrength: 600
+    doesForceComesFromCenterOfTheArea: 1
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0

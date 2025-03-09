@@ -7,6 +7,7 @@ using Player.Effects;
 using Player.Movement;
 using TMPro;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 namespace Player
@@ -49,6 +50,7 @@ namespace Player
         private bool _ability1Input;
         private bool _ability2Input;
         private bool _inCombat;
+        private bool _canBeDisplaced = false;
 
         private float _ability1Time;
         private float _ability2Time;
@@ -78,6 +80,7 @@ namespace Player
         [SerializeField] private WallClimbAbility _wallClimbAbility;
         [SerializeField] private HookAbility _hookAbility;
         [SerializeField] private LineRenderer _hookLineRenderer;
+        [SerializeField] private Transform _hookParticle;
         [SerializeField] HookUI _hookUI;
 
         [Range(1, 7)]
@@ -108,7 +111,7 @@ namespace Player
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
 
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
-            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, GetComponent<Hitstop>());
+            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, _hookParticle, GetComponent<Hitstop>());
             _hookAbility.Setup(_hookLineRenderer);
 
             _hookCharges = _maxHookCharges;
@@ -119,12 +122,12 @@ namespace Player
         {
             CheckGround();
             CheckInput();
-            HandWobble();
+            HandUpdate();
             CalculateAirTime();
             CalculateCooldowns();
             UpdateCharges();
         }
-    
+
         private void FixedUpdate()
         {        
             if (_movementHandler.ShouldGravityApply(this))
@@ -246,8 +249,14 @@ namespace Player
             //
         }
 
-        private void HandWobble()
+        private void HandUpdate()
         {
+            if (_movementHandler is not HookMovementHandler)
+            {
+                Vector3 particlePos = transform.position + new Vector3(0f, 1f, 0f) + GetOrientation().right * -1.5f;
+                _hookParticle.position = particlePos;
+            }
+
             if (!_onGround) return;
             Vector3 wandPos = new Vector3(Mathf.Sin(Time.time * 5f), Mathf.Sin(Time.time * 6f));
             float wobbleMagnitude = Mathf.Clamp(_rigidbody.velocity.magnitude / 25f, 0f, 1f);
@@ -454,6 +463,8 @@ namespace Player
         {
             _airborneMovementHandler.ResetValues();
             _movementHandler = _airborneMovementHandler;
+            _hookLineRenderer.enabled = false;
+            _hookParticle.gameObject.SetActive(false);
             //_movementHandler = new AirborneMovementHandler();
         }
 
@@ -471,7 +482,7 @@ namespace Player
 
         public void ChangeMovementHandlerToHook(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
         {
-            _hookMovementHandler.Setup(startPos, endPos, endVisualPos, snap, smash);
+            _hookMovementHandler.Setup(this, startPos, endPos, endVisualPos, snap, smash);
             _hookMovementHandler.ResetValues();
             _movementHandler = _hookMovementHandler;
         }
@@ -512,6 +523,16 @@ namespace Player
         public void SetMoveSpeedMultiplier(float moveSpeedMultiplier)
         {
             _moveSpeedMultiplier = moveSpeedMultiplier;
+        }
+
+        public void SetDisplaceability(bool d)
+        {
+            _canBeDisplaced = d;
+        }
+
+        public bool CanBeDisplaced()
+        {
+            return _canBeDisplaced;
         }
     }
 }

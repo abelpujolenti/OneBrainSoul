@@ -66,7 +66,7 @@ namespace Player
             DamageEffect(hitPosition);
             
             PostProcessingManager.Instance.DamageEffect(_damageEffectDuration);
-            _camera.ScreenShake(_damageEffectDuration * .25f, 1f);
+            _camera.ScreenShake(_damageEffectDuration * 0.65f, .9f);
             
             StartCoroutine(DecreaseDamageCooldown());
         }

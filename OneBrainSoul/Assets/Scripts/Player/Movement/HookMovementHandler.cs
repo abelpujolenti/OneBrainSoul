@@ -39,14 +39,16 @@ namespace Player.Movement
         bool smash = false;
         Vector3 movementDirection = Vector3.zero;
         LineRenderer line;
+        Transform particle;
 
-        public HookMovementHandler(LineRenderer lineRenderer, Hitstop hitstop)
+        public HookMovementHandler(LineRenderer lineRenderer, Transform particleTransform, Hitstop hitstop)
         {
             line = lineRenderer;
+            particle = particleTransform;
             _hitstop = hitstop;
         }
 
-        public void Setup(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
+        public void Setup(PlayerCharacterController player, Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
         {
             this.startPos = startPos;
             this.endPos = endPos;
@@ -56,6 +58,14 @@ namespace Player.Movement
             hookDistance = Vector3.Distance(this.endPos, this.startPos);
             line.enabled = true;
             line.positionCount = lineVertices;
+            lineStartPos = GetLineStartPos(player);
+            particle.position = lineStartPos;
+            particle.gameObject.SetActive(true);
+        }
+
+        private Vector3 GetLineStartPos(PlayerCharacterController player)
+        {
+            return player.transform.position + new Vector3(0f, 1f, 0f) + player.GetOrientation().right * -1.5f;
         }
 
         public void ResetValues()
@@ -67,11 +77,17 @@ namespace Player.Movement
 
         public void VisualUpdate(PlayerCharacterController player)
         {
-            lineStartPos = player.transform.position + new Vector3(0f, 1f, 0f) + player.GetOrientation().right * 2f;
-            line.SetPosition(0, lineStartPos);
+            lineStartPos = GetLineStartPos(player);
+            //line.SetPosition(0, lineStartPos);
+
+            Vector3 lineEndPos = lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(Mathf.Clamp01(delayTime / delay), 2f);
+            particle.transform.position = lineEndPos;
+
             if (delayTime < delay)
             {
-                line.SetPosition(1, lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f));
+                //Vector3 lineEndPos = lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(delayTime / delay, 2f);
+                //particle.transform.position = lineEndPos;
+                //line.SetPosition(1, lineEndPos);
             }
         }
 
@@ -185,7 +201,9 @@ namespace Player.Movement
         private void Exit(PlayerCharacterController player)
         {
             line.enabled = false;
-            
+            particle.gameObject.SetActive(false);
+            particle.position = GetLineStartPos(player);
+
             if (!player.IsOnTheGround())
             {
                 player.ChangeMovementHandlerToAirborne();

@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Triface_mat 1
-  m_Shader: {fileID: 4800000, guid: 0e9d5a909a1f7e84882a534d0d11e49f, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0fc100ce7c916be45897f4c763782efc, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -103,6 +103,7 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _DamageTick: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -136,7 +137,7 @@ Material:
     - _Color: {r: 1, g: 0, b: 0, a: 1}
     - _Color_1: {r: 1, g: 1, b: 1, a: 0}
     - _DamageColor: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0.03396219, g: 0, b: 0.0031964413, a: 1}
+    - _EmissionColor: {r: 0.07169801, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _UvOffset: {r: 0, g: 0, b: 0, a: 0}
     - _UvTiling: {r: 1, g: 1, b: 0, a: 0}
