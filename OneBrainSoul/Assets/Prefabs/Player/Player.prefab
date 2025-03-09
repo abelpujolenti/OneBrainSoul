@@ -1063,6 +1063,7 @@ MonoBehaviour:
   _hookAbility: {fileID: 8022381131504467490}
   _hookLineRenderer: {fileID: 3127817565339649075}
   _hookParticle: {fileID: 5558414127364850149}
+  _trailParticle: {fileID: 6387602860837234916}
   _hookUI: {fileID: 2481377896329111756}
   _maxHookCharges: 3
   _outOfCombatRechargeDuration: 1.2
@@ -3194,6 +3195,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7150928455a2ee1489002d0d091d8b2a, type: 3}
+--- !u!198 &6387602860837234916 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8506623859463053739, guid: 7150928455a2ee1489002d0d091d8b2a,
+    type: 3}
+  m_PrefabInstance: {fileID: 3362161018398607695}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8255427964378359582 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6645589425647103569, guid: 7150928455a2ee1489002d0d091d8b2a,

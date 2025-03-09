@@ -81,6 +81,7 @@ namespace Player
         [SerializeField] private HookAbility _hookAbility;
         [SerializeField] private LineRenderer _hookLineRenderer;
         [SerializeField] private Transform _hookParticle;
+        [SerializeField] private ParticleSystem _trailParticle;
         [SerializeField] HookUI _hookUI;
 
         [Range(1, 7)]
@@ -265,7 +266,7 @@ namespace Player
         }
 
         private void CalculateAirTime()
-        {
+        {            
             if (!_onGround)
             {
                 _airTime += Time.deltaTime;
@@ -273,6 +274,13 @@ namespace Player
                 {
                 }
             }
+            else
+            {
+                _airTime = 0f;
+            }
+
+            var em = _trailParticle.emission;
+            em.rateOverDistance = Mathf.Max(0f, 12 - _airTime * 50f);
         }
 
         private void CalculateCooldowns()
@@ -457,6 +465,7 @@ namespace Player
         {
             _groundedMovementHandler.ResetValues();
             _movementHandler = _groundedMovementHandler;
+            _canBeDisplaced = true;
         }
 
         public void ChangeMovementHandlerToAirborne()
@@ -466,6 +475,7 @@ namespace Player
             _hookLineRenderer.enabled = false;
             _hookParticle.gameObject.SetActive(false);
             //_movementHandler = new AirborneMovementHandler();
+            _canBeDisplaced = true;
         }
 
         public void SetHorizontalDrag(float drag)
@@ -478,6 +488,7 @@ namespace Player
             _chargeMovementHandler.Setup(this, _orientation.forward);
             _chargeMovementHandler.ResetValues();
             _movementHandler = _chargeMovementHandler;
+            _canBeDisplaced = false;
         }
 
         public void ChangeMovementHandlerToHook(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
@@ -485,6 +496,7 @@ namespace Player
             _hookMovementHandler.Setup(this, startPos, endPos, endVisualPos, snap, smash);
             _hookMovementHandler.ResetValues();
             _movementHandler = _hookMovementHandler;
+            _canBeDisplaced = false;
         }
 
         public void ChangeMovementHandlerToDash(Vector3 dashDirection)
