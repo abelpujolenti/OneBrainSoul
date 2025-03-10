@@ -24,7 +24,13 @@ namespace AI.Combat.AbilityAoEColliders
             _radiusResizeCurve = sphericalAbilityComponent.GetAoE().radiusChangeOverTime;
             _actionResizing = time =>
             {
-                _sphereCollider.radius = ReturnSizeOverTime(time, _radiusResizeCurve);
+                float newRadius = ReturnSizeOverTime(time, _radiusResizeCurve);
+                
+                _sphereCollider.radius = newRadius;
+
+                float newScale = newRadius / _radiusResizeCurve.keys[0].value;
+                
+                _childWithParticleSystem.transform.localScale = new Vector3(newScale, newScale, newScale);
             };
         }
     }

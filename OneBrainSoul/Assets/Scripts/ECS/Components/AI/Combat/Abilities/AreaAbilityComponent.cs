@@ -12,6 +12,8 @@ namespace ECS.Components.AI.Combat.Abilities
         private readonly AbilityAoEType _abilityAoEType;
         private readonly AbilityAoE _abilityAoE;
 
+        private readonly AbilityMovement _abilityMovement;
+
         public AreaAbilityComponent(AreaAbilityProperties areaAbilityProperties)
         {
             _doesItTriggerOnTriggerEnter = areaAbilityProperties.doesItTriggerOnTriggerEnter;
@@ -20,6 +22,7 @@ namespace ECS.Components.AI.Combat.Abilities
 
             _abilityAoEType = areaAbilityProperties.abilityAoEType;
             _abilityAoE = areaAbilityProperties.abilityAoE;
+            _abilityMovement = areaAbilityProperties.abilityMovement;
         }
 
         public bool DoesItTriggerOnTriggerEnter()
@@ -40,6 +43,11 @@ namespace ECS.Components.AI.Combat.Abilities
         public AbilityAoE GetAoE()
         {
             return _abilityAoE;
+        }
+
+        public AbilityMovement GetMovement()
+        {
+            return _abilityMovement;
         }
     }
 }

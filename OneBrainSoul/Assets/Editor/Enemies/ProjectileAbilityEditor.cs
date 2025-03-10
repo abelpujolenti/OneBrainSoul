@@ -17,6 +17,7 @@ namespace Editor.Enemies
         private bool isAbilityEffectOnTheDurationFoldoutOpen = true;
         private bool isAbilityEffectOnEndFoldoutOpen = true;
         private bool isAbilityAoEFoldoutOpen = true;
+        private bool isAbilityMovementFoldoutOpen = true;
 
         public override void OnInspectorGUI()
         {
@@ -96,6 +97,10 @@ namespace Editor.Enemies
             AbilityProjectile(ref projectileAbilityProperties.abilityProjectile, projectileAbilityProperties.abilityCast.maximumRangeToCast);
             
             AbilityAoE(ref projectileAbilityProperties.abilityAoE, ref projectileAbilityProperties.abilityAoEType);
+            
+            ObjectField(ref projectileAbilityProperties.abilityAoE.objectWithParticleSystem, "Object With Area Particle System");
+            
+            AbilityMovement(ref projectileAbilityProperties.abilityMovement, projectileAbilityProperties.abilityAoE.duration);
 
             if (projectileAbilityProperties.abilityAoE.duration == 0)
             {
@@ -370,6 +375,8 @@ namespace Editor.Enemies
             
             Vector3Field(ref abilityProjectile.relativePositionToCaster, "Relative Position To Caster");
             ObjectField<GameObject>(ref abilityProjectile.projectilePrefab, "Projectile Prefab");
+            ObjectField(ref abilityProjectile.objectWithParticleSystem, "Object With Trail Particle System");
+            Vector3Field(ref abilityProjectile.relativePositionForParticles, "Relative Position To Projectile");
             //ToggleField(ref abilityProjectile.makesParabola, "Makes a Parabola");
             FloatField(ref abilityProjectile.projectileSpeed, 0, "Projectile Speed");
             UintField(ref abilityProjectile.instances, 1, "Projectile Instances");
@@ -422,7 +429,7 @@ namespace Editor.Enemies
                         abilityAoE.doesHeightChangeOverTheTime = false;
                         abilityAoE.doesWidthChangeOverTheTime = false;
                         abilityAoE.doesLengthChangeOverTheTime = false;
-                        return;
+                        break;
                     }
                     
                     ToggleField(ref abilityAoE.doesHeightChangeOverTheTime, "Does Height Change Over Time");
@@ -454,7 +461,7 @@ namespace Editor.Enemies
                     if (abilityAoE.duration == 0)
                     {
                         abilityAoE.doesRadiusChangeOverTheTime = false;
-                        return;
+                        break;
                     }
                     
                     ToggleField(ref abilityAoE.doesRadiusChangeOverTheTime, "Does Radius Change Over Time");
@@ -495,7 +502,7 @@ namespace Editor.Enemies
                     if (abilityAoE.duration == 0)
                     {
                         abilityAoE.doesScaleChangeOverTheTime = false;
-                        return;
+                        break;
                     }
                     
                     ToggleField(ref abilityAoE.doesScaleChangeOverTheTime, "Does Scale Change Over Time");
@@ -506,6 +513,58 @@ namespace Editor.Enemies
                     }
                     break;
             }
+            
+            ObjectField(ref abilityAoE.objectWithParticleSystem, "Object With Area Particle System");
+            Vector3Field(ref abilityAoE.relativePositionForParticles, "Relative Position To Area");
+        }
+
+        private void AbilityMovement(ref AbilityMovement abilityMovement, float aoeDuration)
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            
+            EditorGUI.indentLevel--;
+            FoldoutField(ref isAbilityMovementFoldoutOpen, "Ability Movement");
+            EditorGUI.indentLevel++;
+
+            if (!isAbilityMovementFoldoutOpen)
+            {
+                return;
+            }
+            
+            //ToggleField(ref abilityMovement.makesBezierCurves, "Makes Bezier Curves");
+
+            for (int i = 0; i < abilityMovement.positions.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal("box");
+
+                EditorGUILayout.BeginVertical(GUILayout.Width(EditorGUIUtility.currentViewWidth * 0.9f));
+
+                abilityMovement.positions[i] = Vector3Field(abilityMovement.positions[i], "Next Position");
+                abilityMovement.timeBetweenPositions[i] = FloatField(abilityMovement.timeBetweenPositions[i], 0, aoeDuration, "Time To Reach");
+                
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.BeginVertical(GUILayout.Width(EditorGUIUtility.currentViewWidth * 0.05f));
+
+                if (GUILayout.Button("-", GUILayout.Height(40)))
+                {
+                    abilityMovement.positions.RemoveAt(i);
+                    abilityMovement.timeBetweenPositions.RemoveAt(i);
+                }
+                
+                EditorGUILayout.EndVertical();
+                
+                EditorGUILayout.EndHorizontal();
+            }
+
+            if (!GUILayout.Button("+"))
+            {
+                return;
+            }
+
+            abilityMovement.positions.Add(new Vector3());
+            abilityMovement.timeBetweenPositions.Add(0);
         }
     }
 }

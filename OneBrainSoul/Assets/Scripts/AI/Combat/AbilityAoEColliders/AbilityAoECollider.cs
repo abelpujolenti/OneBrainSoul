@@ -9,20 +9,21 @@ using ECS.Entities.AI;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace AI.Combat.AbilityAoEColliders
 {
-    public abstract class AbilityAoECollider<TAreaAbilityComponent> : MonoBehaviour, IAbilityCollider 
+    public abstract class AbilityAoECollider<TAreaAbilityComponent> : MonoBehaviour, IAbilityCollider
         where TAreaAbilityComponent : AreaAbilityComponent
     {
         private Coroutine _abilityDurationCoroutine;
 
         private Transform _parentTransform;
-        
+
         private Stopwatch _stopwatch = new Stopwatch();
 
         protected List<EntityType> _abilityTargets;
-        
+
         private List<AgentEntity> _agentsInside = new List<AgentEntity>();
 
         private List<Action<AgentEntity>> _actionsOnTriggerEnter = new List<Action<AgentEntity>>();
@@ -30,7 +31,7 @@ namespace AI.Combat.AbilityAoEColliders
         private List<Action<AgentEntity>> _actionsOnTriggerExit = new List<Action<AgentEntity>>();
 
         private Vector3 _relativePosition;
-        
+
         private Quaternion _parentRotation;
 
         private Vector3 _direction;
@@ -39,10 +40,17 @@ namespace AI.Combat.AbilityAoEColliders
         private Action _actionOnStartTrigger = () => { };
         private Action<AgentEntity> _actionOnTriggerEnter = agentEntity => { };
         protected Action<float> _actionResizing = value => { };
-        private Action<AgentEntity> _actionOnTriggerExit  = agentEntity => { };
+        private Action<AgentEntity> _actionOnTriggerExit = agentEntity => { };
+
+        private Func<ushort, float, ushort> _actionMovement = (positionCounter, time) => positionCounter;
+        private Action<Vector3> _actionSetPosition;
+
+        private List<AbilityAoEPositions> _positionsOverTime = new List<AbilityAoEPositions>();
 
         private float _abilityDuration;
         private float _tickTimer;
+
+        protected GameObject _childWithParticleSystem;
 
         protected virtual void OnDisable()
         {
@@ -58,6 +66,8 @@ namespace AI.Combat.AbilityAoEColliders
             
             _relativePosition = areaAbilityComponent.GetAoE().relativePositionToCaster;
 
+            _childWithParticleSystem = Instantiate(areaAbilityComponent.GetAoE().objectWithParticleSystem, transform);
+
             {
                 Vector3 direction = areaAbilityComponent.GetAoE().direction;
 
@@ -65,11 +75,66 @@ namespace AI.Combat.AbilityAoEColliders
             }
 
             _actionAttaching = areaAbilityComponent.GetAoE().isAttachedToCaster
-                ? () => { }
+                ? () =>
+                {
+                    _actionSetPosition = position => transform.localPosition = position;
+                    foreach (AbilityAoEPositions abilityPosition in _positionsOverTime)
+                    {
+                        abilityPosition.RotatePosition(_parentTransform.forward);
+                    }
+                }
                 : () =>
                 {
+                    _actionSetPosition = position => transform.position = position;
                     transform.parent = null;
+                    foreach (AbilityAoEPositions abilityPosition in _positionsOverTime)
+                    {
+                        abilityPosition.SetWorldPosition(_parentTransform.forward, _parentTransform.position);
+                    }
                 };
+
+            AbilityMovement abilityMovement = areaAbilityComponent.GetMovement();
+
+            if (abilityMovement.positions.Count != 0)
+            {
+                _positionsOverTime = new List<AbilityAoEPositions>
+                {
+                    new AbilityAoEPositions(0, _relativePosition)
+                };
+
+                for (int i = 0; i < abilityMovement.positions.Count; i++)
+                {
+                    _positionsOverTime.Add(new AbilityAoEPositions(abilityMovement.timeBetweenPositions[i],
+                        abilityMovement.positions[i]));
+                }
+                
+                _actionMovement = (positionCounter, timer) =>
+                {
+                    if (positionCounter >= _positionsOverTime.Count - 1)
+                    {
+                        return positionCounter;
+                    }
+                    
+                    float currentTime = 0;
+
+                    for (int i = 0; i < positionCounter; i++)
+                    {
+                        currentTime += _positionsOverTime[i].GetTimeToReach();
+                    }
+
+                    float nextTimeSpot = currentTime + _positionsOverTime[positionCounter + 1].GetTimeToReach();
+                    
+                    _actionSetPosition(Vector3.Lerp(_positionsOverTime[positionCounter].GetRotatedPosition(),
+                        _positionsOverTime[positionCounter + 1].GetRotatedPosition(), (timer - currentTime) / (nextTimeSpot - currentTime)));
+                    
+                    if (timer > nextTimeSpot)
+                    {
+                        positionCounter++;
+                    }
+
+                    return positionCounter;
+                };
+            }
 
             AbilityTrigger abilityTrigger = basicAbilityComponent.GetTrigger();
 
@@ -390,6 +455,8 @@ namespace AI.Combat.AbilityAoEColliders
 
             yield return null;
             yield return new WaitForFixedUpdate();
+
+            ushort positionCounter = 0;
             
             _actionOnStartTrigger();
             
@@ -401,6 +468,8 @@ namespace AI.Combat.AbilityAoEColliders
                 tickTimer += Time.deltaTime;
 
                 _actionResizing(timer);
+
+                positionCounter = _actionMovement(positionCounter, timer);
 
                 if (tickTimer >= _tickTimer)
                 {
@@ -470,6 +539,11 @@ namespace AI.Combat.AbilityAoEColliders
             gameObject.SetActive(false);
         }
 
+        private Vector3 GetLocalPosition()
+        {
+            return transform.localPosition;
+        }
+
         protected virtual void OnTriggerEnter(Collider other)
         {
             AgentEntity agentEntity = other.GetComponent<AgentEntity>();
@@ -479,7 +553,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            for (int i = 0; i < _abilityTargets.Count; i++)
+            /*for (int i = 0; i < _abilityTargets.Count; i++)
             {
                 if (agentEntity.GetEntityType() == _abilityTargets[i])
                 {
@@ -490,7 +564,7 @@ namespace AI.Combat.AbilityAoEColliders
                 {
                     return;
                 }
-            }
+            }*/
             
             _agentsInside.Add(agentEntity);
 
@@ -506,7 +580,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            for (int i = 0; i < _abilityTargets.Count; i++)
+            /*for (int i = 0; i < _abilityTargets.Count; i++)
             {
                 if (agentEntity.GetEntityType() == _abilityTargets[i])
                 {
@@ -517,7 +591,7 @@ namespace AI.Combat.AbilityAoEColliders
                 {
                     return;
                 }
-            }
+            }*/
             
             _agentsInside.Remove(agentEntity);
 

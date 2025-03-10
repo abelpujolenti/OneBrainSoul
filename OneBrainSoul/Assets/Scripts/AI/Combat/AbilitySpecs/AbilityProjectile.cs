@@ -18,6 +18,9 @@ namespace AI.Combat.AbilitySpecs
 
         public float maximumDispersion;
 
+        public GameObject objectWithParticleSystem;
+        public Vector3 relativePositionForParticles;
+
         public bool doesVanishOnImpact;
         public bool doesVanishOverTime;
         

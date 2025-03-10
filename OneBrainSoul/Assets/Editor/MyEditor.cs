@@ -129,9 +129,31 @@ namespace Editor
             value = Mathf.Clamp(floatValue, min, max);
         }
 
+        protected float FloatField(float value, string message)
+        {
+            return EditorGUI.FloatField(GetControlRect(), message, value);
+        }
+
+        protected float FloatField(float value, float min, string message)
+        {
+            float floatValue = EditorGUI.FloatField(GetControlRect(), message, value);
+            return Mathf.Max(min, floatValue);
+        }
+
+        protected float FloatField(float value, float min, float max, string message)
+        {
+            float floatValue = EditorGUI.FloatField(GetControlRect(), message, value);
+            return Mathf.Clamp(floatValue, min, max);
+        }
+
         protected void Vector3Field(ref Vector3 value, string message)
         {
             value = EditorGUI.Vector3Field(GetControlRect(), message, value);
+        }
+
+        protected Vector3 Vector3Field(Vector3 value, string message)
+        {
+            return EditorGUI.Vector3Field(GetControlRect(), message, value);
         }
 
         protected void ToggleField(ref bool value, string message)

@@ -77,11 +77,11 @@ MonoBehaviour:
   abilityAoE:
     isAttachedToCaster: 0
     relativePositionToCaster: {x: 0, y: 0, z: 12.5}
-    duration: 0.25
+    duration: 2
     direction: {x: 0, y: 0, z: 1}
     height: 1
     width: 1
-    length: 25
+    length: 1
     radius: 5
     customMeshPrefab: {fileID: 0}
     scale: 0
@@ -159,5 +159,11 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  abilityMovement:
+    makesBezierCurves: 0
+    positions:
+    - {x: 0, y: 0, z: 25}
+    timeBetweenPositions:
+    - 2
   doesItTriggerOnTriggerEnter: 0
   doesItTriggerOnTriggerExit: 0

@@ -38,7 +38,7 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] protected Animator _animator;
 
         [SerializeField] private bool _doesRestoreHealthOfPlayer;
-        [FormerlySerializedAs("_doesRestoreStacksOfPlayer")] [SerializeField] private bool _doesRestoreAChargeOfPlayer;
+        [SerializeField] private bool _doesRestoreAChargeOfPlayer;
 
         [SerializeField] protected uint _areaNumber;
 
