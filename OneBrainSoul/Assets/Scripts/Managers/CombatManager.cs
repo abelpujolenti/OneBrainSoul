@@ -201,6 +201,28 @@ namespace Managers
             return targets;
         }
 
+        public void PlayerAttackSoundArea(Vector3 position, float soundRadius)
+        {
+            foreach (CombatArea combatArea in _combatAreas.Values)
+            {
+                if (!combatArea.HasPlayerInside())
+                {
+                    continue;
+                }
+
+                foreach (uint enemyId in combatArea.GetEnemiesInside())
+                {
+                    if ((_returnAgent[enemyId]().GetTransformComponent().GetPosition() - position).sqrMagnitude >= soundRadius * soundRadius)
+                    {
+                        continue;
+                    }
+                    
+                    combatArea.AddSightedTarget(EntityType.PLAYER, _playerCharacter.GetAgentID());
+                    break;
+                }
+            }
+        }
+
         public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, 
             Dictionary<EntityType, HashSet<uint>> targetsInsideVisionArea, uint areaNumber)
         {
@@ -432,6 +454,7 @@ namespace Managers
 
             if (_combatAreas[areaNumber].IsAreaEmpty())
             {
+                Destroy(_combatAreas[areaNumber]);
                 _combatAreas.Remove(areaNumber);
             }
             

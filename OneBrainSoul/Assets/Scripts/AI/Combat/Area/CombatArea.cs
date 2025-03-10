@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ECS.Entities;
 using ECS.Entities.AI;
 using Managers;
@@ -23,6 +24,12 @@ namespace AI.Combat.Area
         public void SetPlayerId(uint playerId)
         {
             _playerId = playerId;
+        }
+
+        public bool HasPlayerInside()
+        {
+            return _targetEntitiesInsideArea.ContainsKey(EntityType.PLAYER) &&
+                   _targetEntitiesInsideArea[EntityType.PLAYER].Contains(_playerId);
         }
 
         public uint GetCombatAreaNumber()
@@ -157,6 +164,16 @@ namespace AI.Combat.Area
             RemoveTarget(entityType, agentId);
             
             RemoveSightedTarget(entityType, agentId);
+        }
+
+        private void OnDestroy()
+        {
+            if (!HasPlayerInside())
+            {
+                return;
+            }
+            
+            CombatManager.Instance.OnLosePlayerDetection();
         }
     }
 }
