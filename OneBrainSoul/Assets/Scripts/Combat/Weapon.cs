@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ECS.Entities.AI;
+using Managers;
 using Player;
 using Player.Effects;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace Combat
         public float innerArc = 150f;
         public float hitstop = .05f;
 
+        public float soundAreaRadius;
+
         [SerializeField] protected Transform parent;
         [SerializeField] protected PlayerCharacterController player;
         [SerializeField] protected Hitstop _hitstop;
@@ -42,6 +45,7 @@ namespace Combat
                 if (animationTimer < cancelAnimationTime)
                 {
                     AttackCommand();
+                    CombatManager.Instance.PlayerAttackSoundArea(transform.position, soundAreaRadius);
                 }
             }
         }

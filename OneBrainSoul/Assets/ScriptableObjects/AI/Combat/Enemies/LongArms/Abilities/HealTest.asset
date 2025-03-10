@@ -141,6 +141,13 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    objectWithParticleSystem: {fileID: 8238923372935108368, guid: 7e9e09a5bbc6aef4fba45945f7a1b85a,
+      type: 3}
+    relativePositionForParticles: {x: 0, y: 0, z: 0}
+  abilityMovement:
+    makesBezierCurves: 0
+    positions: []
+    timeBetweenPositions: []
   doesItTriggerOnTriggerEnter: 0
   doesItTriggerOnTriggerExit: 0
   abilityProjectile:
@@ -151,6 +158,9 @@ MonoBehaviour:
     projectileSpeed: 60
     instances: 30
     maximumDispersion: 5
+    objectWithParticleSystem: {fileID: 5574815293590225142, guid: bf3e7f459d4e8df45a792ea19c5b69aa,
+      type: 3}
+    relativePositionForParticles: {x: 0, y: 0, z: 0}
     doesVanishOnImpact: 0
     doesVanishOverTime: 0
     timeToVanish: 0
