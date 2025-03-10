@@ -141,5 +141,13 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  abilityMovement:
+    makesBezierCurves: 0
+    positions:
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    timeBetweenPositions:
+    - 0
+    - 0
   doesItTriggerOnTriggerEnter: 1
   doesItTriggerOnTriggerExit: 0

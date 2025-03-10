@@ -22,9 +22,6 @@ namespace ECS.Entities.AI.Combat
         private Func<bool> _cancelSlamFunc = () => false;
 
         private float _rotationSpeedWhenCastingSlam;
-
-        private GameObject _testDestination;
-        private GameObject _testRotateDestination;
         
         private void Start()
         {
@@ -44,9 +41,6 @@ namespace ECS.Entities.AI.Combat
             GetNavMeshAgentComponent().GetAStarPath().SetOnReachDestination(_context.SetHasReachedDestination);
             
             CombatManager.Instance.AddEnemy(this);
-
-            _testDestination = new GameObject("TEST_DESTINATION");
-            _testRotateDestination = new GameObject("TEST_ROTATION_DESTINATION");
 
             _startPosition = transform.position;
         }
@@ -126,14 +120,11 @@ namespace ECS.Entities.AI.Combat
                 StopNavigation();
                 SetDirectionToRotateBody(vectorToTarget);
                 ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
-                _testDestination.transform.position = GetNavMeshAgentComponent().GetAStarPath().destination;
-                _testRotateDestination.transform.position = transform.position + GetDirectionToRotateBody() * 3;
                 return;
             }
             
             _agentSlot = agentSlotPosition.agentSlot;
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
-            _testDestination.transform.position = GetNavMeshAgentComponent().GetAStarPath().destination;
         }
 
         private Vector3 _startPosition;

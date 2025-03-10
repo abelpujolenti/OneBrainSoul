@@ -141,10 +141,14 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  abilityMovement:
+    makesBezierCurves: 0
+    positions: []
+    timeBetweenPositions: []
   doesItTriggerOnTriggerEnter: 0
   doesItTriggerOnTriggerExit: 0
   abilityProjectile:
-    projectilePrefab: {fileID: 5930364971465029039, guid: 61a7ac1bf6057534d8aab30f6f4b1fa1,
+    projectilePrefab: {fileID: 3800350742969002482, guid: ec71cec977754184db3209642af2f048,
       type: 3}
     relativePositionToCaster: {x: 0, y: 2, z: 5}
     makesParabola: 0

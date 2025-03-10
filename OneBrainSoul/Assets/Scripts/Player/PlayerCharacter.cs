@@ -229,12 +229,22 @@ namespace Player
 
         public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {
+            if (!_playerCharacterController.CanBeDisplaced())
+            {
+                return;
+            }
+            
             base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength, sourcePosition);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 
         public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
         {
+            if (!_playerCharacterController.CanBeDisplaced())
+            {
+                return;
+            }
+            
             base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength, sourcePosition);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }

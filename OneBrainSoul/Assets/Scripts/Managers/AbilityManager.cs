@@ -191,9 +191,8 @@ namespace Managers
             for (int i = 0; i < abilityProjectile.instances; i++)
             {
                 projectiles.Add(InstantiateProjectile<TAreaAbilityComponent, TAbilityCollider>(basicAbilityComponent, 
-                    areaAbilityComponent, abilityProjectile.projectileSpeed,
-                    abilityProjectile.projectilePrefab, 
-                    abilityProjectile.makesParabola));
+                    areaAbilityComponent, abilityProjectile.projectileSpeed, abilityProjectile.projectilePrefab, 
+                    abilityProjectile.objectWithParticleSystem, abilityProjectile.makesParabola));
             }
 
             return new ProjectileAbility(basicAbilityComponent, projectiles, parentTransform, 
@@ -206,11 +205,13 @@ namespace Managers
 
         private Projectile InstantiateProjectile<TAreaAbilityComponent, TAbilityCollider>
             (BasicAbilityComponent basicAbilityComponent, TAreaAbilityComponent areaAbilityComponent, float projectileSpeed, 
-                GameObject projectilePrefab, bool makesAParabola)
+                GameObject projectilePrefab, GameObject particleObjectPrefab, bool makesAParabola)
                 where TAbilityCollider : AbilityAoECollider<TAreaAbilityComponent>
                 where TAreaAbilityComponent : AreaAbilityComponent
         {
             GameObject projectileObject = Instantiate(projectilePrefab);
+
+            Instantiate(particleObjectPrefab, projectileObject.transform);
             
             Projectile projectile = projectileObject.GetComponent<Projectile>();
 
