@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 7329697106141931807}
-  _damageParticlePrefab: {fileID: 1782360678715371482, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
+  _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
     type: 3}
   _showMessages: 0
   _visionAreas:

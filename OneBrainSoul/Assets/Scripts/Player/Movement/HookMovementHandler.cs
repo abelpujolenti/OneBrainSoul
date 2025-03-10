@@ -39,12 +39,14 @@ namespace Player.Movement
         bool smash = false;
         Vector3 movementDirection = Vector3.zero;
         LineRenderer line;
-        Transform particle;
+        Transform hookParticleTransform;
+        ParticleSystem smashParticle;
 
-        public HookMovementHandler(LineRenderer lineRenderer, Transform particleTransform, Hitstop hitstop)
+        public HookMovementHandler(LineRenderer lineRenderer, ParticleSystem smashParticle, Transform hookParticle, Hitstop hitstop)
         {
             line = lineRenderer;
-            particle = particleTransform;
+            hookParticleTransform = hookParticle;
+            this.smashParticle = smashParticle;
             _hitstop = hitstop;
         }
 
@@ -59,8 +61,9 @@ namespace Player.Movement
             line.enabled = true;
             line.positionCount = lineVertices;
             lineStartPos = GetLineStartPos(player);
-            particle.position = lineStartPos;
-            particle.gameObject.SetActive(true);
+            hookParticleTransform.position = lineStartPos;
+            hookParticleTransform.gameObject.SetActive(true);
+            hookParticleTransform.GetComponent<ParticleSystem>().Play();
         }
 
         private Vector3 GetLineStartPos(PlayerCharacterController player)
@@ -81,7 +84,7 @@ namespace Player.Movement
             //line.SetPosition(0, lineStartPos);
 
             Vector3 lineEndPos = lineStartPos + (endVisualPos - lineStartPos) * Mathf.Pow(Mathf.Clamp01(delayTime / delay), 2f);
-            particle.transform.position = lineEndPos;
+            hookParticleTransform.transform.position = lineEndPos;
 
             if (delayTime < delay)
             {
@@ -94,8 +97,6 @@ namespace Player.Movement
         public void Move(PlayerCharacterController player)
         {
             float distanceToTarget = Vector3.Distance(endPos, player.transform.position);
-            
-            lineStartPos = player.transform.position + new Vector3(0f, 1f, 0f) + player.GetOrientation().right * 2f;
             //Throw hook
             if (delayTime < delay + delayHitImpact)
             {
@@ -162,25 +163,11 @@ namespace Player.Movement
             Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * (-playerCollider.height * 0.5f);
             Vector3 p2 = p1 + Vector3.up * playerCollider.height;
             if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.GetRigidbody().velocity.normalized, out hit, 
-                    player.GetRigidbody().velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), 
+                    player.GetRigidbody().velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayersWithoutAlly(), 
                     QueryTriggerInteraction.Ignore))
             {
                 if (smash)
                 {
-                    DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
-                    bool hitTerrain = destructibleTerrain != null;
-                    if (hitTerrain)
-                    {
-                        destructibleTerrain.Break(hit.point);
-                    }
-                    AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
-                    if (entity != null)
-                    {
-                        entity.OnReceiveDamage(smashDamage, hit.point, player.transform.position);
-                    }
-
-                    bool damaged = hitTerrain || entity != null;
-
                     Smash(player,hit);
                 }
                 Exit(player);
@@ -201,8 +188,8 @@ namespace Player.Movement
         private void Exit(PlayerCharacterController player)
         {
             line.enabled = false;
-            particle.gameObject.SetActive(false);
-            particle.position = GetLineStartPos(player);
+            hookParticleTransform.gameObject.SetActive(false);
+            hookParticleTransform.position = GetLineStartPos(player);
 
             if (!player.IsOnTheGround())
             {
@@ -218,7 +205,25 @@ namespace Player.Movement
         {
             player.GetCamera().ScreenShake(.2f, .8f);
 
-            bool damaged = false;
+            DestructibleTerrain destructibleTerrain = hit.collider.GetComponent<DestructibleTerrain>();
+            bool hitTerrain = destructibleTerrain != null;
+            if (hitTerrain)
+            {
+                destructibleTerrain.Break(hit.point);
+            }
+            AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
+            if (entity != null)
+            {
+                entity.OnReceiveDamage(smashDamage, hit.point, player.transform.position);
+            }
+
+            bool damaged = hitTerrain || entity != null;
+
+            var em = smashParticle.emission;
+            var b = em.GetBurst(0);
+            b.count = damaged ? 20 : 8;
+            em.SetBurst(0, b);
+            smashParticle.Play();
 
             PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
             AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);

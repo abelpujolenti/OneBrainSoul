@@ -19,6 +19,7 @@ namespace Managers
                         player.UnlockHook();
                         player.UnlockWallClimb();
                         player.SetJumpsAmount(2);
+                        player.UnlockCharge();
                         break;
                     case KeyCode.F2:
                         player.SetMoveSpeedMultiplier(5f);

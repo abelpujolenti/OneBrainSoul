@@ -4,6 +4,7 @@ using ECS.Entities;
 using ECS.Entities.AI;
 using Managers;
 using Player.Camera;
+using Player.Effects;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,10 +14,14 @@ namespace Player
     {
         [SerializeField] private FirstPersonCamera _camera;
         [SerializeField] private PlayerCharacterController _playerCharacterController;
+        private Hitstop _hitstop;
 
         [SerializeField] private uint _maxHealth;
         [SerializeField] private float _agentsPositionRadius;
         [SerializeField] private float _damageEffectDuration;
+
+        [SerializeField] private float killHitstop = 0.15f;
+        [SerializeField] private float onDamageHitstop = 0.15f;
 
         private uint _areasDetecting = 0;
 
@@ -31,6 +36,9 @@ namespace Player
             _receiveDamageCooldown = GameManager.Instance.GetPlayerReceiveDamageCooldown();
 
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
+            _hitstop = GetComponent<Hitstop>();
+
+            EventsManager.OnAgentDefeated += DefeatAgent;
 
             _height = capsuleCollider.height;
             _radius = capsuleCollider.radius;
@@ -38,6 +46,16 @@ namespace Player
             Setup(_radius + _agentsPositionRadius, EntityType.PLAYER);
             
             CombatManager.Instance.AddPlayer(this);
+        }
+
+        private void OnDestroy()
+        {
+            EventsManager.OnAgentDefeated -= DefeatAgent;
+        }
+
+        public void DefeatAgent(uint id)
+        {
+            _hitstop.Add(killHitstop);
         }
 
         public void RechargeHookCharge()
@@ -67,6 +85,7 @@ namespace Player
             
             PostProcessingManager.Instance.DamageEffect(_damageEffectDuration);
             _camera.ScreenShake(_damageEffectDuration * 0.65f, .9f);
+            _hitstop.Add(onDamageHitstop);
             
             StartCoroutine(DecreaseDamageCooldown());
         }
