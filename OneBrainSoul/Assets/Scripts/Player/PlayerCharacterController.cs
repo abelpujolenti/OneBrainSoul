@@ -80,8 +80,9 @@ namespace Player
         [SerializeField] private WallClimbAbility _wallClimbAbility;
         [SerializeField] private HookAbility _hookAbility;
         [SerializeField] private LineRenderer _hookLineRenderer;
-        [SerializeField] private Transform _hookParticle;
+        [SerializeField] private Transform _hookParticleTransform;
         [SerializeField] private ParticleSystem _trailParticle;
+        [SerializeField] private ParticleSystem _smashParticle;
         [SerializeField] HookUI _hookUI;
 
         [Range(1, 7)]
@@ -112,7 +113,7 @@ namespace Player
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
 
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
-            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, _hookParticle, GetComponent<Hitstop>());
+            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, _smashParticle, _hookParticleTransform, GetComponent<Hitstop>());
             _hookAbility.Setup(_hookLineRenderer);
 
             _hookCharges = _maxHookCharges;
@@ -255,7 +256,7 @@ namespace Player
             if (_movementHandler is not HookMovementHandler)
             {
                 Vector3 particlePos = transform.position + new Vector3(0f, 1f, 0f) + GetOrientation().right * -1.5f;
-                _hookParticle.position = particlePos;
+                _hookParticleTransform.position = particlePos;
             }
 
             if (!_onGround) return;
@@ -473,7 +474,7 @@ namespace Player
             _airborneMovementHandler.ResetValues();
             _movementHandler = _airborneMovementHandler;
             _hookLineRenderer.enabled = false;
-            _hookParticle.gameObject.SetActive(false);
+            _hookParticleTransform.gameObject.SetActive(false);
             //_movementHandler = new AirborneMovementHandler();
             _canBeDisplaced = true;
         }

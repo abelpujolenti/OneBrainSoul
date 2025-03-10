@@ -367,8 +367,8 @@ namespace ECS.Entities.AI.Combat
             }
             
             DamageEffect(hitPosition);
-            
-            _material.SetColor("_DamageColor", new Color(1,0,0));
+
+            StartCoroutine(DamageEffectCoroutine(.4f));
             
             SetHealth(_context.GetHealth() - damageValue);
 
@@ -379,6 +379,21 @@ namespace ECS.Entities.AI.Combat
             }
 
             Destroy(gameObject);
+        }
+
+        private IEnumerator DamageEffectCoroutine(float duration)
+        {
+            Material matInstance = GetComponent<MeshRenderer>().material;
+
+            float t = 0f;
+            while (t < duration)
+            {
+                float p = 1f - t / duration;
+                matInstance.SetFloat("_DamageT", Mathf.Pow(p, 0.75f));
+                yield return new WaitForFixedUpdate();
+                t += Time.fixedDeltaTime;
+            }
+            matInstance.SetFloat("_DamageT", 0f);
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)
