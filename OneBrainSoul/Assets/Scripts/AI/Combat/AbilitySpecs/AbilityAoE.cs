@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AI.Combat.AbilitySpecs
 {
@@ -48,5 +49,8 @@ namespace AI.Combat.AbilitySpecs
         public AnimationCurve XScaleChangeOverTime = new AnimationCurve();
         public AnimationCurve YScaleChangeOverTime = new AnimationCurve();
         public AnimationCurve ZScaleChangeOverTime = new AnimationCurve();
+
+        public GameObject objectWithParticleSystem;
+        public Vector3 relativePositionForParticles;
     }
 }

@@ -9,7 +9,6 @@ using AI.Combat.Steering;
 using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using Managers;
-using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 using Utilities;
@@ -22,8 +21,6 @@ namespace ECS.Entities.AI.Combat
         where TAction : Enum
     {
         [SerializeField] protected NavMeshAgentSpecs _navMeshAgentSpecs;
-
-        [SerializeField] private NavMeshSurface _navMeshSurface;
 
         [SerializeField] protected NavMeshAgent _navMeshAgent;
         
@@ -44,14 +41,15 @@ namespace ECS.Entities.AI.Combat
 
         protected int _raysTargetsLayerMask;
 
-        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, EntityType entityType)
+        protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, 
+            EntityType entityType, EntityType targetEntities)
         {
-            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType);
+            base.EnemySetup(radius, freeMobilityEnemyProperties, entityType, targetEntities);
             
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
             _navMeshAgent.speed = _navMeshAgentSpecs.movementSpeed;
-            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent());
+            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent(), RotateBody);
             
             ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
         }
@@ -103,11 +101,13 @@ namespace ECS.Entities.AI.Combat
         protected void ContinueNavigation()
         {
             _navMeshAgent.isStopped = false;
+            _context.SetHasStopped(false);
         }
 
         protected void StopNavigation()
         {
             _navMeshAgent.isStopped = true;
+            _context.SetHasStopped(true);
         }
 
         protected void RotateInSitu()
@@ -135,6 +135,8 @@ namespace ECS.Entities.AI.Combat
 
             _isRotating = true;
             
+            BlockFSM();
+            
             StopNavigation();
             
             StartCoroutine(RotateToGivenPositionCoroutine());
@@ -142,7 +144,7 @@ namespace ECS.Entities.AI.Combat
 
         private IEnumerator RotateToGivenPositionCoroutine()
         {
-            while (Vector3.Angle(transform.forward, GetDirectionToRotateBody()) >= 5f)
+            while (Vector3.Dot(transform.forward, GetDirectionToRotateBody()) < 0.99f)
             {
                 RotateBody();
                 yield return null;
@@ -150,21 +152,9 @@ namespace ECS.Entities.AI.Combat
             
             _isRotating = false;
             
+            UnblockFSM();
+            
             ContinueNavigation();
-        }
-
-        protected Vector3 ReturnValidPositionInNavMesh()
-        {
-            Vector3 randomPosition = Vector3.down;
-            Vector3 sampledPosition;
-
-            do
-            {
-                
-                
-            } while (!SampleSurfacePosition(randomPosition, out sampledPosition));
-
-            return sampledPosition;
         }
 
         private bool SampleSurfacePosition(Vector3 position, out Vector3 sampledPosition)
@@ -187,6 +177,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override void OnEndInvestigation()
         {
+            base.OnEndInvestigation();
             //TODO FREE MOBILITY ENEMY CHOOSE NEW POINT TO PATROL
         }
 
@@ -224,9 +215,7 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Triface " + GetAgentID() + " Patrolling");
             
-            //SetDestination(new VectorComponent(ReturnValidPositionInNavMesh()));
-
-            //TODO TRIFACE PATROL
+            //TODO TRIFACE PATROL, TODO POINTS OF PATROL
         }
 
         protected override void InvestigateArea()
@@ -236,12 +225,20 @@ namespace ECS.Entities.AI.Combat
             
             base.InvestigateArea();
         }
-        
+
+        protected void GoToClosestSightedTarget()
+        {
+            ShowDebugMessages("Triface " + GetAgentID() + " Going To Closest Sighted Target");
+            
+            SetDestination(CombatManager.Instance.ReturnClosestAgentEntity(transform.position, _targetsSightedInsideCombatArea)
+                .GetTransformComponent());
+        }
+
         #endregion
 
-        public override void OnReceiveSlow(uint slowID, uint slowPercent)
+        public override void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition)
         {
-            base.OnReceiveSlow(slowID, slowPercent);
+            base.OnReceiveSlow(slowID, slowPercent, sourcePosition);
             
             //TODO SLOW FREE MOBILITY
         }
@@ -252,7 +249,7 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
         }
 
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
             if (ECSNavigationManager.Instance == null)
             {
@@ -301,7 +298,7 @@ namespace ECS.Entities.AI.Combat
 
         private Vector3 Up(Vector3 position)
         {
-            return new Vector3(position.x, position.y + 0, position.z);
+            return new Vector3(position.x, position.y + 5, position.z);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using FMOD.Studio;
 using FMODUnity;
 using Player.Abilities;
@@ -6,6 +7,7 @@ using Player.Effects;
 using Player.Movement;
 using TMPro;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 namespace Player
@@ -48,6 +50,7 @@ namespace Player
         private bool _ability1Input;
         private bool _ability2Input;
         private bool _inCombat;
+        private bool _canBeDisplaced = false;
 
         private float _ability1Time;
         private float _ability2Time;
@@ -64,6 +67,7 @@ namespace Player
         [SerializeField] private Transform _hand;
         [SerializeField] private GameObject _display;
         [SerializeField] private Canvas _uiCanvas;
+        [SerializeField] private Canvas _uiCrosshairCanvas;
         [SerializeField] private Canvas _hookCanvas;
         [SerializeField] private TextMeshProUGUI _crosshair;
 
@@ -76,6 +80,9 @@ namespace Player
         [SerializeField] private WallClimbAbility _wallClimbAbility;
         [SerializeField] private HookAbility _hookAbility;
         [SerializeField] private LineRenderer _hookLineRenderer;
+        [SerializeField] private Transform _hookParticleTransform;
+        [SerializeField] private ParticleSystem _trailParticle;
+        [SerializeField] private ParticleSystem _smashParticle;
         [SerializeField] HookUI _hookUI;
 
         [Range(1, 7)]
@@ -98,6 +105,7 @@ namespace Player
             _camera.Setup();
             _display.SetActive(false);
             _movementHandler = new GroundedMovementHandler();
+            _uiCrosshairCanvas.gameObject.SetActive(true);
             _uiCanvas.gameObject.SetActive(true);
             _startPos = transform.position;
 
@@ -105,7 +113,7 @@ namespace Player
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
 
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
-            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer);
+            _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, _smashParticle, _hookParticleTransform, GetComponent<Hitstop>());
             _hookAbility.Setup(_hookLineRenderer);
 
             _hookCharges = _maxHookCharges;
@@ -116,12 +124,12 @@ namespace Player
         {
             CheckGround();
             CheckInput();
-            HandWobble();
+            HandUpdate();
             CalculateAirTime();
             CalculateCooldowns();
             UpdateCharges();
         }
-    
+
         private void FixedUpdate()
         {        
             if (_movementHandler.ShouldGravityApply(this))
@@ -174,7 +182,7 @@ namespace Player
 
         private void VoidReturn()
         {
-            if (transform.position.y < -30f)
+            if (transform.position.y < -100f)
             {
                 transform.position = _startPos;
             }
@@ -218,17 +226,17 @@ namespace Player
             _yInput = Input.GetAxis("Vertical");
             _jumpInput = Input.GetButton("Jump");
             _ability1Input = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            _ability2Input = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Return);
+            _ability2Input = Input.GetMouseButton(1) || Input.GetKey(KeyCode.Return);
 
             if (_isDashUnlocked)
             {
                 _dashAbility.CheckDash(this, _ability1Input);
             }
 
-            if (_isChargeUnlocked)
+            /*if (_isChargeUnlocked)
             {
                 _chargeAbility.CheckCharge(this, _ability1Input);
-            }
+            }*/
 
             if (_isHookUnlocked)
             {
@@ -243,8 +251,14 @@ namespace Player
             //
         }
 
-        private void HandWobble()
+        private void HandUpdate()
         {
+            if (_movementHandler is not HookMovementHandler)
+            {
+                Vector3 particlePos = transform.position + new Vector3(0f, 1f, 0f) + GetOrientation().right * -1.5f;
+                _hookParticleTransform.position = particlePos;
+            }
+
             if (!_onGround) return;
             Vector3 wandPos = new Vector3(Mathf.Sin(Time.time * 5f), Mathf.Sin(Time.time * 6f));
             float wobbleMagnitude = Mathf.Clamp(_rigidbody.velocity.magnitude / 25f, 0f, 1f);
@@ -253,7 +267,7 @@ namespace Player
         }
 
         private void CalculateAirTime()
-        {
+        {            
             if (!_onGround)
             {
                 _airTime += Time.deltaTime;
@@ -261,12 +275,24 @@ namespace Player
                 {
                 }
             }
+            else
+            {
+                _airTime = 0f;
+            }
+
+            var em = _trailParticle.emission;
+            em.rateOverDistance = Mathf.Max(0f, 12 - _airTime * 50f);
         }
 
         private void CalculateCooldowns()
         {
             _ability1Time = Mathf.Max(0f, _ability1Time - Time.deltaTime);
             _ability2Time = Mathf.Max(0f, _ability2Time - Time.deltaTime);
+        }
+
+        public void AddHookCharge(int amount = 1)
+        {
+            _hookCharges = Math.Min(_hookCharges + amount, _maxHookCharges);
         }
 
         private void UpdateCharges()
@@ -405,6 +431,10 @@ namespace Player
             _ability2Time = _ability2Cooldown;
         }
 
+        public void SetInCombat(bool c)
+        {
+            _inCombat = c;
+        }
         public bool IsInCombat()
         {
             return _inCombat;
@@ -436,13 +466,17 @@ namespace Player
         {
             _groundedMovementHandler.ResetValues();
             _movementHandler = _groundedMovementHandler;
+            _canBeDisplaced = true;
         }
 
         public void ChangeMovementHandlerToAirborne()
         {
             _airborneMovementHandler.ResetValues();
             _movementHandler = _airborneMovementHandler;
+            _hookLineRenderer.enabled = false;
+            _hookParticleTransform.gameObject.SetActive(false);
             //_movementHandler = new AirborneMovementHandler();
+            _canBeDisplaced = true;
         }
 
         public void SetHorizontalDrag(float drag)
@@ -455,13 +489,15 @@ namespace Player
             _chargeMovementHandler.Setup(this, _orientation.forward);
             _chargeMovementHandler.ResetValues();
             _movementHandler = _chargeMovementHandler;
+            _canBeDisplaced = false;
         }
 
         public void ChangeMovementHandlerToHook(Vector3 startPos, Vector3 endPos, Vector3 endVisualPos, bool snap, bool smash)
         {
-            _hookMovementHandler.Setup(startPos, endPos, endVisualPos, snap, smash);
+            _hookMovementHandler.Setup(this, startPos, endPos, endVisualPos, snap, smash);
             _hookMovementHandler.ResetValues();
             _movementHandler = _hookMovementHandler;
+            _canBeDisplaced = false;
         }
 
         public void ChangeMovementHandlerToDash(Vector3 dashDirection)
@@ -500,6 +536,16 @@ namespace Player
         public void SetMoveSpeedMultiplier(float moveSpeedMultiplier)
         {
             _moveSpeedMultiplier = moveSpeedMultiplier;
+        }
+
+        public void SetDisplaceability(bool d)
+        {
+            _canBeDisplaced = d;
+        }
+
+        public bool CanBeDisplaced()
+        {
+            return _canBeDisplaced;
         }
     }
 }

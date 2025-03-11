@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Player;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +7,7 @@ public class HpBar : MonoBehaviour
     [SerializeField] Sprite[] faceSprites;
     [SerializeField] Image fill;
     [SerializeField] Image face;
-    [SerializeField] Player.PlayerCharacter player;
+    [SerializeField] PlayerCharacter player;
     void Start()
     {
         

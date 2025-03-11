@@ -17,6 +17,14 @@ namespace Editor.Enemies
 
             EditorGUI.indentLevel++;
             
+            UintField(ref trifaceProperties.maximumHeadYawRotation, 0, "Maximum Head Yaw Rotation");
+            
+            UintField(ref trifaceProperties.maximumHeadPitchUpRotation, 0, "Maximum Head Pitch Up Rotation");
+            
+            UintField(ref trifaceProperties.maximumHeadPitchDownRotation, 0, "Maximum Head Pitch Down Rotation");
+            
+            FloatField(ref trifaceProperties.headRotationSpeed, 1, "Head Rotation Speed");
+            
             FloatField(ref trifaceProperties.bodyNormalRotationSpeed, 1, "Body Normal Rotation Speed");
 
             EditorGUI.indentLevel--;

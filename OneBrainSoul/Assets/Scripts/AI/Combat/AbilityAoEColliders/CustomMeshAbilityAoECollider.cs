@@ -38,6 +38,10 @@ namespace AI.Combat.AbilityAoEColliders
                     Vector3 newSize = _gameObject.transform.localScale;
                     newSize.x = ReturnSizeOverTime(time, _XRescaleCurve);
                     _gameObject.transform.localScale = newSize;
+
+                    Vector3 scale = _childWithParticleSystem.transform.localScale;
+                    scale.x = newSize.x / _XRescaleCurve.keys[0].value;
+                    _childWithParticleSystem.transform.localScale = scale;
                 };
             }
 
@@ -51,6 +55,10 @@ namespace AI.Combat.AbilityAoEColliders
                         Vector3 newSize = _gameObject.transform.localScale;
                         newSize.y = ReturnSizeOverTime(time, _YRescaleCurve);
                         _gameObject.transform.localScale = newSize;
+
+                        Vector3 scale = _childWithParticleSystem.transform.localScale;
+                        scale.y = newSize.y / _YRescaleCurve.keys[0].value;
+                        _childWithParticleSystem.transform.localScale = scale;
                     };    
                 }
                 else
@@ -60,6 +68,10 @@ namespace AI.Combat.AbilityAoEColliders
                         Vector3 newSize = _gameObject.transform.localScale;
                         newSize.y = ReturnSizeOverTime(time, _YRescaleCurve);
                         _gameObject.transform.localScale = newSize;
+
+                        Vector3 scale = _childWithParticleSystem.transform.localScale;
+                        scale.y = newSize.y / _YRescaleCurve.keys[0].value;
+                        _childWithParticleSystem.transform.localScale = scale;
                     }; 
                 }
                 
@@ -79,6 +91,10 @@ namespace AI.Combat.AbilityAoEColliders
                     Vector3 newSize = _gameObject.transform.localScale;
                     newSize.z = ReturnSizeOverTime(time, _ZRescaleCurve);
                     _gameObject.transform.localScale = newSize;
+
+                    Vector3 scale = _childWithParticleSystem.transform.localScale;
+                    scale.z = newSize.z / _ZRescaleCurve.keys[0].value;
+                    _childWithParticleSystem.transform.localScale = scale;
                 };
                 return;
             }
@@ -88,6 +104,10 @@ namespace AI.Combat.AbilityAoEColliders
                 Vector3 newSize = _gameObject.transform.localScale;
                 newSize.z = ReturnSizeOverTime(time, _ZRescaleCurve);
                 _gameObject.transform.localScale = newSize;
+
+                Vector3 scale = _childWithParticleSystem.transform.localScale;
+                scale.z = newSize.z / _ZRescaleCurve.keys[0].value;
+                _childWithParticleSystem.transform.localScale = scale;
             };
         }
     }

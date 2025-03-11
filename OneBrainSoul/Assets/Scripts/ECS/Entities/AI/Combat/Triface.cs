@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
-using AI.Combat.Contexts.Target;
 using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
 using AI.Combat.ScriptableObjects;
+using ECS.Components.AI.Navigation;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
@@ -17,11 +16,10 @@ namespace ECS.Entities.AI.Combat
     public class Triface : FreeMobilityEnemy<TrifaceContext, TrifaceAction>
     {
         [SerializeField] private TrifaceProperties _trifaceProperties;
-
+        
         private IAreaAbility _slamAbility;
         private HashSet<uint> _visibleTargetsForSlamAbility;
         private Func<bool> _cancelSlamFunc = () => false;
-        private Stopwatch _timeElapsedSinceTheLastSeenOfSlamTarget = new Stopwatch();
 
         private float _rotationSpeedWhenCastingSlam;
         
@@ -30,7 +28,7 @@ namespace ECS.Entities.AI.Combat
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
             
-            EnemySetup(radius, _trifaceProperties, EntityType.TRIFACE);
+            EnemySetup(radius, _trifaceProperties, EntityType.TRIFACE, _trifaceProperties.slamAbilityProperties.abilityTarget);
 
             _utilityFunction = new TrifaceUtilityFunction();
 
@@ -43,6 +41,8 @@ namespace ECS.Entities.AI.Combat
             GetNavMeshAgentComponent().GetAStarPath().SetOnReachDestination(_context.SetHasReachedDestination);
             
             CombatManager.Instance.AddEnemy(this);
+
+            _startPosition = transform.position;
         }
 
         protected override void InitiateDictionaries()
@@ -53,14 +53,16 @@ namespace ECS.Entities.AI.Combat
                 { TrifaceAction.ROTATE , RotateInSitu },
                 { TrifaceAction.PATROL , Patrol },
                 { TrifaceAction.INVESTIGATE_AREA , InvestigateArea },
+                { TrifaceAction.GO_TO_CLOSEST_SIGHTED_TARGET , GoToClosestSightedTarget },
                 { TrifaceAction.ACQUIRE_NEW_TARGET_FOR_SLAM , AcquireNewTargetForSlam },
-                { TrifaceAction.LOSE_TARGET , LoseTarget },
                 { TrifaceAction.SLAM , Slam }
             };
         }
 
         protected override void CreateAbilities()
         {
+            base.CreateAbilities();
+            
             _slamAbility = AbilityManager.Instance.ReturnAreaAbility(_trifaceProperties.slamAbilityProperties,
                 transform);
 
@@ -83,6 +85,8 @@ namespace ECS.Entities.AI.Combat
 
         private void Update()
         {
+            UpdateSightedTargetsInsideCombatArea();
+            
             UpdateVisibleTargets();
             
             UpdateVectorToTargets();
@@ -92,7 +96,7 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            RotateBody();
+            //RotateBody();
             
             //RotateHead();
                 
@@ -104,18 +108,41 @@ namespace ECS.Entities.AI.Combat
             {
                 return;
             }
+            
+            Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
                 
-            //TODO AGENT SLOTS
+            //TODO AQUI AGENT SLOTS WHEN NEAR
             AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
-                .GetAgentSlotPosition(_context.GetSlamTargetContext().GetVectorToTarget(), _context.GetRadius());
+                .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
 
             if (agentSlotPosition == null)
             {
+                StopNavigation();
+                SetDirectionToRotateBody(vectorToTarget);
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
                 return;
             }
-
+            
             _agentSlot = agentSlotPosition.agentSlot;
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
+        }
+
+        private Vector3 _startPosition;
+
+        protected override void UpdateSightedTargetsInsideCombatArea()
+        {
+            base.UpdateSightedTargetsInsideCombatArea();
+            
+            if (!_context.HasATargetForSlam() || _targetsSightedInsideCombatArea.Contains(_slamAbility.GetTargetId()))
+            {
+                return;
+            }
+            
+            ShowDebugMessages("Triface " + GetAgentID() + " Losing Target");
+            
+            _context.LoseSlamTarget();
+            
+            SetDestination(new VectorComponent(_startPosition));
         }
 
         protected override void UpdateVisibleTargets()
@@ -124,7 +151,7 @@ namespace ECS.Entities.AI.Combat
             
             _visibleTargetsForSlamAbility = CombatManager.Instance.ReturnVisibleTargets(
                 _trifaceProperties.slamAbilityProperties.abilityTarget, ownTransform.position, 
-                _context.GetSightMaximumDistance(), ownTransform.forward, _context.GetFov());
+                _targetsInsideVisionArea, _areaNumber);
             
             _context.SetIsSeeingATargetForSlam(_visibleTargetsForSlamAbility.Count != 0);
         }
@@ -133,13 +160,6 @@ namespace ECS.Entities.AI.Combat
         {
             if (!_context.HasATargetForSlam())
             {
-                return;
-            }
-
-            if (!_visibleTargetsForSlamAbility.Contains(_slamAbility.GetTargetId()))
-            {
-                _timeElapsedSinceTheLastSeenOfSlamTarget.Start();
-                _context.GetSlamTargetContext().OnLoseSightOfTarget();
                 return;
             }
 
@@ -158,8 +178,12 @@ namespace ECS.Entities.AI.Combat
             
             targetPosition.y -= _context.GetSlamTargetContext().GetTargetHeight() / 2;
             agentPosition.y -= _context.GetHeight() / 2;
+
+            Vector3 vectorToTarget = targetPosition - agentPosition;
             
-            _context.GetSlamTargetContext().SetVectorToTarget(targetPosition - agentPosition);
+            _context.GetSlamTargetContext().SetVectorToTarget(vectorToTarget);
+            
+            SetDirectionToRotateBody(vectorToTarget);
         }
 
         #endregion
@@ -180,30 +204,6 @@ namespace ECS.Entities.AI.Combat
             _slamAbility.SetTargetId(target.GetAgentID());
             
             SetDestination(target.GetTransformComponent());
-        }
-
-        private void LoseTarget()
-        {
-            ShowDebugMessages("Triface " + GetAgentID() + " Target Lost");
-            
-            //ContinueNavigation();
-
-            if (_context.IsSeeingATargetForSlam())
-            {
-                AcquireNewTargetForSlam();
-                return;
-            }
-            
-            _context.LoseSlamTarget();
-            
-            _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
-
-            TargetContext targetContext = _context.GetSlamTargetContext();
-
-            OnLoseSightOfTarget(targetContext.GetTargetPosition(), targetContext.GetTargetVelocity(),
-                _timeElapsedSinceTheLastSeenOfSlamTarget.ElapsedMilliseconds / 1000);
-            
-            _timeElapsedSinceTheLastSeenOfSlamTarget.Reset();
         }
 
         private void Slam()
@@ -263,7 +263,7 @@ namespace ECS.Entities.AI.Combat
             
             areaAbility.Activate();
             
-            //ContinueNavigation();
+            ContinueNavigation();
             
             StartCoroutine(StartCooldownCoroutine(areaAbility.GetCast()));
         }
@@ -275,24 +275,20 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            CombatManager.Instance.OnEnemyDefeated(this);
+            CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
-        
         
         /////////////////////////DEBUG
         
         [SerializeField] private bool _showDetectionAreaOfSlam;
         [SerializeField] private Color _colorOfDetectionAreaOfSlam;
 
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
-            Vector3 origin = _headTransform.position;
+            Vector3 origin = _bodyTransform.position;
             int segments = 20;
-
-            if (_showFov)
-            {
-                DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
-            }
+            
+            base.OnDrawGizmos();
             
             if (_showDetectionAreaOfSlam)
             {
@@ -301,4 +297,4 @@ namespace ECS.Entities.AI.Combat
             }
         }
     }
-}
+} 

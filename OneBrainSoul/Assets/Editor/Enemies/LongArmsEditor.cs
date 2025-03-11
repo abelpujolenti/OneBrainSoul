@@ -17,6 +17,14 @@ namespace Editor.Enemies
 
             EditorGUI.indentLevel++;
             
+            UintField(ref longArmsProperties.maximumHeadYawRotation, 0, "Maximum Head Yaw Rotation");
+            
+            UintField(ref longArmsProperties.maximumHeadPitchUpRotation, 0, "Maximum Head Pitch Up Rotation");
+            
+            UintField(ref longArmsProperties.maximumHeadPitchDownRotation, 0, "Maximum Head Pitch Down Rotation");
+            
+            FloatField(ref longArmsProperties.headRotationSpeed, 1, "Head Rotation Speed");
+            
             FloatField(ref longArmsProperties.bodyNormalRotationSpeed, 1, "Body Normal Rotation Speed");
             
             FloatField(ref longArmsProperties.minimumTimeBeforeSettingNewDirection, 0, "Minimum Time Before Setting New Direction");

@@ -12,14 +12,14 @@ namespace AI.Combat.AbilityAoEColliders
         private AnimationCurve _lengthResizeCurve;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            RectangularAbilityComponent sphericalAbilityComponent)
+            RectangularAbilityComponent rectangularAbilityComponent)
         {
-            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, sphericalAbilityComponent);
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, rectangularAbilityComponent);
             
             _boxCollider.size = new Vector3(
-                sphericalAbilityComponent.GetWidth(), 
-                sphericalAbilityComponent.GetHeight(), 
-                sphericalAbilityComponent.GetLength());
+                rectangularAbilityComponent.GetWidth(), 
+                rectangularAbilityComponent.GetHeight(), 
+                rectangularAbilityComponent.GetLength());
 
             /*Vector3 center = new Vector3
             {
@@ -30,28 +30,36 @@ namespace AI.Combat.AbilityAoEColliders
 
             _boxCollider.center = Vector3.zero;
             
-            if (sphericalAbilityComponent.GetAoE().doesHeightChangeOverTheTime)
+            if (rectangularAbilityComponent.GetAoE().doesHeightChangeOverTheTime)
             {
-                _heightResizeCurve = sphericalAbilityComponent.GetAoE().heightChangeOverTime;
+                _heightResizeCurve = rectangularAbilityComponent.GetAoE().heightChangeOverTime;
                 _actionResizing = time =>
                 {
                     Vector3 newSize = _boxCollider.size;
                     newSize.y = ReturnSizeOverTime(time, _heightResizeCurve);
                     _boxCollider.size = newSize;
+
+                    Vector3 scale = _childWithParticleSystem.transform.localScale;
+                    scale.y = newSize.y / _heightResizeCurve.keys[0].value;
+                    _childWithParticleSystem.transform.localScale = scale;
                 };
             }
 
-            if (sphericalAbilityComponent.GetAoE().doesWidthChangeOverTheTime)
+            if (rectangularAbilityComponent.GetAoE().doesWidthChangeOverTheTime)
             {
-                _widthResizeCurve = sphericalAbilityComponent.GetAoE().widthChangeOverTime;
+                _widthResizeCurve = rectangularAbilityComponent.GetAoE().widthChangeOverTime;
 
-                if (!sphericalAbilityComponent.GetAoE().doesHeightChangeOverTheTime)
+                if (!rectangularAbilityComponent.GetAoE().doesHeightChangeOverTheTime)
                 {
                     _actionResizing = time =>
                     {
                         Vector3 newSize = _boxCollider.size;
                         newSize.x = ReturnSizeOverTime(time, _widthResizeCurve);
                         _boxCollider.size = newSize;
+
+                        Vector3 scale = _childWithParticleSystem.transform.localScale;
+                        scale.x = newSize.x / _widthResizeCurve.keys[0].value;
+                        _childWithParticleSystem.transform.localScale = scale;
                     };
                 }
                 else
@@ -61,16 +69,20 @@ namespace AI.Combat.AbilityAoEColliders
                         Vector3 newSize = _boxCollider.size;
                         newSize.x = ReturnSizeOverTime(time, _widthResizeCurve);
                         _boxCollider.size = newSize;
+
+                        Vector3 scale = _childWithParticleSystem.transform.localScale;
+                        scale.x = newSize.x / _widthResizeCurve.keys[0].value;
+                        _childWithParticleSystem.transform.localScale = scale;
                     };
                 }
             }
 
-            if (!sphericalAbilityComponent.GetAoE().doesLengthChangeOverTheTime)
+            if (!rectangularAbilityComponent.GetAoE().doesLengthChangeOverTheTime)
             {
                 return;
             }
             
-            _lengthResizeCurve = sphericalAbilityComponent.GetAoE().lengthChangeOverTime;
+            _lengthResizeCurve = rectangularAbilityComponent.GetAoE().lengthChangeOverTime;
 
             if (_actionResizing.GetInvocationList().Length == 0)
             {
@@ -79,6 +91,10 @@ namespace AI.Combat.AbilityAoEColliders
                     Vector3 newSize = _boxCollider.size;
                     newSize.z = ReturnSizeOverTime(time, _lengthResizeCurve);
                     _boxCollider.size = newSize;
+
+                    Vector3 scale = _childWithParticleSystem.transform.localScale;
+                    scale.z = newSize.z / _lengthResizeCurve.keys[0].value;
+                    _childWithParticleSystem.transform.localScale = scale;
                 };
                 return;
             }
@@ -88,6 +104,10 @@ namespace AI.Combat.AbilityAoEColliders
                 Vector3 newSize = _boxCollider.size;
                 newSize.z = ReturnSizeOverTime(time, _lengthResizeCurve);
                 _boxCollider.size = newSize;
+
+                Vector3 scale = _childWithParticleSystem.transform.localScale;
+                scale.z = newSize.z / _lengthResizeCurve.keys[0].value;
+                _childWithParticleSystem.transform.localScale = scale;
             };
         }
     }

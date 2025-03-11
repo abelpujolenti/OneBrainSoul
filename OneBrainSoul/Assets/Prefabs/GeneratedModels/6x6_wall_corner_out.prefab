@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3650022275025175151}
   - component: {fileID: 357321985385217074}
   - component: {fileID: -7177322192273754325}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 6x6_wall_corner_out
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 91201e9d7af77684c864c534da05a7fe, type: 2}
+  - {fileID: 2100000, guid: 2696207f988fa3e4381cf44b5c16ff5d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

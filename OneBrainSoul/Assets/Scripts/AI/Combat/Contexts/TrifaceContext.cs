@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public class TrifaceContext : FreeMobilityEnemyContext, ITrifaceIdleUtility, 
-        ITrifaceAcquireNewTargetForSlamUtility, ITrifaceLoseTargetUtility, ITrifaceSlamUtility
+    public class TrifaceContext : FreeMobilityEnemyContext, ITrifaceIdleUtility, ITrifaceAcquireNewTargetForSlamUtility, 
+        ITrifaceSlamUtility
     {
         private bool _isSeeingATargetForSlam;
         private bool _slamAbilityHasATarget;
@@ -17,14 +17,15 @@ namespace AI.Combat.Contexts
         private TargetContext _slamTarget = new TargetContext();
         
         public TrifaceContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
+            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
             base(EntityType.TRIFACE, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
                 fov, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {
                 (uint)TrifaceAction.ROTATE,
-                (uint)TrifaceAction.PATROL
+                (uint)TrifaceAction.PATROL,
+                (uint)TrifaceAction.GO_TO_CLOSEST_SIGHTED_TARGET,
             };
 
             _slamCast = slamCast;
@@ -43,11 +44,6 @@ namespace AI.Combat.Contexts
         public bool HasATargetForSlam()
         {
             return _slamAbilityHasATarget;
-        }
-
-        public bool CanSeeTargetOfSlam()
-        {
-            return _slamTarget.CanSeeTarget();
         }
 
         public float GetSlamMinimumRangeToCast()
@@ -84,17 +80,18 @@ namespace AI.Combat.Contexts
             return _slamCast.minimumAngleToCast;
         }
 
-        public void LoseSlamTarget()
-        {
-            _slamAbilityHasATarget = false;
-        }
-
         public void SetSlamTargetProperties(float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
             _slamTarget.SetTargetProperties(targetRadius, targetHeight);
 
             _slamAbilityHasATarget = true;
+        }
+
+        public void LoseSlamTarget()
+        {
+            SetIsFighting(false);
+            _slamAbilityHasATarget = false;
         }
 
         public override bool IsSeeingATarget()

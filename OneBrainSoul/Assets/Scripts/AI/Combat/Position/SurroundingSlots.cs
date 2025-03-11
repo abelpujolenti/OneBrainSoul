@@ -15,18 +15,14 @@ namespace AI.Combat.Position
             _radiusFromAgent = radiusFromAgent;
         }
 
-        public AgentSlotPosition ReserveSubtendedAngle(uint agentID, Vector3 direction, float radius)
+        public AgentSlotPosition ReserveSubtendedAngle(uint agentID, Vector3 vectorFromTarget, float radius)
         {
-            if (_rivalSlots.ContainsKey(agentID) && direction.magnitude < _radiusFromAgent)
+            if (_rivalSlots.ContainsKey(agentID) && vectorFromTarget.magnitude - radius < _radiusFromAgent)
             {
-                return new AgentSlotPosition
-                {
-                    deviationVector = -direction,
-                    agentSlot = _rivalSlots[agentID]
-                };
+                return null;
             }
             
-            float angle = MathUtil.VectorXZToYAxisAngle(-direction);
+            float angle = MathUtil.VectorXZToYAxisAngle(-vectorFromTarget);
             float subtendedAngle = CalculateSubtendedAngle(radius) + 10;
 
             PriorityQueue<float> angles = new PriorityQueue<float>();

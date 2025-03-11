@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2292523668758255270}
   - component: {fileID: 5988477013890525012}
   - component: {fileID: -1834590546784561857}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 1x3_bordillo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8274133419916619345, guid: 4334f63b18322254b97f8d89e2d513a4, type: 3}
+  - {fileID: 2100000, guid: 4cdde8ecb85cd7942ba52b9d740e5964, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

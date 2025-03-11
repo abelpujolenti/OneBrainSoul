@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7518348376115011578}
   - component: {fileID: 358602183896936899}
   m_Layer: 0
-  m_Name: LongArmsBase
+  m_Name: LongarmsBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3033667219593020291, guid: 3a2b0c60566495844862a7643f5ce286, type: 3}
+  - {fileID: 2100000, guid: d3dcfd59f7b574647a2e953938b9ff08, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -148,12 +148,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 7518348376115011578}
-  _damageParticlePrefab: {fileID: 1782360678715371482, guid: cbf24b761ccd9ea4da8983e892c9a1d5,
+  _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
     type: 3}
   _showMessages: 0
   _material: {fileID: -3033667219593020291, guid: 3a2b0c60566495844862a7643f5ce286,
     type: 3}
-  _totalHealth: 20
+  _totalHealth: 18
   _radius: 2.5
   _height: 2
   _agentPositionRadius: 1

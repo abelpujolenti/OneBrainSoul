@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7243523282608894983}
   - component: {fileID: 2200176267921715963}
   - component: {fileID: 5311007484656972950}
-  - component: {fileID: 5859013161781758583}
-  m_Layer: 0
+  - component: {fileID: 3331620357388494093}
+  m_Layer: 6
   m_Name: 5x3_bordillo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8274133419916619345, guid: 4334f63b18322254b97f8d89e2d513a4, type: 3}
+  - {fileID: 2100000, guid: 4cefa48951dcde24783a04133e4c6248, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &5859013161781758583
-MeshCollider:
+--- !u!65 &3331620357388494093
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,7 +102,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2432090755550338912, guid: bdc514e7d7fef554da8548287e9ca40f, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 3, z: 5}
+  m_Center: {x: 0.05, y: 1.5, z: -2.5}

@@ -12,13 +12,17 @@ namespace ECS.Components.AI.Navigation
         private TransformComponent _transformComponent;
         private NavMeshAgent _agent;
         private AStarPath _aStarPath;
+        private Action _rotateBody;
+        public bool isGoingBackwards;
 
-        public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, TransformComponent transformComponent)
+        public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, TransformComponent transformComponent, 
+            Action rotateBody)
         {
             _navMeshAgentSpecs = navMeshAgentSpecs;
             _agent = agent;
             _transformComponent = transformComponent;
             _aStarPath = new AStarPath(_transformComponent);
+            _rotateBody = rotateBody;
         }
 
         public NavMeshAgent GetNavMeshAgent()
@@ -39,6 +43,11 @@ namespace ECS.Components.AI.Navigation
         public void SetAStarPathDestination(IPosition iPosition)
         {
             _aStarPath.destinationPosition = iPosition;
+        }
+
+        public void CallRotateBody()
+        {
+            _rotateBody();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace ECS.Systems.AI.Navigation
             aStarPath.path = AStarPathFindingAlgorithm.OptimizePath(newPath, aStarPath.origin, 
                 aStarPath.navMeshGraph.nodes, triangleSideLength);
             
-            aStarPath.path.RemoveAt(0);
+            /*aStarPath.path.RemoveAt(0);
 
             if (aStarPath.path.Count < 2)
             {
@@ -32,7 +32,7 @@ namespace ECS.Systems.AI.Navigation
             {
                 return;
             }
-            aStarPath.path.RemoveAt(aStarPath.path.Count - 2);
+            aStarPath.path.RemoveAt(aStarPath.path.Count - 2);*/
         }
     }
 }

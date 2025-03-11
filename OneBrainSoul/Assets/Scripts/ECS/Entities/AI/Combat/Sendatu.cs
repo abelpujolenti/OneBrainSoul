@@ -22,7 +22,7 @@ namespace ECS.Entities.AI.Combat
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             float radius = capsuleCollider.radius;
             
-            EnemySetup(radius, _sendatuProperties, EntityType.LONG_ARMS);
+            EnemySetup(radius, _sendatuProperties, EntityType.SENDATU, EntityType.SENDATU);
 
             _utilityFunction = new SendatuUtilityFunction();
 
@@ -254,13 +254,15 @@ namespace ECS.Entities.AI.Combat
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            CombatManager.Instance.OnEnemyDefeated(this);
+            CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
 
-        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition)
         {}
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength)
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition)
         {}
     }
 }

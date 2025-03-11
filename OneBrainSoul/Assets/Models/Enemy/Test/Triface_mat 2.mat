@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Triface_mat 2
-  m_Shader: {fileID: 4800000, guid: f9e13083542b4854785883541e969b81, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0fc100ce7c916be45897f4c763782efc, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -103,6 +103,8 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _DamageT: 0
+    - _DamageTick: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -124,8 +126,8 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _UseAoMap: 0
-    - _UseColorMap: 1
-    - _UseEmissiveMap: 1
+    - _UseColorMap: 0
+    - _UseEmissiveMap: 0
     - _UseMetallicMap: 1
     - _UseNormalMap: 1
     - _UseRoughnessMap: 1
@@ -133,9 +135,10 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0, g: 1, b: 0.10675144, a: 1}
+    - _Color: {r: 1, g: 0, b: 0.79116774, a: 1}
     - _Color_1: {r: 1, g: 1, b: 1, a: 0}
-    - _DamageColor: {r: 1, g: 1, b: 1, a: 0}
+    - _DamageColor: {r: 0.42830187, g: 0.87643176, b: 1, a: 1}
+    - _DamageTint: {r: 0.3875293, g: 0.17999998, b: 0.9, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _UvOffset: {r: 0, g: 0, b: 0, a: 0}

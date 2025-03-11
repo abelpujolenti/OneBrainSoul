@@ -9,8 +9,7 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public class LongArmsContext : TeleportMobilityEnemyContext, ILongArmsIdleUtility, ILongArmsAcquireNewTargetForThrowRockUtility, 
-        ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsLoseTargetUtility, ILongArmsThrowRockUtility, 
-        ILongArmsClapAboveUtility, ILongArmsFleeUtility
+        ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsThrowRockUtility, ILongArmsClapAboveUtility, ILongArmsFleeUtility
     {
         private Dictionary<uint, float> _distancesToTargetsToFleeFrom;
         private uint _longArmsBasesFree;
@@ -27,13 +26,14 @@ namespace AI.Combat.Contexts
         private TargetContext _clapAboveTarget = new TargetContext();
         
         public LongArmsContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, float fov, Transform headAgentTransform, Transform bodyAgentTransform, 
+            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, 
             AbilityCast throwRockCast, AbilityCast clapAboveCast, float radiusToFlee) : base(EntityType.LONG_ARMS, 
             totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, fov, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {
                 (uint)LongArmsAction.OBSERVE,
+                (uint)LongArmsAction.GO_TO_CLOSEST_SIGHTED_TARGET,
                 (uint)LongArmsAction.THROW_ROCK
             };
 
@@ -56,11 +56,6 @@ namespace AI.Combat.Contexts
         public bool HasATargetForThrowRock()
         {
             return _throwRockAbilityHasATarget;
-        }
-
-        public bool CanSeeTargetOfThrowRock()
-        {
-            return _throwRockTarget.CanSeeTarget();
         }
 
         public float GetThrowRockMinimRangeToCast()
@@ -97,17 +92,19 @@ namespace AI.Combat.Contexts
             return _throwRockCast.minimumAngleToCast;
         }
 
-        public void LoseThrowRockTarget()
-        {
-            _throwRockAbilityHasATarget = false;
-        }
-
         public void SetThrowRockTargetProperties(float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
             _throwRockTarget.SetTargetProperties(targetRadius, targetHeight);
 
             _throwRockAbilityHasATarget = true;
+        }
+
+        public void LoseThrowRockTarget()
+        {
+            SetIsFighting(HasATarget());
+            
+            _throwRockAbilityHasATarget = false;
         }
 
         public void SetIsSeeingATargetForClapAbove(bool isSeeingATarget)
@@ -123,11 +120,6 @@ namespace AI.Combat.Contexts
         public bool HasATargetForClapAbove()
         {
             return _clapAboveAbilityHasATarget;
-        }
-
-        public bool CanSeeTargetOfClapAbove()
-        {
-            return _clapAboveTarget.CanSeeTarget();
         }
 
         public float GetClapAboveMinimRangeToCast()
@@ -164,17 +156,19 @@ namespace AI.Combat.Contexts
             return _clapAboveCast.minimumAngleToCast;
         }
 
-        public void LoseClapAboveTarget()
-        {
-            _clapAboveAbilityHasATarget = false;
-        }
-
         public void SetClapAboveTargetProperties(float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
             _clapAboveTarget.SetTargetProperties(targetRadius, targetHeight);
 
             _clapAboveAbilityHasATarget = true;
+        }
+
+        public void LoseClapAboveTarget()
+        {
+            SetIsFighting(HasATarget());
+            
+            _clapAboveAbilityHasATarget = false;
         }
 
         public void IncrementLongArmsBasesFree()

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using AI.Combat.Area;
 using ECS.Entities;
 using ECS.Entities.AI;
 using ECS.Entities.AI.Combat;
 using Player;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Managers
@@ -23,6 +25,10 @@ namespace Managers
         private Dictionary<uint, Sendatu> _sendatus = new Dictionary<uint, Sendatu>();
 
         private HashSet<uint> _longArmsBasesFreeId = new HashSet<uint>();
+
+        [SerializeField] private List<CombatArea> _fuckYouUnity = new List<CombatArea>();
+
+        private Dictionary<uint, CombatArea> _combatAreas = new Dictionary<uint, CombatArea>();
         
         private readonly Dictionary<EntityType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<EntityType, Delegate>
         {
@@ -66,6 +72,13 @@ namespace Managers
             {
                 _instance = this;
 
+                foreach (CombatArea combatArea in _fuckYouUnity)
+                {
+                    _combatAreas.Add(combatArea.GetCombatAreaNumber(), combatArea);
+                }
+
+                _fuckYouUnity = null;
+
                 DontDestroyOnLoad(gameObject);
 
                 return;
@@ -79,8 +92,15 @@ namespace Managers
         public void AddPlayer(PlayerCharacter playerCharacter)
         {
             _playerCharacter = playerCharacter;
+
+            uint agentId = playerCharacter.GetAgentID();
             
-            _returnAgent.Add(playerCharacter.GetAgentID(), () => _playerCharacter);
+            _returnAgent.Add(agentId, () => _playerCharacter);
+
+            foreach (CombatArea combatArea in _combatAreas.Values)
+            {
+                combatArea.SetPlayerId(agentId);
+            }
         }
 
         public void AddEnemy(Triface triface)
@@ -89,6 +109,8 @@ namespace Managers
             
             _trifaces.Add(agentID, triface);
             _returnAgent.Add(agentID, () => _trifaces[agentID]);
+
+            AddEnemyToAreaNumber(triface.GetAreaNumber(), agentID, EntityType.TRIFACE, triface.GetTarget());
         }
 
         public void AddEnemy(LongArms longArms)
@@ -97,7 +119,13 @@ namespace Managers
             
             _longArms.Add(agentID, longArms);
             _returnAgent.Add(agentID, () => _longArms[agentID]);
-            DecrementLongArmsBasesFree(longArms.CallLongArmsBaseIdFunc());
+
+            for (int i = 0; i < _longArmsBasesFreeId.Count; i++)
+            {
+                longArms.IncrementLongArmsFreeBases();
+            }
+
+            AddEnemyToAreaNumber(longArms.GetAreaNumber(), agentID, EntityType.LONG_ARMS, longArms.GetTarget());
         }
 
         public void AddEnemy(LongArmsBase longArmsBase)
@@ -106,6 +134,12 @@ namespace Managers
             
             _longArmsBases.Add(agentID, longArmsBase);
             _returnAgent.Add(agentID, () => _longArmsBases[agentID]);
+
+            if (!longArmsBase.IsFree())
+            {
+                return;
+            }
+            
             IncrementLongArmsBasesFree(agentID);
         }
 
@@ -115,94 +149,128 @@ namespace Managers
             
             _sendatus.Add(agentID, sendatu);
             _returnAgent.Add(agentID, () => _sendatus[agentID]);
+
+            AddEnemyToAreaNumber(sendatu.GetAreaNumber(), agentID, EntityType.SENDATU, sendatu.GetTarget());
+        }
+
+        #endregion
+
+        #region Combat Areas
+
+        public void AddCombatArea(CombatArea combatArea, uint areaNumber)
+        {
+            _combatAreas.Add(areaNumber, combatArea);
+        }
+
+        private void AddEnemyToAreaNumber(uint areaNumber, uint enemyId, EntityType enemyEntityType, EntityType target)
+        {
+            CombatArea combatArea = _combatAreas[areaNumber];
+            
+            combatArea.AddEnemy(enemyId, enemyEntityType);
+
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((target & i) == 0)
+                {
+                    continue;
+                }
+                
+                combatArea.AddEntityType(i);
+            }
         }
 
         #endregion
 
         #region UBS
 
-        public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, float sightMaximumDistance, 
-            Vector3 forward, float fov)
+        public HashSet<uint> ReturnPositionOfRelevantSightedTargetsInsideCombatArea(uint areaNumber, 
+            EntityType target)
+        {
+            HashSet<uint> targets = new HashSet<uint>();
+
+            for (EntityType i = (EntityType)1; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((target & i) == 0)
+                {
+                    continue;
+                }
+                
+                targets.AddRange(_combatAreas[areaNumber].GetEntityTypeTargetsSighted(i));
+            }
+
+            return targets;
+        }
+
+        public void PlayerAttackSoundArea(Vector3 position, float soundRadius)
+        {
+            foreach (CombatArea combatArea in _combatAreas.Values)
+            {
+                if (!combatArea.HasPlayerInside())
+                {
+                    continue;
+                }
+
+                foreach (uint enemyId in combatArea.GetEnemiesInside())
+                {
+                    if ((_returnAgent[enemyId]().GetTransformComponent().GetPosition() - position).sqrMagnitude >= soundRadius * soundRadius)
+                    {
+                        continue;
+                    }
+                    
+                    combatArea.AddSightedTarget(EntityType.PLAYER, _playerCharacter.GetAgentID());
+                    break;
+                }
+            }
+        }
+
+        public HashSet<uint> ReturnVisibleTargets(EntityType target, Vector3 position, 
+            Dictionary<EntityType, HashSet<uint>> targetsInsideVisionArea, uint areaNumber)
         {
             HashSet<uint> visibleTargets = new HashSet<uint>();
 
-            if ((target & EntityType.PLAYER) != 0)
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
             {
-                if (CanSeeEntity(_playerCharacter.GetTransformComponent().GetPosition(), _playerCharacter.GetRadius(), 
-                        position, sightMaximumDistance, forward, fov))
+                if ((target & i) == 0 || !targetsInsideVisionArea.ContainsKey(i))
                 {
-                    visibleTargets.Add(_playerCharacter.GetAgentID());
+                    continue;
                 }
-            }
+                
+                HashSet<uint> targetsInsideCombatArea = _combatAreas[areaNumber].GetEntityTypeTargets(i);
 
-            if ((target & EntityType.TRIFACE) != 0)
-            {
-                List<Triface> allTrifaces = ReturnAllTrifaces();
-                foreach (Triface triface in allTrifaces)
+                if (targetsInsideCombatArea.Count == 0)
                 {
-                    if (CanSeeEntity(triface.GetTransformComponent().GetPosition(), triface.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
-                    {
-                        visibleTargets.Add(triface.GetAgentID());
-                    }
+                    continue;
                 }
-            }
-
-            if ((target & EntityType.LONG_ARMS) != 0)
-            {
-                List<LongArms> allLongArms = ReturnAllLongArms();
-                foreach (LongArms longArms in allLongArms)
+                    
+                foreach (uint targetId in targetsInsideVisionArea[i])
                 {
-                    if (CanSeeEntity(longArms.GetTransformComponent().GetPosition(), longArms.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
+                    if (!targetsInsideCombatArea.Contains(targetId))
                     {
-                        visibleTargets.Add(longArms.GetAgentID());
+                        continue;
                     }
-                }
-            }
+                    
+                    AgentEntity agentEntity = _returnAgent[targetId]();
 
-            if ((target & EntityType.LONG_ARMS_BASE) != 0)
-            {
-                List<LongArmsBase> allLongArmsBases = ReturnAllLongArmsBases();
-                foreach (LongArmsBase longArmsBase in allLongArmsBases)
-                {
-                    if (CanSeeEntity(longArmsBase.GetTransformComponent().GetPosition(), longArmsBase.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
+                    if (!CanSeeEntity(agentEntity.GetTransformComponent().GetPosition(), agentEntity.GetRadius(), position))
                     {
-                        visibleTargets.Add(longArmsBase.GetAgentID());
+                        continue;
                     }
-                }
-            }
-
-            if ((target & EntityType.SENDATU) != 0)
-            {
-                List<Sendatu> allSendatus = RequestAllSendatus();
-                foreach (Sendatu sendatu in allSendatus)
-                {
-                    if (CanSeeEntity(sendatu.GetTransformComponent().GetPosition(), sendatu.GetRadius(), position, 
-                            sightMaximumDistance, forward, fov))
-                    {
-                        visibleTargets.Add(sendatu.GetAgentID());
-                    }
+                    
+                    visibleTargets.Add(targetId);
+                    _combatAreas[areaNumber].AddSightedTarget(i, targetId);
                 }
             }
 
             return visibleTargets;
         }
 
-        private bool CanSeeEntity(Vector3 targetPosition, float targetRadius, Vector3 position, float sightMaximumDistance, 
-            Vector3 forward, float fov)
+        private bool CanSeeEntity(Vector3 targetPosition, float targetRadius, Vector3 position)
         {
             Vector3 vectorToTarget = (targetPosition - position).normalized;
             float distanceToTarget = (targetPosition - position).magnitude - targetRadius;
 
-            if (distanceToTarget > sightMaximumDistance || Vector3.Angle(forward, vectorToTarget) > fov)
-            {
-                return false;
-            }
-
             return !Physics.Raycast(position, vectorToTarget, distanceToTarget, 
-                GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
+                GameManager.Instance.GetGroundLayer());
         }
 
         public void AddFreeLongArmsBaseId(uint longArmsBaseId)
@@ -248,9 +316,31 @@ namespace Managers
             return _returnAgent[agentId]();
         }
 
+        public List<AgentEntity> ReturnAgentEntities(HashSet<uint> agentsId)
+        {
+            List<AgentEntity> agentEntities = new List<AgentEntity>();
+
+            foreach (uint agentId in agentsId)
+            {
+                agentEntities.Add(_returnAgent[agentId]());
+            }
+
+            return agentEntities;
+        }
+
         public PlayerCharacter ReturnPlayer()
         {
             return _playerCharacter;
+        }
+
+        public void OnPlayerDetection()
+        {
+            _playerCharacter.WhenDetected();
+        }
+
+        public void OnLosePlayerDetection()
+        {
+            _playerCharacter.WhenDetectionLost();
         }
 
         private List<Triface> ReturnAllTrifaces()
@@ -356,35 +446,69 @@ namespace Managers
 
         #region Combat Agents Events
 
-        public void OnEnemyDefeated(Triface triface)
+        public void OnEnemyDefeated(Triface triface, uint areaNumber)
         {
-            _returnAgent.Remove(triface.GetAgentID());
-            _trifaces.Remove(triface.GetAgentID());
+            uint trifaceId = triface.GetAgentID();
+            
+            _combatAreas[areaNumber].RemoveEnemy(trifaceId);
+
+            if (_combatAreas[areaNumber].IsAreaEmpty())
+            {
+                Destroy(_combatAreas[areaNumber]);
+                _combatAreas.Remove(areaNumber);
+            }
+            
+            _returnAgent.Remove(trifaceId);
+            _trifaces.Remove(trifaceId);
         }
 
-        public void OnEnemyDefeated(LongArms longArms)
+        public void OnEnemyDefeated(LongArms longArms, uint areaNumber)
         {
-            _returnAgent.Remove(longArms.GetAgentID());
-            _longArms.Remove(longArms.GetAgentID());
+            uint longArmsId = longArms.GetAgentID();
+            
+            _combatAreas[areaNumber].RemoveEnemy(longArmsId);
+
+            if (_combatAreas[areaNumber].IsAreaEmpty())
+            {
+                _combatAreas.Remove(areaNumber);
+            }
+            
+            _returnAgent.Remove(longArmsId);
+            _longArms.Remove(longArmsId);
             IncrementLongArmsBasesFree(longArms.CallLongArmsBaseIdFunc());
         }
 
         public void OnEnemyDefeated(LongArmsBase longArmsBase)
         {
-            _returnAgent.Remove(longArmsBase.GetAgentID());
-            _longArms.Remove(longArmsBase.GetAgentID());
+            uint longArmsBaseId = longArmsBase.GetAgentID();
+            
+            _returnAgent.Remove(longArmsBaseId);
+            _longArms.Remove(longArmsBaseId);
             DecrementLongArmsBasesFree(longArmsBase.GetAgentID());
         }
 
-        public void OnEnemyDefeated(Sendatu sendatu)
+        public void OnEnemyDefeated(Sendatu sendatu, uint areaNumber)
         {
-            _returnAgent.Remove(sendatu.GetAgentID());
-            _longArms.Remove(sendatu.GetAgentID());
+            uint sendatuId = sendatu.GetAgentID();
+            
+            _combatAreas[areaNumber].RemoveEnemy(sendatuId);
+
+            if (_combatAreas[areaNumber].IsAreaEmpty())
+            {
+                _combatAreas.Remove(areaNumber);
+            }
+            _returnAgent.Remove(sendatuId);
+            _longArms.Remove(sendatuId);
+        }
+
+        public void RechargeAChargeOfPlayer()
+        {
+            _playerCharacter.RechargeHookCharge();
         }
 
         public void HealPlayer()
         {
-            _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath());
+            _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath(), _playerCharacter.transform.position);
         }
 
         #endregion

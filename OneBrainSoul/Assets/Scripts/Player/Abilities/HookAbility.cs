@@ -33,37 +33,36 @@ namespace Player.Abilities
         }
         
         //TODO ADRI PASA-HO PER ONGUI(), I LES COSES QUE FACI AQUEST UPDATE MENTRES ESTA EN HOOK PASA-HO PER UNA COROUTINE 
-        public void FakeUpdate(PlayerCharacterController playerCharacterController)
+        public void FakeUpdate(PlayerCharacterController player)
         {
-            if (playerCharacterController.GetMovementHandler() is HookMovementHandler)
+            if (player.GetMovementHandler() is HookMovementHandler)
             {
-                (playerCharacterController.GetMovementHandler() as HookMovementHandler).VisualUpdate(playerCharacterController);
+                (player.GetMovementHandler() as HookMovementHandler).VisualUpdate(player);
             }
 
             Vector3 startPos, endPos;
-            Vector3 dir = playerCharacterController.GetCamera().transform.forward;
-            startPos = playerCharacterController.transform.position + new Vector3(0f, .5f, 0f);
+            Vector3 dir = player.GetCamera().transform.forward;
+            startPos = player.transform.position + new Vector3(0f, .5f, 0f);
             bool landed = Physics.SphereCast(startPos + dir * 2f, _radius, dir, out _hit, _range,
                 GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore);
 
             if (landed)
             {
-                if (playerCharacterController.GetAbility2Time() == 0f)
+                if (player.GetAbility2Time() == 0f)
                 {
-                    playerCharacterController.SetCrosshairColor(new Color(.9f, .9f, .1f));
+                    player.SetCrosshairColor(new Color(1f, .1f, 1f));
                 }
                 else
                 {
-                    playerCharacterController.SetCrosshairColor(new Color(.1f, .9f, .9f));
+                    player.SetCrosshairColor(new Color(.1f, .9f, .9f));
                 }
             }
             else
             {
-                playerCharacterController.SetCrosshairColor(new Color(1f, 1f, 1f));
+                player.SetCrosshairColor(new Color(1f, 1f, 1f));
             }
 
-
-            if (playerCharacterController.GetCharges() > 0 && playerCharacterController.GetAbility2Input() && playerCharacterController.GetAbility2Time() == 0f && landed)
+            if (player.GetCharges() > 0 && player.GetAbility2Input() && player.GetAbility2Time() == 0f && landed)
             {
                 RaycastHit ledgeHit;
                 _ledgeSnapLeniency = 4f;
@@ -82,14 +81,14 @@ namespace Player.Abilities
                     endPos = ledgeHit.point + new Vector3(0f, .65f, 0f) + (ledgeHitDir + ledgeHit.normal).normalized * _ledgeSnapDistance;
                 }
 
-                bool smash = dir.y <= -_smashThreshold && _hit.normal.y >= _ledgeSnapNormalThreshold;
+                bool smash = player._isChargeUnlocked && dir.y <= -_smashThreshold && _hit.normal.y >= _ledgeSnapNormalThreshold;
 
-                playerCharacterController.ChangeMovementHandlerToHook(startPos, endPos, ledgeFound ? ledgeHit.point: _hit.point, ledgeFound, smash);
-                playerCharacterController.ResetAbility2Cooldown();
+                player.ChangeMovementHandlerToHook(startPos, endPos, ledgeFound ? ledgeHit.point: _hit.point, ledgeFound, smash);
+                player.ResetAbility2Cooldown();
 
                 AudioManager.instance.PlayOneShot(FMODEvents.instance.hookThrow, transform.position);
 
-                playerCharacterController.ConsumeCharge();
+                player.ConsumeCharge();
             }
         }
     }

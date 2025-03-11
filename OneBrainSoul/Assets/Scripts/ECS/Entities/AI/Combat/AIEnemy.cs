@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
+using AI.Combat.Area;
 using AI.Combat.Contexts;
 using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
@@ -22,26 +24,34 @@ namespace ECS.Entities.AI.Combat
 
         protected Dictionary<TAction, Action> _actions;
 
-        private Coroutine _updateCoroutine;
+        private EntityType _targetEntities;
+
+        [SerializeField] private VisionArea[] _visionAreas;
+
+        protected Dictionary<EntityType, HashSet<uint>> _targetsInsideVisionArea =
+            new Dictionary<EntityType, HashSet<uint>>();
+
+        protected HashSet<uint> _targetsSightedInsideCombatArea = new HashSet<uint>();
         
         [SerializeField] protected Material _material;
 
         [SerializeField] protected Animator _animator;
 
-        [SerializeField] private bool _isMarked;
+        [SerializeField] private bool _doesRestoreHealthOfPlayer;
+        [SerializeField] private bool _doesRestoreAChargeOfPlayer;
 
-        protected Vector3 _directionOfSight;
+        [SerializeField] protected uint _areaNumber;
 
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
 
         [SerializeField] protected Transform _headTransform; 
         [SerializeField] protected Transform _bodyTransform;
-        
-        
 
         private float _yawHeadRotation;
         private float _pitchHeadRotation;
+
+        private float _headRotationSpeed;
 
         protected float _bodyNormalRotationSpeed;
         protected float _bodyCurrentRotationSpeed;
@@ -49,21 +59,22 @@ namespace ECS.Entities.AI.Combat
         protected float _minimumTimeInvestigatingArea;
         protected float _maximumTimeInvestigatingArea;
 
-        protected float _minimumTimeInvestigatingAtEstimatedPosition;
-        protected float _maximumTimeInvestigatingAtEstimatedPosition;
-
         protected float _timeInvestigating;
 
-        private uint _maximumHeadPitchRotation;
-        private uint _minimumHeadPitchRotation;
+        private uint _maximumHeadPitchUpRotation;
+        private uint _maximumHeadPitchDownRotation;
         
         protected bool _isRotating;
 
-        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType)
+        protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType, 
+            EntityType targetEntities)
         {
-            SetDirectionToRotateHead(_headTransform.forward);
+            //SetDirectionToRotateHead(Vector3.forward);
+            SetDirectionToRotateBody(Vector3.forward);
             
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
+
+            _headRotationSpeed = aiEnemyProperties.headRotationSpeed;
 
             _bodyNormalRotationSpeed = aiEnemyProperties.bodyNormalRotationSpeed;
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
@@ -71,24 +82,36 @@ namespace ECS.Entities.AI.Combat
             _minimumTimeInvestigatingArea = aiEnemyProperties.minimumTimeInvestigatingArea;
             _maximumTimeInvestigatingArea = aiEnemyProperties.maximumTimeInvestigatingArea;
 
-            _minimumTimeInvestigatingAtEstimatedPosition =
-                aiEnemyProperties.minimumTimeInvestigatingAtEstimatedPosition;
-
-            _maximumTimeInvestigatingAtEstimatedPosition =
-                aiEnemyProperties.maximumTimeInvestigatingAtEstimatedPosition;
-
-            _maximumHeadPitchRotation = aiEnemyProperties.maximumHeadPitchRotation;
-            _minimumHeadPitchRotation = aiEnemyProperties.minimumHeadPitchRotation;
+            _maximumHeadPitchUpRotation = aiEnemyProperties.maximumHeadPitchUpRotation;
+            _maximumHeadPitchDownRotation = aiEnemyProperties.maximumHeadPitchDownRotation;
             
             Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
             InitiateDictionaries();
+
+            _targetEntities = targetEntities;
             
             CreateAbilities();
+
+            foreach (VisionArea visionArea in _visionAreas)
+            {
+                visionArea.Setup(AddTargetInsideVisionArea, RemoveTargetInsideVisionArea);
+            }
         }
 
-        protected abstract void CreateAbilities();
-        
+        protected virtual void CreateAbilities()
+        {
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((_targetEntities & i) == 0)
+                {
+                    continue;
+                }   
+                
+                _targetsInsideVisionArea.Add(i, new HashSet<uint>());
+            }
+        }
+
         #region Context
         
         public abstract TContext GetContext();
@@ -160,24 +183,46 @@ namespace ECS.Entities.AI.Combat
         
         #region FSM
 
+        protected virtual void UpdateSightedTargetsInsideCombatArea()
+        {
+            _targetsSightedInsideCombatArea =
+                CombatManager.Instance.ReturnPositionOfRelevantSightedTargetsInsideCombatArea(_areaNumber, _targetEntities);
+            
+            _context.SetHasAnyTargetBeenSightedInsideCombatArea(_targetsSightedInsideCombatArea.Count != 0);
+        }
+
         protected abstract void UpdateVisibleTargets();
 
         protected void RotateBody()
         {
+            ShowDebugMessages("Rotation Speed " + _bodyCurrentRotationSpeed);
+            
             _bodyTransform.rotation = Quaternion.RotateTowards(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
         }
 
+        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
+        {
+            directionToRotate = directionToRotate.normalized;
+            directionToRotate.y = 0;
+            _directionToRotateBody = directionToRotate.normalized;
+        }
+
+        protected Vector3 GetDirectionToRotateBody()
+        {
+            return _directionToRotateBody;
+        }
+
         protected void RotateHead()
         {
-            Debug.Log(_bodyTransform.rotation * GetDirectionToRotateHead());
-            
             _headTransform.rotation = Quaternion.RotateTowards(_headTransform.rotation,
-                Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _bodyCurrentRotationSpeed * Time.deltaTime);
+                Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _headRotationSpeed * Time.deltaTime);
         }
 
         protected void SetDirectionToRotateHead(Vector3 directionToRotate)
         {
+            directionToRotate = directionToRotate.normalized;
+            directionToRotate.z = 1;
             _directionToRotateHead = directionToRotate.normalized;
         }
 
@@ -196,48 +241,6 @@ namespace ECS.Entities.AI.Combat
                 Mathf.Sin(pitchRad),                   
                 Mathf.Cos(pitchRad) * Mathf.Cos(yawRad)
             ).normalized;
-        }
-
-        protected void SetDirectionToRotateBody(Vector3 directionToRotate)
-        {
-            directionToRotate = directionToRotate.normalized;
-            directionToRotate.y = 0;
-            _directionToRotateBody = directionToRotate.normalized;
-        }
-
-        protected Vector3 GetDirectionToRotateBody()
-        {
-            return _directionToRotateBody;
-        }
-
-        protected void OnLoseSightOfTarget(Vector3 lastKnownPosition, Vector3 lastKnownVelocity, float timeElapsed)
-        {
-            Vector3 estimatedTargetPosition = lastKnownPosition + lastKnownVelocity * timeElapsed;
-            
-            _timeInvestigating = Random.Range(_minimumTimeInvestigatingAtEstimatedPosition,
-                _maximumTimeInvestigatingAtEstimatedPosition);
-            
-            if (IsInsideSightRange(transform.position, estimatedTargetPosition, _context.GetSightMaximumDistance()))
-            {
-                SetDirectionToRotateHead(transform.position - estimatedTargetPosition);
-                InvestigateArea();
-                return;
-            }
-            
-            GoToArea(estimatedTargetPosition);
-        }
-
-        private bool IsInsideSightRange(Vector3 position, Vector3 targetPosition, float sightDistance)
-        {
-            Vector3 vectorToTarget = targetPosition - position;
-            float distanceToTarget = vectorToTarget.sqrMagnitude;
-
-            if (IsThereAnyObstacleInBetween(position, vectorToTarget.normalized, Mathf.Sqrt(distanceToTarget)))
-            {
-                return false;
-            }
-
-            return !(distanceToTarget > sightDistance * sightDistance);
         }
 
         protected virtual void InvestigateArea()
@@ -264,34 +267,21 @@ namespace ECS.Entities.AI.Combat
                 timeDeltaTime = Time.deltaTime;
                 timer += timeDeltaTime;
 
-                /*if (Vector3.Dot(_bodyTransform.forward, GetDirectionToRotateBody()) > 0.95f)
+                if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateBody()) > 0.95f)
                 {
                     timerLookingAtTheSameDirection += timeDeltaTime;
 
                     if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
                     {
                         uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
-                        SetDirectionToRotateBody(new Vector3(0, Random.Range(-maximumHeadYawRotation - _yawHeadRotation, maximumHeadYawRotation - _yawHeadRotation), 0));
-
-                        timerLookingAtTheSameDirection = 0;
-                    }
-                }*/
-
-                /*if (Vector3.Dot(_headTransform.forward, GetDirectionToRotateHead()) > 0.95f)
-                {
-                    timerLookingAtTheSameDirection += timeDeltaTime;
-
-                    if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
-                    {
-                        uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
-                        _yawHeadRotation = Random.Range(-maximumHeadYawRotation - _yawHeadRotation, maximumHeadYawRotation - _yawHeadRotation);
-                        _pitchHeadRotation = Random.Range(-_minimumHeadPitchRotation - _pitchHeadRotation, _maximumHeadPitchRotation - _pitchHeadRotation);
+                        float yawHeadRotation = Random.Range(-maximumHeadYawRotation, maximumHeadYawRotation);
+                        float pitchHeadRotation = Random.Range(-_maximumHeadPitchDownRotation, _maximumHeadPitchUpRotation);
                         
-                        SetDirectionToRotateHead(Quaternion.Euler(_pitchHeadRotation, _yawHeadRotation, 0) * Vector3.forward);
+                        SetDirectionToRotateBody(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
 
                         timerLookingAtTheSameDirection = 0;
                     }
-                }*/
+                }
                 
                 yield return null;
             }
@@ -303,12 +293,12 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnEndInvestigation()
         {
-            //SetDirectionToRotateHead(_bodyTransform.forward);
+            SetDirectionToRotateBody(Vector3.forward);
         }
 
         private bool IsThereAnyObstacleInBetween(Vector3 position, Vector3 direction, float distance)
         {
-            return !Physics.Raycast(position, direction, distance,
+            return Physics.Raycast(position, direction, distance,
                 GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer());
         }
 
@@ -335,17 +325,17 @@ namespace ECS.Entities.AI.Combat
 
         #region Ally Abilities
 
-        public override void OnReceiveHeal(uint healValue)
+        public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             SetHealth(_context.GetHealth() + healValue);
         }
 
-        public override void OnReceiveHealOverTime(uint healValue, float duration)
+        public override void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition)
         {
-            StartCoroutine(HealOverTimeCoroutine(healValue, duration));
+            StartCoroutine(HealOverTimeCoroutine(healValue, duration, sourcePosition));
         }
 
-        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration)
+        protected override IEnumerator HealOverTimeCoroutine(uint healValue, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
             float tickTimer = 0;
@@ -357,7 +347,7 @@ namespace ECS.Entities.AI.Combat
 
                 if (tickTimer >= _timeBetweenHealTicks)
                 {
-                    OnReceiveHeal(healValue);
+                    OnReceiveHeal(healValue, sourcePosition);
                     tickTimer = 0;
                 }
                 
@@ -369,7 +359,7 @@ namespace ECS.Entities.AI.Combat
 
         #region Rival Abilities
 
-        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition)
+        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
         {
             if (_currentReceiveDamageCooldown > 0f)
             {
@@ -377,8 +367,8 @@ namespace ECS.Entities.AI.Combat
             }
             
             DamageEffect(hitPosition);
-            
-            _material.SetColor("_DamageColor", new Color(1,0,0));
+
+            StartCoroutine(DamageEffectCoroutine(.4f));
             
             SetHealth(_context.GetHealth() - damageValue);
 
@@ -391,12 +381,27 @@ namespace ECS.Entities.AI.Combat
             Destroy(gameObject);
         }
 
-        public override void OnReceiveDamageOverTime(uint damageValue, float duration)
+        private IEnumerator DamageEffectCoroutine(float duration)
         {
-            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration));
+            Material matInstance = GetComponent<MeshRenderer>().material;
+
+            float t = 0f;
+            while (t < duration)
+            {
+                float p = 1f - t / duration;
+                matInstance.SetFloat("_DamageT", Mathf.Pow(p, 0.75f));
+                yield return new WaitForFixedUpdate();
+                t += Time.fixedDeltaTime;
+            }
+            matInstance.SetFloat("_DamageT", 0f);
         }
 
-        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration)
+        public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)
+        {
+            StartCoroutine(DamageOverTimeCoroutine(damageValue, duration, sourcePosition));
+        }
+
+        protected override IEnumerator DamageOverTimeCoroutine(uint damageValue, float duration, Vector3 sourcePosition)
         {
             float timer = 0;
             float tickTimer = 0;
@@ -408,7 +413,7 @@ namespace ECS.Entities.AI.Combat
 
                 if (tickTimer >= _timeBetweenDamageTicks)
                 {
-                    OnReceiveDamage(damageValue, transform.position);
+                    OnReceiveDamage(damageValue, transform.position, sourcePosition);
                     tickTimer = 0;
                 }
                 
@@ -423,28 +428,28 @@ namespace ECS.Entities.AI.Combat
             _material.SetColor("_DamageColor", new Color(1,1,1));
         }
 
-        public override void OnReceiveSlow(uint slowID, uint slowPercent)
+        public override void OnReceiveSlow(uint slowID, uint slowPercent, Vector3 sourcePosition)
         {
             //TODO ENEMY SLOW
         }
 
-        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration)
+        public override void OnReceiveSlowOverTime(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             //TODO ENEMY SLOW OVER TIME
         }
 
-        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration)
+        protected override IEnumerator SlowOverTimeCoroutine(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             //TODO ENEMY SLOW OVER TIME COROUTINE
             yield break;
         }
 
-        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration)
+        public override void OnReceiveDecreasingSlow(uint slowID, uint slowPercent, float duration, Vector3 sourcePosition)
         {
             //TODO ENEMY DECREASING SLOW
         }
 
-        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow)
+        protected override IEnumerator DecreasingSlowCoroutine(uint slowID, uint slowPercent, float duration, int slow, Vector3 sourcePosition)
         {
             //TODO ENEMY DECREASING SLOW COROUTINE
             yield break;
@@ -457,7 +462,12 @@ namespace ECS.Entities.AI.Combat
                 EventsManager.OnAgentDefeated(GetAgentID());
             }
 
-            if (!_isMarked)
+            if (_doesRestoreAChargeOfPlayer)
+            {
+                CombatManager.Instance.RechargeAChargeOfPlayer();
+            }
+
+            if (!_doesRestoreHealthOfPlayer)
             {
                 return;
             }
@@ -469,6 +479,36 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        public EntityType GetTarget()
+        {
+            return _targetEntities;
+        }
+
+        private bool IsADesiredTargetEntity(EntityType entityType)
+        {
+            return (_targetEntities & entityType) != 0;
+        }
+
+        private void AddTargetInsideVisionArea(EntityType entityType, uint targetId)
+        {
+            if (!IsADesiredTargetEntity(entityType))
+            {
+                return;
+            }
+            
+            _targetsInsideVisionArea[entityType].Add(targetId);
+        }
+
+        private void RemoveTargetInsideVisionArea(EntityType entityType, uint targetId)
+        {
+            if (!IsADesiredTargetEntity(entityType))
+            {
+                return;
+            }
+            
+            _targetsInsideVisionArea[entityType].Remove(targetId);
+        }
+
         public override float GetRadius()
         {
             return _context.GetRadius();
@@ -478,11 +518,35 @@ namespace ECS.Entities.AI.Combat
         {
             return _context.GetHeight();
         }
-        
+
+        public uint GetAreaNumber()
+        {
+            return _areaNumber;
+        }
+
         /////////////////////////DEBUG
 
         [SerializeField] protected bool _showFov;
         [SerializeField] protected Color _fovColor;
+
+        protected virtual void OnDrawGizmos()
+        {
+            if (!_showFov)
+            {
+                return;
+            }
+            
+            Gizmos.color = _fovColor;
+            BoxCollider boxCollider = _visionAreas[0].GetComponent<BoxCollider>();
+            Vector3 center = transform.position + transform.rotation * boxCollider.center;
+            Matrix4x4 oldMatrix = Gizmos.matrix;
+            Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
+            Gizmos.DrawCube(Vector3.zero, boxCollider.size);
+            Gizmos.matrix = oldMatrix;
+            SphereCollider sphereCollider = _visionAreas[1].GetComponent<SphereCollider>();
+            Gizmos.DrawSphere(transform.position, sphereCollider.radius);
+            //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
+        }
 
         protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,
             int segments)

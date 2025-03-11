@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8677701544087066257}
   - component: {fileID: 8623274764433244947}
   - component: {fileID: 7040407507251120829}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 12x6_wall_bricks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8274133419916619345, guid: 4334f63b18322254b97f8d89e2d513a4, type: 3}
+  - {fileID: 2100000, guid: b71b560266d348a409ff3ef6fe868e53, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

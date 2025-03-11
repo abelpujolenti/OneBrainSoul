@@ -106,7 +106,7 @@ namespace Combat
         private void Land(AgentEntity entity)
         {
             landTime = landDuration;
-            entity.OnReceiveDamage((uint)(empowered ? 3 : 2), transform.position);
+            entity.OnReceiveDamage((uint)(empowered ? 3 : 2), transform.position, transform.position);
         }
     }
 }

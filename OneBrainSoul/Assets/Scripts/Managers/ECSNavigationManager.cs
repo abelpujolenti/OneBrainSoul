@@ -6,7 +6,6 @@ using AI.Navigation;
 using ECS.Components.AI.Navigation;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
-using Threads;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -24,8 +23,6 @@ namespace Managers
         
         private Dictionary<uint, NavMeshAgentComponent> _navMeshAgentDestinations = 
             new Dictionary<uint, NavMeshAgentComponent>();
-
-        private MainThreadQueue _mainThreadQueue = new MainThreadQueue();
 
         private Dictionary<uint, Stopwatch> _stopwatches = new Dictionary<uint, Stopwatch>();
         private List<List<uint>> _agentsPerThread = new List<List<uint>>();
@@ -104,19 +101,26 @@ namespace Managers
 
                 Vector3 firstPathPosition = path[0].position;
 
-                navMeshAgentComponent.GetNavMeshAgent().SetDestination(firstPathPosition);
+                float distanceToNextPoint =
+                    Vector3.Distance(navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition);
 
-                if (Vector3.Distance(navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition) > 4f)
+                while (path.Count > 1 && distanceToNextPoint < 4f)
                 {
-                    continue;
+                    path[^1].gCost -= path[0].gCost;
+                
+                    path.RemoveAt(0);
+
+                    firstPathPosition = path[0].position;
+                    
+                    distanceToNextPoint = 
+                        Vector3.Distance(navMeshAgentComponent.GetTransformComponent().GetPosition(), firstPathPosition);
                 }
 
-                path[^1].gCost -= path[0].gCost;
-                
-                path.RemoveAt(0);
+                NavMeshAgent navMeshAgent = navMeshAgentComponent.GetNavMeshAgent();
+
+                navMeshAgent.updateRotation = true;
+                navMeshAgent.SetDestination(firstPathPosition);
             }
-            
-            //_mainThreadQueue.Execute(5);
         }
 
         private void UpdateOwnPosition(NavMeshAgentComponent navMeshAgentComponent)
@@ -449,7 +453,7 @@ namespace Managers
             
             Gizmos.color = Color.blue;
             
-            /*foreach (Node node in _navMeshGraph.nodes.Values)
+            foreach (Node node in _navMeshGraph.nodes.Values)
             {
                 Gizmos.DrawSphere(node.position, 0.2f);
 
@@ -458,7 +462,7 @@ namespace Managers
                     Gizmos.color = Color.red;
                     Gizmos.DrawLine(_navMeshGraph.nodes[edge.fromNodeIndex].position, _navMeshGraph.nodes[edge.toNodeIndex].position);
                 }
-            }*/
+            }
             
             foreach (Node node in _navMeshAgentDestinations[ID].GetAStarPath().navMeshGraph.nodes.Values)
             {
@@ -475,7 +479,6 @@ namespace Managers
 
             foreach (NavMeshAgentComponent navMeshAgentComponent in _navMeshAgentDestinations.Values)
             {
-
                 AStarPath aStarPath = navMeshAgentComponent.GetAStarPath();
 
                 for (int i = 0; i < aStarPath.path.Count - 1; i++)
