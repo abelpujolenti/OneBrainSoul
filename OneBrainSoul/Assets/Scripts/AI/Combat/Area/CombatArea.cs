@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ECS.Entities;
 using ECS.Entities.AI;
 using Managers;
@@ -170,7 +171,8 @@ namespace AI.Combat.Area
         {
             foreach (EntityType entityType in _targetEntitiesInsideArea.Keys)
             {
-                foreach (uint agentId in _targetEntitiesInsideArea[entityType])
+                uint[] agentsId = _targetEntitiesInsideArea[entityType].ToArray();
+                foreach (uint agentId in agentsId)
                 {
                     RemoveTarget(entityType, agentId);
                     RemoveSightedTarget(entityType, agentId);
