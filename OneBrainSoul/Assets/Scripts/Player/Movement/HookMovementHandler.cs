@@ -17,7 +17,8 @@ namespace Player.Movement
         public static float bobbingStrength = .65f;
         public static float snapDownwardsStrength = 6f;
         public static float smashAdditionalSpeed = 90f;
-        public static uint smashDamage = 5;
+        public static uint hookDamage = 1;
+        public static uint smashDamage = 2;
 
         public static float bounceStrength = 1900f;
         public static float bounceVerticalRatio = .45f;
@@ -168,8 +169,17 @@ namespace Player.Movement
             {
                 if (smash)
                 {
-                    Smash(player,hit);
+                    Smash(player, hit);
                 }
+                else
+                {
+                    AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
+                    if (entity != null)
+                    {
+                        entity.OnReceiveDamage(hookDamage, hit.point, player.transform.position);
+                    }
+                }
+
                 Exit(player);
             }
 
