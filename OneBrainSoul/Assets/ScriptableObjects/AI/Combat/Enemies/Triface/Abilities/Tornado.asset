@@ -41,7 +41,7 @@ MonoBehaviour:
     isSlowAttachedToEntity: 1
     doesApplyAForce: 1
     forceDirection: {x: 0, y: 1, z: 0}
-    forceStrength: 100
+    forceStrength: 200
     doesForceComesFromCenterOfTheArea: 1
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
@@ -56,7 +56,7 @@ MonoBehaviour:
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
     forceDirection: {x: 1, y: 0.5, z: -2}
-    forceStrength: 40
+    forceStrength: 80
     doesForceComesFromCenterOfTheArea: 1
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
@@ -75,8 +75,8 @@ MonoBehaviour:
     doesForceComesFromCenterOfTheArea: 1
   abilityAoEType: 1
   abilityAoE:
-    isAttachedToCaster: 0
-    relativePositionToCaster: {x: 0, y: 5, z: 5}
+    isAttachedToCaster: 1
+    relativePositionToCaster: {x: 0, y: 5, z: 0}
     duration: 2
     direction: {x: 0, y: 0, z: 1}
     height: 2
@@ -159,5 +159,12 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    objectWithParticleSystem: {fileID: 4218669516899327888, guid: c71dedb22a4bd334da3a2d3077ae6f3a,
+      type: 3}
+    relativePositionForParticles: {x: 0, y: -7, z: 0}
+  abilityMovement:
+    makesBezierCurves: 0
+    positions: []
+    timeBetweenPositions: []
   doesItTriggerOnTriggerEnter: 1
   doesItTriggerOnTriggerExit: 0

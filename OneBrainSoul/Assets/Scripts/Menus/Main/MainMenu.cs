@@ -58,7 +58,7 @@ namespace Menus.Main
             float timer = 0;
 
             float startYPosition = _contentToScroll.transform.localPosition.y;
-            float endYPosition = 151;
+            float endYPosition = 300;
             
             while (timer < _autoScrollTime)
             {
