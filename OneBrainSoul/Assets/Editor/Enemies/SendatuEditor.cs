@@ -32,6 +32,20 @@ namespace Editor.Enemies
             EditorGUI.indentLevel++;
 
             EditorGUI.indentLevel--;
+            
+            EditorGUILayout.Space();
+            
+            LabelField("VFX");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref sendatuProperties.healEffect, "Heal Effect");
+
+            Vector3Field(ref sendatuProperties.healRelativePosition, "Heal Position");
+            Vector3Field(ref sendatuProperties.healRelativeRotation, "Heal Rotation");
+            Vector3Field(ref sendatuProperties.healRelativeScale, "Heal Scale");
+
+            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

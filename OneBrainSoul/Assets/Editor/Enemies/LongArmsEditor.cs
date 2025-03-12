@@ -85,6 +85,20 @@ namespace Editor.Enemies
             ObjectField(ref longArmsProperties.clapAboveAbilityProperties, "Clap Above Ability");
 
             EditorGUI.indentLevel--;
+            
+            EditorGUILayout.Space();
+            
+            LabelField("VFX");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref longArmsProperties.healEffect, "Heal Effect");
+
+            Vector3Field(ref longArmsProperties.healRelativePosition, "Heal Position");
+            Vector3Field(ref longArmsProperties.healRelativeRotation, "Heal Rotation");
+            Vector3Field(ref longArmsProperties.healRelativeScale, "Heal Scale");
+
+            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

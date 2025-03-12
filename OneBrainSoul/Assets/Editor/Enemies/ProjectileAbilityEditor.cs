@@ -98,8 +98,6 @@ namespace Editor.Enemies
             
             AbilityAoE(ref projectileAbilityProperties.abilityAoE, ref projectileAbilityProperties.abilityAoEType);
             
-            ObjectField(ref projectileAbilityProperties.abilityAoE.objectWithParticleSystem, "Object With Area Particle System");
-            
             AbilityMovement(ref projectileAbilityProperties.abilityMovement, projectileAbilityProperties.abilityAoE.duration);
 
             if (projectileAbilityProperties.abilityAoE.duration == 0)

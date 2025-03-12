@@ -18,13 +18,16 @@ MonoBehaviour:
   fov: 75
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  minimumTimeInvestigatingAtEstimatedPosition: 5
-  maximumTimeInvestigatingAtEstimatedPosition: 7
   maximumHeadYawRotation: 45
   maximumHeadPitchUpRotation: 0
   maximumHeadPitchDownRotation: 0
   headRotationSpeed: 1
   bodyNormalRotationSpeed: 30
+  healEffect: {fileID: 326565652972303605, guid: b1b8db585722ef74286b706191482b5a,
+    type: 3}
+  healPosition: {x: 0, y: 0, z: 0}
+  healRotation: {x: 0, y: 0, z: 0}
+  healScale: {x: 0, y: 0, z: 0}
   bodyRotationSpeedWhileTurningAround: 150
   minimumTimeBeforeSettingNewDirection: 1
   maximumTimeBeforeSettingNewDirection: 3
