@@ -159,6 +159,9 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    objectWithParticleSystem: {fileID: 8197331530097022447, guid: f5c30b458af874647ac3d582dcf96388,
+      type: 3}
+    relativePositionForParticles: {x: 0, y: 0, z: 0}
   abilityMovement:
     makesBezierCurves: 0
     positions:

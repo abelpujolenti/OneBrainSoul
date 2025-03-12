@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AI.Combat.ScriptableObjects
 {
@@ -25,5 +26,11 @@ namespace AI.Combat.ScriptableObjects
         public float headRotationSpeed;
 
         public float bodyNormalRotationSpeed;
+
+        public GameObject healEffect;
+
+        public Vector3 healRelativePosition;
+        public Vector3 healRelativeRotation;
+        public Vector3 healRelativeScale;
     }
 }

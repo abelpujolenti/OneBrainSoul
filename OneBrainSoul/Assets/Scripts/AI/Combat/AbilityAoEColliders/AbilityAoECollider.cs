@@ -61,12 +61,16 @@ namespace AI.Combat.AbilityAoEColliders
             TAreaAbilityComponent areaAbilityComponent)
         {
             _parentTransform = parentTransform;
-            
-            _abilityDuration = areaAbilityComponent.GetAoE().duration;
-            
-            _relativePosition = areaAbilityComponent.GetAoE().relativePositionToCaster;
 
-            _childWithParticleSystem = Instantiate(areaAbilityComponent.GetAoE().objectWithParticleSystem, transform);
+            AbilityAoE abilityAoE = areaAbilityComponent.GetAoE();
+            
+            _abilityDuration = abilityAoE.duration;
+            
+            _relativePosition = abilityAoE.relativePositionToCaster;
+
+            _childWithParticleSystem = Instantiate(abilityAoE.objectWithParticleSystem, transform);
+
+            _childWithParticleSystem.transform.localPosition = abilityAoE.relativePositionForParticles;
 
             {
                 Vector3 direction = areaAbilityComponent.GetAoE().direction;
@@ -553,7 +557,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            /*for (int i = 0; i < _abilityTargets.Count; i++)
+            for (int i = 0; i < _abilityTargets.Count; i++)
             {
                 if (agentEntity.GetEntityType() == _abilityTargets[i])
                 {
@@ -564,7 +568,7 @@ namespace AI.Combat.AbilityAoEColliders
                 {
                     return;
                 }
-            }*/
+            }
             
             _agentsInside.Add(agentEntity);
 
@@ -580,7 +584,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            /*for (int i = 0; i < _abilityTargets.Count; i++)
+            for (int i = 0; i < _abilityTargets.Count; i++)
             {
                 if (agentEntity.GetEntityType() == _abilityTargets[i])
                 {
@@ -591,7 +595,7 @@ namespace AI.Combat.AbilityAoEColliders
                 {
                     return;
                 }
-            }*/
+            }
             
             _agentsInside.Remove(agentEntity);
 

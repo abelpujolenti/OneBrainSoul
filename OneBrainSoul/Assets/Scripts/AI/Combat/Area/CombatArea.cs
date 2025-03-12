@@ -168,12 +168,14 @@ namespace AI.Combat.Area
 
         private void OnDestroy()
         {
-            if (!HasPlayerInside())
+            foreach (EntityType entityType in _targetEntitiesInsideArea.Keys)
             {
-                return;
+                foreach (uint agentId in _targetEntitiesInsideArea[entityType])
+                {
+                    RemoveTarget(entityType, agentId);
+                    RemoveSightedTarget(entityType, agentId);
+                }
             }
-            
-            CombatManager.Instance.OnLosePlayerDetection();
         }
     }
 }

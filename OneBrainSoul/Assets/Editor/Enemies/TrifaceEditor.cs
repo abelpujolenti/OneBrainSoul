@@ -40,6 +40,20 @@ namespace Editor.Enemies
             FloatField(ref trifaceProperties.rotationSpeedWhileCastingSlam, 0, "Rotation Speed While Casting Slam");
 
             EditorGUI.indentLevel--;
+            
+            EditorGUILayout.Space();
+            
+            LabelField("VFX");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref trifaceProperties.healEffect, "Heal Effect");
+
+            Vector3Field(ref trifaceProperties.healRelativePosition, "Heal Position");
+            Vector3Field(ref trifaceProperties.healRelativeRotation, "Heal Rotation");
+            Vector3Field(ref trifaceProperties.healRelativeScale, "Heal Scale");
+
+            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

@@ -16,6 +16,10 @@ namespace ECS.Entities.AI.Combat
     public class Triface : FreeMobilityEnemy<TrifaceContext, TrifaceAction>
     {
         [SerializeField] private TrifaceProperties _trifaceProperties;
+
+        [SerializeField] private Transform _pivotTransform;
+
+        private GameObject _endEffector; 
         
         private IAreaAbility _slamAbility;
         private HashSet<uint> _visibleTargetsForSlamAbility;
@@ -43,6 +47,9 @@ namespace ECS.Entities.AI.Combat
             CombatManager.Instance.AddEnemy(this);
 
             _startPosition = transform.position;
+
+            _endEffector = new GameObject("EndEffector");
+            _endEffector.transform.SetParent(transform);
         }
 
         protected override void InitiateDictionaries()
@@ -127,7 +134,10 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
         }
 
+        
+        //TODO ERASE
         private Vector3 _startPosition;
+        //
 
         protected override void UpdateSightedTargetsInsideCombatArea()
         {
