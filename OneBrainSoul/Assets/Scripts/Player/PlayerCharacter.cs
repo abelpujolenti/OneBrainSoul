@@ -29,6 +29,10 @@ namespace Player
         private float _height;
         private float _radius;
 
+        [SerializeField] private uint _healthLostPerTick;
+        [SerializeField] private float _timeBetweenTicks;
+        private float _currentTimeBetweenTicks = 0;
+
         private void Start()
         {
             _health = _maxHealth;
@@ -46,6 +50,19 @@ namespace Player
             Setup(_radius + _agentsPositionRadius, EntityType.PLAYER);
             
             CombatManager.Instance.AddPlayer(this);
+        }
+
+        private void Update()
+        {
+            _currentTimeBetweenTicks += Time.deltaTime;
+
+            if (_currentTimeBetweenTicks < _timeBetweenTicks)
+            {
+                return;
+            }
+
+            _currentTimeBetweenTicks = 0;
+            _health -= _healthLostPerTick;
         }
 
         private void OnDestroy()
