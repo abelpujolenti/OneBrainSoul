@@ -141,5 +141,12 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    objectWithParticleSystem: {fileID: 4218669516899327888, guid: c71dedb22a4bd334da3a2d3077ae6f3a,
+      type: 3}
+    relativePositionForParticles: {x: 0, y: 0, z: 0}
+  abilityMovement:
+    makesBezierCurves: 0
+    positions: []
+    timeBetweenPositions: []
   doesItTriggerOnTriggerEnter: 1
   doesItTriggerOnTriggerExit: 0
