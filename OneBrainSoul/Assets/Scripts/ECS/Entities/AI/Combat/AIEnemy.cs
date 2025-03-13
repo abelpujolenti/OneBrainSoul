@@ -323,8 +323,8 @@ namespace ECS.Entities.AI.Combat
 
             while (abilityCast.IsOnCooldown())
             {
-                abilityCast.DecreaseCooldown();
                 yield return null;
+                abilityCast.DecreaseCooldown();
             }
         }
 
