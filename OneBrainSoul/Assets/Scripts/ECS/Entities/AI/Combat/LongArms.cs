@@ -82,7 +82,7 @@ namespace ECS.Entities.AI.Combat
             LongArmsBase longArmsBase = transform.parent.GetComponent<LongArmsBase>(); 
             
             longArmsBase.SetLongArms(this);
-            
+
             CombatManager.Instance.AddEnemy(this);
             
             _timesSettingNewDirection = (uint)Random.Range(_minimumTimesSettingNewDirectionToTurnAround,
@@ -423,7 +423,7 @@ namespace ECS.Entities.AI.Combat
             
             //_animator.
             
-            TeleportToAnotherLongArmsBase();
+             TeleportToAnotherLongArmsBase();
         }
 
         private void TeleportToAnotherLongArmsBase()

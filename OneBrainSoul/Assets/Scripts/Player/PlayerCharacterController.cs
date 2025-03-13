@@ -7,7 +7,6 @@ using Player.Effects;
 using Player.Movement;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.ParticleSystem;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 namespace Player
