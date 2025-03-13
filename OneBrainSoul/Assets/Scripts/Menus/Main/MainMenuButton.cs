@@ -1,5 +1,4 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 using Button = UnityEngine.UI.Button;
 
 namespace Menus.Main

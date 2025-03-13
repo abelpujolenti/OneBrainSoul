@@ -8,8 +8,6 @@ using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.VFX;
 using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
@@ -88,11 +86,11 @@ namespace ECS.Entities.AI.Combat
             _maximumHeadPitchUpRotation = aiEnemyProperties.maximumHeadPitchUpRotation;
             _maximumHeadPitchDownRotation = aiEnemyProperties.maximumHeadPitchDownRotation;
 
-            _healEffect = Instantiate(aiEnemyProperties.healEffect, transform);
+            /*_healEffect = Instantiate(aiEnemyProperties.healEffect, transform);
 
             _healEffect.transform.localPosition = aiEnemyProperties.healRelativePosition;
             _healEffect.transform.localRotation = Quaternion.Euler(aiEnemyProperties.healRelativeRotation);
-            _healEffect.transform.localScale = aiEnemyProperties.healRelativeScale;
+            _healEffect.transform.localScale = aiEnemyProperties.healRelativeScale;*/
             
             Setup(radius + aiEnemyProperties.agentsPositionRadius, entityType);
             
