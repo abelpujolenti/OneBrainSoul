@@ -347,7 +347,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 1.1540337
   m_Speed: 3.5
-  m_Acceleration: 20
+  m_Acceleration: 0
   avoidancePriority: 50
   m_AngularSpeed: 1000
   m_StoppingDistance: 0.1
@@ -390,7 +390,7 @@ MonoBehaviour:
   _navMeshAgent: {fileID: 4363023524190419784}
   _pointsToPatrol: []
   _trifaceProperties: {fileID: 11400000, guid: d8be553b4f835d2449cb81c4e30d0780, type: 2}
-  _itGoesOnAutomatic: 0
+  _itGoesOnAutomatic: 1
   _showDetectionAreaOfSlam: 0
   _colorOfDetectionAreaOfSlam: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8694353061951785001

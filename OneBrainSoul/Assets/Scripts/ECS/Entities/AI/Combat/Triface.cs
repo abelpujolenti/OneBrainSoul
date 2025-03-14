@@ -160,6 +160,7 @@ namespace ECS.Entities.AI.Combat
             
                 _agentSlot = agentSlotPosition.agentSlot;
                 ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
+                yield return null;
             }
         }
 

@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: Shove Projectile Trap 1
   m_EditorClassIdentifier: 
-  totalHealth: 9
+  totalHealth: 1000
   agentsPositionRadius: 5
   sightMaximumDistance: 0
   fov: 45
-  minimumTimeInvestigatingArea: 5
-  maximumTimeInvestigatingArea: 7
-  maximumHeadYawRotation: 45
+  minimumTimeInvestigatingArea: 0
+  maximumTimeInvestigatingArea: 0
+  maximumHeadYawRotation: 0
   maximumHeadPitchUpRotation: 0
   maximumHeadPitchDownRotation: 0
   headRotationSpeed: 1
-  bodyNormalRotationSpeed: 3
+  bodyNormalRotationSpeed: 1
   healEffect: {fileID: 0}
   healRelativePosition: {x: 0, y: 0, z: 0}
   healRelativeRotation: {x: 0, y: 0, z: 0}

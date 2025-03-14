@@ -16,16 +16,16 @@ MonoBehaviour:
   abilityTarget: 1
   abilityCast:
     minimumRangeToCast: 0
-    maximumRangeToCast: 6
+    maximumRangeToCast: 0
     directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 15
+    minimumAngleToCast: 0
     canCancelCast: 0
     maximumAngleToCancelCast: 0
-    timeToCast: 0.2
-    cooldown: 200
+    timeToCast: 0
+    cooldown: 1
     duration: 0
   abilityTrigger:
-    hasAnEffectOnStart: 0
+    hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 1
     hasAnEffectOnEnd: 0
   abilityEffectOnHealthTypeOnStart: 0
@@ -40,9 +40,9 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 1
     doesApplyAForce: 1
-    forceDirection: {x: 0, y: 3, z: 10}
-    forceStrength: 40
-    doesForceComesFromCenterOfTheArea: 0
+    forceDirection: {x: 0, y: 1, z: 2}
+    forceStrength: 1200
+    doesForceComesFromCenterOfTheArea: 1
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -51,13 +51,13 @@ MonoBehaviour:
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
     doesDecreaseOverTime: 0
-    slowPercent: 0
+    slowPercent: 10
     slowDuration: 0
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
-    forceDirection: {x: 0, y: 0.3, z: 1}
-    forceStrength: 10
-    doesForceComesFromCenterOfTheArea: 0
+    forceDirection: {x: 0, y: 1, z: 2}
+    forceStrength: 1200
+    doesForceComesFromCenterOfTheArea: 1
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -69,21 +69,22 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 0
-    doesApplyAForce: 0
-    forceDirection: {x: 0, y: 0, z: 0}
-    forceStrength: 0
+    doesApplyAForce: 1
+    forceDirection: {x: 1, y: 0, z: 0}
+    forceStrength: 1000
     doesForceComesFromCenterOfTheArea: 0
-  abilityAoEType: 0
+  abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
     relativePositionToCaster: {x: 0, y: 0, z: 4}
-    duration: 0.5
+    duration: 3
     direction: {x: 0, y: 0, z: 1}
-    height: 2
-    width: 2
+    height: 10
+    width: 7
     length: 7
-    radius: 0
-    customMeshPrefab: {fileID: 0}
+    radius: 4
+    customMeshPrefab: {fileID: 2430207424799574835, guid: ee99914edafad8846b21e7289cfef22e,
+      type: 3}
     scale: 0
     doesHeightChangeOverTheTime: 0
     doesWidthChangeOverTheTime: 0
@@ -95,7 +96,25 @@ MonoBehaviour:
     doesZScaleChangeOverTheTime: 0
     heightChangeOverTime:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 5
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -147,8 +166,8 @@ MonoBehaviour:
   abilityMovement:
     makesBezierCurves: 0
     positions:
-    - {x: 0, y: 0, z: 20}
+    - {x: 0, y: 0, z: 50}
     timeBetweenPositions:
-    - 0.5
-  doesItTriggerOnTriggerEnter: 0
+    - 3
+  doesItTriggerOnTriggerEnter: 1
   doesItTriggerOnTriggerExit: 0

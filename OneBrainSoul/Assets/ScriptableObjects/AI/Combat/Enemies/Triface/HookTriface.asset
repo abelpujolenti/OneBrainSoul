@@ -22,12 +22,12 @@ MonoBehaviour:
   maximumHeadPitchUpRotation: 0
   maximumHeadPitchDownRotation: 0
   headRotationSpeed: 1
-  bodyNormalRotationSpeed: 45
+  bodyNormalRotationSpeed: 300
   healEffect: {fileID: 326565652972303605, guid: b1b8db585722ef74286b706191482b5a,
     type: 3}
-  healPosition: {x: 0, y: 0, z: 0}
-  healRotation: {x: 0, y: 0, z: 0}
-  healScale: {x: 0, y: 0, z: 0}
+  healRelativePosition: {x: 0, y: 0, z: 0}
+  healRelativeRotation: {x: 0, y: 0, z: 0}
+  healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 645d62defe1275a47922e69eba7a5022,
     type: 2}
   rotationSpeedWhileCastingSlam: 0

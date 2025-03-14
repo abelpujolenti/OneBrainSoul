@@ -18,12 +18,16 @@ MonoBehaviour:
   fov: 45
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  minimumTimeInvestigatingAtEstimatedPosition: 5
-  maximumTimeInvestigatingAtEstimatedPosition: 7
   maximumHeadYawRotation: 45
-  maximumHeadPitchRotation: 30
-  minimumHeadPitchRotation: 10
-  bodyNormalRotationSpeed: 3
+  maximumHeadPitchUpRotation: 0
+  maximumHeadPitchDownRotation: 0
+  headRotationSpeed: 1
+  bodyNormalRotationSpeed: 300
+  healEffect: {fileID: 326565652972303605, guid: b1b8db585722ef74286b706191482b5a,
+    type: 3}
+  healRelativePosition: {x: 0, y: 0, z: 0}
+  healRelativeRotation: {x: 0, y: 0, z: 0}
+  healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 4faafba7ee80f514ea23b2713fbcf68a,
     type: 2}
   rotationSpeedWhileCastingSlam: 0
