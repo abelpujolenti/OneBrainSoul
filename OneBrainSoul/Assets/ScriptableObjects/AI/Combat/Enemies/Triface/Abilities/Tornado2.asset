@@ -14,13 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canAffectCaster: 0
   abilityTarget: 1
+  typesAffectedByTheAbility: 1
   abilityCast:
-    minimumRangeToCast: 5
-    maximumRangeToCast: 12
-    directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 15
     canCancelCast: 0
-    maximumAngleToCancelCast: 0
     timeToCast: 0.5
     cooldown: 4
     duration: 2
@@ -43,6 +39,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 1, z: 0}
     forceStrength: 50
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnTheDuration: 0
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -58,6 +55,7 @@ MonoBehaviour:
     forceDirection: {x: 1, y: 0.55, z: -0.45}
     forceStrength: 40
     doesForceComesFromCenterOfTheArea: 1
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -73,3 +71,4 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0

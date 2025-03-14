@@ -48,8 +48,16 @@ namespace Editor.Enemies
 
             EditorGUI.indentLevel++;
             
-            ToggleField(ref basicAbilityProperties.canAffectCaster, "Can Affect Caster");
             EnumFlagsField<EntityType>(ref basicAbilityProperties.abilityTarget, "Entity Type");
+            
+            EditorGUILayout.Space();
+
+            basicAbilityProperties.typesAffectedByTheAbility =
+                (basicAbilityProperties.typesAffectedByTheAbility & ~basicAbilityProperties.abilityTarget) |
+                basicAbilityProperties.abilityTarget;
+            
+            ToggleField(ref basicAbilityProperties.canAffectCaster, "Can Affect Caster");
+            EnumFlagsField<EntityType>(ref basicAbilityProperties.typesAffectedByTheAbility, "Types Affected By The Ability");
 
             EditorGUI.indentLevel--;
         }
@@ -67,24 +75,10 @@ namespace Editor.Enemies
                 FloatField(ref basicAbilityProperties.abilityCast.timeToCast, 0, "Time To Cast");
                 FloatField(ref basicAbilityProperties.abilityCast.cooldown, 0, "Cooldown");
                 FloatField(ref basicAbilityProperties.abilityCast.duration, "Duration");
-                
-                FloatField(ref basicAbilityProperties.abilityCast.minimumRangeToCast, 0, "Minimum Range To Cast");
-                FloatField(ref basicAbilityProperties.abilityCast.maximumRangeToCast, 
-                    basicAbilityProperties.abilityCast.minimumRangeToCast, "Maximum Range To Cast");
-                
-                Vector3Field(ref basicAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Head's Forward)");
-                
-                FloatField(ref basicAbilityProperties.abilityCast.minimumAngleToCast, 0, 360, "Minimum Angle To Cast");
 
                 if (basicAbilityProperties.abilityCast.timeToCast != 0)
                 {
                     ToggleField(ref basicAbilityProperties.abilityCast.canCancelCast, "Can Cancel Cast");
-
-                    if (basicAbilityProperties.abilityCast.canCancelCast)
-                    {
-                        FloatField(ref basicAbilityProperties.abilityCast.maximumAngleToCancelCast, 
-                            basicAbilityProperties.abilityCast.minimumAngleToCast, 360, "Maximum Angle To Cancel Cast");
-                    }   
                 }
                 else
                 {

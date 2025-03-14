@@ -11,6 +11,7 @@ namespace ECS.Entities
         LONG_ARMS = 1 << 2,
         LONG_ARMS_BASE = 1 << 3,
         SENDATU = 1 << 4,
-        ENUM_SIZE
+        ENUM_SIZE = 1 << 5,
+        ALL = ~0
     }
 }

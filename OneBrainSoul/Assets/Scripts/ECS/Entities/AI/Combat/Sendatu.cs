@@ -29,8 +29,7 @@ namespace ECS.Entities.AI.Combat
             _bodyNormalRotationSpeed = _sendatuProperties.bodyNormalRotationSpeed;
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
 
-            _context = new SendatuContext(_sendatuProperties.totalHealth, _sendatuProperties.maximumHeadYawRotation, 
-                radius, capsuleCollider.height, _sendatuProperties.sightMaximumDistance, _sendatuProperties.fov, _headTransform, 
+            _context = new SendatuContext(_sendatuProperties.totalHealth, radius, capsuleCollider.height, _headTransform, 
                 _bodyTransform, _sendatuProperties.radiusToFlee);
             
             SetDirectionToRotateBody(transform.forward);
@@ -48,37 +47,7 @@ namespace ECS.Entities.AI.Combat
         
         protected override void CreateAbilities()
         {
-            /*_throwRockAbility = AbilityManager.Instance.ReturnProjectileAbility(_sendatuProperties.throwRockAbilityProperties,
-                transform);
-
-            if (_throwRockAbility.GetCast().canCancelCast)
-            {
-                _cancelThrowRockFunc = () =>
-                {
-                    AbilityCast abilityCast = _throwRockAbility.GetCast();
-                    Vector3 vectorToTarget = _context.GetThrowRockTargetContext().GetVectorToTarget();
-
-                    return Vector3.Angle(transform.forward, vectorToTarget) > abilityCast.maximumAngleFromForwardToCancelCast ||
-                           vectorToTarget.sqrMagnitude > abilityCast.maximumRangeToCast * abilityCast.maximumRangeToCast;
-                };
-            }
-            
-            _clapAboveAbility = AbilityManager.Instance.ReturnAreaAbility(_sendatuProperties.clapAboveAbilityProperties,
-                transform);
-
-            if (!_clapAboveAbility.GetCast().canCancelCast)
-            {
-                return;
-            }
-
-            _cancelClapAboveFunc = () =>
-            {
-                AbilityCast abilityCast = _clapAboveAbility.GetCast();
-                Vector3 vectorToTarget = _context.GetClapAboveTargetContext().GetVectorToTarget();
-
-                return Vector3.Angle(transform.forward, vectorToTarget) > abilityCast.maximumAngleFromForwardToCancelCast ||
-                    vectorToTarget.sqrMagnitude > abilityCast.maximumRangeToCast * abilityCast.maximumRangeToCast;
-            };*/
+            //TODO SENDATU CREATE ABILITIES
         }
 
         #region AI LOOP
@@ -257,12 +226,17 @@ namespace ECS.Entities.AI.Combat
             CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
 
+        protected override void RemoveATargetIfWasLost(uint targetIdToCheck)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
-            Vector3 sourcePosition)
+            Vector3 sourcePosition, ForceMode forceMode)
         {}
 
         public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, 
-            Vector3 sourcePosition)
+            Vector3 sourcePosition, ForceMode forceMode)
         {}
     }
 }

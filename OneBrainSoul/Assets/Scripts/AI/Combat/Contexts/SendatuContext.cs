@@ -10,10 +10,9 @@ namespace AI.Combat.Contexts
         private Dictionary<uint, float> _distancesToTargetsToFleeFrom;
         private float _radiusToFlee;
         
-        public SendatuContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, float radiusToFlee) : 
-            base(EntityType.SENDATU, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
-            fov, headAgentTransform, bodyAgentTransform)
+        public SendatuContext(uint totalHealth,float radius, float height,
+            Transform headAgentTransform, Transform bodyAgentTransform, float radiusToFlee) : 
+            base(EntityType.SENDATU, totalHealth, radius, height, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {

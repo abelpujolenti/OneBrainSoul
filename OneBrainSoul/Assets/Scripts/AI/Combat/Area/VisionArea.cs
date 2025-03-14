@@ -1,6 +1,7 @@
 ﻿using System;
 using ECS.Entities;
 using ECS.Entities.AI;
+using Managers;
 using UnityEngine;
 
 namespace AI.Combat.Area
@@ -14,6 +15,7 @@ namespace AI.Combat.Area
         {
             _addAction = addAction;
             _removeAction = removeAction;
+            EventsManager.OnAgentDefeated += _removeAction;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -25,9 +27,7 @@ namespace AI.Combat.Area
                 return;
             }
 
-            EntityType agentEntityType = agentEntity.GetEntityType();
-
-            _addAction(agentEntityType, agentEntity.GetAgentID());
+            _addAction(agentEntity.GetEntityType(), agentEntity.GetAgentID());
         }
 
         private void OnTriggerExit(Collider other)
@@ -39,9 +39,12 @@ namespace AI.Combat.Area
                 return;
             }
 
-            EntityType agentEntityType = agentEntity.GetEntityType();
+            _removeAction(agentEntity.GetEntityType(), agentEntity.GetAgentID());
+        }
 
-            _removeAction(agentEntityType, agentEntity.GetAgentID());
+        private void OnDestroy()
+        {
+            EventsManager.OnAgentDefeated -= _removeAction;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using ECS.Components.AI.Combat.Abilities;
+﻿using System.Collections.Generic;
+using ECS.Components.AI.Combat.Abilities;
+using ECS.Entities;
 using UnityEngine;
 
 namespace AI.Combat.AbilityAoEColliders
@@ -13,9 +15,9 @@ namespace AI.Combat.AbilityAoEColliders
         private float _radius;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            ConicalAbilityComponent conicalAbilityComponent)
+            ConicalAbilityComponent conicalAbilityComponent, EntityType typesAffectedByTheAbility)
         {
-            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, conicalAbilityComponent);
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, conicalAbilityComponent, typesAffectedByTheAbility);
             
             _sphereCollider.radius = conicalAbilityComponent.GetHeight();
             _radius = conicalAbilityComponent.GetRadius();

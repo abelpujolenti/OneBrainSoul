@@ -4,6 +4,7 @@ namespace AI.Combat.Contexts.Target
 {
     public class TargetContext
     {
+        private uint _targetId;
         private float _targetRadius;
         private float _targetHeight;
         private float _distanceToTarget;
@@ -12,10 +13,16 @@ namespace AI.Combat.Contexts.Target
         private Vector3 _targetPosition;
         private Vector3 _targetVelocity;
 
-        public void SetTargetProperties(float targetRadius, float targetHeight)
+        public void SetTargetProperties(uint targetId, float targetRadius, float targetHeight)
         {
+            _targetId = targetId;
             _targetRadius = targetRadius;
             _targetHeight = targetHeight;
+        }
+
+        public uint GetTargetId()
+        {
+            return _targetId;
         }
 
         public float GetTargetRadius()

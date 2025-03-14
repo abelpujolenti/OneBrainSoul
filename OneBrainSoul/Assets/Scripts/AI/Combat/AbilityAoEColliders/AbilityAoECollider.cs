@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using AI.Combat.AbilitySpecs;
 using ECS.Components.AI.Combat.Abilities;
 using ECS.Entities;
@@ -19,9 +18,7 @@ namespace AI.Combat.AbilityAoEColliders
 
         private Transform _parentTransform;
 
-        private Stopwatch _stopwatch = new Stopwatch();
-
-        protected List<EntityType> _abilityTargets;
+        private EntityType _typesAffectedByTheAbility;
 
         private List<AgentEntity> _agentsInside = new List<AgentEntity>();
 
@@ -50,14 +47,17 @@ namespace AI.Combat.AbilityAoEColliders
         private float _tickTimer;
 
         protected GameObject _childWithParticleSystem;
-
-        protected virtual void OnDisable()
+        
+        private readonly Dictionary<AbilityEffectForceType, ForceMode> _forceModes = new Dictionary<AbilityEffectForceType, ForceMode>
         {
-            _stopwatch.Reset();
-        }
+            { AbilityEffectForceType.FORCE , ForceMode.Force},  
+            { AbilityEffectForceType.IMPULSE , ForceMode.Impulse},  
+            { AbilityEffectForceType.ACCELERATION , ForceMode.Acceleration},  
+            { AbilityEffectForceType.VELOCITY_CHANGE , ForceMode.VelocityChange}  
+        };
 
         public virtual void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            TAreaAbilityComponent areaAbilityComponent)
+            TAreaAbilityComponent areaAbilityComponent, EntityType typesAffectedByTheAbility)
         {
             _parentTransform = parentTransform;
 
@@ -70,6 +70,8 @@ namespace AI.Combat.AbilityAoEColliders
             _childWithParticleSystem = Instantiate(abilityAoE.objectWithParticleSystem, transform);
 
             _childWithParticleSystem.transform.localPosition = abilityAoE.relativePositionForParticles;
+            
+            _typesAffectedByTheAbility = typesAffectedByTheAbility;
 
             {
                 Vector3 direction = areaAbilityComponent.GetAoE().direction;
@@ -254,15 +256,13 @@ namespace AI.Combat.AbilityAoEColliders
 
             if (abilityEffect.doesForceComesFromCenterOfTheArea)
             {
-                AddPushFromCenter(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength, comesFromCaster);
+                AddPushFromCenter(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength,
+                    comesFromCaster, abilityEffect.abilityEffectForceType);
                 return;
             }
-            AddPushInADirection(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength, comesFromCaster);
-        }
 
-        public void SetAbilityTargets(List<EntityType> abilityTargets)
-        {
-            _abilityTargets = abilityTargets;
+            AddPushInADirection(actionsList, abilityEffect.forceDirection, abilityEffect.forceStrength, comesFromCaster,
+                abilityEffect.abilityEffectForceType);
         }
 
         private void AddDamage(List<Action<AgentEntity>> actionsList, uint damageValue, bool comesFromCaster)
@@ -375,7 +375,7 @@ namespace AI.Combat.AbilityAoEColliders
         }
 
         private void AddPushFromCenter(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength, 
-            bool comesFromCaster)
+            bool comesFromCaster, AbilityEffectForceType abilityEffectForceType)
         {
             Transform source = transform;
 
@@ -384,16 +384,17 @@ namespace AI.Combat.AbilityAoEColliders
                 source = _parentTransform;
             }
 
-            actionsList.Add(agentEntity => PushFromCenter(agentEntity, forceDirection, forceStrength, source.position));
+            actionsList.Add(agentEntity => PushFromCenter(agentEntity, forceDirection, forceStrength, source.position, _forceModes[abilityEffectForceType]));
         }
 
-        private void PushFromCenter(IPushable agent, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
+        private void PushFromCenter(IPushable agent, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition, ForceMode forceMode)
         {
-            agent.OnReceivePushFromCenter(transform.position, forceDirection, forceStrength, sourcePosition);
+            agent.OnReceivePushFromCenter(transform.position, forceDirection, forceStrength, sourcePosition, forceMode);
         }
 
         private void AddPushInADirection(List<Action<AgentEntity>> actionsList, Vector3 forceDirection, float forceStrength, 
-            bool comesFromCaster)
+            bool comesFromCaster, AbilityEffectForceType abilityEffectForceType)
         {
             Transform source = transform;
 
@@ -402,12 +403,13 @@ namespace AI.Combat.AbilityAoEColliders
                 source = _parentTransform;
             }
 
-            actionsList.Add(agentEntity => PushInADirection(agentEntity, forceDirection, forceStrength, source.position));
+            actionsList.Add(agentEntity => PushInADirection(agentEntity, forceDirection, forceStrength, source.position, _forceModes[abilityEffectForceType]));
         }
 
-        private void PushInADirection(IPushable agent, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
+        private void PushInADirection(IPushable agent, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition, ForceMode forceMode)
         {
-            agent.OnReceivePushInADirection(transform.forward, forceDirection, forceStrength, sourcePosition);
+            agent.OnReceivePushInADirection(transform.forward, forceDirection, forceStrength, sourcePosition, forceMode);
         }
 
         private void AddReleaseFromSlow(List<Action<AgentEntity>> actionsList)
@@ -433,7 +435,6 @@ namespace AI.Combat.AbilityAoEColliders
         public void Activate()
         {
             gameObject.SetActive(true);
-            _stopwatch.Start();
             _actionResizing(0);
             
             SetParent(_parentTransform);
@@ -538,7 +539,6 @@ namespace AI.Combat.AbilityAoEColliders
         private void Deactivate()
         {
             _agentsInside.Clear();
-            _stopwatch.Reset();
             gameObject.SetActive(false);
         }
 
@@ -556,17 +556,9 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            for (int i = 0; i < _abilityTargets.Count; i++)
+            if ((agentEntity.GetEntityType() & _typesAffectedByTheAbility) == 0)
             {
-                if (agentEntity.GetEntityType() == _abilityTargets[i])
-                {
-                    break;
-                }
-
-                if (i == _abilityTargets.Count - 1)
-                {
-                    return;
-                }
+                return;
             }
             
             _agentsInside.Add(agentEntity);
@@ -583,17 +575,9 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            for (int i = 0; i < _abilityTargets.Count; i++)
+            if ((agentEntity.GetEntityType() & _typesAffectedByTheAbility) == 0)
             {
-                if (agentEntity.GetEntityType() == _abilityTargets[i])
-                {
-                    break;
-                }
-
-                if (i == _abilityTargets.Count - 1)
-                {
-                    return;
-                }
+                return;
             }
             
             _agentsInside.Remove(agentEntity);

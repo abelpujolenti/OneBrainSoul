@@ -13,14 +13,10 @@ MonoBehaviour:
   m_Name: HealTest
   m_EditorClassIdentifier: 
   canAffectCaster: 0
-  abilityTarget: 6
+  abilityTarget: 2
+  typesAffectedByTheAbility: 2
   abilityCast:
-    minimumRangeToCast: 0
-    maximumRangeToCast: 300
-    directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 30
     canCancelCast: 0
-    maximumAngleToCancelCast: 0
     timeToCast: 0
     cooldown: 7
     duration: 0
@@ -43,6 +39,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnTheDuration: 0
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -58,6 +55,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -73,6 +71,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
@@ -157,7 +156,7 @@ MonoBehaviour:
     makesParabola: 0
     projectileSpeed: 60
     instances: 30
-    maximumDispersion: 5
+    dispersionRatePer1Meter: 0
     objectWithParticleSystem: {fileID: 5574815293590225142, guid: bf3e7f459d4e8df45a792ea19c5b69aa,
       type: 3}
     relativePositionForParticles: {x: 0, y: 0, z: 0}

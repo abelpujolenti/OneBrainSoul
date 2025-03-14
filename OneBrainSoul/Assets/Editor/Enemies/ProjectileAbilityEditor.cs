@@ -51,8 +51,16 @@ namespace Editor.Enemies
 
             EditorGUI.indentLevel++;
             
-            ToggleField(ref projectileAbilityProperties.canAffectCaster, "Can Affect Caster");
             EnumFlagsField<EntityType>(ref projectileAbilityProperties.abilityTarget, "Entity Type");
+            
+            EditorGUILayout.Space();
+
+            projectileAbilityProperties.typesAffectedByTheAbility =
+                (projectileAbilityProperties.typesAffectedByTheAbility & ~projectileAbilityProperties.abilityTarget) |
+                projectileAbilityProperties.abilityTarget;
+            
+            ToggleField(ref projectileAbilityProperties.canAffectCaster, "Can Affect Caster");
+            EnumFlagsField<EntityType>(ref projectileAbilityProperties.typesAffectedByTheAbility, "Types Affected By The Ability");
 
             EditorGUI.indentLevel--;
         }
@@ -69,24 +77,10 @@ namespace Editor.Enemies
             {
                 FloatField(ref projectileAbilityProperties.abilityCast.timeToCast, 0, "Time To Cast");
                 FloatField(ref projectileAbilityProperties.abilityCast.cooldown, 0, "Cooldown");
-                
-                FloatField(ref projectileAbilityProperties.abilityCast.minimumRangeToCast, 0, "Minimum Range To Cast");
-                FloatField(ref projectileAbilityProperties.abilityCast.maximumRangeToCast, 
-                    projectileAbilityProperties.abilityCast.minimumRangeToCast, "Maximum Range To Cast");
-                
-                Vector3Field(ref projectileAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Head's Forward)");
-                
-                FloatField(ref projectileAbilityProperties.abilityCast.minimumAngleToCast, 0, 360, "Minimum Angle To Cast");
 
                 if (projectileAbilityProperties.abilityCast.timeToCast != 0)
                 {
                     ToggleField(ref projectileAbilityProperties.abilityCast.canCancelCast, "Can Cancel Cast");
-
-                    if (projectileAbilityProperties.abilityCast.canCancelCast)
-                    {
-                        FloatField(ref projectileAbilityProperties.abilityCast.maximumAngleToCancelCast, 
-                            projectileAbilityProperties.abilityCast.minimumAngleToCast, 360, "Maximum Angle To Cancel Cast");
-                    }   
                 }
                 else
                 {
@@ -94,7 +88,7 @@ namespace Editor.Enemies
                 }
             }
             
-            AbilityProjectile(ref projectileAbilityProperties.abilityProjectile, projectileAbilityProperties.abilityCast.maximumRangeToCast);
+            AbilityProjectile(ref projectileAbilityProperties.abilityProjectile);
             
             AbilityAoE(ref projectileAbilityProperties.abilityAoE, ref projectileAbilityProperties.abilityAoEType);
             
@@ -355,9 +349,11 @@ namespace Editor.Enemies
             FloatField(ref abilityEffect.forceStrength, 0, "Force Strength");
             
             ToggleField(ref abilityEffect.doesForceComesFromCenterOfTheArea, "Does The Force Come From The Center Of The Area");
+            
+            EnumField(ref abilityEffect.abilityEffectForceType, "Ability Effect Force Type");
         }
 
-        private void AbilityProjectile(ref AbilityProjectile abilityProjectile, float maximumRangeToCast)
+        private void AbilityProjectile(ref AbilityProjectile abilityProjectile)
         {
             EditorGUILayout.Space();
             EditorGUILayout.Space();
@@ -378,7 +374,7 @@ namespace Editor.Enemies
             //ToggleField(ref abilityProjectile.makesParabola, "Makes a Parabola");
             FloatField(ref abilityProjectile.projectileSpeed, 0, "Projectile Speed");
             UintField(ref abilityProjectile.instances, 1, "Projectile Instances");
-            FloatField(ref abilityProjectile.maximumDispersion, 0, "Dispersion At Maximum Distance");
+            FloatField(ref abilityProjectile.dispersionRatePer1Meter, 0, "Dispersion Rate Per 1 Meter");
             /*ToggleField(ref abilityProjectile.doesVanishOnImpact, "Does It Vanish On Impact");
             ToggleField(ref abilityProjectile.doesVanishOverTime, "Does It Vanish Over Time");
 

@@ -14,12 +14,12 @@ namespace AI.Combat.Contexts
         private bool _isSeeingATargetForSlam;
         private bool _slamAbilityHasATarget;
         private AbilityCast _slamCast;
+        private HashSet<uint> _targetsInsideSlamDetectionArea = new HashSet<uint>();
         private TargetContext _slamTarget = new TargetContext();
         
-        public TrifaceContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
-            base(EntityType.TRIFACE, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
-                fov, headAgentTransform, bodyAgentTransform)
+        public TrifaceContext(uint totalHealth,float radius, float height, 
+            Transform headAgentTransform, Transform bodyAgentTransform, AbilityCast slamCast) : 
+            base(EntityType.TRIFACE, totalHealth,radius, height, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {
@@ -46,16 +46,6 @@ namespace AI.Combat.Contexts
             return _slamAbilityHasATarget;
         }
 
-        public float GetSlamMinimumRangeToCast()
-        {
-            return _slamCast.minimumRangeToCast;
-        }
-
-        public float GetSlamMaximumRangeToCast()
-        {
-            return _slamCast.maximumRangeToCast;
-        }
-
         public bool IsSlamOnCooldown()
         {
             return _slamCast.IsOnCooldown();
@@ -66,24 +56,25 @@ namespace AI.Combat.Contexts
             return _slamTarget;
         }
 
-        public Vector3 GetDirectionOfSlamDetection()
+        public void AddTargetInsideSlamDetectionArea(uint targetId)
         {
-            Vector3 direction = _slamCast.directionOfDetection;
-
-            direction = GetAgentHeadTransform().rotation * direction;
-            
-            return direction;
+            _targetsInsideSlamDetectionArea.Add(targetId);
         }
 
-        public float GetMinimumAngleFromForwardToCastSlam()
+        public void RemoveTargetInsideSlamDetectionArea(uint targetId)
         {
-            return _slamCast.minimumAngleToCast;
+            _targetsInsideSlamDetectionArea.Remove(targetId);
         }
 
-        public void SetSlamTargetProperties(float targetRadius, float targetHeight)
+        public bool IsSlamTargetInsideDetectionArea()
+        {
+            return _targetsInsideSlamDetectionArea.Contains(_slamTarget.GetTargetId());
+        }
+
+        public void SetSlamTargetProperties(uint targetId, float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
-            _slamTarget.SetTargetProperties(targetRadius, targetHeight);
+            _slamTarget.SetTargetProperties(targetId, targetRadius, targetHeight);
 
             _slamAbilityHasATarget = true;
         }

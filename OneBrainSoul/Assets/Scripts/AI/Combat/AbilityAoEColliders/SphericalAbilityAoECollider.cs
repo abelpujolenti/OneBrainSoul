@@ -1,4 +1,6 @@
-﻿using ECS.Components.AI.Combat.Abilities;
+﻿using System.Collections.Generic;
+using ECS.Components.AI.Combat.Abilities;
+using ECS.Entities;
 using UnityEngine;
 
 namespace AI.Combat.AbilityAoEColliders
@@ -10,9 +12,9 @@ namespace AI.Combat.AbilityAoEColliders
         private AnimationCurve _radiusResizeCurve;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            SphericalAbilityComponent sphericalAbilityComponent)
+            SphericalAbilityComponent sphericalAbilityComponent, EntityType typesAffectedByTheAbility)
         {
-            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, sphericalAbilityComponent);
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, sphericalAbilityComponent, typesAffectedByTheAbility);
 
             _sphereCollider.radius = sphericalAbilityComponent.GetRadius();
 

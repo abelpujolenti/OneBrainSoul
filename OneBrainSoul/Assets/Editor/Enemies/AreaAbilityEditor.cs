@@ -53,8 +53,16 @@ namespace Editor.Enemies
 
             EditorGUI.indentLevel++;
             
-            ToggleField(ref areaAbilityProperties.canAffectCaster, "Can Affect Caster");
             EnumFlagsField<EntityType>(ref areaAbilityProperties.abilityTarget, "Entity Type");
+            
+            EditorGUILayout.Space();
+
+            areaAbilityProperties.typesAffectedByTheAbility =
+                (areaAbilityProperties.typesAffectedByTheAbility & ~areaAbilityProperties.abilityTarget) |
+                areaAbilityProperties.abilityTarget;
+            
+            ToggleField(ref areaAbilityProperties.canAffectCaster, "Can Affect Caster");
+            EnumFlagsField<EntityType>(ref areaAbilityProperties.typesAffectedByTheAbility, "Types Affected By The Ability");
 
             EditorGUI.indentLevel--;
         }
@@ -71,24 +79,10 @@ namespace Editor.Enemies
             {
                 FloatField(ref areaAbilityProperties.abilityCast.timeToCast, 0, "Time To Cast");
                 FloatField(ref areaAbilityProperties.abilityCast.cooldown, 0, "Cooldown");
-                
-                FloatField(ref areaAbilityProperties.abilityCast.minimumRangeToCast, 0, "Minimum Range To Cast");
-                FloatField(ref areaAbilityProperties.abilityCast.maximumRangeToCast, 
-                    areaAbilityProperties.abilityCast.minimumRangeToCast, "Maximum Range To Cast");
-                
-                Vector3Field(ref areaAbilityProperties.abilityCast.directionOfDetection, "Direction Of Detection (Relative To Head's Forward)");
-                
-                FloatField(ref areaAbilityProperties.abilityCast.minimumAngleToCast, 0, 360, "Minimum Angle To Cast");
 
                 if (areaAbilityProperties.abilityCast.timeToCast != 0)
                 {
                     ToggleField(ref areaAbilityProperties.abilityCast.canCancelCast, "Can Cancel Cast");
-
-                    if (areaAbilityProperties.abilityCast.canCancelCast)
-                    {
-                        FloatField(ref areaAbilityProperties.abilityCast.maximumAngleToCancelCast, 
-                            areaAbilityProperties.abilityCast.minimumAngleToCast, 360, "Maximum Angle To Cancel Cast");
-                    }   
                 }
                 else
                 {
@@ -354,6 +348,8 @@ namespace Editor.Enemies
             FloatField(ref abilityEffect.forceStrength, 0, "Force Strength");
             
             ToggleField(ref abilityEffect.doesForceComesFromCenterOfTheArea, "Does The Force Come From The Center Of The Area");
+            
+            EnumField(ref abilityEffect.abilityEffectForceType, "Ability Effect Force Type");
         }
 
         private void AbilityAoE(ref AbilityAoE abilityAoE, ref AbilityAoEType abilityAoEType)

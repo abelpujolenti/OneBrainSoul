@@ -6,7 +6,7 @@ namespace ECS.Components.AI.Combat.Abilities
 {
     public class BasicAbilityComponent
     {
-        private readonly EntityType _abilityTarget;
+        private readonly EntityType _entityAffectedByTheAbility;
 
         private readonly AbilityCast _abilityCast;
 
@@ -23,7 +23,7 @@ namespace ECS.Components.AI.Combat.Abilities
 
         public BasicAbilityComponent(BasicAbilityProperties basicAbilityProperties)
         {
-            _abilityTarget = basicAbilityProperties.abilityTarget;
+            _entityAffectedByTheAbility = basicAbilityProperties.typesAffectedByTheAbility;
 
             _abilityCast = basicAbilityProperties.abilityCast.DeepCopy();
 
@@ -39,9 +39,9 @@ namespace ECS.Components.AI.Combat.Abilities
             _abilityEffectOnEnd = basicAbilityProperties.abilityEffectOnEnd;
         }
 
-        public EntityType GetTargets()
+        public EntityType GetAffectedEntities()
         {
-            return _abilityTarget;
+            return _entityAffectedByTheAbility;
         }
 
         public AbilityCast GetCast()

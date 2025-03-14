@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using AI.Combat.AbilityProjectiles;
 using AI.Combat.AbilitySpecs;
-using ECS.Components.AI.Combat.Abilities;
 using ECS.Entities.AI;
 using Interfaces.AI.Combat;
 using Managers;
@@ -13,7 +12,7 @@ namespace AI.Combat.AbilityCasts
 {
     public class ProjectileAbility : IProjectileAbility
     {
-        private BasicAbilityComponent _basicAbilityComponent;
+        private AbilityCast _abilityCast;
         private Queue<Projectile> _projectilesPool = new Queue<Projectile>();
         private Projectile _currentProjectile;
 
@@ -21,7 +20,7 @@ namespace AI.Combat.AbilityCasts
 
         private Vector3 _relativePosition;
 
-        private float _maximumDispersion;
+        private float _dispersionRatePer1Meter;
         
         private uint _targetId;
         
@@ -31,10 +30,10 @@ namespace AI.Combat.AbilityCasts
 
         private Vector3 _automaticShootDirection;
 
-        public ProjectileAbility(BasicAbilityComponent basicAbilityComponent, List<Projectile> projectiles, 
-            Transform parentTransform, Vector3 relativePosition, float maximumDispersion, bool makesParabola)
+        public ProjectileAbility(AbilityCast abilityCast, List<Projectile> projectiles, 
+            Transform parentTransform, Vector3 relativePosition, float dispersionRatePer1Meter, bool makesParabola)
         {
-            _basicAbilityComponent = basicAbilityComponent;
+            _abilityCast = abilityCast;
 
             foreach (Projectile projectile in projectiles)
             {
@@ -43,7 +42,7 @@ namespace AI.Combat.AbilityCasts
             
             _parentTransform = parentTransform;
             _relativePosition = relativePosition;
-            _maximumDispersion = maximumDispersion;
+            _dispersionRatePer1Meter = dispersionRatePer1Meter;
             
             if (makesParabola)
             {
@@ -60,8 +59,7 @@ namespace AI.Combat.AbilityCasts
             {
                 AgentEntity target = CombatManager.Instance.ReturnAgentEntity(_targetId);
                 return CalculateLinearForceVector(target.GetTransformComponent().GetPosition(), target.GetVelocity(), 
-                    projectile.transform.position, projectile.GetSpeed(), basicAbilityComponent.GetCast().maximumRangeToCast, 
-                    _maximumDispersion);
+                    projectile.transform.position, projectile.GetSpeed(), _dispersionRatePer1Meter);
             };
 
         }
@@ -88,7 +86,7 @@ namespace AI.Combat.AbilityCasts
 
         public AbilityCast GetCast()
         {
-            return _basicAbilityComponent.GetCast();
+            return _abilityCast;
         }
 
         public void SetTargetId(uint targetId)
@@ -126,9 +124,9 @@ namespace AI.Combat.AbilityCasts
         }
 
         private static Vector3 CalculateLinearForceVector(Vector3 targetPosition, Vector3 targetVelocity, Vector3 ownPosition,
-            float projectileSpeed, float maximumDistance, float maximumDispersion)
+            float projectileSpeed, float dispersionRatePer1Meter)
         {
-            Vector3 dispersionVector = CalculateDispersion(targetPosition - ownPosition, maximumDistance, maximumDispersion);
+            Vector3 dispersionVector = CalculateDispersion(targetPosition - ownPosition, dispersionRatePer1Meter);
 
             targetPosition += dispersionVector;
             
@@ -198,14 +196,14 @@ namespace AI.Combat.AbilityCasts
             return forceVector.magnitude > projectileSpeed ? Vector3.zero : forceVector.normalized * projectileSpeed;
         }
 
-        private static Vector3 CalculateDispersion(Vector3 vectorToTarget, float maximumDistance, float maximumDispersion)
+        private static Vector3 CalculateDispersion(Vector3 vectorToTarget, float dispersionRatePer1Meter)
         {
             Vector3 randomPerpendicular = Vector3.Cross(vectorToTarget, Vector3.up).normalized;
             
             Quaternion randomRotation = Quaternion.AngleAxis(Random.Range(0f, 360f), vectorToTarget);
             Vector3 randomDeviation = randomRotation * randomPerpendicular;
 
-            return randomDeviation * (Random.Range(0, (vectorToTarget.magnitude * maximumDispersion) / maximumDistance));
+            return randomDeviation * Random.Range(0, vectorToTarget.magnitude / 100 * dispersionRatePer1Meter);
         }
     }
 }

@@ -149,10 +149,12 @@ namespace ECS.Entities.AI.Combat
             yield break;
         }
 
-        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition, ForceMode forceMode)
         {}
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, 
+            float forceStrength, Vector3 sourcePosition, ForceMode forceMode)
         {}
 
         public void SetLongArms(LongArms longArms)

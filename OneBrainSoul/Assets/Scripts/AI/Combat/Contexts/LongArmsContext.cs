@@ -10,25 +10,26 @@ namespace AI.Combat.Contexts
 {
     public class LongArmsContext : TeleportMobilityEnemyContext, ILongArmsIdleUtility, ILongArmsAcquireNewTargetForThrowRockUtility, 
         ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsThrowRockUtility, ILongArmsClapAboveUtility, ILongArmsFleeUtility
-    {
-        private Dictionary<uint, float> _distancesToTargetsToFleeFrom;
+    {        
+        private float _distanceToClosestTargetToFleeFrom;
         private uint _longArmsBasesFree;
         private float _radiusToFlee;
 
         private bool _isSeeingATargetForThrowRock;
         private bool _throwRockAbilityHasATarget;
         private AbilityCast _throwRockCast;
+        private HashSet<uint> _targetsInsideThrowRockDetectionArea = new HashSet<uint>();
         private TargetContext _throwRockTarget = new TargetContext();
 
         private bool _isSeeingATargetForClapAbove;
         private bool _clapAboveAbilityHasATarget;
         private AbilityCast _clapAboveCast;
+        private HashSet<uint> _targetsInsideClapAboveDetectionArea = new HashSet<uint>();
         private TargetContext _clapAboveTarget = new TargetContext();
         
-        public LongArmsContext(uint totalHealth, uint maximumHeadYawRotation,float radius, float height, 
-            float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform, 
-            AbilityCast throwRockCast, AbilityCast clapAboveCast, float radiusToFlee) : base(EntityType.LONG_ARMS, 
-            totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, fov, headAgentTransform, bodyAgentTransform)
+        public LongArmsContext(uint totalHealth,float radius, float height, Transform headAgentTransform, 
+            Transform bodyAgentTransform, AbilityCast throwRockCast, AbilityCast clapAboveCast, float radiusToFlee) 
+            : base(EntityType.LONG_ARMS, totalHealth, radius, height, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
             {
@@ -37,7 +38,6 @@ namespace AI.Combat.Contexts
                 (uint)LongArmsAction.THROW_ROCK
             };
 
-            _distancesToTargetsToFleeFrom = new Dictionary<uint, float>();
             _throwRockCast = throwRockCast;
             _clapAboveCast = clapAboveCast;
             _radiusToFlee = radiusToFlee;
@@ -58,16 +58,6 @@ namespace AI.Combat.Contexts
             return _throwRockAbilityHasATarget;
         }
 
-        public float GetThrowRockMinimRangeToCast()
-        {
-            return _throwRockCast.minimumRangeToCast;
-        }
-
-        public float GetThrowRockMaximRangeToCast()
-        {
-            return _throwRockCast.maximumRangeToCast;
-        }
-
         public bool IsThrowRockOnCooldown()
         {
             return _throwRockCast.IsOnCooldown();
@@ -78,24 +68,25 @@ namespace AI.Combat.Contexts
             return _throwRockTarget;
         }
 
-        public Vector3 GetDirectionOfThrowRockDetection()
+        public void AddTargetInsideThrowRockDetectionArea(uint targetId)
         {
-            Vector3 direction = _throwRockCast.directionOfDetection;
-
-            direction = GetAgentHeadTransform().rotation * direction;
-            
-            return direction;
+            _targetsInsideThrowRockDetectionArea.Add(targetId);
         }
 
-        public float GetMinimumAngleFromForwardToCastThrowRock()
+        public void RemoveTargetInsideThrowRockDetectionArea(uint targetId)
         {
-            return _throwRockCast.minimumAngleToCast;
+            _targetsInsideThrowRockDetectionArea.Remove(targetId);
         }
 
-        public void SetThrowRockTargetProperties(float targetRadius, float targetHeight)
+        public bool IsThrowRockTargetInsideDetectionArea()
+        {
+            return _targetsInsideThrowRockDetectionArea.Contains(_throwRockTarget.GetTargetId());
+        }
+
+        public void SetThrowRockTargetProperties(uint targetId, float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
-            _throwRockTarget.SetTargetProperties(targetRadius, targetHeight);
+            _throwRockTarget.SetTargetProperties(targetId, targetRadius, targetHeight);
 
             _throwRockAbilityHasATarget = true;
         }
@@ -122,16 +113,6 @@ namespace AI.Combat.Contexts
             return _clapAboveAbilityHasATarget;
         }
 
-        public float GetClapAboveMinimRangeToCast()
-        {
-            return _clapAboveCast.minimumRangeToCast;
-        }
-
-        public float GetClapAboveMaximRangeToCast()
-        {
-            return _clapAboveCast.maximumRangeToCast;
-        }
-
         public bool IsClapAboveOnCooldown()
         {
             return _clapAboveCast.IsOnCooldown();
@@ -142,24 +123,25 @@ namespace AI.Combat.Contexts
             return _clapAboveTarget;
         }
 
-        public Vector3 GetDirectionOfClapAboveDetection()
+        public void AddTargetInsideClapAboveDetectionArea(uint targetId)
         {
-            Vector3 direction = _clapAboveCast.directionOfDetection;
-
-            direction = GetAgentHeadTransform().rotation * direction;
-            
-            return direction;
+            _targetsInsideClapAboveDetectionArea.Add(targetId);
         }
 
-        public float GetMinimumAngleFromForwardToCastClapAbove()
+        public void RemoveTargetInsideClapAboveDetectionArea(uint targetId)
         {
-            return _clapAboveCast.minimumAngleToCast;
+            _targetsInsideClapAboveDetectionArea.Remove(targetId);
         }
 
-        public void SetClapAboveTargetProperties(float targetRadius, float targetHeight)
+        public bool IsClapAboveTargetInsideDetectionArea()
+        {
+            return _targetsInsideClapAboveDetectionArea.Contains(_clapAboveTarget.GetTargetId());
+        }
+
+        public void SetClapAboveTargetProperties(uint targetId, float targetRadius, float targetHeight)
         {
             SetIsFighting(true);
-            _clapAboveTarget.SetTargetProperties(targetRadius, targetHeight);
+            _clapAboveTarget.SetTargetProperties(targetId, targetRadius, targetHeight);
 
             _clapAboveAbilityHasATarget = true;
         }
@@ -188,30 +170,12 @@ namespace AI.Combat.Contexts
 
         public float GetDistanceToClosestTargetToFleeFrom()
         {
-            float minimumDistance = Mathf.Infinity;
-
-            foreach (float distance in _distancesToTargetsToFleeFrom.Values)
-            {
-                if (minimumDistance < distance)
-                {
-                    continue;
-                }
-
-                minimumDistance = distance;
-            }
-            
-            return minimumDistance;
+            return _distanceToClosestTargetToFleeFrom;
         }
 
-        public void SetDistanceToTargetToFleeFrom(uint agentID, float distance)
+        public void SetDistanceToClosestTargetToFleeFrom(float distance)
         {
-            if (_distancesToTargetsToFleeFrom.ContainsKey(agentID))
-            {
-                _distancesToTargetsToFleeFrom[agentID] = distance;
-                return;
-            }
-            
-            _distancesToTargetsToFleeFrom.Add(agentID, distance);
+            _distanceToClosestTargetToFleeFrom = distance;
         }
 
         public float GetRadiusToFlee()

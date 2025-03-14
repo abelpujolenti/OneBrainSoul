@@ -28,7 +28,6 @@ namespace Menus.Main
 
         public void TitleAnimationFinished()
         {
-            Debug.Log("Holi");
             StartCoroutine(DelayAfterTitleAnimationFinished());
         }
 

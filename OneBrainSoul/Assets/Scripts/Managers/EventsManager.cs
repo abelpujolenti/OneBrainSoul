@@ -1,4 +1,5 @@
 using System;
+using ECS.Entities;
 
 namespace Managers
 {
@@ -39,7 +40,8 @@ namespace Managers
 
         #endregion
 
-        public static Action<uint> OnAgentDefeated;
+        public static Action OnDefeatEnemy;
+        public static Action<EntityType, uint> OnAgentDefeated;
 
     }
 }

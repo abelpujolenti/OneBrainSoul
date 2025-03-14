@@ -42,7 +42,7 @@ namespace Player
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
             _hitstop = GetComponent<Hitstop>();
 
-            EventsManager.OnAgentDefeated += DefeatAgent;
+            EventsManager.OnDefeatEnemy += DefeatAgent;
 
             _height = capsuleCollider.height;
             _radius = capsuleCollider.radius;
@@ -67,10 +67,10 @@ namespace Player
 
         private void OnDestroy()
         {
-            EventsManager.OnAgentDefeated -= DefeatAgent;
+            EventsManager.OnDefeatEnemy -= DefeatAgent;
         }
 
-        public void DefeatAgent(uint id)
+        private void DefeatAgent()
         {
             _hitstop.Add(killHitstop);
         }
@@ -93,7 +93,7 @@ namespace Player
 
             if (_health == 0)
             {
-                SceneManager.LoadScene("ControllerTest", LoadSceneMode.Single);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
                 //TODO PLAYER DIE
                 return;
             }
@@ -263,25 +263,29 @@ namespace Player
             _slowCoroutinesSubscriptions.Remove(slowID);
         }
 
-        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
+        public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
+            Vector3 sourcePosition, ForceMode forceMode)
         {
             if (!_playerCharacterController.CanBeDisplaced())
             {
                 return;
             }
             
-            base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength, sourcePosition);
+            base.OnReceivePushFromCenter(centerPosition, forceDirection, forceStrength, sourcePosition, forceMode);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 
-        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, Vector3 sourcePosition)
+        public override void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, 
+            float forceStrength, Vector3 sourcePosition, ForceMode forceMode)
         {
             if (!_playerCharacterController.CanBeDisplaced())
             {
                 return;
             }
+
+            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength, sourcePosition,
+                forceMode);
             
-            base.OnReceivePushInADirection(colliderForwardVector, forceDirection, forceStrength, sourcePosition);
             _playerCharacterController.ChangeMovementHandlerToAirborne();
         }
 
