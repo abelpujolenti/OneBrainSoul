@@ -17,7 +17,7 @@ LightingSettings:
   m_IndirectOutputScale: 3.31
   m_UsingShadowmask: 1
   m_BakeBackend: 2
-  m_LightmapMaxSize: 2048
+  m_LightmapMaxSize: 256
   m_BakeResolution: 45
   m_Padding: 4
   m_LightmapCompression: 3
