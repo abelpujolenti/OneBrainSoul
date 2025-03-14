@@ -1,4 +1,4 @@
-﻿using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,10 +20,6 @@ namespace Editor.Enemies
             LabelField("Targetting");
             
             EditorGUI.indentLevel++;
-            
-            /*FloatField(ref aiEnemyProperties.sightMaximumDistance, 0, "Sight Maximum Distance");
-            
-            UintField(ref aiEnemyProperties.fov, 0, 360, "FOV");*/
             
             FloatField(ref aiEnemyProperties.minimumTimeInvestigatingArea, 0, "Minimum Time Investigating Area");
             

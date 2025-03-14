@@ -15,12 +15,7 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 1
   abilityCast:
-    minimumRangeToCast: 0
-    maximumRangeToCast: 10
-    directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 45
     canCancelCast: 0
-    maximumAngleToCancelCast: 0
     timeToCast: 0.5
     cooldown: 4
     duration: 0
@@ -43,6 +38,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 1, z: 0}
     forceStrength: 200
     doesForceComesFromCenterOfTheArea: 1
+    abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -58,6 +54,7 @@ MonoBehaviour:
     forceDirection: {x: 1, y: 0.5, z: -2}
     forceStrength: 80
     doesForceComesFromCenterOfTheArea: 1
+    abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 1
@@ -73,6 +70,7 @@ MonoBehaviour:
     forceDirection: {x: 1, y: 0.5, z: 0}
     forceStrength: 600
     doesForceComesFromCenterOfTheArea: 1
+    abilityEffectForceType: 3
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 1

@@ -1,3 +1,4 @@
+using ECS.Entities.AI;
 using Managers;
 using Player.Effects;
 using UnityEngine;
@@ -87,13 +88,15 @@ namespace Player.Movement
                 {
                     destructibleTerrain.Break(hit.point);
                 }
-                DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
-                if (entity != null)
+
+                AgentEntity agentEntity = hit.collider.GetComponent<AgentEntity>();
+                if (agentEntity)
                 {
-                    entity.Damage(player, hit.point);
+                    //TODO CHANGE CHARGE DAMAGE
+                    agentEntity.OnReceiveDamage(20, hit.point, player.transform.position);
                 }
 
-                bool damaged = hitTerrain || entity != null;
+                bool damaged = hitTerrain || agentEntity;
                 Collide(player, rigidbody, hit.normal, damaged);
                 //Exit(player);
                 return;

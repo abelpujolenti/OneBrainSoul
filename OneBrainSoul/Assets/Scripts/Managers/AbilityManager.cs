@@ -21,35 +21,6 @@ namespace Managers
         [SerializeField] private GameObject _enemyRectangleAttackColliderPrefab;
         [SerializeField] private GameObject _enemyCircleAttackColliderPrefab;
 
-        /*private readonly Dictionary<AbilityAoEType, Delegate> _colliderFactories = new Dictionary<AbilityAoEType, Delegate>
-            {
-                { AbilityAoEType.RECTANGULAR , 
-                    new Func<BasicAbilityComponent, RectangularAbilityComponent, Transform, EntityType, RectangularAbilityAoECollider>(
-                        (basicAbilityComponent, rectangularAbilityComponent, parentTransform, entityType) => 
-                    _instance.InstantiateAbilityCollider<RectangularAbilityComponent, RectangularAbilityAoECollider>
-                        (basicAbilityComponent, rectangularAbilityComponent, parentTransform, entityType)) },
-                
-                { AbilityAoEType.SPHERICAL , 
-                    new Func<BasicAbilityComponent, SphericalAbilityComponent, Transform, EntityType, SphericalAbilityAoECollider>(
-                        (basicAbilityComponent, sphericalAbilityComponent, parentTransform, entityType) => 
-                    _instance.InstantiateAbilityCollider<SphericalAbilityComponent, SphericalAbilityAoECollider>
-                        (basicAbilityComponent, sphericalAbilityComponent, parentTransform, entityType)) },
-                
-                
-                { AbilityAoEType.CONICAL , 
-                    new Func<BasicAbilityComponent, ConicalAbilityComponent, Transform, EntityType, ConicalAbilityAoECollider>(
-                        (basicAbilityComponent, abilityComponent, parentTransform, entityType) => 
-                    _instance.InstantiateAbilityCollider<ConicalAbilityComponent, ConicalAbilityAoECollider>
-                        (basicAbilityComponent, abilityComponent, parentTransform, entityType)) },
-                
-                
-                { AbilityAoEType.CUSTOM_MESH , 
-                    new Func<BasicAbilityComponent, CustomMeshAbilityComponent, Transform, EntityType, CustomMeshAbilityAoECollider>(
-                        (basicAbilityComponent, abilityComponent, parentTransform, entityType) => 
-                    _instance.InstantiateAbilityCollider<CustomMeshAbilityComponent, CustomMeshAbilityAoECollider>
-                        (basicAbilityComponent, abilityComponent, parentTransform, entityType)) }
-            };*/
-
         private void Awake()
         {
             if (_instance == null)
@@ -195,8 +166,8 @@ namespace Managers
                     abilityProjectile.objectWithParticleSystem, abilityProjectile.makesParabola));
             }
 
-            return new ProjectileAbility(basicAbilityComponent, projectiles, parentTransform, 
-                abilityProjectile.relativePositionToCaster, abilityProjectile.maximumDispersion, abilityProjectile.makesParabola);
+            return new ProjectileAbility(basicAbilityComponent.GetCast(), projectiles, parentTransform, 
+                abilityProjectile.relativePositionToCaster, abilityProjectile.dispersionRatePer1Meter, abilityProjectile.makesParabola);
         }
 
         #endregion
@@ -236,12 +207,9 @@ namespace Managers
                 : Instantiate(ReturnPrefab(areaAbilityComponent.GetAoEType()));
             
             TAbilityCollider abilityCollider = colliderObject.GetComponent<TAbilityCollider>();
-            
-            abilityCollider.SetAbilitySpecs(parentTransform, basicAbilityComponent, areaAbilityComponent);
 
-            EntityType abilityTargets = basicAbilityComponent.GetTargets();
-
-            abilityCollider.SetAbilityTargets(ReturnTargets(abilityTargets));
+            abilityCollider.SetAbilitySpecs(parentTransform, basicAbilityComponent, areaAbilityComponent,
+                ReturnTargets(basicAbilityComponent.GetAffectedEntities()));
             
             colliderObject.SetActive(false);
 

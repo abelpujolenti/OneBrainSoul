@@ -79,8 +79,40 @@ PrefabInstance:
       propertyPath: m_Name
       value: Triface Tornado
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2543479680164596848, guid: 72a9fbec98cacae4e8138e005ee5328d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4012908002206744978, guid: 72a9fbec98cacae4e8138e005ee5328d,
+        type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 4245317020318030987}
   m_SourcePrefab: {fileID: 100100000, guid: 72a9fbec98cacae4e8138e005ee5328d, type: 3}
+--- !u!1 &5871781549162289595 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4012908002206744978, guid: 72a9fbec98cacae4e8138e005ee5328d,
+    type: 3}
+  m_PrefabInstance: {fileID: 7407423736709240873}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &4245317020318030987
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5871781549162289595}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 8
+  m_Center: {x: 0, y: 0, z: 0}

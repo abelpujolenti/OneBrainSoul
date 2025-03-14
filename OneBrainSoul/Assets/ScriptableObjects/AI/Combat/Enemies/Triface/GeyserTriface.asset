@@ -14,16 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 12
   agentsPositionRadius: 5
-  sightMaximumDistance: 0
-  fov: 45
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  minimumTimeInvestigatingAtEstimatedPosition: 5
-  maximumTimeInvestigatingAtEstimatedPosition: 7
-  maximumHeadYawRotation: 45
-  maximumHeadPitchRotation: 30
-  minimumHeadPitchRotation: 10
-  bodyNormalRotationSpeed: 3
+  bodyNormalRotationSpeed: 45
+  healEffect: {fileID: 326565652972303605, guid: b1b8db585722ef74286b706191482b5a,
+    type: 3}
+  healRelativePosition: {x: 0, y: 0, z: 0}
+  healRelativeRotation: {x: 0, y: 0, z: 0}
+  healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 85537e7caa4d50f4cbb5d2b823d55410,
     type: 2}
   rotationSpeedWhileCastingSlam: 0

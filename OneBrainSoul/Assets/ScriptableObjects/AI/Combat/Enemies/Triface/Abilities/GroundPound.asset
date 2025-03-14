@@ -15,12 +15,7 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 1
   abilityCast:
-    minimumRangeToCast: 2
-    maximumRangeToCast: 10
-    directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 15
     canCancelCast: 0
-    maximumAngleToCancelCast: 0
     timeToCast: 1
     cooldown: 4
     duration: 0
@@ -43,6 +38,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 1, z: 0}
     forceStrength: 300
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -58,6 +54,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 1, z: 0.01}
     forceStrength: 600
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -73,6 +70,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 1
@@ -141,6 +139,8 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    objectWithParticleSystem: {fileID: 0}
+    relativePositionForParticles: {x: 0, y: 0, z: 0}
   abilityMovement:
     makesBezierCurves: 0
     positions:

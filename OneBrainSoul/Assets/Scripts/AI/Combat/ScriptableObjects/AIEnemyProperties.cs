@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
 {
@@ -8,21 +8,9 @@ namespace AI.Combat.ScriptableObjects
 
         public float agentsPositionRadius;
 
-        public float sightMaximumDistance;
-
-        public uint fov;
-
         public float minimumTimeInvestigatingArea;
         
         public float maximumTimeInvestigatingArea;
-
-        public uint maximumHeadYawRotation;
-        
-        public uint maximumHeadPitchUpRotation;
-        
-        public uint maximumHeadPitchDownRotation;
-
-        public float headRotationSpeed;
 
         public float bodyNormalRotationSpeed;
 

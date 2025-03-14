@@ -57,19 +57,6 @@ namespace Player.Movement
             rigidbody.AddForce(-horizontalVelocity * (player.IsOnTheGround() ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
 
             RaycastHit hit;
-            if (Physics.Raycast(player.transform.position, dashForwardDirection, out hit, rigidbody.velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayers(), QueryTriggerInteraction.Ignore))
-            {
-                DamageTakingEntity entity = hit.collider.GetComponent<DamageTakingEntity>();
-                if (entity != null)
-                {
-                    entity.Damage(player, hit.point, 1);
-                }
-
-                bool damaged = entity != null;
-                Exit(player);
-                return;
-            }
-
             CapsuleCollider playerCollider = player.GetCapsuleCollider();
             Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * (-playerCollider.height * 0.5f);
             Vector3 p2 = p1 + Vector3.up * playerCollider.height;

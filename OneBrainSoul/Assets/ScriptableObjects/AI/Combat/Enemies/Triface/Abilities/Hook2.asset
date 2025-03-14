@@ -14,14 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canAffectCaster: 0
   abilityTarget: 1
+  typesAffectedByTheAbility: 1
   abilityCast:
-    minimumRangeToCast: 3
-    maximumRangeToCast: 25
-    directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 3
     canCancelCast: 0
-    maximumAngleToCancelCast: 7
-    timeToCast: 0.1
+    timeToCast: 0.3
     cooldown: 3
     duration: 0
   abilityTrigger:
@@ -39,10 +35,11 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 1
-    doesApplyAForce: 1
+    doesApplyAForce: 0
     forceDirection: {x: 0, y: 0.2, z: -1}
-    forceStrength: 20000
+    forceStrength: 200
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -54,10 +51,11 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 0
-    doesApplyAForce: 0
+    doesApplyAForce: 1
     forceDirection: {x: 0, y: 0, z: -1}
-    forceStrength: 20000
+    forceStrength: 100
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 1
@@ -73,15 +71,16 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 0, z: 0}
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityAoEType: 0
   abilityAoE:
     isAttachedToCaster: 0
-    relativePositionToCaster: {x: 0, y: 0, z: 12.5}
+    relativePositionToCaster: {x: 0, y: 0, z: 5}
     duration: 0.25
     direction: {x: 0, y: 0, z: 1}
     height: 1
     width: 1
-    length: 1
+    length: 25
     radius: 5
     customMeshPrefab: {fileID: 0}
     scale: 0
@@ -169,4 +168,4 @@ MonoBehaviour:
     timeBetweenPositions:
     - 0.25
   doesItTriggerOnTriggerEnter: 0
-  doesItTriggerOnTriggerExit: 0
+  doesItTriggerOnTriggerExit: 1

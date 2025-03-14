@@ -8,7 +8,6 @@ using AI.Combat.ScriptableObjects;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace ECS.Entities.AI.Combat
 {
@@ -49,11 +48,6 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] protected Transform _headTransform; 
         [SerializeField] protected Transform _bodyTransform;
 
-        private float _yawHeadRotation;
-        private float _pitchHeadRotation;
-
-        private float _headRotationSpeed;
-
         protected float _bodyNormalRotationSpeed;
         protected float _bodyCurrentRotationSpeed;
 
@@ -61,9 +55,6 @@ namespace ECS.Entities.AI.Combat
         protected float _maximumTimeInvestigatingArea;
 
         protected float _timeInvestigating;
-
-        private uint _maximumHeadPitchUpRotation;
-        private uint _maximumHeadPitchDownRotation;
         
         protected bool _isRotating;
 
@@ -75,16 +66,8 @@ namespace ECS.Entities.AI.Combat
             
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
 
-            _headRotationSpeed = aiEnemyProperties.headRotationSpeed;
-
             _bodyNormalRotationSpeed = aiEnemyProperties.bodyNormalRotationSpeed;
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
-
-            _minimumTimeInvestigatingArea = aiEnemyProperties.minimumTimeInvestigatingArea;
-            _maximumTimeInvestigatingArea = aiEnemyProperties.maximumTimeInvestigatingArea;
-
-            _maximumHeadPitchUpRotation = aiEnemyProperties.maximumHeadPitchUpRotation;
-            _maximumHeadPitchDownRotation = aiEnemyProperties.maximumHeadPitchDownRotation;
 
             /*_healEffect = Instantiate(aiEnemyProperties.healEffect, transform);
 
@@ -202,8 +185,6 @@ namespace ECS.Entities.AI.Combat
 
         protected void RotateBody()
         {
-            ShowDebugMessages("Rotation Speed " + _bodyCurrentRotationSpeed);
-            
             _bodyTransform.rotation = Quaternion.RotateTowards(_bodyTransform.rotation,
                 Quaternion.LookRotation(GetDirectionToRotateBody()), _bodyCurrentRotationSpeed * Time.deltaTime);
         }
@@ -218,24 +199,6 @@ namespace ECS.Entities.AI.Combat
         protected Vector3 GetDirectionToRotateBody()
         {
             return _directionToRotateBody;
-        }
-
-        protected void RotateHead()
-        {
-            _headTransform.rotation = Quaternion.RotateTowards(_headTransform.rotation,
-                Quaternion.LookRotation(_bodyTransform.rotation * GetDirectionToRotateHead()), _headRotationSpeed * Time.deltaTime);
-        }
-
-        protected void SetDirectionToRotateHead(Vector3 directionToRotate)
-        {
-            directionToRotate = directionToRotate.normalized;
-            directionToRotate.z = 1;
-            _directionToRotateHead = directionToRotate.normalized;
-        }
-
-        protected Vector3 GetDirectionToRotateHead()
-        {
-            return _directionToRotateHead;
         }
 
         protected Vector3 ReturnDirectionToRotate(float yaw, float pitch)
@@ -280,11 +243,8 @@ namespace ECS.Entities.AI.Combat
 
                     if (timerLookingAtTheSameDirection >= timeLookingAtTheSameDirection)
                     {
-                        uint maximumHeadYawRotation = _context.GetMaximumHeadYawRotation();
-                        float yawHeadRotation = Random.Range(-maximumHeadYawRotation, maximumHeadYawRotation);
-                        float pitchHeadRotation = Random.Range(-_maximumHeadPitchDownRotation, _maximumHeadPitchUpRotation);
-                        
-                        SetDirectionToRotateBody(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
+                        //TODO AI ENEMY ROTATE BODY WHEN INVESTIGATING
+                        //SetDirectionToRotateBody(ReturnDirectionToRotate(yawHeadRotation, pitchHeadRotation));
 
                         timerLookingAtTheSameDirection = 0;
                     }
@@ -464,9 +424,14 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnDestroy()
         {
+            if (EventsManager.OnDefeatEnemy != null)
+            {
+                EventsManager.OnDefeatEnemy();
+            }
+
             if (EventsManager.OnAgentDefeated != null)
             {
-                EventsManager.OnAgentDefeated(GetAgentID());
+                EventsManager.OnAgentDefeated(GetEntityType(), GetAgentID());
             }
 
             if (_doesRestoreAChargeOfPlayer)
@@ -516,6 +481,8 @@ namespace ECS.Entities.AI.Combat
             _targetsInsideVisionArea[entityType].Remove(targetId);
         }
 
+        protected abstract void RemoveATargetIfWasLost(uint targetIdToCheck);
+
         public override float GetRadius()
         {
             return _context.GetRadius();
@@ -553,61 +520,6 @@ namespace ECS.Entities.AI.Combat
             SphereCollider sphereCollider = _visionAreas[1].GetComponent<SphereCollider>();
             Gizmos.DrawSphere(transform.position, sphereCollider.radius);
             //DrawCone(_fovColor, _context.GetFov(), 0, _context.GetSightMaximumDistance(), origin, _headTransform.forward, segments);
-        }
-
-        protected void DrawAbilityCone(Color color, bool hasATarget, AbilityCast abilityCast, Vector3 origin, Vector3 direction,
-            int segments)
-        {
-            float fovAngle = abilityCast.minimumAngleToCast;
-            
-            if (abilityCast.canCancelCast)
-            {
-                fovAngle = hasATarget ? abilityCast.maximumAngleToCancelCast : abilityCast.minimumAngleToCast;
-            }
-
-            float minimumRange = abilityCast.minimumRangeToCast;
-            float maximumRange = abilityCast.maximumRangeToCast;
-            
-            DrawCone(color, fovAngle, minimumRange, maximumRange, origin, direction, segments);
-        }
-
-        protected void DrawCone(Color color, float fovAngle, float minimumRange, float maximumRange, Vector3 origin, Vector3 direction, int segments)
-        {
-            Gizmos.color = color;
-
-            float maxRadius = Mathf.Tan(fovAngle * 2 * Mathf.Deg2Rad * 0.5f) * maximumRange;
-            float minRadius = Mathf.Tan(fovAngle * 2 * Mathf.Deg2Rad * 0.5f) * minimumRange;
-
-            Vector3 minBaseCenter = origin + direction * minimumRange;
-            Vector3 maxBaseCenter = origin + direction * maximumRange;
-
-            Vector3 prevMinPoint = Vector3.zero;
-            Vector3 prevMaxPoint = Vector3.zero;
-            float angleStep = 360f / segments;
-
-            Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
-
-            for (int i = 0; i <= segments; i++)
-            {
-                float angle = i * angleStep;
-                float rad = angle * Mathf.Deg2Rad;
-                Vector3 localOffsetMin = new Vector3(Mathf.Cos(rad) * minRadius, Mathf.Sin(rad) * minRadius, 0);
-                Vector3 localOffsetMax = new Vector3(Mathf.Cos(rad) * maxRadius, Mathf.Sin(rad) * maxRadius, 0);
-
-                Vector3 minPoint = minBaseCenter + rotation * localOffsetMin;
-                Vector3 maxPoint = maxBaseCenter + rotation * localOffsetMax;
-
-                Gizmos.DrawLine(minPoint, maxPoint);
-
-                if (i > 0)
-                {
-                    Gizmos.DrawLine(prevMinPoint, minPoint);
-                    Gizmos.DrawLine(prevMaxPoint, maxPoint);
-                }
-
-                prevMinPoint = minPoint;
-                prevMaxPoint = maxPoint;
-            }
         }
     }
 }

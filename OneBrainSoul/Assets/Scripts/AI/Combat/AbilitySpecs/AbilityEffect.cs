@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace AI.Combat.AbilitySpecs
 {
@@ -10,10 +9,12 @@ namespace AI.Combat.AbilitySpecs
         HEAL
     }
 
-    public enum AbilityEffectForceApplicationType
+    public enum AbilityEffectForceType
     {
-        CENTER,
-        DIRECTIONAL
+        FORCE,
+        IMPULSE,
+        ACCELERATION,
+        VELOCITY_CHANGE
     }
 
     [Serializable]
@@ -33,6 +34,7 @@ namespace AI.Combat.AbilitySpecs
         public bool doesApplyAForce;
         public Vector3 forceDirection;
         public float forceStrength;
-        [FormerlySerializedAs("doesForceComesFromCenter")] public bool doesForceComesFromCenterOfTheArea;
+        public bool doesForceComesFromCenterOfTheArea;
+        public AbilityEffectForceType abilityEffectForceType;
     }
 }

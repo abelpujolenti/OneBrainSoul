@@ -131,15 +131,15 @@ namespace ECS.Entities.AI
         }
 
         public virtual void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 
-            Vector3 casterToTargetDirection)
+            Vector3 casterToTargetDirection, ForceMode forceMode)
         {
             Vector3 centerToMe = (transform.position - centerPosition).normalized;
             
-            OnReceivePushInADirection(centerToMe, forceDirection, forceStrength, casterToTargetDirection);
+            OnReceivePushInADirection(centerToMe, forceDirection, forceStrength, casterToTargetDirection, forceMode);
         }
 
         public virtual void OnReceivePushInADirection(Vector3 colliderForwardVector, Vector3 forceDirection, float forceStrength, 
-            Vector3 casterToTargetDirection)
+            Vector3 casterToTargetDirection, ForceMode forceMode)
         {
             Vector3 referenceVector = Vector3.up;
             
@@ -150,7 +150,7 @@ namespace ECS.Entities.AI
 
             Quaternion rotation = Quaternion.LookRotation(colliderForwardVector, referenceVector);
             
-            _rigidbody.AddForce(rotation * forceDirection * forceStrength, ForceMode.Acceleration);
+            _rigidbody.AddForce(rotation * forceDirection * forceStrength, forceMode);
         }
 
         public Vector3 GetVelocity()

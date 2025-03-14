@@ -1,11 +1,9 @@
 using System;
 using AI.Combat.Contexts;
-using AI.Combat.Contexts.Target;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.Enemy;
 using Interfaces.AI.UBS.Enemy.FreeMobilityEnemy;
 using Interfaces.AI.UBS.Enemy.FreeMobilityEnemy.Triface;
-using UnityEngine;
 
 namespace AI.Combat.Enemy.Triface
 {
@@ -84,15 +82,7 @@ namespace AI.Combat.Enemy.Triface
                 return 0;
             }
 
-            TargetContext slamTargetContext = trifaceSlamUtility.GetSlamTargetContext();
-
-            float distanceToTarget = slamTargetContext.GetDistanceToTarget();
-
-            return Convert.ToInt16(
-                trifaceSlamUtility.GetSlamMinimumRangeToCast() < distanceToTarget &&
-                trifaceSlamUtility.GetSlamMaximumRangeToCast() > distanceToTarget &&
-                Vector3.Angle(trifaceSlamUtility.GetDirectionOfSlamDetection(), slamTargetContext.GetVectorToTarget()) <
-                trifaceSlamUtility.GetMinimumAngleFromForwardToCastSlam());
+            return Convert.ToInt16(trifaceSlamUtility.IsSlamTargetInsideDetectionArea());
         }
     }
 }

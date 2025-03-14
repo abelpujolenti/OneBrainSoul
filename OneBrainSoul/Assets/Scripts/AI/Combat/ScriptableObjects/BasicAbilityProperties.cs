@@ -9,6 +9,7 @@ namespace AI.Combat.ScriptableObjects
     {
         public bool canAffectCaster;
         public EntityType abilityTarget;
+        public EntityType typesAffectedByTheAbility;
 
         public AbilityCast abilityCast = new AbilityCast();
 

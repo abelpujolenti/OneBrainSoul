@@ -1,9 +1,7 @@
 using System;
 using AI.Combat.Contexts;
-using AI.Combat.Contexts.Target;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.Enemy.TeleportMobilityEnemy.LongArms;
-using Vector3 = UnityEngine.Vector3;
 
 namespace AI.Combat.Enemy.LongArms
 {
@@ -69,15 +67,7 @@ namespace AI.Combat.Enemy.LongArms
                 return 0;
             }
 
-            TargetContext throwRockTargetContext = longArmsThrowRockUtility.GetThrowRockTargetContext();
-
-            float distanceToTarget = throwRockTargetContext.GetDistanceToTarget();
-
-            return Convert.ToInt16(
-                longArmsThrowRockUtility.GetThrowRockMinimRangeToCast() < distanceToTarget &&
-                longArmsThrowRockUtility.GetThrowRockMaximRangeToCast() > distanceToTarget &&
-                Vector3.Angle(longArmsThrowRockUtility.GetDirectionOfThrowRockDetection(), throwRockTargetContext.GetVectorToTarget()) <
-                longArmsThrowRockUtility.GetMinimumAngleFromForwardToCastThrowRock()) * 0.7f;
+            return Convert.ToInt16(longArmsThrowRockUtility.IsThrowRockTargetInsideDetectionArea()) * 0.7f;
         }
 
         private static float CalculateClapAboveUtility(ILongArmsClapAboveUtility longArmsClapAboveUtility)
@@ -87,15 +77,7 @@ namespace AI.Combat.Enemy.LongArms
                 return 0;
             }
 
-            TargetContext clapAboveTargetContext = longArmsClapAboveUtility.GetClapAboveTargetContext();
-
-            float distanceToTarget = clapAboveTargetContext.GetDistanceToTarget();
-
-            return Convert.ToInt16(
-                longArmsClapAboveUtility.GetClapAboveMinimRangeToCast() < distanceToTarget &&
-                longArmsClapAboveUtility.GetClapAboveMaximRangeToCast() > distanceToTarget &&
-                Vector3.Angle(longArmsClapAboveUtility.GetDirectionOfClapAboveDetection(), clapAboveTargetContext.GetVectorToTarget()) <
-                longArmsClapAboveUtility.GetMinimumAngleFromForwardToCastClapAbove() * 0.9f);
+            return Convert.ToInt16(longArmsClapAboveUtility.IsClapAboveTargetInsideDetectionArea()) * 0.9f;
         }
         
         private static float CalculateFleeUtility(ILongArmsFleeUtility longArmsFleeUtility)  

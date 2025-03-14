@@ -16,7 +16,7 @@ namespace AI.Combat.AbilitySpecs
 
         public uint instances;
 
-        public float maximumDispersion;
+        public float dispersionRatePer1Meter;
 
         public GameObject objectWithParticleSystem;
         public Vector3 relativePositionForParticles;

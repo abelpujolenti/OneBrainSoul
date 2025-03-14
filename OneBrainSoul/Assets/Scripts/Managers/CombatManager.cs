@@ -26,8 +26,6 @@ namespace Managers
 
         private HashSet<uint> _longArmsBasesFreeId = new HashSet<uint>();
 
-        [SerializeField] private List<CombatArea> _fuckYouUnity = new List<CombatArea>();
-
         private Dictionary<uint, CombatArea> _combatAreas = new Dictionary<uint, CombatArea>();
         
         private readonly Dictionary<EntityType, Delegate> _returnDictionaryOfTheSameType = new Dictionary<EntityType, Delegate>
@@ -66,20 +64,15 @@ namespace Managers
             }
         };
 
-        private void Awake()
+        private void Start()
         {
             if (_instance == null)
             {
                 _instance = this;
 
-                foreach (CombatArea combatArea in _fuckYouUnity)
-                {
-                    _combatAreas.Add(combatArea.GetCombatAreaNumber(), combatArea);
-                }
-
-                _fuckYouUnity = null;
-
                 DontDestroyOnLoad(gameObject);
+                
+                LoadSceneManager.Instance.ManagerLoaded();
 
                 return;
             }
@@ -175,7 +168,7 @@ namespace Managers
                     continue;
                 }
                 
-                combatArea.AddEntityType(i);
+                combatArea.AddTargetEntityType(i, enemyId);
             }
         }
 
@@ -382,12 +375,41 @@ namespace Managers
             return enemies;
         }
 
+        public HashSet<uint> ReturnSightedTargetsAgentEntity(EntityType target, uint areaNumber)
+        {
+            HashSet<uint> sightedTargetAgents = new HashSet<uint>();
+
+            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            {
+                if ((target & i) == 0)
+                {
+                    continue;
+                }
+                
+                sightedTargetAgents.AddRange(_combatAreas[areaNumber].GetEntityTypeTargetsSighted(i));
+            }
+
+            return sightedTargetAgents;
+        }
+
+        public float ReturnClosestDistanceToSightedTarget(Vector3 position, HashSet<uint> targetsId)
+        {
+            AgentEntity agentEntity = ReturnClosestAgentEntity(position, targetsId);
+
+            if (!agentEntity)
+            {
+                return Mathf.Infinity;
+            }
+            
+            return ReturnDistanceToTarget(position, agentEntity.GetAgentID());
+        }
+
         public AgentEntity ReturnClosestAgentEntity(Vector3 position, HashSet<uint> targetsId)
         {
             return ReturnClosestTargetAgent(position, targetsId, targetId => _returnAgent[targetId]());
         }
 
-        public LongArmsBase ReturnClosestLongArmsBase(Vector3 position, HashSet<uint> longArmsBasesId)
+        private LongArmsBase ReturnClosestLongArmsBase(Vector3 position, HashSet<uint> longArmsBasesId)
         {
             return ReturnClosestTargetAgent(position, longArmsBasesId, longArmsBaseId => _longArmsBases[longArmsBaseId]);
         }
@@ -450,7 +472,7 @@ namespace Managers
         {
             uint trifaceId = triface.GetAgentID();
             
-            _combatAreas[areaNumber].RemoveEnemy(trifaceId);
+            _combatAreas[areaNumber].RemoveEnemy(trifaceId, EntityType.TRIFACE);
 
             if (_combatAreas[areaNumber].IsAreaEmpty())
             {
@@ -466,7 +488,7 @@ namespace Managers
         {
             uint longArmsId = longArms.GetAgentID();
             
-            _combatAreas[areaNumber].RemoveEnemy(longArmsId);
+            _combatAreas[areaNumber].RemoveEnemy(longArmsId, EntityType.LONG_ARMS);
 
             if (_combatAreas[areaNumber].IsAreaEmpty())
             {
@@ -491,7 +513,7 @@ namespace Managers
         {
             uint sendatuId = sendatu.GetAgentID();
             
-            _combatAreas[areaNumber].RemoveEnemy(sendatuId);
+            _combatAreas[areaNumber].RemoveEnemy(sendatuId, EntityType.SENDATU);
 
             if (_combatAreas[areaNumber].IsAreaEmpty())
             {
@@ -508,6 +530,11 @@ namespace Managers
 
         public void HealPlayer()
         {
+            if (!_playerCharacter)
+            {
+                return;
+            }
+            
             _playerCharacter.OnReceiveHeal(GameManager.Instance.GetHealPerDeath(), _playerCharacter.transform.position);
         }
 

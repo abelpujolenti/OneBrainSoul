@@ -9,30 +9,17 @@ namespace AI.Combat.AbilitySpecs
         public AbilityCast()
         {}
 
-        public AbilityCast(float minimumRangeToCast, float maximumRangeToCast, Vector3 directionOfDetection, 
-            float minimumAngleToCast, bool canCancelCast, float maximumAngleToCancelCast, 
-            float timeToCast, float currentTimeToFinishCast, float cooldown, float currentCooldown)
+        public AbilityCast(bool canCancelCast, float timeToCast, float currentTimeToFinishCast, 
+            float cooldown, float currentCooldown)
         {
-            this.minimumRangeToCast = minimumRangeToCast;
-            this.maximumRangeToCast = maximumRangeToCast;
-            this.directionOfDetection = directionOfDetection.normalized;
-            this.minimumAngleToCast = minimumAngleToCast;
             this.canCancelCast = canCancelCast;
-            this.maximumAngleToCancelCast = maximumAngleToCancelCast;
             this.timeToCast = timeToCast;
             _currentTimeToFinishCast = currentTimeToFinishCast;
             this.cooldown = cooldown;
             _currentCooldown = currentCooldown;
         }
-        
-        public float minimumRangeToCast;
-        public float maximumRangeToCast;
-
-        public Vector3 directionOfDetection;
-        public float minimumAngleToCast;
 
         public bool canCancelCast;
-        public float maximumAngleToCancelCast;
 
         public float timeToCast;
         private float _currentTimeToFinishCast;
@@ -79,8 +66,7 @@ namespace AI.Combat.AbilitySpecs
 
         public AbilityCast DeepCopy()
         {
-            return new AbilityCast(minimumRangeToCast, maximumRangeToCast, directionOfDetection, minimumAngleToCast, 
-                canCancelCast, maximumAngleToCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown);
+            return new AbilityCast(canCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown);
         }
     }
 }

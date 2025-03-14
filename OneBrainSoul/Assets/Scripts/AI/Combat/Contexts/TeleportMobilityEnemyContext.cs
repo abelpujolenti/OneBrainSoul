@@ -7,10 +7,9 @@ namespace AI.Combat.Contexts
     {
         private bool _hasReachedDestination;
         
-        protected TeleportMobilityEnemyContext(EntityType entityType, uint totalHealth, uint maximumHeadYawRotation, 
-            float radius, float height, float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform) : 
-            base(entityType, totalHealth, maximumHeadYawRotation,radius, height, sightMaximumDistance, 
-            fov, headAgentTransform, bodyAgentTransform)
+        protected TeleportMobilityEnemyContext(EntityType entityType, uint totalHealth, float radius, float height, 
+            Transform headAgentTransform, Transform bodyAgentTransform) : base(entityType, totalHealth,radius, height, 
+            headAgentTransform, bodyAgentTransform)
         {
             
         }

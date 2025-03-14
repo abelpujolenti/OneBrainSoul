@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AI.Combat.Contexts
 {
-    public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, IGetSightMaximumDistance, 
+    public abstract class AIEnemyContext : IGetTotalHealth, ILastActionIndex, IHealth, IGetRadius, 
         IHasATarget, IFighting, ICastingAnAbility, IGetAgentBodyTransform, IEnemyGoToClosestSightedTarget
     {
         private EntityType _entityType;
@@ -18,12 +18,9 @@ namespace AI.Combat.Contexts
 
         private uint _totalHealth;
         private uint _health;
-        private uint _maximumHeadYawRotation;
 
         private float _radius;
         private float _height;
-        private float _sightMaximumDistance;
-        private uint _fov;
 
         private bool _isFighting;
         private bool _isFSMBlocked;
@@ -33,17 +30,14 @@ namespace AI.Combat.Contexts
         private Transform _headAgentTransform;
         private Transform _bodyAgentTransform;
 
-        protected AIEnemyContext(EntityType entityType, uint totalHealth, uint maximumHeadYawRotation, 
-            float radius, float height, float sightMaximumDistance, uint fov, Transform headAgentTransform, Transform bodyAgentTransform)
+        protected AIEnemyContext(EntityType entityType, uint totalHealth, float radius, 
+            float height, Transform headAgentTransform, Transform bodyAgentTransform)
         {
             _entityType = entityType;
             _totalHealth = totalHealth;
             _health = totalHealth;
-            _maximumHeadYawRotation = maximumHeadYawRotation;
             _radius = radius;
             _height = height;
-            _sightMaximumDistance = sightMaximumDistance != 0 ? sightMaximumDistance : Mathf.Infinity;
-            _fov = fov / 2;
             _headAgentTransform = headAgentTransform;
             _bodyAgentTransform = bodyAgentTransform;
         }
@@ -91,16 +85,6 @@ namespace AI.Combat.Contexts
         public float GetHeight()
         {
             return _height;
-        }
-
-        public float GetSightMaximumDistance()
-        {
-            return _sightMaximumDistance;
-        }
-
-        public float GetFov()
-        {
-            return _fov;
         }
 
         public void SetIsFighting(bool isFighting)
@@ -160,11 +144,6 @@ namespace AI.Combat.Contexts
         public Vector3 GetVectorToDestination()
         {
             throw new NotImplementedException();
-        }
-
-        public uint GetMaximumHeadYawRotation()
-        {
-            return _maximumHeadYawRotation;
         }
     }
 }

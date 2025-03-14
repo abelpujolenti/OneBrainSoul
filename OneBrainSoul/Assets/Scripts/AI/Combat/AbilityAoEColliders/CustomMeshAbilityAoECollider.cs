@@ -1,4 +1,6 @@
-﻿using ECS.Components.AI.Combat.Abilities;
+﻿using System.Collections.Generic;
+using ECS.Components.AI.Combat.Abilities;
+using ECS.Entities;
 using UnityEngine;
 
 namespace AI.Combat.AbilityAoEColliders
@@ -15,9 +17,9 @@ namespace AI.Combat.AbilityAoEColliders
         private AnimationCurve _ZRescaleCurve;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            CustomMeshAbilityComponent customMeshAbilityComponent)
+            CustomMeshAbilityComponent customMeshAbilityComponent, List<EntityType> typesAffectedByTheAbility)
         {
-            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, customMeshAbilityComponent);
+            base.SetAbilitySpecs(parentTransform, basicAbilityComponent, customMeshAbilityComponent, typesAffectedByTheAbility);
 
             if (customMeshAbilityComponent.GetAoE().doesScaleChangeOverTheTime)
             {
