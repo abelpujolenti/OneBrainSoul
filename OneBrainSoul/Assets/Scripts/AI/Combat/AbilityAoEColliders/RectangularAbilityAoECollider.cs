@@ -14,7 +14,7 @@ namespace AI.Combat.AbilityAoEColliders
         private AnimationCurve _lengthResizeCurve;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            RectangularAbilityComponent rectangularAbilityComponent, List<EntityType> typesAffectedByTheAbility)
+            RectangularAbilityComponent rectangularAbilityComponent, EntityType typesAffectedByTheAbility)
         {
             base.SetAbilitySpecs(parentTransform, basicAbilityComponent, rectangularAbilityComponent, typesAffectedByTheAbility);
             

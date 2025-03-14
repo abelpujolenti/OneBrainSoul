@@ -15,7 +15,7 @@ namespace AI.Combat.AbilityAoEColliders
         private float _radius;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            ConicalAbilityComponent conicalAbilityComponent, List<EntityType> typesAffectedByTheAbility)
+            ConicalAbilityComponent conicalAbilityComponent, EntityType typesAffectedByTheAbility)
         {
             base.SetAbilitySpecs(parentTransform, basicAbilityComponent, conicalAbilityComponent, typesAffectedByTheAbility);
             

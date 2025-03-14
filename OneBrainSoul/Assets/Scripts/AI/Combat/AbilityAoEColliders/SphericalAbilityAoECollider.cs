@@ -12,7 +12,7 @@ namespace AI.Combat.AbilityAoEColliders
         private AnimationCurve _radiusResizeCurve;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            SphericalAbilityComponent sphericalAbilityComponent, List<EntityType> typesAffectedByTheAbility)
+            SphericalAbilityComponent sphericalAbilityComponent, EntityType typesAffectedByTheAbility)
         {
             base.SetAbilitySpecs(parentTransform, basicAbilityComponent, sphericalAbilityComponent, typesAffectedByTheAbility);
 

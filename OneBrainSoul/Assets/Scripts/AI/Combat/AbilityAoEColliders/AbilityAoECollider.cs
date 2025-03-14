@@ -18,7 +18,7 @@ namespace AI.Combat.AbilityAoEColliders
 
         private Transform _parentTransform;
 
-        private List<EntityType> _typesAffectedByTheAbility;
+        private EntityType _typesAffectedByTheAbility;
 
         private List<AgentEntity> _agentsInside = new List<AgentEntity>();
 
@@ -57,7 +57,7 @@ namespace AI.Combat.AbilityAoEColliders
         };
 
         public virtual void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            TAreaAbilityComponent areaAbilityComponent, List<EntityType> typesAffectedByTheAbility)
+            TAreaAbilityComponent areaAbilityComponent, EntityType typesAffectedByTheAbility)
         {
             _parentTransform = parentTransform;
 
@@ -556,18 +556,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            bool match = false;
-
-            foreach (EntityType affectedEntityType in _typesAffectedByTheAbility)
-            {
-                if (agentEntity.GetEntityType() == affectedEntityType)
-                {
-                    match = true;
-                    break;
-                }
-            }
-
-            if (!match)
+            if ((agentEntity.GetEntityType() & _typesAffectedByTheAbility) == 0)
             {
                 return;
             }
@@ -586,18 +575,7 @@ namespace AI.Combat.AbilityAoEColliders
                 return;
             }
 
-            bool match = false;
-
-            foreach (EntityType affectedEntityType in _typesAffectedByTheAbility)
-            {
-                if (agentEntity.GetEntityType() == affectedEntityType)
-                {
-                    match = true;
-                    break;
-                }
-            }
-
-            if (!match)
+            if ((agentEntity.GetEntityType() & _typesAffectedByTheAbility) == 0)
             {
                 return;
             }

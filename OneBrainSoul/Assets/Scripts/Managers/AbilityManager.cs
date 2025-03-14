@@ -209,7 +209,7 @@ namespace Managers
             TAbilityCollider abilityCollider = colliderObject.GetComponent<TAbilityCollider>();
 
             abilityCollider.SetAbilitySpecs(parentTransform, basicAbilityComponent, areaAbilityComponent,
-                ReturnTargets(basicAbilityComponent.GetAffectedEntities()));
+                basicAbilityComponent.GetAffectedEntities());
             
             colliderObject.SetActive(false);
 

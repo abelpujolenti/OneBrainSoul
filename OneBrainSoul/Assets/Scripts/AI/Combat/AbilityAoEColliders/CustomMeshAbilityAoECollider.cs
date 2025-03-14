@@ -17,7 +17,7 @@ namespace AI.Combat.AbilityAoEColliders
         private AnimationCurve _ZRescaleCurve;
 
         public override void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
-            CustomMeshAbilityComponent customMeshAbilityComponent, List<EntityType> typesAffectedByTheAbility)
+            CustomMeshAbilityComponent customMeshAbilityComponent, EntityType typesAffectedByTheAbility)
         {
             base.SetAbilitySpecs(parentTransform, basicAbilityComponent, customMeshAbilityComponent, typesAffectedByTheAbility);
 
