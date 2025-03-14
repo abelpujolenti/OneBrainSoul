@@ -53,7 +53,7 @@ MonoBehaviour:
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
     forceDirection: {x: 0, y: 0, z: -1}
-    forceStrength: 100
+    forceStrength: 750
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnEnd: 0
@@ -80,7 +80,7 @@ MonoBehaviour:
     direction: {x: 0, y: 0, z: 1}
     height: 1
     width: 1
-    length: 25
+    length: 12.5
     radius: 5
     customMeshPrefab: {fileID: 0}
     scale: 0

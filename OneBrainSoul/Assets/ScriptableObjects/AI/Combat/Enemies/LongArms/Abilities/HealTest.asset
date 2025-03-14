@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canAffectCaster: 0
   abilityTarget: 2
-  typesAffectedByTheAbility: 0
+  typesAffectedByTheAbility: 2
   abilityCast:
     canCancelCast: 0
     timeToCast: 0
