@@ -27,7 +27,7 @@ MonoBehaviour:
   abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
     hasAnEffectOnHealth: 1
-    healthModificationValue: 10
+    healthModificationValue: 6
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
