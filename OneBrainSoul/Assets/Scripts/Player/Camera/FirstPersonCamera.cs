@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Player.Camera
 {
@@ -36,6 +37,8 @@ namespace Player.Camera
         Vector3 shakeOffset = new Vector3();
         Vector3 startPos;
 
+        int mouseStartDelay = 0;
+
         public void Setup()
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -50,6 +53,14 @@ namespace Player.Camera
             // Uses unscaled delta time so it's not affected by slow motion mechanics
             float mouseX = Input.GetAxis("Mouse X") * horizontalSensitivity * Time.unscaledDeltaTime;
             float mouseY = Input.GetAxis("Mouse Y") * verticalSensitivity * Time.unscaledDeltaTime;
+
+            if (mouseStartDelay < 2)
+            {
+                mouseX = 0f;
+                mouseY = 0f;
+
+                mouseStartDelay++;
+            }
 
             // Yaw, unrestricted
             yRotation += mouseX;

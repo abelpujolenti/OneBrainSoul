@@ -230,8 +230,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fov: 100
-  verticalSensitivity: 400
-  horizontalSensitivity: 400
+  verticalSensitivity: 200
+  horizontalSensitivity: 200
   orientation: {fileID: 7876644653598473924}
   fovAnimationCurve:
     serializedVersion: 2
@@ -1167,7 +1167,7 @@ MonoBehaviour:
   _playerCharacterController: {fileID: 7820339696052967221}
   _maxHealth: 20
   _agentsPositionRadius: 2
-  _damageEffectDuration: 0.35
+  _damageEffectDuration: 0.5
   killHitstop: 0.15
   onDamageHitstop: 0.15
   ghostDuration: 20
@@ -1434,7 +1434,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5161130021299862406}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

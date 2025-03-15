@@ -107,6 +107,8 @@ namespace Player
                 Instantiate(corpsePrefab, transform.position + Vector3.up * 0.75f, Quaternion.identity);
                 _playerCharacterController.Respawn();
                 ghostTimerCoroutine = StartCoroutine(GhostTimerCoroutine());
+                PostProcessingManager.Instance.GhostEffect(ghostDuration);
+                _hitstop.Add(0.5f);
                 return;
             }
             
@@ -140,6 +142,7 @@ namespace Player
             _playerCharacterController.SetMoveSpeedMultiplier(1f);
             _health = _maxHealth;
             SetEntityType(EntityType.PLAYER);
+            PostProcessingManager.Instance.RecoverGhostEffect(.65f);
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)

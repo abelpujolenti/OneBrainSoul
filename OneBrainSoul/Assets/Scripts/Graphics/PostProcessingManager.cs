@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public class PostProcessingManager : Singleton<PostProcessingManager>
 {
@@ -14,13 +15,54 @@ public class PostProcessingManager : Singleton<PostProcessingManager>
     [SerializeField] AnimationCurve switchModeCurve;
     [SerializeField] AnimationCurve switchModeOutCurve;
     [SerializeField] AnimationCurve damageCurve;
+    [SerializeField] AnimationCurve ghostCurve;
+    [SerializeField] AnimationCurve recoverGhostCurve;
 
     Coroutine chargeRunCoroutine;
+    Coroutine ghostCoroutine;
     bool switchMode = false;
 
     private void Start()
     {
         GetFullscreenPasses();
+
+        SceneManager.sceneLoaded += ToggleFog;
+        ToggleFog(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+
+    private void ToggleFog(Scene s, LoadSceneMode mode)
+    {
+        if (s.name != "MainMenu")
+        {
+            EnableFog();
+        }
+        else
+        {
+            DisableFog();
+        }
+    }
+
+    public void EnableFog()
+    {
+        fullscreenPasses["Fog"].SetActive(true);
+    }
+
+    public void DisableFog()
+    {
+        fullscreenPasses["Fog"].SetActive(false);
+    }
+
+    public void GhostEffect(float t)
+    {
+        var pass = fullscreenPasses["Ghost"];
+        ghostCoroutine = StartCoroutine(EffectCoroutine(pass, t, ghostCurve));
+    }
+
+    public void RecoverGhostEffect(float t)
+    {
+        var pass = fullscreenPasses["Ghost"];
+        if (ghostCoroutine != null) StopCoroutine(ghostCoroutine);
+        StartCoroutine(EffectCoroutine(pass, t, recoverGhostCurve));
     }
 
     public void DamageEffect(float t)
