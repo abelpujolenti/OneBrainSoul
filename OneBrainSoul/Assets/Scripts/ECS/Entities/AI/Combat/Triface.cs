@@ -330,13 +330,5 @@ namespace ECS.Entities.AI.Combat
         
         [SerializeField] private bool _showDetectionAreaOfSlam;
         [SerializeField] private Color _colorOfDetectionAreaOfSlam;
-
-        protected override void OnDrawGizmos()
-        {
-            Vector3 origin = _bodyTransform.position;
-            int segments = 20;
-            
-            base.OnDrawGizmos();
-        }
     }
 } 

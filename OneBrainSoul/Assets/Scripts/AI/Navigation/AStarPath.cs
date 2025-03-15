@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using AI.Combat.CombatNavigation;
 using Interfaces.AI.Navigation;
+using Managers;
 using UnityEngine;
+using Utilities;
 
 namespace AI.Navigation
 {
@@ -13,15 +15,13 @@ namespace AI.Navigation
         public IPosition destinationPosition;
         public Vector3 deviationVector;
         public List<Node> path = new List<Node>();
-        public List<DynamicObstacle> dynamicObstacles = new List<DynamicObstacle>();
+
+        private Action<Vector3, float> _onUpdateDynamicObstacle;
         
         public Vector3 origin;
         public Vector3 destination;
-        public List<Vector3> dynamicObstaclesPositions = new List<Vector3>();
 
         private Action<bool> _hasReachDestinationAction;
-
-        private Mutex _mutex = new Mutex();
 
         public AStarPath(IPosition destinationPosition)
         {
@@ -30,29 +30,17 @@ namespace AI.Navigation
 
         public void UpdateNavMeshGraphObstacles()
         {
-            LockMutex();
-            
-            for (int i = 0; i < dynamicObstaclesPositions.Count; i++)
+            List<DynamicObstacleThreadSafe> dynamicObstacleAndRadius = EventsManager.OnUpdateDynamicObstacle();
+
+            foreach (DynamicObstacleThreadSafe positionAndRadius in dynamicObstacleAndRadius)
             {
-                navMeshGraph.UpdateEdgeWeights(dynamicObstaclesPositions[i], dynamicObstacles[i].radius, 100);
+                navMeshGraph.UpdateEdgeWeights(positionAndRadius.GetPosition(), positionAndRadius.GetRadius(), 100);
             }
-            
-            ReleaseMutex();
         }
 
         public Vector3 GetPosition()
         {
             return destinationPosition.GetPosition();
-        }
-
-        public void LockMutex()
-        {
-            _mutex.WaitOne();
-        }
-
-        public void ReleaseMutex()
-        {
-            _mutex.ReleaseMutex();
         }
 
         public void SetOnReachDestination(Action<bool> hasReachDestinationAction)

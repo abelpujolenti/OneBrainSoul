@@ -452,7 +452,7 @@ namespace ECS.Entities.AI.Combat
             
             //_animator.
             
-             TeleportToAnotherLongArmsBase();
+            TeleportToAnotherLongArmsBase();
         }
 
         private void TeleportToAnotherLongArmsBase()
@@ -616,9 +616,6 @@ namespace ECS.Entities.AI.Combat
         
         private new void OnDrawGizmos()
         {
-            Vector3 origin = _headTransform.position;
-            int segments = 20;
-            
             base.OnDrawGizmos();
 
             if (_showDetectionAreaOfFlee)

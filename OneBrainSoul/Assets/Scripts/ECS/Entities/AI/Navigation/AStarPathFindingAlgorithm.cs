@@ -153,14 +153,14 @@ namespace ECS.Entities.AI.Navigation
             }
 
             return RemoveNonCorners(path);
-            path = RemoveNonCorners(path);
+            /*path = RemoveNonCorners(path);
 
             if (path.Count < 3)
             {
                 return path;
             }
             
-            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength);
+            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength);*/
         }
 
         private static List<Node> RemoveNonCorners(List<Node> path)
