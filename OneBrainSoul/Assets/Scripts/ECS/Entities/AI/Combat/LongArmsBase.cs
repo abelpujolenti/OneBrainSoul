@@ -28,6 +28,19 @@ namespace ECS.Entities.AI.Combat
             _receiveDamageCooldown = GameManager.Instance.GetEnemyReceiveDamageCooldown();
             
             Setup(_radius + _agentPositionRadius, EntityType.LONG_ARMS_BASE);
+
+            StartCoroutine(Delay());
+        }
+
+        private IEnumerator Delay()
+        {
+            float timer = 0;
+
+            while (timer < 0.2f)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
             
             CombatManager.Instance.AddEnemy(this);
         }
@@ -146,7 +159,7 @@ namespace ECS.Entities.AI.Combat
         {
             Transform longArmsTransform = longArms.transform;
             longArmsTransform.transform.SetParent(transform);
-            longArmsTransform.localPosition = _offsetToLongArms + new Vector3(0, longArms.GetHeight() / 2 ,0);
+            longArmsTransform.localPosition = _offsetToLongArms + new Vector3(0, longArms.GetHeight() / 2 , 0);
             
             CombatManager.Instance.RemoveFreeLongArmsBaseId(GetAgentID());
             longArms.SetOnFleeAction(SetFree);

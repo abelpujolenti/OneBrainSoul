@@ -27,6 +27,10 @@ namespace AI.Combat.AbilityCasts
         
         private Func<Projectile, Vector3> _actionProjectileLaunch;
 
+        private bool _goesOnAutomatic;
+
+        private Vector3 _automaticShootDirection;
+
         public ProjectileAbility(BasicAbilityComponent basicAbilityComponent, List<Projectile> projectiles, 
             Transform parentTransform, Vector3 relativePosition, float maximumDispersion, bool makesParabola)
         {
@@ -62,6 +66,18 @@ namespace AI.Combat.AbilityCasts
 
         }
 
+        public void GoesOnAutomatic(bool goesOnAutomatic, Vector3 direction)
+        {
+            _goesOnAutomatic = goesOnAutomatic;
+
+            if (!_goesOnAutomatic)
+            {
+                return;
+            }
+
+            _automaticShootDirection = direction.normalized;
+        }
+
         public void Activate()
         {
             _currentProjectile = _projectilesPool.Dequeue();
@@ -87,12 +103,22 @@ namespace AI.Combat.AbilityCasts
 
         public bool FIREEEEEEEEEEEEEE()
         {
-            Vector3 forceVector = _actionProjectileLaunch(_currentProjectile);
-
-            if (forceVector == Vector3.zero)
+            Vector3 forceVector;
+            
+            if (_goesOnAutomatic)
             {
-                _currentProjectile.gameObject.SetActive(false);
-                return false;
+                forceVector = _automaticShootDirection * _currentProjectile.GetSpeed();
+            }
+            else
+            {
+                forceVector = _actionProjectileLaunch(_currentProjectile);
+
+                if (forceVector == Vector3.zero)
+                {
+                    _currentProjectile.gameObject.SetActive(false);
+                    return false;
+                }
+                
             }
             
             _currentProjectile.FIREEEEEEEEEEEE(forceVector);

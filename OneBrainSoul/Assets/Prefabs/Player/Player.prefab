@@ -1103,7 +1103,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hookShotChainMaterial: {fileID: 2100000, guid: f9c15ca6cd933e4478201f6cd861be45,
     type: 2}
-  _range: 80
+  _range: 40
   _radius: 0.5
   _ledgeSnapLeniency: 8
   _ledgeSnapNormalThreshold: 0.5
@@ -1165,11 +1165,17 @@ MonoBehaviour:
   _showMessages: 0
   _camera: {fileID: 7644145240796908984}
   _playerCharacterController: {fileID: 7820339696052967221}
-  _maxHealth: 300
+  _maxHealth: 20
   _agentsPositionRadius: 2
   _damageEffectDuration: 0.35
   killHitstop: 0.15
   onDamageHitstop: 0.15
+  ghostDuration: 20
+  ghostSpeed: 1.5
+  corpsePrefab: {fileID: 8477975951827032449, guid: 16afdbccdc6c9634b94a9c5a6a5a3211,
+    type: 3}
+  _healthLostPerTick: 0
+  _timeBetweenTicks: 0
 --- !u!1 &4680270387884578829
 GameObject:
   m_ObjectHideFlags: 0

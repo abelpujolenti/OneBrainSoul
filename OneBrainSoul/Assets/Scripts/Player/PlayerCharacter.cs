@@ -23,6 +23,13 @@ namespace Player
         [SerializeField] private float killHitstop = 0.15f;
         [SerializeField] private float onDamageHitstop = 0.15f;
 
+        [SerializeField] private float ghostDuration = 60f;
+        [SerializeField] private float ghostSpeed = 1.2f;
+        private float ghostTime = 0f;
+        private Coroutine ghostTimerCoroutine;
+        private bool hasBody = true;
+        [SerializeField] Transform corpsePrefab;
+
         private uint _areasDetecting = 0;
 
         private uint _health;
@@ -93,8 +100,13 @@ namespace Player
 
             if (_health == 0)
             {
-                SceneManager.LoadScene("ControllerTest", LoadSceneMode.Single);
-                //TODO PLAYER DIE
+                //Player Die
+                SetEntityType(EntityType.GHOST);
+                _playerCharacterController.SetMoveSpeedMultiplier(ghostSpeed);
+                hasBody = false;
+                Instantiate(corpsePrefab, transform.position + Vector3.up * 0.75f, Quaternion.identity);
+                _playerCharacterController.Respawn();
+                ghostTimerCoroutine = StartCoroutine(GhostTimerCoroutine());
                 return;
             }
             
@@ -105,6 +117,29 @@ namespace Player
             _hitstop.Add(onDamageHitstop);
             
             StartCoroutine(DecreaseDamageCooldown());
+        }
+
+        private IEnumerator GhostTimerCoroutine()
+        {
+            ghostTime = 0f;
+            while (ghostTime < ghostDuration && !hasBody)
+            {
+
+                yield return new WaitForFixedUpdate();
+                ghostTime += Time.fixedDeltaTime;
+            }
+            if (!hasBody)
+            {
+                SceneManager.LoadScene("ControllerTest", LoadSceneMode.Single);
+            }
+        }
+
+        public void RecoverBody()
+        {
+            hasBody = true;
+            _playerCharacterController.SetMoveSpeedMultiplier(1f);
+            _health = _maxHealth;
+            SetEntityType(EntityType.PLAYER);
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)
