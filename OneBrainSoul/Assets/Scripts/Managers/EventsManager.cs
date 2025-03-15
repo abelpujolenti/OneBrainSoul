@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using AI.Navigation;
 using ECS.Entities;
+using UnityEngine;
 
 namespace Managers
 {
@@ -42,6 +45,14 @@ namespace Managers
 
         public static Action OnDefeatEnemy;
         public static Action<EntityType, uint> OnAgentDefeated;
+
+        #region Navigation
+
+        public static Action<uint> UpdatePositionAndDestination;
+        public static Action<uint> UpdateAgentPath;
+        public static Func<List<DynamicObstacleThreadSafe>> OnUpdateDynamicObstacle;
+
+        #endregion
 
     }
 }

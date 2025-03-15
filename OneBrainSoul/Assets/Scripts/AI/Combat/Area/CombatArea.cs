@@ -23,8 +23,6 @@ namespace AI.Combat.Area
 
         private uint _playerId;
 
-        public bool _debug;
-
         private void Awake()
         {
             CombatManager.Instance.AddCombatArea(this, _combatAreaNumber);

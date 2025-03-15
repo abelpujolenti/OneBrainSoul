@@ -89,10 +89,10 @@ namespace ECS.Entities.AI.Combat
 
         private void UpdateVectorsToTargets()
         {
-            Vector3 targetPosition;
+            /*Vector3 targetPosition;
             Vector3 agentPosition;
             
-            /*if (_context.HasATargetForThrowRock())
+            if (_context.HasATargetForThrowRock())
             {
                 targetPosition = _context.GetThrowRockTargetContext().GetTargetTransform().position;
                 agentPosition = transform.position;
@@ -164,7 +164,6 @@ namespace ECS.Entities.AI.Combat
                     UnblockFSM();
                     yield break;
                 }
-                yield return null;
             }
 
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
@@ -206,7 +205,6 @@ namespace ECS.Entities.AI.Combat
                     UnblockFSM();
                     yield break;
                 }
-                yield return null;
             }
             
             AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyAttack, transform.position);

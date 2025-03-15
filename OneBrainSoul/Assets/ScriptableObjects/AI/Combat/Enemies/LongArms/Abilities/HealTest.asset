@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: HealTest
   m_EditorClassIdentifier: 
   canAffectCaster: 0
-  abilityTarget: 2
-  typesAffectedByTheAbility: 2
+  abilityTarget: 4
+  typesAffectedByTheAbility: 4
   abilityCast:
     canCancelCast: 0
     timeToCast: 0
