@@ -162,7 +162,12 @@ namespace ECS.Entities.AI
         {
             return _entityType;
         }
-        
+
+        public void SetEntityType(EntityType entityType)
+        {
+            _entityType = entityType;
+        }
+
         ///////////////TODO ERASE
         [SerializeField] private bool _showMessages;
 

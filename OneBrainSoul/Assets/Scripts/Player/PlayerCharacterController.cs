@@ -72,6 +72,7 @@ namespace Player
 
         [SerializeField] private float _airTime;
         private Vector3 _startPos;
+        private Vector3 _respawnPos;
         private EventInstance _footstepSound;
 
         [SerializeField] private DashAbility _dashAbility;
@@ -106,7 +107,7 @@ namespace Player
             _movementHandler = new GroundedMovementHandler();
             _uiCrosshairCanvas.gameObject.SetActive(true);
             _uiCanvas.gameObject.SetActive(true);
-            _startPos = transform.position;
+            _respawnPos = _startPos = transform.position;
 
             _footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
@@ -177,6 +178,16 @@ namespace Player
             _rigidbody.AddTorque(
                 axis2.normalized * (alpha2 * Mathf.Deg2Rad * _rotationCorrectionStrength) -
                 _rigidbody.angularVelocity * _rotationCorrectionDamp, ForceMode.Acceleration);
+        }
+
+        public void Respawn()
+        {
+            transform.position = _respawnPos;
+        }
+
+        public void SetRespawn(Vector3 newPos)
+        {
+            _respawnPos = newPos;
         }
 
         private void VoidReturn()
