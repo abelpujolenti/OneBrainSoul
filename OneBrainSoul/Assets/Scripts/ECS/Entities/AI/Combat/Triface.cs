@@ -9,6 +9,7 @@ using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Navigation;
 using Interfaces.AI.Combat;
 using Managers;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace ECS.Entities.AI.Combat
@@ -17,7 +18,7 @@ namespace ECS.Entities.AI.Combat
     {
         [SerializeField] private TrifaceProperties _trifaceProperties;
 
-        [SerializeField] private Transform _pivotTransform;
+        [SerializeField] private bool _itGoesOnAutomatic;
 
         private GameObject _endEffector; 
         
@@ -48,8 +49,13 @@ namespace ECS.Entities.AI.Combat
 
             _startPosition = transform.position;
 
-            _endEffector = new GameObject("EndEffector");
-            _endEffector.transform.SetParent(transform);
+            if (_itGoesOnAutomatic)
+            {
+                StartCoroutine(OnAutomatic());
+                return;
+            }
+
+            StartCoroutine(AILoop());
         }
 
         protected override void InitiateDictionaries()
@@ -90,48 +96,73 @@ namespace ECS.Entities.AI.Combat
 
         #region AI LOOP
 
-        private void Update()
+        private IEnumerator OnAutomatic()
         {
-            UpdateSightedTargetsInsideCombatArea();
+            _slamAbility.GetCast().ResetCastTime();
             
-            UpdateVisibleTargets();
-            
-            UpdateVectorToTargets();
-
-            if (_context.IsFSMBlocked())
+            while (true)
             {
-                return;
-            }
-            
-            //RotateBody();
-            
-            //RotateHead();
+                if (_slamAbility.GetCast().IsOnCooldown())
+                {
+                    yield return null;
+                    continue;
+                }
                 
-            //LaunchRaycasts();
-            
-            CalculateBestAction();
-
-            if (!_context.HasATargetForSlam())
-            {
-                return;
+                Slam();
+                yield return null;
             }
+        }
+
+        private IEnumerator AILoop()
+        {
+            while (true)
+            {
+                UpdateSightedTargetsInsideCombatArea();
             
-            Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
+                UpdateVisibleTargets();
+            
+                UpdateVectorToTargets();
+
+                if (_context.IsFSMBlocked())
+                {
+                    yield return null;
+                    continue;
+                }
+            
+                //RotateBody();
+            
+                //RotateHead();
                 
-            //TODO AQUI AGENT SLOTS WHEN NEAR
-            AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
-                .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
-
-            if (agentSlotPosition == null)
-            {
-                StopNavigation();
-                SetDirectionToRotateBody(vectorToTarget);
-                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
-                return;
-            }
+                //LaunchRaycasts();
             
-            _agentSlot = agentSlotPosition.agentSlot;
-            ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
+                CalculateBestAction();
+
+                if (!_context.HasATargetForSlam())
+                {
+                    yield return null;
+                    continue;
+                }
+            
+                Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
+                
+                //TODO AQUI AGENT SLOTS WHEN NEAR
+                AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
+                    .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
+
+                if (agentSlotPosition == null)
+                {
+                    StopNavigation();
+                    SetDirectionToRotateBody(vectorToTarget);
+                    ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
+                    yield return null;
+                    continue;
+                }
+            
+                _agentSlot = agentSlotPosition.agentSlot;
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
+
+                yield return null;
+            }
         }
 
         
