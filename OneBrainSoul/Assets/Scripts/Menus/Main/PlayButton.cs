@@ -1,4 +1,5 @@
-﻿using UnityEngine.SceneManagement;
+﻿using Managers;
+using UnityEngine.SceneManagement;
 
 namespace Menus.Main
 {
@@ -11,7 +12,7 @@ namespace Menus.Main
                 return;
             }
 
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            GameManager.Instance.LoadSceneIndex(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using AI.Navigation;
 using ECS.Entities;
-using UnityEngine;
 
 namespace Managers
 {
@@ -21,6 +20,7 @@ namespace Managers
         public static Action StopMovingBackwards;
         public static Action StopMovingRight;
         public static Action ReleaseJump;
+        public static Action ReleaseEscape;
         
         #endregion
 

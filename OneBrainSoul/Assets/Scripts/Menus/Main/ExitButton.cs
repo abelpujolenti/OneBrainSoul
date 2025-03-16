@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using Managers;
 
 namespace Menus.Main
 {
@@ -11,7 +11,7 @@ namespace Menus.Main
                 return;
             }
             
-            Application.Quit();
+            GameManager.Instance.ExitGame();
         }
     }
 }

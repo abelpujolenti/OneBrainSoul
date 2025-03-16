@@ -1,5 +1,4 @@
-﻿using Interfaces.AI.Navigation;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace AI.Navigation
 {

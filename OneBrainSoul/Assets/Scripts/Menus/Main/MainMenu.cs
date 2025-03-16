@@ -15,6 +15,8 @@ namespace Menus.Main
 
         [SerializeField] private ScrollRect _scrollRect;
 
+        [SerializeField] private float _positionToScroll;
+
         [SerializeField] private PressAnyKey _pressAnyKey;
 
         [SerializeField] private RectTransform _contentToScroll;
@@ -55,13 +57,13 @@ namespace Menus.Main
             float timer = 0;
 
             float startYPosition = _contentToScroll.transform.localPosition.y;
-            float endYPosition = 300;
+            float endYPosition = _positionToScroll;
             
             while (timer < _autoScrollTime)
             {
                 timer += Time.deltaTime;
                 _contentToScroll.transform.localPosition =
-                    new Vector3(0, Mathf.Lerp(startYPosition, endYPosition, timer / _autoScrollTime), 0);
+                    new Vector3(0, Mathf.SmoothStep(startYPosition, endYPosition, timer / _autoScrollTime), 0);
                 yield return null;
             }
 
@@ -71,6 +73,11 @@ namespace Menus.Main
             {
                 button.SetActive(true);
             }
+        }
+
+        private void OnDestroy()
+        {
+            _instance = null;
         }
     }
 }

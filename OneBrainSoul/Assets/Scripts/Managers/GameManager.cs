@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Managers
 {
@@ -8,6 +9,8 @@ namespace Managers
         private static GameManager _instance;
 
         public static GameManager Instance => _instance;
+
+        private const int MAIN_MENU_SCENE_INDEX = 1;
 
         [Min(0f)] 
         [SerializeField] private float _playerReceiveDamageCooldown;
@@ -101,6 +104,21 @@ namespace Managers
         public int GetRaycastLayersWithoutAlly()
         {
             return GetInteractableLayer() + GetGroundLayer() + GetEnemyLayer() + 1;
+        }
+
+        public void LoadSceneIndex(int index)
+        {
+            SceneManager.LoadScene(index);
+        }
+
+        public void GoToMainMenu()
+        {
+            SceneManager.LoadScene(MAIN_MENU_SCENE_INDEX);
+        }
+
+        public void ExitGame()
+        {
+            Application.Quit();
         }
     }
 }
