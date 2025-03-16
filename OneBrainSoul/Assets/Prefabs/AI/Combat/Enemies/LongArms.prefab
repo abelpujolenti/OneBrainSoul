@@ -260,7 +260,7 @@ MonoBehaviour:
     type: 3}
   _animator: {fileID: 0}
   _doesRestoreHealthOfPlayer: 1
-  _doesRestoreAChargeOfPlayer: 0
+  _doesRestoreAChargeOfPlayer: 1
   _areaNumber: 0
   _headTransform: {fileID: 1720201521735616698}
   _bodyTransform: {fileID: 1720201521735616698}

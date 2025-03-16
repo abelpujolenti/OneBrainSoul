@@ -93,6 +93,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 299d4953ab33dc94daf9559ab30036d7,
         type: 2}
+    - target: {fileID: 1103668164191771316, guid: 72a9fbec98cacae4e8138e005ee5328d,
+        type: 3}
+      propertyPath: _doesRestoreHealthOfPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103668164191771316, guid: 72a9fbec98cacae4e8138e005ee5328d,
+        type: 3}
+      propertyPath: _doesRestoreAChargeOfPlayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2543479680164596848, guid: 72a9fbec98cacae4e8138e005ee5328d,
         type: 3}
       propertyPath: m_Size.x

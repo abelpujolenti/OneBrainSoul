@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using FMOD.Studio;
 using FMODUnity;
 using Player.Abilities;
@@ -8,6 +9,8 @@ using Player.Movement;
 using TMPro;
 using UnityEngine;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
+using Managers;
+using ECS.Entities.AI;
 
 namespace Player
 {
@@ -69,6 +72,7 @@ namespace Player
         [SerializeField] private Canvas _uiCrosshairCanvas;
         [SerializeField] private Canvas _hookCanvas;
         [SerializeField] private TextMeshProUGUI _crosshair;
+        [SerializeField] private TextMeshProUGUI _controlPrompt;
 
         [SerializeField] private float _airTime;
         private Vector3 _startPos;
@@ -94,6 +98,10 @@ namespace Player
 
         private int _hookCharges;
         private float _rechargeTime;
+
+        private float _contactDamageTime = 0f;
+        private uint _contactDamageAmount = 1;
+        private float _contactDamageHitstop = .1f;
 
         public bool _isDashUnlocked = false;
         public bool _isChargeUnlocked = false;
@@ -128,6 +136,7 @@ namespace Player
             CalculateAirTime();
             CalculateCooldowns();
             UpdateCharges();
+            CheckContactDamage();
         }
 
         private void FixedUpdate()
@@ -325,6 +334,28 @@ namespace Player
             }
         }
 
+        private void CheckContactDamage()
+        {
+            if (_contactDamageTime <= 0f) return;
+
+            RaycastHit hit;
+            Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
+            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;
+            if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius, _rigidbody.velocity.normalized, out hit, 1f,
+                GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
+            {
+                AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
+                if (entity != null)
+                {
+                    entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
+                    GetComponent<Hitstop>().Add(_contactDamageHitstop);
+                    _contactDamageTime = 0f;
+                }
+            }
+
+            _contactDamageTime = Mathf.Max(0f, _contactDamageTime - Time.deltaTime);
+        }
+
         private void SoundUpdate()
         {
             //Walk sound
@@ -454,17 +485,44 @@ namespace Player
         {
             _isDashUnlocked = true;
             _hookCanvas.gameObject.SetActive(true);
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Shift]</b> <color=white> <size=40>Dash", 0.5f, _dashMovementHandler));
         }
 
         public void UnlockCharge()
         {
             _isChargeUnlocked = true;
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Hook Downwards]</b> <color=white> <size=40>Smash", 0.5f, _hookMovementHandler));
         }
 
         public void UnlockHook()
         {
             _isHookUnlocked = true;
             _hookCanvas.gameObject.SetActive(true);
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Right Click]</b> <color=white> <size=40>Hook", 0.5f, _hookMovementHandler));
+        }
+
+        private IEnumerator SetControlText(string text, float dur = 0.5f, IMovementHandler movementHandler = null)
+        {
+            _controlPrompt.text = text;
+            _controlPrompt.color = new Color(1f, 1f, 1f, 1f);
+            if (movementHandler != null)
+            {
+                yield return new WaitUntil(() => _movementHandler == movementHandler);
+            }
+            else
+            {
+                yield return new WaitForSeconds(5);
+            }
+            float t = 0f;
+            float a = 1f;
+            while (t < dur)
+            {
+                a = 1f - t / dur;
+                _controlPrompt.color = new Color(1f, 1f, 1f, a);
+                yield return new WaitForFixedUpdate();
+                t += Time.fixedDeltaTime;
+            }
+            _controlPrompt.text = "";
         }
 
         public void UnlockWallClimb()
@@ -531,6 +589,16 @@ namespace Player
         public void SetJumpsAmount(int jumps)
         {
             _jumps = jumps;
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Space] Mid-air</b> <color=white> <size=40>Double Jump", 0.5f, _airborneMovementHandler));
+        }
+
+        public void SetContactDamage(float t, int damage = -1)
+        {
+            _contactDamageTime = t;
+            if (damage > 0)
+            {
+                _contactDamageAmount = (uint)damage;
+            }
         }
 
         public int GetCharges()

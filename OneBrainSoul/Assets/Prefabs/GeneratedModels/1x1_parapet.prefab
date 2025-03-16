@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8204029990068647556}
   - component: {fileID: 2167565467023224191}
   - component: {fileID: 8981034673996650293}
+  - component: {fileID: 4775587677549155238}
   m_Layer: 0
   m_Name: 1x1_parapet
   m_TagString: Untagged
@@ -83,3 +84,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &4775587677549155238
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4836637354314865249}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.8000002, y: 2.099999, z: 1.0000002}
+  m_Center: {x: -0.4050001, y: 1.0499995, z: -0.5000001}

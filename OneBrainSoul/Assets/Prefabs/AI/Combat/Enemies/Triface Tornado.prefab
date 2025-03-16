@@ -19,6 +19,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: baf02d5de16d5bc418cb21a8cc133e03,
         type: 2}
+    - target: {fileID: 1103668164191771316, guid: 72a9fbec98cacae4e8138e005ee5328d,
+        type: 3}
+      propertyPath: _doesRestoreHealthOfPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103668164191771316, guid: 72a9fbec98cacae4e8138e005ee5328d,
+        type: 3}
+      propertyPath: _doesRestoreAChargeOfPlayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4231735849328312706, guid: 72a9fbec98cacae4e8138e005ee5328d,
         type: 3}
       propertyPath: m_Materials.Array.data[0]

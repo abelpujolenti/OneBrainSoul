@@ -80,6 +80,7 @@ namespace Player
         private void DefeatAgent()
         {
             _hitstop.Add(killHitstop);
+            _hitstop.AddAftershock(killHitstop * 1.5f);
         }
 
         public void RechargeHookCharge()

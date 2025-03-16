@@ -12,16 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: TornadoTriface
   m_EditorClassIdentifier: 
-  totalHealth: 15
+  totalHealth: 2
   agentsPositionRadius: 5
-  sightMaximumDistance: 0
-  fov: 45
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  maximumHeadYawRotation: 45
-  maximumHeadPitchUpRotation: 0
-  maximumHeadPitchDownRotation: 0
-  headRotationSpeed: 1
   bodyNormalRotationSpeed: 300
   healEffect: {fileID: 326565652972303605, guid: b1b8db585722ef74286b706191482b5a,
     type: 3}

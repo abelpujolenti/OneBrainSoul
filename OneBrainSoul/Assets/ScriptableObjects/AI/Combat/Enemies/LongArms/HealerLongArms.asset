@@ -12,16 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7bb48592f074430b3b10e52e0706acc, type: 3}
   m_Name: HealerLongArms
   m_EditorClassIdentifier: 
-  totalHealth: 9
+  totalHealth: 2
   agentsPositionRadius: 5
-  sightMaximumDistance: 300
-  fov: 75
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  maximumHeadYawRotation: 45
-  maximumHeadPitchUpRotation: 0
-  maximumHeadPitchDownRotation: 0
-  headRotationSpeed: 1
   bodyNormalRotationSpeed: 30
   healEffect: {fileID: 0}
   healRelativePosition: {x: 0, y: 0, z: 0}

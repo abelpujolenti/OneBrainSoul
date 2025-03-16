@@ -445,8 +445,8 @@ MonoBehaviour:
   - {fileID: 162569519068269043}
   _material: {fileID: 2100000, guid: aca85766c475a3541b409606e2da2b2e, type: 2}
   _animator: {fileID: 0}
-  _doesRestoreHealthOfPlayer: 0
-  _doesRestoreAChargeOfPlayer: 0
+  _doesRestoreHealthOfPlayer: 1
+  _doesRestoreAChargeOfPlayer: 1
   _areaNumber: 0
   _headTransform: {fileID: 6000714678988991945}
   _bodyTransform: {fileID: 6000714678988991945}

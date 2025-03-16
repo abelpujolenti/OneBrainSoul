@@ -13,14 +13,10 @@ MonoBehaviour:
   m_Name: Shove
   m_EditorClassIdentifier: 
   canAffectCaster: 0
-  abilityTarget: 1
+  abilityTarget: 3
+  typesAffectedByTheAbility: 3
   abilityCast:
-    minimumRangeToCast: 0
-    maximumRangeToCast: 0
-    directionOfDetection: {x: 0, y: 0, z: 1}
-    minimumAngleToCast: 0
     canCancelCast: 0
-    maximumAngleToCancelCast: 0
     timeToCast: 0
     cooldown: 1
     duration: 0
@@ -43,6 +39,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 1, z: 2}
     forceStrength: 1200
     doesForceComesFromCenterOfTheArea: 1
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -58,6 +55,7 @@ MonoBehaviour:
     forceDirection: {x: 0, y: 1, z: 2}
     forceStrength: 1200
     doesForceComesFromCenterOfTheArea: 1
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -73,6 +71,7 @@ MonoBehaviour:
     forceDirection: {x: 1, y: 0, z: 0}
     forceStrength: 1000
     doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 0
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
@@ -82,7 +81,7 @@ MonoBehaviour:
     height: 10
     width: 7
     length: 7
-    radius: 4
+    radius: 3.5
     customMeshPrefab: {fileID: 2430207424799574835, guid: ee99914edafad8846b21e7289cfef22e,
       type: 3}
     scale: 0
