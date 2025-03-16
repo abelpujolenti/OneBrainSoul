@@ -1068,7 +1068,7 @@ MonoBehaviour:
   _smashParticle: {fileID: 3076238583181615966}
   _hookUI: {fileID: 2481377896329111756}
   _maxHookCharges: 3
-  _outOfCombatRechargeDuration: 1.5
+  _outOfCombatRechargeDuration: 1
   _inCombatRechargeDuration: 3.5
   _isDashUnlocked: 0
   _isChargeUnlocked: 0
@@ -1258,7 +1258,7 @@ MonoBehaviour:
   duration: 0.5
   strength: 1.8
   cancelAnimationTime: 0.1
-  baseDamage: 3
+  baseDamage: 1
   activeStart: 0.05
   activeEnd: 0.15
   range: 11

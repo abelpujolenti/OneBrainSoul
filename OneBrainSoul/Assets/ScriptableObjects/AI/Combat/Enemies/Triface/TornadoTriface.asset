@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: TornadoTriface
   m_EditorClassIdentifier: 
-  totalHealth: 15
+  totalHealth: 3
   agentsPositionRadius: 5
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7

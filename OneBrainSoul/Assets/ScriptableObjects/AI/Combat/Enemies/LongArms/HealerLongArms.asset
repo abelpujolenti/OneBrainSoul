@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7bb48592f074430b3b10e52e0706acc, type: 3}
   m_Name: HealerLongArms
   m_EditorClassIdentifier: 
-  totalHealth: 9
+  totalHealth: 2
   agentsPositionRadius: 5
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7

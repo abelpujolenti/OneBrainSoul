@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: GeyserTriface
   m_EditorClassIdentifier: 
-  totalHealth: 12
+  totalHealth: 2
   agentsPositionRadius: 5
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
