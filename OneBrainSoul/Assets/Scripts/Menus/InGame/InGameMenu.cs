@@ -17,6 +17,7 @@ namespace Menus.InGame
             EventsManager.ReleaseEscape += Resume;
             Time.timeScale = 0;
             gameObject.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
         }
 
         private void Resume()
@@ -25,6 +26,7 @@ namespace Menus.InGame
             EventsManager.ReleaseEscape += Pause;
             Time.timeScale = 1;
             gameObject.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         public void MainMenu()
