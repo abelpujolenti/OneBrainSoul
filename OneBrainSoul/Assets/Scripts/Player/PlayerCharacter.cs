@@ -25,9 +25,9 @@ namespace Player
 
         [SerializeField] private float ghostDuration = 60f;
         [SerializeField] private float ghostSpeed = 1.2f;
-        private float ghostTime = 0f;
+        private float _ghostTime = -1f;
         private Coroutine ghostTimerCoroutine;
-        private bool hasBody = true;
+        private bool _hasBody = true;
         [SerializeField] Transform corpsePrefab;
 
         private uint _areasDetecting = 0;
@@ -80,6 +80,7 @@ namespace Player
         private void DefeatAgent()
         {
             _hitstop.Add(killHitstop);
+            _hitstop.AddAftershock(killHitstop * 1.5f);
         }
 
         public void RechargeHookCharge()
@@ -103,7 +104,7 @@ namespace Player
                 //Player Die
                 SetEntityType(EntityType.GHOST);
                 _playerCharacterController.SetMoveSpeedMultiplier(ghostSpeed);
-                hasBody = false;
+                _hasBody = false;
                 Instantiate(corpsePrefab, transform.position + Vector3.up * 0.75f, Quaternion.identity);
                 _playerCharacterController.Respawn();
                 ghostTimerCoroutine = StartCoroutine(GhostTimerCoroutine());
@@ -123,14 +124,13 @@ namespace Player
 
         private IEnumerator GhostTimerCoroutine()
         {
-            ghostTime = 0f;
-            while (ghostTime < ghostDuration && !hasBody)
+            _ghostTime = 0f;
+            while (_ghostTime < ghostDuration && !_hasBody)
             {
-
                 yield return new WaitForFixedUpdate();
-                ghostTime += Time.fixedDeltaTime;
+                _ghostTime += Time.fixedDeltaTime;
             }
-            if (!hasBody)
+            if (!_hasBody)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
             }
@@ -138,9 +138,10 @@ namespace Player
 
         public void RecoverBody()
         {
-            hasBody = true;
+            _hasBody = true;
             _playerCharacterController.SetMoveSpeedMultiplier(1f);
             _health = _maxHealth;
+            _ghostTime = -1;
             SetEntityType(EntityType.PLAYER);
             PostProcessingManager.Instance.RecoverGhostEffect(.65f);
         }
@@ -362,6 +363,11 @@ namespace Player
         public uint GetMaxHealth()
         {
             return _maxHealth;
+        }
+
+        public float GetGhostTimeNormalized()
+        {
+            return _ghostTime / ghostDuration;
         }
     }
 }

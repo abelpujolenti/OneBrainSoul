@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: Triface
   m_EditorClassIdentifier: 
-  totalHealth: 9
+  totalHealth: 1
   agentsPositionRadius: 5
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
-  bodyNormalRotationSpeed: 45
+  bodyNormalRotationSpeed: 300
   healEffect: {fileID: 326565652972303605, guid: b1b8db585722ef74286b706191482b5a,
     type: 3}
   healRelativePosition: {x: 0, y: 0, z: 0}

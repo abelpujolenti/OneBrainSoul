@@ -56,7 +56,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _ActivatedColor: {r: 1.4872073, g: 0.050956994, b: 9.002533, a: 1}
-    - _Color: {r: 0, g: 0.6866329, b: 1, a: 0.5019608}
-    - _EmissiveColor: {r: 0.4713812, g: 0, b: 1, a: 1}
+    - _ActivatedColor: {r: 4.8699083, g: 4.3938775, b: 7.392874, a: 1}
+    - _Color: {r: 0, g: 0.50752556, b: 0.8490566, a: 0.5019608}
+    - _EmissiveColor: {r: 0.4699907, g: 0.35207537, b: 0.5999999, a: 1}
   m_BuildTextureStacks: []

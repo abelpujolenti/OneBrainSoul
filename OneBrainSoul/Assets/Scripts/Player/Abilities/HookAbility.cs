@@ -81,7 +81,7 @@ namespace Player.Abilities
                     endPos = ledgeHit.point + new Vector3(0f, .65f, 0f) + (ledgeHitDir + ledgeHit.normal).normalized * _ledgeSnapDistance;
                 }
 
-                bool smash = player._isChargeUnlocked && dir.y <= -_smashThreshold && _hit.normal.y >= _ledgeSnapNormalThreshold;
+                bool smash = player._isChargeUnlocked && dir.y <= -_smashThreshold && _hit.normal.y >= _ledgeSnapNormalThreshold && _hit.distance > 5f;
 
                 player.ChangeMovementHandlerToHook(startPos, endPos, ledgeFound ? ledgeHit.point: _hit.point, ledgeFound, smash);
                 player.ResetAbility2Cooldown();

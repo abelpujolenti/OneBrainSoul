@@ -5,8 +5,14 @@ namespace Managers
 {
     public class DebugManager : Singleton<DebugManager>
     {
-        [SerializeField] PlayerCharacterController player;
+        PlayerCharacterController player;
         [SerializeField] Vector3[] positions;
+
+        private void Start()
+        {
+            player = FindObjectOfType<PlayerCharacterController>();
+        }
+
         private void OnGUI()
         {
             Event e = Event.current;
@@ -15,6 +21,7 @@ namespace Managers
                 switch(e.keyCode)
                 {
                     case KeyCode.F1:
+                        player = FindObjectOfType<PlayerCharacterController>();
                         player.UnlockDash();
                         player.UnlockHook();
                         player.UnlockWallClimb();

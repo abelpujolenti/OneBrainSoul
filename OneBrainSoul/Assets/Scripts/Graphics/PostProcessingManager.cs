@@ -25,6 +25,8 @@ public class PostProcessingManager : Singleton<PostProcessingManager>
     private void Start()
     {
         GetFullscreenPasses();
+        fullscreenPasses["Ghost"].SetActive(false);
+        fullscreenPasses["Damage"].SetActive(false);
 
         SceneManager.sceneLoaded += ToggleFog;
         ToggleFog(SceneManager.GetActiveScene(), LoadSceneMode.Single);
