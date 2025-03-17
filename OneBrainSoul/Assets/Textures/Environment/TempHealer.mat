@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TempHealer
-  m_Shader: {fileID: 4800000, guid: 0fc100ce7c916be45897f4c763782efc, type: 3}
+  m_Shader: {fileID: 4800000, guid: 939701980e99e77448cec9e3b0d6f1fe, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -118,6 +118,9 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _RimLightEdgePower: 2.12
+    - _RimLightShadowPower: 1.48
+    - _RimLightStrength: 1.92
     - _Smoothness: 0.176
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -137,6 +140,7 @@ Material:
     - _Color: {r: 0.78867924, g: 0.46874326, b: 0.78516936, a: 1}
     - _DamageTint: {r: 0.35549903, g: 0.20857947, b: 0.81886786, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _RImLightColor: {r: 0.4634386, g: 0.1706016, b: 0.554717, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _UvOffset: {r: 0, g: 0, b: 0, a: 0}
     - _UvTiling: {r: 1, g: 1, b: 0, a: 0}

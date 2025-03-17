@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 5908945272944013587}
   - component: {fileID: 7601048549255348943}
   - component: {fileID: 9140836565692572940}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Recharger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

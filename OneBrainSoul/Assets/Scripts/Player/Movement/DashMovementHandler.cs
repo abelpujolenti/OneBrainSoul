@@ -13,7 +13,8 @@ namespace Player.Movement
         public static float horizontalAirDrag = 25f;
         public static float bobbingStrength = 0.6f;
         public static float duration = .09f;
-        public static uint damage = 1;
+        public static float contactDamageDuration = .8f;
+        public static int damage = 1;
 
         private float chargeTime = 0f;
         private float bobbingCycle = 0f;
@@ -56,7 +57,9 @@ namespace Player.Movement
             horizontalVelocity.y = 0;
             rigidbody.AddForce(-horizontalVelocity * (player.IsOnTheGround() ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
 
-            RaycastHit hit;
+            player.SetContactDamage(contactDamageDuration, damage);
+
+            /*RaycastHit hit;
             CapsuleCollider playerCollider = player.GetCapsuleCollider();
             Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * (-playerCollider.height * 0.5f);
             Vector3 p2 = p1 + Vector3.up * playerCollider.height;
@@ -70,7 +73,7 @@ namespace Player.Movement
                     entity.OnReceiveDamage(damage, hit.point, player.transform.position);
                 }
                 Exit(player);
-            }
+            }*/
         }
 
         private void Exit(PlayerCharacterController player)
