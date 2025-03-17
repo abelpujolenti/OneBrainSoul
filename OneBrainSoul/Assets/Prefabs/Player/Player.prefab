@@ -1176,8 +1176,8 @@ MonoBehaviour:
     m_Bits: 64
   _jumps: 2
   _moveSpeedMultiplier: 1.1
-  _ability1Cooldown: 0.8
-  _ability2Cooldown: 0.8
+  _ability1Cooldown: 0.3
+  _ability2Cooldown: 0.5
   _gravityStrength: 32
   _hoverHeight: 1.2
   _hoverStrength: 500

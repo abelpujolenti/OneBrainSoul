@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5925981114812805985}
   - component: {fileID: 6151351774202797665}
   - component: {fileID: 6148826975069710462}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 2x2_floor_tiles_corner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
