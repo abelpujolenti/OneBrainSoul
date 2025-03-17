@@ -49,6 +49,8 @@ namespace Player.Camera
 
         void Update()
         {
+            if (Cursor.lockState != CursorLockMode.Locked) return;
+
             // Uses unscaled delta time so it's not affected by slow motion mechanics
             float mouseX = Input.GetAxis("Mouse X") * horizontalSensitivity * Time.unscaledDeltaTime;
             float mouseY = Input.GetAxis("Mouse Y") * verticalSensitivity * Time.unscaledDeltaTime;
