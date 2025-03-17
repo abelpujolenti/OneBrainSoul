@@ -320,6 +320,15 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
+        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
+        {
+            if (_itGoesOnAutomatic)
+            {
+                return;
+            }
+            base.OnReceiveDamage(damageValue, hitPosition, sourcePosition);
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();

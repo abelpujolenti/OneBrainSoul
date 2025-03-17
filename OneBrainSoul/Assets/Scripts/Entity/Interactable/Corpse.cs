@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Player;
+using UnityEngine;
 
 public class Corpse : Item
 {

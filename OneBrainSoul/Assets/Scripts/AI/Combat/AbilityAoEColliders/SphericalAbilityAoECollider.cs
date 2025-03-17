@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ECS.Components.AI.Combat.Abilities;
+﻿using ECS.Components.AI.Combat.Abilities;
 using ECS.Entities;
 using UnityEngine;
 

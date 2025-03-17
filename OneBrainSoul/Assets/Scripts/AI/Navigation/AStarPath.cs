@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using AI.Combat.CombatNavigation;
 using Interfaces.AI.Navigation;
 using Managers;
 using UnityEngine;
-using Utilities;
 
 namespace AI.Navigation
 {
