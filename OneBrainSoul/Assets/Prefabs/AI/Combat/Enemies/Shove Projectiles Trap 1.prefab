@@ -330,7 +330,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: aca85766c475a3541b409606e2da2b2e, type: 2}
+  - {fileID: 2100000, guid: 5d174d3d188359b4ba1f81949de43198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -443,7 +443,7 @@ MonoBehaviour:
   _visionAreas:
   - {fileID: 7569773403801526068}
   - {fileID: 162569519068269043}
-  _material: {fileID: 2100000, guid: aca85766c475a3541b409606e2da2b2e, type: 2}
+  _material: {fileID: 2100000, guid: 5d174d3d188359b4ba1f81949de43198, type: 2}
   _animator: {fileID: 0}
   _doesRestoreHealthOfPlayer: 1
   _doesRestoreAChargeOfPlayer: 1

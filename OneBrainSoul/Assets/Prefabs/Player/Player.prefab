@@ -2845,10 +2845,10 @@ MonoBehaviour:
   innerRange: 4
   innerArc: 90
   hitstop: 0.09
-  soundAreaRadius: 0
+  soundAreaRadius: 20
   parent: {fileID: 571497645259441326}
   player: {fileID: 7820339696052967221}
-  _hitstop: {fileID: 0}
+  _hitstop: {fileID: 5004512723018151163}
   animationCurve:
     serializedVersion: 2
     m_Curve: []

@@ -17,11 +17,12 @@ namespace Player.Movement
         public static float bobbingStrength = .65f;
         public static float snapDownwardsStrength = 6f;
         public static float smashAdditionalSpeed = 90f;
+        public static float smashRadius = 5f;
+        public static float smashRadiusTerrainDestroyed = 11f;
         public static uint hookDamage = 1;
-        public static uint smashDamage = 2;
+        public static uint smashDamage = 1;
 
-        public static float bounceStrength = 1900f;
-        public static float bounceVerticalRatio = .45f;
+        public static float bounceStrength = 8f;
 
         public static float delay = 0.2f;
         public static float delayHitImpact = 0.025f;
@@ -221,18 +222,28 @@ namespace Player.Movement
             {
                 destructibleTerrain.Break(hit.point);
             }
-            AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
-            if (entity != null)
+
+            bool damaged = false;
+
+            Collider[] colliders = Physics.OverlapCapsule(player.transform.position - Vector3.up, player.transform.position + Vector3.up, hitTerrain ? smashRadiusTerrainDestroyed : smashRadius, GameManager.Instance.GetRaycastLayersWithoutAlly());
+            foreach (Collider collider in colliders)
             {
-                entity.OnReceiveDamage(smashDamage, hit.point, player.transform.position);
+                AgentEntity entity = collider.GetComponent<AgentEntity>();
+                if (entity != null)
+                {
+                    damaged = true;
+                    entity.OnReceiveDamage(smashDamage, hit.point, player.transform.position);
+                }
             }
 
-            bool damaged = hitTerrain || entity != null;
+            damaged |= hitTerrain;
 
             var em = smashParticle.emission;
             var b = em.GetBurst(0);
-            b.count = damaged ? 20 : 8;
+            b.count = damaged ? 20 : 4;
             em.SetBurst(0, b);
+            var s = smashParticle.shape;
+            s.radius = damaged ? 0.8f : 0.4f;
             smashParticle.Play();
 
             PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
@@ -245,9 +256,8 @@ namespace Player.Movement
             _hitstop.AddAftershock(damaged ? .23f : .2f);
             player.GetRigidbody().velocity = Vector3.zero;
             player.GetRigidbody().AddForce(
-                (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
-                 new Vector3(0f, bounceVerticalRatio * (damaged ? 1.2f : 1f), 0f)).normalized *
-                (bounceStrength * (damaged ? 1.4f : 1f)), ForceMode.Acceleration);
+                (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized *
+                bounceStrength * (damaged ? 1.4f : 1f)), ForceMode.VelocityChange);
         }
 
         public bool ShouldGravityApply(PlayerCharacterController player)

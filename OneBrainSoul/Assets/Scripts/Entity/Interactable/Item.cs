@@ -10,7 +10,7 @@ public class Item : MonoBehaviour
     private void Start()
     {
         sprite = GetComponentInChildren<SpriteRenderer>();
-        pointLight = GetComponent<Light>();
+        pointLight = GetComponentInChildren<Light>();
         startSpritePosition = sprite.transform.localPosition;
     }
     void LateUpdate()
@@ -33,7 +33,7 @@ public class Item : MonoBehaviour
     private IEnumerator PickupDeleteCoroutine()
     {
         yield return SetScaleCoroutine(0f, .3f);
-        StartCoroutine(SetLightIntensityCoroutine(0f, .3f));
+        //StartCoroutine(SetLightIntensityCoroutine(0f, .3f));
         Destroy(this.gameObject);
     }
 

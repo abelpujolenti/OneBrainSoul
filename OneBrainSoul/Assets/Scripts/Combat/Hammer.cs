@@ -24,28 +24,28 @@ namespace Combat
                 for (int i = 0; i < entities.Count; i++)
                 {
                     AgentEntity entity = entities[i];
+                    if (entity == null) continue;
                     Vector3 enemyPos = entity.transform.position;
                     Vector3 enemyPosOuter = entity.transform.position + (player.transform.position - entity.transform.position).normalized * entity.GetRadius();
                     float distance = Vector3.Distance(player.transform.position, enemyPosOuter);
                     float dotInnerNormalized = Vector3.Dot(player.GetOrientation().forward, (enemyPos - player.transform.position).normalized);
                     float dotOuterNormalized = Vector3.Dot(player.GetOrientation().forward, (enemyPosOuter - player.transform.position).normalized);
-                    if (!(distance < range))
+                    if (distance < range)
                     {
-                        continue;
-                    }
-
-                    //Debug.Log("Dot inner: " + dotInnerNormalized + "  Dot outer: " + dotOuterNormalized);
-                    if (dotOuterNormalized > 1f - outerArc / 180f ||
-                        (dotInnerNormalized > 0.2f && distance < innerRange))
-                    {
-                        affectedEntities.Add(entity);
+                        //Debug.Log("Dot inner: " + dotInnerNormalized + "  Dot outer: " + dotOuterNormalized);
+                        if (
+                            (dotOuterNormalized > 1f - outerArc / 180f) ||
+                            (dotInnerNormalized > 0.2f && distance < innerRange)
+                        )
+                        {
+                            affectedEntities.Add(entity);
+                        }
                     }
                 }
-                if (affectedEntities.Count == 0)
+                if (affectedEntities.Count > 0)
                 {
-                    return;
+                    AttackLand(affectedEntities);
                 }
-                AttackLand(affectedEntities);
             }
         }
 
@@ -62,10 +62,11 @@ namespace Combat
             Vector3 pushVector = player.GetOrientation().forward;
             pushVector.y = 1;
             pushVector = pushVector.normalized;
-            float forceMagnitude = Mathf.Sqrt(2000f * 2000f + 1000f * 1000f); 
+            float forceMagnitude = 300f; 
         
             foreach (AgentEntity enemy in affectedEntities)
             {
+                if (enemy == null) continue;
                 enemy.OnReceivePushFromCenter(transform.position, pushVector, forceMagnitude, transform.position, 
                     ForceMode.VelocityChange);    
             }

@@ -341,7 +341,7 @@ namespace Player
             RaycastHit hit;
             Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
             Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;
-            if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius, _rigidbody.velocity.normalized, out hit, 1f,
+            if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius * 1.2f, _rigidbody.velocity.normalized, out hit, 0.9f,
                 GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
             {
                 AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
