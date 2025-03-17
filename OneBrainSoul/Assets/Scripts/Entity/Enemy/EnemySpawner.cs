@@ -10,7 +10,8 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] bool spawnOnStart = true;
     [SerializeField] bool spawnOnEnterTrigger = false;
     public bool canSpawn = true;
-    AgentEntity agentEntity;
+    public AgentEntity agentEntity { get; private set; }
+    private List<AgentEntity> spawnedEntities = new List<AgentEntity>();
     private void Awake()
     {
         agentEntity = transform.GetChild(0).GetComponent<AgentEntity>();
@@ -25,13 +26,25 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        for (int i = spawnedEntities.Count - 1; i >= 0; i--)
+        {
+            if (spawnedEntities[i] = null)
+            {
+                spawnedEntities.RemoveAt(i);
+            }
+        }
+    }
+
     public void Spawn()
     {
         if (!canSpawn) return;
         canSpawn = false;
-        var spawnedAgent = Instantiate(agentEntity.transform, transform.transform.position, agentEntity.transform.rotation);
+        var spawnedAgent = Instantiate(agentEntity.transform, agentEntity.transform.position, agentEntity.transform.rotation);
         spawnedAgent.localScale = agentEntity.transform.localScale;
         spawnedAgent.gameObject.SetActive(true);
+        spawnedEntities.Add(spawnedAgent.GetComponent<AgentEntity>());
     }
 
     private void OnTriggerEnter(Collider other)
@@ -40,5 +53,10 @@ public class EnemySpawner : MonoBehaviour
         {
             Spawn();
         }
+    }
+
+    public bool HasLiveSpawns()
+    {
+        return spawnedEntities.Count > 0;
     }
 }

@@ -1,13 +1,17 @@
+using System.Collections.Generic;
 using System.Collections;
 using ECS.Entities.AI;
 using Player;
 using UnityEngine;
+using System.Linq;
 
 public class CombatRoom : MonoBehaviour
 {
-    [SerializeField] AgentEntity[] enemies;
+    List<EnemySpawner> spawners = new List<EnemySpawner>();
+    List<AgentEntity> enemies = new List<AgentEntity>();
     [SerializeField] GameObject[] walls;
     [SerializeField] float delay = .5f;
+    [SerializeField] float enemyDelay = .12f;
 
     PlayerCharacterController player;
     bool active = false;
@@ -15,9 +19,10 @@ public class CombatRoom : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < enemies.Length; i++)
+        spawners = GetComponentsInChildren<EnemySpawner>().ToList();
+        for (int i = 0; i < spawners.Count; i++)
         {
-            //enemies[i].gameObject.SetActive(false);
+            enemies.Add(spawners[i].agentEntity);
         }
         for (int i = 0; i < walls.Length; i++)
         {
@@ -28,12 +33,12 @@ public class CombatRoom : MonoBehaviour
     void Update()
     {
         if (!active || beat) return;
-        int e = 0;
-        while (e < enemies.Length && enemies[e] == null)
+        beat = true;
+        for (int i = 0; i < spawners.Count; i++)
         {
-            e++;
+            beat &= !spawners[i].HasLiveSpawns();
         }
-        if (e >= enemies.Length)
+        if (beat)
         {
             Beat();
         }
@@ -44,19 +49,20 @@ public class CombatRoom : MonoBehaviour
         if (active || beat) return;
         active = true;
         this.player = player;
-        StartCoroutine(EnterCoroutine(delay));
+        StartCoroutine(EnterCoroutine(delay, enemyDelay));
     }
 
-    private IEnumerator EnterCoroutine(float t)
+    private IEnumerator EnterCoroutine(float t, float enemyDelay)
     {
-        yield return new WaitForSeconds(t);
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            enemies[i].gameObject.SetActive(true);
-        }
         for (int i = 0; i < walls.Length; i++)
         {
             ActivateWall(walls[i]);
+        }
+        yield return new WaitForSeconds(t);
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            yield return new WaitForSeconds(enemyDelay);
+            spawners[i].Spawn();
         }
     }
 
