@@ -5,6 +5,7 @@ using AI.Combat.AbilitySpecs;
 using ECS.Components.AI.Combat.Abilities;
 using ECS.Entities;
 using ECS.Entities.AI;
+using FMODUnity;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
@@ -21,6 +22,8 @@ namespace AI.Combat.AbilityAoEColliders
         private EntityType _typesAffectedByTheAbility;
 
         private List<AgentEntity> _agentsInside = new List<AgentEntity>();
+
+        private EventReference _abilityAoESound;
 
         private List<Action<AgentEntity>> _actionsOnTriggerEnter = new List<Action<AgentEntity>>();
         private List<Action<AgentEntity>> _actionsOnTriggerStay = new List<Action<AgentEntity>>();
@@ -59,6 +62,8 @@ namespace AI.Combat.AbilityAoEColliders
         public virtual void SetAbilitySpecs(Transform parentTransform, BasicAbilityComponent basicAbilityComponent, 
             TAreaAbilityComponent areaAbilityComponent, EntityType typesAffectedByTheAbility)
         {
+            _abilityAoESound = areaAbilityComponent.GetAbilityAoESound();
+            
             _parentTransform = parentTransform;
 
             AbilityAoE abilityAoE = areaAbilityComponent.GetAoE();
@@ -441,6 +446,8 @@ namespace AI.Combat.AbilityAoEColliders
             MoveToPosition(_relativePosition);
             _parentRotation = _parentTransform.rotation;
             Rotate();
+            
+            AudioManager.instance.PlayOneShot(_abilityAoESound, transform.position);
             
             _actionAttaching();
             

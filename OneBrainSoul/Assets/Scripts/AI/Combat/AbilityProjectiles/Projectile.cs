@@ -1,4 +1,5 @@
 ﻿using System;
+using FMODUnity;
 using Interfaces.AI.Combat;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace AI.Combat.AbilityProjectiles
     public class Projectile: MonoBehaviour
     {
         [SerializeField] private Rigidbody _rigidbody;
+
+        private EventReference _projectileSound;
         
         private float _speed;
 
@@ -15,8 +18,10 @@ namespace AI.Combat.AbilityProjectiles
         
         private IAbilityCollider _abilityCollider;
 
-        public void SetProjectileSpecs(float projectileSpeed, bool makesAParabola)
+        public void SetProjectileSpecs(float projectileSpeed, bool makesAParabola, EventReference projectileSound)
         {
+            _projectileSound = projectileSound;
+            
             _speed = projectileSpeed;
 
             if (!makesAParabola)
@@ -47,6 +52,7 @@ namespace AI.Combat.AbilityProjectiles
 
         public void FIREEEEEEEEEEEE(Vector3 forceVector)
         {
+            AudioManager.instance.PlayOneShot(_projectileSound, transform.position);
             _onFireAction();
             transform.rotation = Quaternion.LookRotation(forceVector.normalized);
             gameObject.SetActive(true);

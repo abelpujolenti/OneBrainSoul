@@ -647,7 +647,7 @@ namespace ECS.Entities.AI.Combat
                 yield return null;
             }
             
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyAttack, transform.position);
+            AudioManager.instance.PlayOneShot(_longArmsProperties.clapAboveAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
             

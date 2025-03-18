@@ -7,6 +7,7 @@ using AI.Combat.AbilitySpecs;
 using AI.Combat.ScriptableObjects;
 using ECS.Components.AI.Combat.Abilities;
 using ECS.Entities;
+using FMODUnity;
 using Interfaces.AI.Combat;
 using UnityEngine;
 
@@ -117,7 +118,7 @@ namespace Managers
 
                     projectileAbility = CreateProjectileAbility<RectangularAbilityComponent, RectangularAbilityAoECollider>(
                             basicAbilityComponent, rectangularAbilityComponent, projectileAbilityProperties.abilityProjectile,
-                            parentTransform);
+                            parentTransform, projectileAbilityProperties.projectileSound);
                     break;
                 
                 case AbilityAoEType.SPHERICAL:
@@ -126,7 +127,7 @@ namespace Managers
 
                     projectileAbility = CreateProjectileAbility<SphericalAbilityComponent, SphericalAbilityAoECollider>(
                             basicAbilityComponent, sphericalAbilityComponent, projectileAbilityProperties.abilityProjectile,
-                            parentTransform);
+                            parentTransform, projectileAbilityProperties.projectileSound);
                     break;
                 
                 case AbilityAoEType.CONICAL:
@@ -135,7 +136,7 @@ namespace Managers
 
                     projectileAbility = CreateProjectileAbility<ConicalAbilityComponent, ConicalAbilityAoECollider>(
                             basicAbilityComponent, conicalAbilityComponent, projectileAbilityProperties.abilityProjectile,
-                            parentTransform);
+                            parentTransform, projectileAbilityProperties.projectileSound);
                     break;
                 
                 case AbilityAoEType.CUSTOM_MESH:
@@ -144,7 +145,7 @@ namespace Managers
                     
                     projectileAbility = CreateProjectileAbility<CustomMeshAbilityComponent, CustomMeshAbilityAoECollider>(
                             basicAbilityComponent, customMeshAbilityComponent, projectileAbilityProperties.abilityProjectile,
-                            parentTransform);
+                            parentTransform, projectileAbilityProperties.projectileSound);
                     break;
             }
 
@@ -153,7 +154,7 @@ namespace Managers
 
         private ProjectileAbility CreateProjectileAbility<TAreaAbilityComponent, TAbilityCollider>(
             BasicAbilityComponent basicAbilityComponent, TAreaAbilityComponent areaAbilityComponent,
-            AbilityProjectile abilityProjectile, Transform parentTransform)
+            AbilityProjectile abilityProjectile, Transform parentTransform, EventReference projectileSound)
                 where TAbilityCollider : AbilityAoECollider<TAreaAbilityComponent>
                 where TAreaAbilityComponent : AreaAbilityComponent
         {
@@ -163,7 +164,7 @@ namespace Managers
             {
                 projectiles.Add(InstantiateProjectile<TAreaAbilityComponent, TAbilityCollider>(basicAbilityComponent, 
                     areaAbilityComponent, abilityProjectile.projectileSpeed, abilityProjectile.projectilePrefab, 
-                    abilityProjectile.objectWithParticleSystem, abilityProjectile.makesParabola));
+                    abilityProjectile.objectWithParticleSystem, abilityProjectile.makesParabola, projectileSound));
             }
 
             return new ProjectileAbility(basicAbilityComponent.GetCast(), projectiles, parentTransform, 
@@ -176,7 +177,7 @@ namespace Managers
 
         private Projectile InstantiateProjectile<TAreaAbilityComponent, TAbilityCollider>
             (BasicAbilityComponent basicAbilityComponent, TAreaAbilityComponent areaAbilityComponent, float projectileSpeed, 
-                GameObject projectilePrefab, GameObject particleObjectPrefab, bool makesAParabola)
+                GameObject projectilePrefab, GameObject particleObjectPrefab, bool makesAParabola, EventReference projectileSound)
                 where TAbilityCollider : AbilityAoECollider<TAreaAbilityComponent>
                 where TAreaAbilityComponent : AreaAbilityComponent
         {
@@ -186,7 +187,7 @@ namespace Managers
             
             Projectile projectile = projectileObject.GetComponent<Projectile>();
 
-            projectile.SetProjectileSpecs(projectileSpeed, makesAParabola);
+            projectile.SetProjectileSpecs(projectileSpeed, makesAParabola, projectileSound);
             
             projectilePrefab.SetActive(false);
 

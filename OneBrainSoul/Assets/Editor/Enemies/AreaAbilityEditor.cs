@@ -1,4 +1,5 @@
-﻿using AI.Combat.AbilitySpecs;
+﻿using System;
+using AI.Combat.AbilitySpecs;
 using AI.Combat.ScriptableObjects;
 using ECS.Entities;
 using UnityEditor;
@@ -21,6 +22,15 @@ namespace Editor.Enemies
         public bool shapeIsCustom;
         public bool unifyScales;
 
+        private SerializedProperty executeAbilitySound;
+        private SerializedProperty abilityAoESound;
+
+        private void OnEnable()
+        {
+            executeAbilitySound = serializedObject.FindProperty("executeAbilitySound");
+            abilityAoESound = serializedObject.FindProperty("abilityAoESound");
+        }
+
         public override void OnInspectorGUI()
         {
             InitializeStyles();
@@ -28,6 +38,8 @@ namespace Editor.Enemies
             AreaAbilityProperties areaAbilityProperties = (AreaAbilityProperties)target;
             
             AbilityTarget(areaAbilityProperties);
+            
+            AbilitySound();
 
             AbilityCast(areaAbilityProperties);
 
@@ -65,6 +77,16 @@ namespace Editor.Enemies
             EnumFlagsField<EntityType>(ref areaAbilityProperties.typesAffectedByTheAbility, "Types Affected By The Ability");
 
             EditorGUI.indentLevel--;
+        }
+
+        private void AbilitySound()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(executeAbilitySound, new GUIContent("Execute Ability Sound"));
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void AbilityCast(AreaAbilityProperties areaAbilityProperties)
@@ -365,6 +387,10 @@ namespace Editor.Enemies
             {
                 return;
             }
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(abilityAoESound, new GUIContent("Ability AoE Sound"));
+            serializedObject.ApplyModifiedProperties();
             
             ToggleField(ref abilityAoE.isAttachedToCaster, "Is Attached To Caster");
             

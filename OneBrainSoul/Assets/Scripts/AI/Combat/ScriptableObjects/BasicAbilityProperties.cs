@@ -1,5 +1,6 @@
 ﻿using AI.Combat.AbilitySpecs;
 using ECS.Entities;
+using FMODUnity;
 using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
@@ -10,6 +11,8 @@ namespace AI.Combat.ScriptableObjects
         public bool canAffectCaster;
         public EntityType abilityTarget;
         public EntityType typesAffectedByTheAbility;
+
+        public EventReference executeAbilitySound;
 
         public AbilityCast abilityCast = new AbilityCast();
 
