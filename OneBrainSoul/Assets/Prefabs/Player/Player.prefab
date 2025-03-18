@@ -444,7 +444,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -63.1474, y: 115.104095}
+  m_AnchoredPosition: {x: -63.1474, y: 82.5}
   m_SizeDelta: {x: 800, y: 80}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &7328321589735318513
@@ -2369,11 +2369,11 @@ RectTransform:
   - {fileID: 8684748120738668746}
   m_Father: {fileID: 2817292714914678878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7, y: -20}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 903, y: 440}
   m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 0}
 --- !u!114 &6931505168930411693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2837,16 +2837,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 30
   rotSpeed: 30
-  duration: 1.35
+  duration: 1.22
   strength: 2
-  cancelAnimationTime: 0.01
+  cancelAnimationTime: 0.001
   baseDamage: 1
   activeStart: 0.07
-  activeEnd: 0.4
-  range: 10
-  outerArc: 13
+  activeEnd: 0.3
+  range: 7
+  outerArc: 9
   innerRange: 4
-  innerArc: 90
+  innerArc: 75
   hitstop: 0.09
   soundAreaRadius: 20
   parent: {fileID: 571497645259441326}
