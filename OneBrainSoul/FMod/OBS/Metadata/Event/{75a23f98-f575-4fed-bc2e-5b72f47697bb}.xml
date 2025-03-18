@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.02.00">
 	<object class="Event" id="{75a23f98-f575-4fed-bc2e-5b72f47697bb}">
+		<property name="note" />
 		<property name="name">
 			<value>Run</value>
 		</property>

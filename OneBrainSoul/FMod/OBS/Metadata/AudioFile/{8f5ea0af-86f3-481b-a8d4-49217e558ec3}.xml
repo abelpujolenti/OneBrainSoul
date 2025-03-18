@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{8f5ea0af-86f3-481b-a8d4-49217e558ec3}">
+		<property name="assetPath">
+			<value>SFX/Alpha/pick_up/pick_up_4.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.5</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e382e244-a54e-4c64-ac94-4851fa907de0}</destination>
+		</relationship>
+	</object>
+</objects>

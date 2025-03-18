@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{d6b0e238-29de-4f3b-949b-102c31f93d3c}">
+		<property name="assetPath">
+			<value>SFX/Alpha/heal/heal_1.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.5</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e382e244-a54e-4c64-ac94-4851fa907de0}</destination>
+		</relationship>
+	</object>
+</objects>
