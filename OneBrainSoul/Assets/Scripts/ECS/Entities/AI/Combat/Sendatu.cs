@@ -14,9 +14,12 @@ namespace ECS.Entities.AI.Combat
     public class Sendatu : TeleportMobilityEnemy<SendatuContext, SendatuAction>
     {
         [SerializeField] private LongArmsProperties _sendatuProperties;
-        
-        
-        
+
+        protected override void PreDeath()
+        {
+            return;
+        }
+
         private void Start()
         {
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
