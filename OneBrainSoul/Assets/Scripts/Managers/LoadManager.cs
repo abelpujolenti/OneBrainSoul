@@ -34,7 +34,7 @@ namespace Managers
 
         private void LoadNextScene()
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
 #if UNITY_EDITOR
             CleanConsole cleanConsole = new CleanConsole();
             cleanConsole = null;

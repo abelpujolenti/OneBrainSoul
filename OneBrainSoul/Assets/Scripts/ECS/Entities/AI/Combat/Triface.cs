@@ -291,7 +291,7 @@ namespace ECS.Entities.AI.Combat
                 
                 RotateBody();
                 
-                if (_cancelSlamFunc())
+                if (!_cancelSlamFunc())
                 {
                     abilityCast.ResetCastTime();
                     UnblockFSM();

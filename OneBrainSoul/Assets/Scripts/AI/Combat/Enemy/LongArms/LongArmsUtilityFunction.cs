@@ -2,6 +2,7 @@ using System;
 using AI.Combat.Contexts;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Interfaces.AI.UBS.Enemy.TeleportMobilityEnemy.LongArms;
+using UnityEngine;
 
 namespace AI.Combat.Enemy.LongArms
 {
@@ -62,6 +63,8 @@ namespace AI.Combat.Enemy.LongArms
 
         private static float CalculateThrowRockUtility(ILongArmsThrowRockUtility longArmsThrowRockUtility)
         {
+            Debug.Log(longArmsThrowRockUtility.HasATargetForThrowRock());
+            
             if (longArmsThrowRockUtility.IsThrowRockOnCooldown() || !longArmsThrowRockUtility.HasATargetForThrowRock())
             {
                 return 0;
