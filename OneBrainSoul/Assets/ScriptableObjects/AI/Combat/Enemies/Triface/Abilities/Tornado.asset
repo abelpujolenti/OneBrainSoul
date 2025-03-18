@@ -53,7 +53,7 @@ MonoBehaviour:
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
     forceDirection: {x: 1, y: 0.5, z: -2}
-    forceStrength: 400
+    forceStrength: 200
     doesForceComesFromCenterOfTheArea: 1
     abilityEffectForceType: 2
   abilityEffectOnHealthTypeOnEnd: 0

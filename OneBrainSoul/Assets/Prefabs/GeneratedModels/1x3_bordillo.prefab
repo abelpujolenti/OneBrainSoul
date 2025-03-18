@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2698407559612629736}
   - component: {fileID: 2292523668758255270}
   - component: {fileID: 5988477013890525012}
-  - component: {fileID: 7538819121399550474}
+  - component: {fileID: 8880695540285481100}
   m_Layer: 6
   m_Name: 1x3_bordillo
   m_TagString: Untagged
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &7538819121399550474
-BoxCollider:
+--- !u!64 &8880695540285481100
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,6 +102,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.05, y: 3, z: 1.0000002}
-  m_Center: {x: 0.02, y: 1.5, z: -0.5000001}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2432090755550338912, guid: 3ebe1b6567118c4478863e9b8c731f77, type: 3}

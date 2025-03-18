@@ -21,10 +21,16 @@ public class Item : MonoBehaviour
     {
         if (other.gameObject.tag.Equals("Player"))
         {
-            Pickup(other.gameObject);
-            StartCoroutine(PickupDeleteCoroutine());
+            TryPickup(other.gameObject);
         }
     }
+
+    protected virtual void TryPickup(GameObject collider)
+    {
+        Pickup(collider);
+        StartCoroutine(PickupDeleteCoroutine());
+    }
+
     protected virtual void Pickup(GameObject collider)
     {
         //AudioManager.instance.PlayOneShot(FMODEvents.instance.itemPickup, transform.position);

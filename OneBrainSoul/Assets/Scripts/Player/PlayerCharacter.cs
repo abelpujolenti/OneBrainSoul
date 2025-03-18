@@ -29,6 +29,7 @@ namespace Player
         private Coroutine ghostTimerCoroutine;
         private bool _hasBody = true;
         [SerializeField] Transform corpsePrefab;
+        private CombatRoom currCombatRoom;
 
         private uint _areasDetecting = 0;
 
@@ -90,7 +91,7 @@ namespace Player
 
         public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
         {
-            if (_currentReceiveDamageCooldown > 0f)
+            if (_currentReceiveDamageCooldown > 0f || GetEntityType() == EntityType.GHOST)
             {
                 return;
             }
@@ -105,11 +106,16 @@ namespace Player
                 SetEntityType(EntityType.GHOST);
                 _playerCharacterController.SetMoveSpeedMultiplier(ghostSpeed);
                 _hasBody = false;
-                Instantiate(corpsePrefab, transform.position + Vector3.up * 0.75f, Quaternion.identity);
+                Vector3 deathPos = transform.position;
                 _playerCharacterController.Respawn();
+                Instantiate(corpsePrefab, deathPos + Vector3.up * 0.75f, Quaternion.identity);
                 ghostTimerCoroutine = StartCoroutine(GhostTimerCoroutine());
                 PostProcessingManager.Instance.GhostEffect(ghostDuration);
                 _hitstop.Add(0.5f);
+                if (currCombatRoom != null)
+                {
+                    currCombatRoom.ResetRoom();
+                }
                 return;
             }
             
@@ -132,7 +138,18 @@ namespace Player
             }
             if (!_hasBody)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+                //TODO: not this garbage
+                var spawners = FindObjectsByType<EnemySpawner>(FindObjectsSortMode.InstanceID);
+                foreach (EnemySpawner spawner in spawners)
+                {
+                    if (spawner.spawnOnStart && !spawner.HasLiveSpawns())
+                    {
+                        spawner.canSpawn = true;
+                        spawner.Spawn();
+                    }
+                }
+                Destroy(FindObjectOfType<Corpse>().gameObject);
+                RecoverBody();
             }
         }
 
@@ -144,6 +161,16 @@ namespace Player
             _ghostTime = -1;
             SetEntityType(EntityType.PLAYER);
             PostProcessingManager.Instance.RecoverGhostEffect(.65f);
+        }
+
+        public void EnterCombatRoom(CombatRoom c)
+        {
+            currCombatRoom = c;
+        }
+
+        public void DefeatCombatRoom()
+        {
+            currCombatRoom = null;
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)

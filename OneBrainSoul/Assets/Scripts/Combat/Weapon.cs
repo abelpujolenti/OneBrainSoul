@@ -63,7 +63,7 @@ namespace Combat
             float rotSpeedAdjusted = rotSpeed;
             if (animationTimer > 0f)
             {
-                if (animationTimer - Time.deltaTime * animationSpeed <= 0.95f && animationTimer - Time.deltaTime > 0.9f)
+                if (animationTimer - Time.deltaTime * animationSpeed <= 0.95f && animationTimer - Time.deltaTime > 0.1f)
                 {
                     AttackEnd();
                 }

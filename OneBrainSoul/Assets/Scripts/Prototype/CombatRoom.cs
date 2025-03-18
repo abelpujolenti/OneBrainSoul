@@ -1,23 +1,29 @@
+using System.Collections.Generic;
 using System.Collections;
 using ECS.Entities.AI;
 using Player;
 using UnityEngine;
+using System.Linq;
 
 public class CombatRoom : MonoBehaviour
 {
-    [SerializeField] AgentEntity[] enemies;
+    List<EnemySpawner> spawners = new List<EnemySpawner>();
+    List<AgentEntity> enemies = new List<AgentEntity>();
     [SerializeField] GameObject[] walls;
     [SerializeField] float delay = .5f;
+    [SerializeField] float enemyDelay = .12f;
 
     PlayerCharacterController player;
     bool active = false;
     bool beat = false;
+    bool spawned = false;
 
     void Start()
     {
-        for (int i = 0; i < enemies.Length; i++)
+        spawners = GetComponentsInChildren<EnemySpawner>().ToList();
+        for (int i = 0; i < spawners.Count; i++)
         {
-            //enemies[i].gameObject.SetActive(false);
+            enemies.Add(spawners[i].agentEntity);
         }
         for (int i = 0; i < walls.Length; i++)
         {
@@ -28,12 +34,16 @@ public class CombatRoom : MonoBehaviour
     void Update()
     {
         if (!active || beat) return;
-        int e = 0;
-        while (e < enemies.Length && enemies[e] == null)
+        if (!spawned) return;
+        beat = true;
+        for (int i = 0; i < spawners.Count; i++)
         {
-            e++;
+            if (spawners[i].HasLiveSpawns())
+            {
+                beat = false;
+            }
         }
-        if (e >= enemies.Length)
+        if (beat)
         {
             Beat();
         }
@@ -44,20 +54,23 @@ public class CombatRoom : MonoBehaviour
         if (active || beat) return;
         active = true;
         this.player = player;
-        StartCoroutine(EnterCoroutine(delay));
+        StartCoroutine(EnterCoroutine(delay, enemyDelay));
+        player.GetComponent<PlayerCharacter>().EnterCombatRoom(this);
     }
 
-    private IEnumerator EnterCoroutine(float t)
+    private IEnumerator EnterCoroutine(float t, float enemyDelay)
     {
-        yield return new WaitForSeconds(t);
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            enemies[i].gameObject.SetActive(true);
-        }
         for (int i = 0; i < walls.Length; i++)
         {
             ActivateWall(walls[i]);
         }
+        yield return new WaitForSeconds(t);
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            yield return new WaitForSeconds(enemyDelay);
+            spawners[i].Spawn();
+        }
+        spawned = true;
     }
 
     private void Beat()
@@ -67,6 +80,25 @@ public class CombatRoom : MonoBehaviour
         for (int i = 0; i < walls.Length; i++)
         {
             DeactivateWall(walls[i]);
+        }
+        player.GetComponent<PlayerCharacter>().DefeatCombatRoom();
+    }
+
+    public void ResetRoom()
+    {
+        for (int i = 0; i < walls.Length; i++)
+        {
+            DeactivateWall(walls[i]);
+        }
+
+        beat = false;
+        active = false;
+        spawned = false;
+
+        for (int i = 0; i < spawners.Count; i++)
+        {
+            spawners[i].ClearEntities();
+            spawners[i].canSpawn = true;
         }
     }
 
