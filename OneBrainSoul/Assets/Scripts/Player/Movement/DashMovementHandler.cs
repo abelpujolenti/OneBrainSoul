@@ -1,5 +1,3 @@
-using ECS.Entities.AI;
-using Managers;
 using UnityEngine;
 
 namespace Player.Movement

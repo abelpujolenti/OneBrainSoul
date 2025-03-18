@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 8435815035724104916}
   - component: {fileID: 2543479680164596848}
   - component: {fileID: 8298059863085958389}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: SlamDetectionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +112,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 7168
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 5502364399653791546}
   - component: {fileID: 6860360150070305249}
   - component: {fileID: 162569519068269043}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SphericalVisionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ SphereCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 7168
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 5846854932155810626}
   - component: {fileID: 8106636271417097602}
   - component: {fileID: 7569773403801526068}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RectangularVisionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 7168
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0

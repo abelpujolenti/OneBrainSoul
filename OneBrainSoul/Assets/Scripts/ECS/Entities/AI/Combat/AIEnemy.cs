@@ -468,11 +468,9 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            Debug.Log("Add: " + entityType);
-            
             _targetsInsideVisionArea[entityType].Add(targetId);
             
-            CombatManager.Instance.CheckIfVisibleToCombatArea(_areaNumber, entityType, targetId);
+            CombatManager.Instance.AddPreSightedTargetToCombatArea(_areaNumber, entityType, targetId);
         }
 
         private void RemoveTargetInsideVisionArea(EntityType entityType, uint targetId)
@@ -482,9 +480,9 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
-            Debug.Log("Remove: " + entityType);
-            
             _targetsInsideVisionArea[entityType].Remove(targetId);
+            
+            CombatManager.Instance.RemovePreSightedTargetToCombatArea(_areaNumber, targetId);
         }
 
         protected abstract void RemoveATargetIfWasLost(uint targetIdToCheck);

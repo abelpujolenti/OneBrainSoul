@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using ECS.Entities.AI;
 using FMOD.Studio;
 using FMODUnity;
+using Managers;
 using Player.Abilities;
 using Player.Camera;
 using Player.Effects;
@@ -9,8 +11,6 @@ using Player.Movement;
 using TMPro;
 using UnityEngine;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
-using Managers;
-using ECS.Entities.AI;
 
 namespace Player
 {
