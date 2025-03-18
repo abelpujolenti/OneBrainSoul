@@ -24,12 +24,12 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] private AbilityDetectionArea _throwRockAbilityDetectionArea;
         private IProjectileAbility _throwRockAbility;
         private HashSet<uint> _visibleTargetsForThrowRock;
-        private Func<bool> _cancelThrowRockFunc = () => false;
+        private Func<bool> _cancelThrowRockFunc = () => true;
 
         [SerializeField] private AbilityDetectionArea _clapAboveAbilityDetectionArea;
         private IAreaAbility _clapAboveAbility;
         private HashSet<uint> _visibleTargetsForClapAbove;
-        private Func<bool> _cancelClapAboveFunc = () => false;
+        private Func<bool> _cancelClapAboveFunc = () => true;
 
         private HashSet<uint> _sightedTargetsToFleeFrom;
 
