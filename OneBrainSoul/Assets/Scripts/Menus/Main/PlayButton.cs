@@ -12,7 +12,7 @@ namespace Menus.Main
                 return;
             }
 
-            GameManager.Instance.LoadSceneIndex(SceneManager.GetActiveScene().buildIndex + 1);
+            LoadSceneManager.Instance.LoadNextScene();
         }
     }
 }
