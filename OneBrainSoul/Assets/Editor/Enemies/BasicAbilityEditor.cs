@@ -16,6 +16,13 @@ namespace Editor.Enemies
         private bool isAbilityEffectOnTheDurationFoldoutOpen = true;
         private bool isAbilityEffectOnEndFoldoutOpen = true;
 
+        private SerializedProperty executeAbilitySound;
+
+        private void OnEnable()
+        {
+            executeAbilitySound = serializedObject.FindProperty("executeAbilitySound");
+        }
+
         public override void OnInspectorGUI()
         {
             InitializeStyles();
@@ -23,6 +30,8 @@ namespace Editor.Enemies
             BasicAbilityProperties basicAbilityProperties = (BasicAbilityProperties)target;
             
             AbilityTarget(basicAbilityProperties);
+
+            AbilitySound();
 
             AbilityCast(basicAbilityProperties);
 
@@ -60,6 +69,16 @@ namespace Editor.Enemies
             EnumFlagsField<EntityType>(ref basicAbilityProperties.typesAffectedByTheAbility, "Types Affected By The Ability");
 
             EditorGUI.indentLevel--;
+        }
+
+        private void AbilitySound()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(executeAbilitySound, new GUIContent("Execute Ability Sound"));
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void AbilityCast(BasicAbilityProperties basicAbilityProperties)
