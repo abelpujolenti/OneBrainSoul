@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.02.00">
-	<object class="AudioFile" id="{96daf604-32cc-4891-a9d0-c2cb4adb7855}">
+	<object class="AudioFile" id="{23720881-9425-46e4-a939-8d3a37f76355}">
 		<property name="assetPath">
-			<value>SFX/Alpha/DungeonAmbient.wav</value>
-		</property>
-		<property name="isStreaming">
-			<value>true</value>
+			<value>SFX/Alpha/LongarmsSpin.wav</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>44.0999985</value>
@@ -14,7 +11,7 @@
 			<value>2</value>
 		</property>
 		<property name="length">
-			<value>18.298435374149658</value>
+			<value>4.8916553287981861</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{e382e244-a54e-4c64-ac94-4851fa907de0}</destination>
