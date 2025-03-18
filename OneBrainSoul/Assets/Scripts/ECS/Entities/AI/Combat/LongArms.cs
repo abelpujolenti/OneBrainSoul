@@ -51,6 +51,8 @@ namespace ECS.Entities.AI.Combat
 
         private Action _onFlee;
         private Func<uint> _longArmsBaseIdFunc;
+
+        private Action _update = () => { };
         
         private void Start()
         {
@@ -102,11 +104,12 @@ namespace ECS.Entities.AI.Combat
             if (_itGoesOnAutomatic)
             {
                 _throwRockAbility.GoesOnAutomatic(true, transform.rotation * _directionToShoot);
-                StartCoroutine(OnAutomatic());
+                _throwRockAbility.GetCast().ResetCastTime();
+                _update = () => OnAutomatic();
                 return;
             }
 
-            StartCoroutine(AILoop());
+            _update = () => AILoop();
         }
 
         protected override void InitiateDictionaries()
@@ -148,46 +151,39 @@ namespace ECS.Entities.AI.Combat
 
         #region AI LOOP
 
-        private IEnumerator OnAutomatic()
+        private void Update()
         {
-            _throwRockAbility.GetCast().ResetCastTime();
-            
-            while (true)
-            {
-                if (_throwRockAbility.GetCast().IsOnCooldown())
-                {
-                    yield return null;
-                    continue;
-                }
-                
-                ThrowRock();
-                yield return null;
-            }
+            _update();
         }
 
-        private IEnumerator AILoop()
+        private void OnAutomatic()
         {
-            while (true)
+            if (_throwRockAbility.GetCast().IsOnCooldown())
             {
-                UpdateSightedTargetsInsideCombatArea();
-            
-                UpdateVisibleTargets();
-            
-                UpdateVectorsToTargets();
-            
-                if (_context.IsFSMBlocked())
-                {
-                    yield return null;
-                    continue;
-                }
-            
-                //RotateHead();
-            
-                RotateBody();
-            
-                CalculateBestAction();
-                yield return null;
+                return;
             }
+                
+            ThrowRock();
+        }
+
+        private void AILoop()
+        {
+            UpdateSightedTargetsInsideCombatArea();
+            
+            UpdateVisibleTargets();
+            
+            UpdateVectorsToTargets();
+            
+            if (_context.IsFSMBlocked())
+            {
+                return;
+            }
+            
+            //RotateHead();
+            
+            RotateBody();
+            
+            CalculateBestAction();
         }
 
         protected override void UpdateSightedTargetsInsideCombatArea()

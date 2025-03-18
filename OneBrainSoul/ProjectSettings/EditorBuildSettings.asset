@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ControllerTest.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/ABEL_ControllerTest.unity
+    guid: 5ee329f59312ef0488cf79fe3214b9cc
   m_configObjects: {}

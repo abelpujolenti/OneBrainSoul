@@ -473,7 +473,6 @@ namespace Managers
             uint trifaceId = triface.GetAgentID();
             
             _combatAreas[areaNumber].RemoveEnemy(trifaceId, EntityType.TRIFACE);
-            
             _returnAgent.Remove(trifaceId);
             _trifaces.Remove(trifaceId);
         }
@@ -503,7 +502,6 @@ namespace Managers
             uint sendatuId = sendatu.GetAgentID();
             
             _combatAreas[areaNumber].RemoveEnemy(sendatuId, EntityType.SENDATU);
-
             _returnAgent.Remove(sendatuId);
             _longArms.Remove(sendatuId);
         }
