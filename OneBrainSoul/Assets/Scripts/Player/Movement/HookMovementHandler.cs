@@ -66,11 +66,14 @@ namespace Player.Movement
             hookParticleTransform.position = lineStartPos;
             hookParticleTransform.gameObject.SetActive(true);
             hookParticleTransform.GetComponent<ParticleSystem>().Play();
+            player.GetAnimator().SetBool("Hook", true);
+            player.GetAnimator().speed = 0.95f;
         }
 
         private Vector3 GetLineStartPos(PlayerCharacterController player)
         {
-            return player.transform.position + new Vector3(0f, 1f, 0f) + player.GetOrientation().right * -1.5f;
+            //return player.transform.position + new Vector3(0f, 1f, 0f) + player.GetOrientation().right * -1.5f + player.GetOrientation().forward * 2f;
+            return player.GetHandBone().position;
         }
 
         public void ResetValues()
@@ -129,6 +132,8 @@ namespace Player.Movement
                 delayTime += Time.fixedDeltaTime;
                 return;
             }
+
+            player.GetAnimator().speed = 0f;
 
             float progress = 1f - Mathf.Min(1f, distanceToTarget / hookDistance);
             float speedWithFalloff = speed - Mathf.Pow(progress, 1f / speedFalloffPower) * speedFalloff;
@@ -201,6 +206,9 @@ namespace Player.Movement
             line.enabled = false;
             hookParticleTransform.gameObject.SetActive(false);
             hookParticleTransform.position = GetLineStartPos(player);
+
+            player.GetAnimator().speed = 1f;
+            player.GetAnimator().SetBool("Hook", false);
 
             if (!player.IsOnTheGround())
             {

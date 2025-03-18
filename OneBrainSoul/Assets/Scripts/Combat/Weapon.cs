@@ -63,6 +63,11 @@ namespace Combat
             float rotSpeedAdjusted = rotSpeed;
             if (animationTimer > 0f)
             {
+                if (animationTimer - Time.deltaTime * animationSpeed <= 0.95f && animationTimer - Time.deltaTime > 0.9f)
+                {
+                    AttackEnd();
+                }
+
                 animationTimer = Math.Clamp(animationTimer - Time.deltaTime * animationSpeed, 0f, 1f);
 
                 float animationValue = animationCurve.Evaluate(animationTimer);
@@ -82,6 +87,10 @@ namespace Combat
         }
 
         protected virtual void AttackUpdate()
+        {
+        }
+
+        protected virtual void AttackEnd()
         {
 
         }

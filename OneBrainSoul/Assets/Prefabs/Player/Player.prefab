@@ -1205,6 +1205,7 @@ MonoBehaviour:
   _hookParticleTransform: {fileID: 5558414127364850149}
   _trailParticle: {fileID: 6387602860837234916}
   _smashParticle: {fileID: 3076238583181615966}
+  _handBone: {fileID: 3687342511031144910}
   _hookUI: {fileID: 2481377896329111756}
   _maxHookCharges: 3
   _outOfCombatRechargeDuration: 1
@@ -2836,9 +2837,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 30
   rotSpeed: 30
-  duration: 1
+  duration: 1.35
   strength: 2
-  cancelAnimationTime: 0.12
+  cancelAnimationTime: 0.01
   baseDamage: 1
   activeStart: 0.07
   activeEnd: 0.4
@@ -3463,6 +3464,12 @@ PrefabInstance:
 --- !u!95 &1756432987455679197 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: c46ccde48c8c2a04095c4af34ffc1b42,
+    type: 3}
+  m_PrefabInstance: {fileID: 5263177268029708108}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3687342511031144910 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8801895887256618626, guid: c46ccde48c8c2a04095c4af34ffc1b42,
     type: 3}
   m_PrefabInstance: {fileID: 5263177268029708108}
   m_PrefabAsset: {fileID: 0}
