@@ -5,7 +5,7 @@
 			<value>Healed</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{18d10646-475b-4ef1-b4f4-eed3024289a4}</destination>
@@ -30,6 +30,9 @@
 		</relationship>
 		<relationship name="parameters">
 			<destination>{088af884-2a98-475a-808a-8ee012312d7b}</destination>
+		</relationship>
+		<relationship name="banks">
+			<destination>{a3f8341f-e5ec-4810-81a3-79fd6013a2da}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixer" id="{1d3a27ac-58ae-492b-94d8-4f06aaff590f}">
@@ -96,7 +99,6 @@
 	<object class="MixerBusEffectChain" id="{085ca4f7-56fd-4797-920f-c79a245398c5}">
 		<relationship name="effects">
 			<destination>{bebf263d-4aeb-4e51-a23e-88d9d9f685a7}</destination>
-			<destination>{22998c32-f773-4fc0-88f5-6a3bf65e863b}</destination>
 			<destination>{18fde03f-8994-4a85-9a1c-a48ef85c6b56}</destination>
 		</relationship>
 	</object>
@@ -108,7 +110,6 @@
 	</object>
 	<object class="MixerBusFader" id="{a3830b55-9b57-4357-a14a-0328a3dece1f}" />
 	<object class="MixerBusFader" id="{bebf263d-4aeb-4e51-a23e-88d9d9f685a7}" />
-	<object class="SpatialiserEffect" id="{22998c32-f773-4fc0-88f5-6a3bf65e863b}" />
 	<object class="PitchShifterEffect" id="{18fde03f-8994-4a85-9a1c-a48ef85c6b56}">
 		<property name="pitch">
 			<value>1</value>
@@ -122,7 +123,7 @@
 			<value>pitch</value>
 		</property>
 		<property name="amount">
-			<value>7</value>
+			<value>11.5</value>
 		</property>
 	</object>
 </objects>

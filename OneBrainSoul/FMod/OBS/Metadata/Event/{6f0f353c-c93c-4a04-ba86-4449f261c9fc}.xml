@@ -111,7 +111,11 @@
 	</object>
 	<object class="MixerBusFader" id="{9f2cf0b4-56d3-460f-89f7-979d85b87bc4}" />
 	<object class="MixerBusFader" id="{64e3bfbb-93ab-4e48-9a93-457d4424f93f}" />
-	<object class="SpatialiserEffect" id="{abf2649c-b6a4-4f8e-a67b-35d4b3839e47}" />
+	<object class="SpatialiserEffect" id="{abf2649c-b6a4-4f8e-a67b-35d4b3839e47}">
+		<property name="overrideRange">
+			<value>true</value>
+		</property>
+	</object>
 	<object class="PitchShifterEffect" id="{07df614d-b86f-44c3-8e85-bed66fe29f56}">
 		<property name="pitch">
 			<value>1.12</value>

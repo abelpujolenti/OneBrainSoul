@@ -15,10 +15,17 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 1
   typesAffectedByTheAbility: 1
+  executeAbilitySound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   abilityCast:
     canCancelCast: 0
-    timeToCast: 0.3
-    cooldown: 3
+    timeToCast: 0.2
+    cooldown: 2
     duration: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
@@ -72,6 +79,13 @@ MonoBehaviour:
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 0
+  abilityAoESound:
+    Guid:
+      Data1: 1182609881
+      Data2: 1275102938
+      Data3: -1912076359
+      Data4: 626643745
+    Path: event:/SFX/Alpha/Throw
   abilityAoEType: 0
   abilityAoE:
     isAttachedToCaster: 0

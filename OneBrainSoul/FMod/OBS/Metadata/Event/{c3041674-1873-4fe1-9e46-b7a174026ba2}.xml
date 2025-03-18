@@ -132,7 +132,11 @@
 	</object>
 	<object class="MixerBusPanner" id="{42a95cb4-28cb-4350-beb0-9da79ff7d081}" />
 	<object class="MixerBusFader" id="{334c5648-7d01-4a5e-ae6f-5acd9190175d}" />
-	<object class="SpatialiserEffect" id="{218db0d8-72b1-4b2f-9467-6ecceed557d4}" />
+	<object class="SpatialiserEffect" id="{218db0d8-72b1-4b2f-9467-6ecceed557d4}">
+		<property name="overrideRange">
+			<value>true</value>
+		</property>
+	</object>
 	<object class="SFXReverbEffect" id="{b1edd72b-324c-4f8c-b89e-dc328217755b}">
 		<property name="decayTime">
 			<value>800</value>

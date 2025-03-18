@@ -7,6 +7,7 @@ public class DeathFog : MonoBehaviour
     {
         PlayerCharacterController player = other.GetComponent<PlayerCharacterController>();
         if (player == null) return;
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.fog, transform.position);
         player.Respawn();
     }
 }

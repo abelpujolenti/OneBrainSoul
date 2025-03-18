@@ -118,6 +118,9 @@
 		<property name="overrideRange">
 			<value>true</value>
 		</property>
+		<property name="extentMode">
+			<value>1</value>
+		</property>
 	</object>
 	<object class="PitchShifterEffect" id="{8e007698-92d7-438c-8607-a8c9cfff78a8}">
 		<property name="pitch">

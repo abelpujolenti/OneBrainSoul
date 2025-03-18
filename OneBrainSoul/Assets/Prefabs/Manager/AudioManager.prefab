@@ -75,6 +75,13 @@ MonoBehaviour:
       Data3: 1253963192
       Data4: -461237912
     Path: event:/SFX/Alpha/Healing
+  <healed>k__BackingField:
+    Guid:
+      Data1: 1399184733
+      Data2: 1117295001
+      Data3: -1682319170
+      Data4: -1838756062
+    Path: event:/SFX/Alpha/Healed
   <pickupItem>k__BackingField:
     Guid:
       Data1: 1397980244

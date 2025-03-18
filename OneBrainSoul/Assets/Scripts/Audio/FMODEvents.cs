@@ -10,6 +10,7 @@ public class FMODEvents : MonoBehaviour
 
     [field: Header("SFX")]
     [field: SerializeField] public EventReference heal { get; private set; }
+    [field: SerializeField] public EventReference healed { get; private set; }
     [field: SerializeField] public EventReference pickupItem { get; private set; }
     [field: SerializeField] public EventReference impact { get; private set; }
     [field: SerializeField] public EventReference shove { get; private set; }
@@ -22,6 +23,7 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference uiGameStart { get; private set; }
     [field: SerializeField] public EventReference uiMainMenuPressAny { get; private set; }
     [field: SerializeField] public EventReference uiSelect { get; private set; }
+    [field: SerializeField] public EventReference fog { get; private set; }
     [field: SerializeField] public EventReference hookThrow { get; private set; }
     [field: SerializeField] public EventReference charge { get; private set; }
     [field: SerializeField] public EventReference dash { get; private set; }
