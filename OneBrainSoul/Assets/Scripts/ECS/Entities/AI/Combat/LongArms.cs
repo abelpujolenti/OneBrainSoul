@@ -207,8 +207,12 @@ namespace ECS.Entities.AI.Combat
             {
                 return;
             }
-            
-            StopCoroutine(_animationCoroutine);
+
+            //TODO: Aixo s'anira a la merda  -Abel
+            if (_animationCoroutine != null)
+            {
+                StopCoroutine(_animationCoroutine);
+            }
 
             _animationCoroutine = null;
             
