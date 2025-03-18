@@ -126,9 +126,9 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 0.2440103, g: 0.18572444, b: 0.4188679, a: 1}
-    - _DamageTint: {r: 0.4392157, g: 0.21960784, b: 0.91764706, a: 1}
+    - _DamageTint: {r: 0.28375745, g: 0.23789605, b: 0.6226415, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RImLightColor: {r: 0.79607844, g: 0.15294118, b: 0.5581162, a: 0}
+    - _RImLightColor: {r: 0.2891153, g: 0.3262213, b: 0.6886792, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _UvOffset: {r: 0, g: 0, b: 0, a: 0}
     - _UvTiling: {r: 1, g: 1, b: 0, a: 0}
