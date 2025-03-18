@@ -11,6 +11,7 @@ namespace Combat
         {
             base.AttackCommand();
             AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
+            player.GetAnimator().SetBool("Attack", true);
         }
 
         protected override void AttackUpdate()
@@ -47,6 +48,12 @@ namespace Combat
                     AttackLand(affectedEntities);
                 }
             }
+        }
+
+        protected override void AttackEnd()
+        {
+            base.AttackEnd();
+            player.GetAnimator().SetBool("Attack", false);
         }
 
         protected override void AttackLand(List<AgentEntity> affectedEntities)

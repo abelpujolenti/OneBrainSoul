@@ -10,35 +10,35 @@ namespace Managers
 
         public static LoadSceneManager Instance => _instance;
 
-        [SerializeField] private int _managersToLoad;
-        private int _currentManagersToLoaded;
+        private const int MAIN_MENU_SCENE_INDEX = 1;
 
         private void Awake()
         {
-            _instance = this;
-        }
-
-        public void ManagerLoaded()
-        {
-            _currentManagersToLoaded++;
-
-            if (_currentManagersToLoaded != _managersToLoad)
+            if (_instance == null)
             {
+                _instance = this;
+                
+                DontDestroyOnLoad(gameObject);
+                
                 return;
             }
-            
-            LoadNextScene();
             
             Destroy(gameObject);
         }
 
-        private void LoadNextScene()
+        public void LoadNextScene()
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-#if UNITY_EDITOR
-            CleanConsole cleanConsole = new CleanConsole();
-            cleanConsole = null;
-#endif
+        }
+
+        public void GoToMainMenu()
+        {
+            SceneManager.LoadScene(MAIN_MENU_SCENE_INDEX);
+        }
+
+        public void ExitGame()
+        {
+            Application.Quit();
         }
     }
 }

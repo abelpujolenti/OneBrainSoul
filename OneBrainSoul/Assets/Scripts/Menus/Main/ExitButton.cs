@@ -11,7 +11,7 @@ namespace Menus.Main
                 return;
             }
             
-            GameManager.Instance.ExitGame();
+            LoadSceneManager.Instance.ExitGame();
         }
     }
 }

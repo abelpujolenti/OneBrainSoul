@@ -44,6 +44,7 @@ namespace Player
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private CapsuleCollider _capsuleCollider;
         [SerializeField] private FirstPersonCamera _camera;
+        [SerializeField] private Animator _animator;
         
         private bool _onGround;
         private float _xInput;
@@ -87,6 +88,7 @@ namespace Player
         [SerializeField] private Transform _hookParticleTransform;
         [SerializeField] private ParticleSystem _trailParticle;
         [SerializeField] private ParticleSystem _smashParticle;
+        [SerializeField] private Transform _handBone;
         [SerializeField] HookUI _hookUI;
 
         [Range(1, 7)]
@@ -274,7 +276,7 @@ namespace Player
         {
             if (_movementHandler is not HookMovementHandler)
             {
-                Vector3 particlePos = transform.position + new Vector3(0f, 1f, 0f) + GetOrientation().right * -1.5f;
+                Vector3 particlePos = GetHandBone().position;
                 _hookParticleTransform.position = particlePos;
             }
 
@@ -398,6 +400,11 @@ namespace Player
         public FirstPersonCamera GetCamera()
         {
             return _camera;
+        }
+
+        public Animator GetAnimator()
+        {
+            return _animator;
         }
 
         public float GetXInput()
@@ -624,6 +631,11 @@ namespace Player
         public bool CanBeDisplaced()
         {
             return _canBeDisplaced;
+        }
+
+        public Transform GetHandBone()
+        {
+            return _handBone;
         }
     }
 }
