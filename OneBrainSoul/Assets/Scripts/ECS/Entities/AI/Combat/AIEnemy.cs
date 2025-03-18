@@ -365,7 +365,18 @@ namespace ECS.Entities.AI.Combat
             Destroy(gameObject);
         }
 
-        protected abstract void PreDeath();
+        protected virtual void PreDeath()
+        {
+            if (EventsManager.OnDefeatEnemy != null)
+            {
+                EventsManager.OnDefeatEnemy();
+            }
+
+            if (EventsManager.OnAgentDefeated != null)
+            {
+                EventsManager.OnAgentDefeated(GetEntityType(), GetAgentID());
+            }
+        }
 
         private IEnumerator DamageEffectCoroutine(float duration)
         {
@@ -443,15 +454,6 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnDestroy()
         {
-            if (EventsManager.OnDefeatEnemy != null)
-            {
-                EventsManager.OnDefeatEnemy();
-            }
-
-            if (EventsManager.OnAgentDefeated != null)
-            {
-                EventsManager.OnAgentDefeated(GetEntityType(), GetAgentID());
-            }
 
             if (_doesRestoreAChargeOfPlayer)
             {

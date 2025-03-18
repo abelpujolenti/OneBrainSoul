@@ -680,6 +680,7 @@ namespace ECS.Entities.AI.Combat
 
         protected override void PreDeath()
         {
+            base.PreDeath();
             _update = () => { };
         }
 
