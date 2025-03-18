@@ -25,7 +25,7 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] private AbilityDetectionArea _slamAbilityDetectionArea;
         private IAreaAbility _slamAbility;
         private HashSet<uint> _visibleTargetsForSlamAbility;
-        private Func<bool> _cancelSlamFunc = () => false;
+        private Func<bool> _cancelSlamFunc = () => true;
 
         private float _rotationSpeedWhenCastingSlam;
 
@@ -112,8 +112,6 @@ namespace ECS.Entities.AI.Combat
 
         private void AILoop()
         {
-            ShowDebugMessages("Holi");
-            
             UpdateSightedTargetsInsideCombatArea();
             
             UpdateVisibleTargets();

@@ -63,8 +63,6 @@ namespace AI.Combat.Enemy.LongArms
 
         private static float CalculateThrowRockUtility(ILongArmsThrowRockUtility longArmsThrowRockUtility)
         {
-            Debug.Log(longArmsThrowRockUtility.HasATargetForThrowRock());
-            
             if (longArmsThrowRockUtility.IsThrowRockOnCooldown() || !longArmsThrowRockUtility.HasATargetForThrowRock())
             {
                 return 0;
