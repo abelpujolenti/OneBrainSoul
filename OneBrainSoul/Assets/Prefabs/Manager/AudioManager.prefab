@@ -45,10 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46025e82205032d47b7b9d6bb0bdc2c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  masterVolume: 1
+  masterVolume: 0.5
   musicVolume: 1
-  ambienceVolume: 1
-  SFXVolume: 1
+  ambienceVolume: 0.65
+  SFXVolume: 0.75
 --- !u!114 &7495049487779558572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,6 +68,13 @@ MonoBehaviour:
       Data3: 1574955151
       Data4: -1232983447
     Path: event:/Music/Music
+  <ambient>k__BackingField:
+    Guid:
+      Data1: 70444505
+      Data2: 1235430195
+      Data3: -1355864145
+      Data4: 1721711815
+    Path: event:/Ambient/DungeonAmbient
   <heal>k__BackingField:
     Guid:
       Data1: 1014361787
@@ -166,6 +173,13 @@ MonoBehaviour:
       Data3: 471719358
       Data4: 1958118136
     Path: event:/SFX/Alpha/UI_Select
+  <fog>k__BackingField:
+    Guid:
+      Data1: -1462057494
+      Data2: 1223665487
+      Data3: -152748612
+      Data4: -1402227001
+    Path: event:/SFX/Alpha/Fog
   <hookThrow>k__BackingField:
     Guid:
       Data1: -2114840081

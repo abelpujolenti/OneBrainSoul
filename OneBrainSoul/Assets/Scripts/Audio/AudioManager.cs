@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using FMOD.Studio;
 using FMODUnity;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class AudioManager : MonoBehaviour
@@ -54,9 +56,24 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeMusic();
-        /*InitializeAmbience();
-        InitializeSnapshots();*/
+        //InitializeMusic();
+        //InitializeAmbience();
+        /*InitializeSnapshots();*/
+
+        SceneManager.sceneLoaded += OnSceneLoad;
+        OnSceneLoad(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+
+    private void OnSceneLoad(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "MainMenu")
+        {
+            InitializeAmbience();
+        }
+        else if (s.name == "ControllerTest")
+        {
+            InitializeMusic();
+        }
     }
 
     private void Update()
@@ -66,22 +83,27 @@ public class AudioManager : MonoBehaviour
         ambienceBus.setVolume(ambienceVolume);
         sfxBus.setVolume(SFXVolume);
     }
-/*
-    private void InitializeAmbience()
-    {
-        ambienceEventInstance = CreateInstance(FMODEvents.instance.ambience);
-        ambienceEventInstance.start();
-        ambienceAdditionsEventInstance = CreateInstance(FMODEvents.instance.ambienceAdditions);
-        ambienceAdditionsEventInstance.start();
-    }
 
+    public void InitializeAmbience()
+    {
+        PLAYBACK_STATE s;
+        ambienceEventInstance.getPlaybackState(out s);
+        if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
+        ambienceEventInstance = CreateInstance(FMODEvents.instance.ambient);
+        ambienceEventInstance.start();
+    }
+/*
     private void InitializeSnapshots()
     {
         insideSnapshotEventInstance = CreateInstance(FMODEvents.instance.insideSnapshot);
         insideSnapshotEventInstance.start();
     }*/
-    private void InitializeMusic()
+    public void InitializeMusic()
     {
+        PLAYBACK_STATE s;
+        musicEventInstance.getPlaybackState(out s);
+        if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
+        Debug.Log("MUSICA---------------");
         musicEventInstance = CreateInstance(FMODEvents.instance.music);
         musicEventInstance.start();
     }
