@@ -305,7 +305,6 @@ GameObject:
   m_Component:
   - component: {fileID: 431293178}
   - component: {fileID: 431293181}
-  - component: {fileID: 431293180}
   - component: {fileID: 431293179}
   - component: {fileID: 431293183}
   - component: {fileID: 431293182}
@@ -355,7 +354,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 0}
     m_HighlightedColor: {r: 0.27058825, g: 0.74509805, b: 0.69803923, a: 1}
@@ -392,36 +391,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &431293180
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 431293177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.22272162, g: 0.7062807, b: 0.7264151, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 10ac67c229b664143b1d0d5f53647aa2, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &431293181
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -442,6 +411,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73e99491204b4b008bad9b8b79d47f33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _text: {fileID: 1877452289}
+  _textColorOnHover: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
+  _textColorOnPress: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
+  _textColorOnExitHover: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
   _button: {fileID: 431293179}
 --- !u!95 &431293183
 Animator:
@@ -2008,7 +1981,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1615358479}
   - component: {fileID: 1615358483}
-  - component: {fileID: 1615358482}
   - component: {fileID: 1615358481}
   - component: {fileID: 1615358484}
   - component: {fileID: 1615358480}
@@ -2036,7 +2008,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 220.4, y: 63.70002}
+  m_AnchoredPosition: {x: 216.4, y: 52.8}
   m_SizeDelta: {x: 90, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1615358480
@@ -2051,6 +2023,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f35807ea3308483ebb437662c154e5be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _text: {fileID: 458839864}
+  _textColorOnHover: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
+  _textColorOnPress: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
+  _textColorOnExitHover: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
   _button: {fileID: 1615358481}
 --- !u!114 &1615358481
 MonoBehaviour:
@@ -2071,7 +2047,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 0}
     m_HighlightedColor: {r: 0.36078432, g: 0.23529413, b: 0.58431375, a: 1}
@@ -2092,7 +2068,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 1615358482}
+  m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -2108,36 +2084,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1615358482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1615358478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.36198217, g: 0.23451404, b: 0.5849056, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 10ac67c229b664143b1d0d5f53647aa2, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1615358483
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2394,7 +2340,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ' P L A Y'
+  m_text: P L A Y
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e13cdb8a2f828594ea39490ae83b5732, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
