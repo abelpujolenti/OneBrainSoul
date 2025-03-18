@@ -16,6 +16,7 @@ public class CombatRoom : MonoBehaviour
     PlayerCharacterController player;
     bool active = false;
     bool beat = false;
+    bool spawned = false;
 
     void Start()
     {
@@ -33,10 +34,14 @@ public class CombatRoom : MonoBehaviour
     void Update()
     {
         if (!active || beat) return;
+        if (!spawned) return;
         beat = true;
         for (int i = 0; i < spawners.Count; i++)
         {
-            beat &= !spawners[i].HasLiveSpawns();
+            if (spawners[i].HasLiveSpawns())
+            {
+                beat = false;
+            }
         }
         if (beat)
         {
@@ -50,6 +55,7 @@ public class CombatRoom : MonoBehaviour
         active = true;
         this.player = player;
         StartCoroutine(EnterCoroutine(delay, enemyDelay));
+        player.GetComponent<PlayerCharacter>().EnterCombatRoom(this);
     }
 
     private IEnumerator EnterCoroutine(float t, float enemyDelay)
@@ -64,6 +70,7 @@ public class CombatRoom : MonoBehaviour
             yield return new WaitForSeconds(enemyDelay);
             spawners[i].Spawn();
         }
+        spawned = true;
     }
 
     private void Beat()
@@ -73,6 +80,24 @@ public class CombatRoom : MonoBehaviour
         for (int i = 0; i < walls.Length; i++)
         {
             DeactivateWall(walls[i]);
+        }
+        player.GetComponent<PlayerCharacter>().DefeatCombatRoom();
+    }
+
+    public void ResetRoom()
+    {
+        for (int i = 0; i < walls.Length; i++)
+        {
+            DeactivateWall(walls[i]);
+        }
+
+        beat = false;
+        active = false;
+        spawned = false;
+
+        for (int i = 0; i < spawners.Count; i++)
+        {
+            spawners[i].canSpawn = true;
         }
     }
 

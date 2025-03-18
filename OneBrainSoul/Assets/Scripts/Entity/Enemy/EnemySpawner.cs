@@ -7,8 +7,8 @@ using Player;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] bool spawnOnStart = true;
-    [SerializeField] bool spawnOnEnterTrigger = false;
+    public bool spawnOnStart = true;
+    public bool spawnOnEnterTrigger = false;
     public bool canSpawn = true;
     public AgentEntity agentEntity { get; private set; }
     private List<AgentEntity> spawnedEntities = new List<AgentEntity>();
@@ -26,12 +26,13 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         for (int i = spawnedEntities.Count - 1; i >= 0; i--)
         {
             if (spawnedEntities[i] == null)
             {
+                Debug.Log("remove");
                 spawnedEntities.RemoveAt(i);
             }
         }

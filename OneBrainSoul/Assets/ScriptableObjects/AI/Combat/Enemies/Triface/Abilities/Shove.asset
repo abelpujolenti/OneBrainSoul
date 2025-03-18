@@ -159,7 +159,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    objectWithParticleSystem: {fileID: 2725686302870647448, guid: bb73f5ad1bea0e74f8b7d350d1ff6624,
+    objectWithParticleSystem: {fileID: 8694282191879408708, guid: fc097e3d0acc25c4a930effbcde94e7c,
       type: 3}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
   abilityMovement:
