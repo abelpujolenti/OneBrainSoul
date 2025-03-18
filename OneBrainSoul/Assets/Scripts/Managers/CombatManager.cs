@@ -72,7 +72,7 @@ namespace Managers
 
                 DontDestroyOnLoad(gameObject);
                 
-                LoadSceneManager.Instance.ManagerLoaded();
+                LoadManager.Instance.ManagerLoaded();
 
                 return;
             }
