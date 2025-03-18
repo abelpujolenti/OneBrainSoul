@@ -9,14 +9,15 @@ namespace AI.Combat.AbilitySpecs
         public AbilityCast()
         {}
 
-        public AbilityCast(bool canCancelCast, float timeToCast, float currentTimeToFinishCast, 
-            float cooldown, float currentCooldown)
+        public AbilityCast(bool canCancelCast, float timeToCast, float currentTimeToFinishCast, float cooldown, 
+            float currentCooldown, float duration)
         {
             this.canCancelCast = canCancelCast;
             this.timeToCast = timeToCast;
             _currentTimeToFinishCast = currentTimeToFinishCast;
             this.cooldown = cooldown;
             _currentCooldown = currentCooldown;
+            this.duration = duration;
         }
 
         public bool canCancelCast;
@@ -66,7 +67,7 @@ namespace AI.Combat.AbilitySpecs
 
         public AbilityCast DeepCopy()
         {
-            return new AbilityCast(canCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown);
+            return new AbilityCast(canCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown, duration);
         }
     }
 }
