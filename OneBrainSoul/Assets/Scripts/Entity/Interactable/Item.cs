@@ -33,7 +33,7 @@ public class Item : MonoBehaviour
 
     protected virtual void Pickup(GameObject collider)
     {
-        //AudioManager.instance.PlayOneShot(FMODEvents.instance.itemPickup, transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.pickupItem, transform.position);
     }
 
     private IEnumerator PickupDeleteCoroutine()

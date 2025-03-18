@@ -10,7 +10,7 @@ namespace Menus.Main
             {
                 return;
             }
-            
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
             LoadSceneManager.Instance.ExitGame();
         }
     }

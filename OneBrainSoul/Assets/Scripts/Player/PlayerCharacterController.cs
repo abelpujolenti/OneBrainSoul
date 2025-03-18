@@ -341,14 +341,16 @@ namespace Player
             if (_contactDamageTime <= 0f) return;
 
             RaycastHit hit;
-            Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
-            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;
-            if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius * 1.2f, _rigidbody.velocity.normalized, out hit, 0.9f,
+            /*Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
+            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;*/
+            //if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius * 1.3f, _rigidbody.velocity.normalized, out hit, 1f,
+            if (Physics.SphereCast(transform.position + Vector3.up, _capsuleCollider.radius * 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
                 GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
             {
                 AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
                 if (entity != null)
                 {
+                    AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
                     entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
                     GetComponent<Hitstop>().Add(_contactDamageHitstop);
                     _contactDamageTime = 0f;

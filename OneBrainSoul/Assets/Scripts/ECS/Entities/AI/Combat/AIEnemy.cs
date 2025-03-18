@@ -296,6 +296,7 @@ namespace ECS.Entities.AI.Combat
 
         public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
             SetHealth(_context.GetHealth() + healValue);
         }
 

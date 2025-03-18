@@ -1,0 +1,266 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7251230047592834590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6409388849624684230}
+  - component: {fileID: 2425636300640345440}
+  - component: {fileID: 7495049487779558572}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6409388849624684230
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7251230047592834590}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 388.32263, y: -294.19177, z: 284.5935}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2425636300640345440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7251230047592834590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46025e82205032d47b7b9d6bb0bdc2c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  masterVolume: 1
+  musicVolume: 1
+  ambienceVolume: 1
+  SFXVolume: 1
+--- !u!114 &7495049487779558572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7251230047592834590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eb692ef385d54a44b26c61b0af8e533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <music>k__BackingField:
+    Guid:
+      Data1: -1844430463
+      Data2: 1158157235
+      Data3: 1574955151
+      Data4: -1232983447
+    Path: event:/Music/Music
+  <heal>k__BackingField:
+    Guid:
+      Data1: 1014361787
+      Data2: 1247930751
+      Data3: 1253963192
+      Data4: -461237912
+    Path: event:/SFX/Alpha/Healing
+  <pickupItem>k__BackingField:
+    Guid:
+      Data1: 1397980244
+      Data2: 1081818238
+      Data3: -1184478299
+      Data4: -1223365055
+    Path: event:/SFX/Alpha/PickUp
+  <impact>k__BackingField:
+    Guid:
+      Data1: -509436728
+      Data2: 1334824025
+      Data3: -584342377
+      Data4: 1249818607
+    Path: event:/SFX/Alpha/RockCollision
+  <shove>k__BackingField:
+    Guid:
+      Data1: -983295065
+      Data2: 1210616701
+      Data3: 1932514214
+      Data4: -934583960
+    Path: event:/SFX/Alpha/AtaqueBarrido
+  <slam>k__BackingField:
+    Guid:
+      Data1: -938012023
+      Data2: 1280502630
+      Data3: 1919674266
+      Data4: 289108638
+    Path: event:/SFX/Alpha/Slam
+  <teleport>k__BackingField:
+    Guid:
+      Data1: -212257591
+      Data2: 1327603634
+      Data3: 1078269363
+      Data4: -853705233
+    Path: event:/SFX/Alpha/Teleport
+  <teleportOut>k__BackingField:
+    Guid:
+      Data1: 1863267644
+      Data2: 1241827644
+      Data3: 1229227706
+      Data4: -53911054
+    Path: event:/SFX/Alpha/Teleport_out
+  <throwRock>k__BackingField:
+    Guid:
+      Data1: 1182609881
+      Data2: 1275102938
+      Data3: -1912076359
+      Data4: 626643745
+    Path: event:/SFX/Alpha/Throw
+  <tornado>k__BackingField:
+    Guid:
+      Data1: -1464359295
+      Data2: 1290968917
+      Data3: -1180361832
+      Data4: 553223918
+    Path: event:/SFX/Alpha/Torbellino
+  <uiExit>k__BackingField:
+    Guid:
+      Data1: -815108240
+      Data2: 1083756902
+      Data3: 731499428
+      Data4: 223835126
+    Path: event:/SFX/Alpha/UI_Exit
+  <uiGameStart>k__BackingField:
+    Guid:
+      Data1: 404585898
+      Data2: 1211807752
+      Data3: 405658498
+      Data4: -409032555
+    Path: event:/SFX/Alpha/UI_GameStart
+  <uiMainMenuPressAny>k__BackingField:
+    Guid:
+      Data1: 1214566802
+      Data2: 1126001116
+      Data3: 498381725
+      Data4: 1444466916
+    Path: event:/SFX/Alpha/UI_PressAnyButton
+  <uiSelect>k__BackingField:
+    Guid:
+      Data1: 298134986
+      Data2: 1134519436
+      Data3: 471719358
+      Data4: 1958118136
+    Path: event:/SFX/Alpha/UI_Select
+  <hookThrow>k__BackingField:
+    Guid:
+      Data1: -2114840081
+      Data2: 1273043267
+      Data3: 76908206
+      Data4: 1493412387
+    Path: event:/SFX/Hook
+  <charge>k__BackingField:
+    Guid:
+      Data1: 186143651
+      Data2: 1168613121
+      Data3: -1749201221
+      Data4: 297806602
+    Path: event:/SFX/Charge
+  <dash>k__BackingField:
+    Guid:
+      Data1: 941955909
+      Data2: 1292324263
+      Data3: 526340236
+      Data4: -521308550
+    Path: event:/SFX/Dash
+  <enemyAttack>k__BackingField:
+    Guid:
+      Data1: -2130849430
+      Data2: 1113414953
+      Data3: -1257666397
+      Data4: -1255097890
+    Path: event:/SFX/EnemyAttack
+  <enemyDamage>k__BackingField:
+    Guid:
+      Data1: -1417363599
+      Data2: 1331540967
+      Data3: -65310278
+      Data4: 1954632470
+    Path: event:/SFX/EnemyDamage
+  <whipAttack>k__BackingField:
+    Guid:
+      Data1: 784512977
+      Data2: 1106228824
+      Data3: 592715189
+      Data4: -759431163
+    Path: event:/SFX/WhipAttack
+  <hammerAttack>k__BackingField:
+    Guid:
+      Data1: 337960716
+      Data2: 1261881557
+      Data3: -496614470
+      Data4: 1454106212
+    Path: event:/SFX/HammerAttack
+  <wandAttack>k__BackingField:
+    Guid:
+      Data1: 1469555132
+      Data2: 1342062739
+      Data3: 689218435
+      Data4: -105240386
+    Path: event:/SFX/WandAttack
+  <openSwitchMode>k__BackingField:
+    Guid:
+      Data1: 19317758
+      Data2: 1100359599
+      Data3: 878718620
+      Data4: 1407751308
+    Path: event:/SFX/openselect
+  <swap>k__BackingField:
+    Guid:
+      Data1: -2086732322
+      Data2: 1151767245
+      Data3: 109609125
+      Data4: -546684500
+    Path: event:/SFX/swap
+  <catDamage>k__BackingField:
+    Guid:
+      Data1: -297492040
+      Data2: 1253889620
+      Data3: 671092358
+      Data4: 72118746
+    Path: event:/SFX/Cat_damage
+  <land>k__BackingField:
+    Guid:
+      Data1: 313609247
+      Data2: 1204400739
+      Data3: -1295044680
+      Data4: -1609836063
+    Path: event:/SFX/Land
+  <playerFootsteps>k__BackingField:
+    Guid:
+      Data1: 1973567384
+      Data2: 1340994933
+      Data3: 1918578364
+      Data4: -1147701516
+    Path: event:/SFX/Run
+  <trifaceFootsteps>k__BackingField:
+    Guid:
+      Data1: -1023142284
+      Data2: 1340151923
+      Data3: -1581824354
+      Data4: -1570045324
+    Path: event:/SFX/Alpha/TrifaceMove
+  <longArmsTurn>k__BackingField:
+    Guid:
+      Data1: -1977143957
+      Data2: 1148918133
+      Data3: -1353118557
+      Data4: 1030141585
+    Path: event:/SFX/Alpha/LongarmsSpin
