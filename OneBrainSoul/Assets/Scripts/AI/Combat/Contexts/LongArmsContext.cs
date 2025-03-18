@@ -27,7 +27,7 @@ namespace AI.Combat.Contexts
         private HashSet<uint> _targetsInsideClapAboveDetectionArea = new HashSet<uint>();
         private TargetContext _clapAboveTarget = new TargetContext();
         
-        public LongArmsContext(uint totalHealth,float radius, float height, Transform headAgentTransform, 
+        public LongArmsContext(uint totalHealth, float radius, float height, Transform headAgentTransform, 
             Transform bodyAgentTransform, AbilityCast throwRockCast, AbilityCast clapAboveCast, float radiusToFlee) 
             : base(EntityType.LONG_ARMS, totalHealth, radius, height, headAgentTransform, bodyAgentTransform)
         {

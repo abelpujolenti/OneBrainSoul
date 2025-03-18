@@ -473,13 +473,6 @@ namespace Managers
             uint trifaceId = triface.GetAgentID();
             
             _combatAreas[areaNumber].RemoveEnemy(trifaceId, EntityType.TRIFACE);
-
-            if (_combatAreas[areaNumber].IsAreaEmpty())
-            {
-                Destroy(_combatAreas[areaNumber]);
-                _combatAreas.Remove(areaNumber);
-            }
-            
             _returnAgent.Remove(trifaceId);
             _trifaces.Remove(trifaceId);
         }
@@ -489,11 +482,6 @@ namespace Managers
             uint longArmsId = longArms.GetAgentID();
             
             _combatAreas[areaNumber].RemoveEnemy(longArmsId, EntityType.LONG_ARMS);
-
-            if (_combatAreas[areaNumber].IsAreaEmpty())
-            {
-                _combatAreas.Remove(areaNumber);
-            }
             
             _returnAgent.Remove(longArmsId);
             _longArms.Remove(longArmsId);
@@ -514,11 +502,6 @@ namespace Managers
             uint sendatuId = sendatu.GetAgentID();
             
             _combatAreas[areaNumber].RemoveEnemy(sendatuId, EntityType.SENDATU);
-
-            if (_combatAreas[areaNumber].IsAreaEmpty())
-            {
-                _combatAreas.Remove(areaNumber);
-            }
             _returnAgent.Remove(sendatuId);
             _longArms.Remove(sendatuId);
         }

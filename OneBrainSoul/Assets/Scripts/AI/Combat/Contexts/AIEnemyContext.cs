@@ -30,8 +30,8 @@ namespace AI.Combat.Contexts
         private Transform _headAgentTransform;
         private Transform _bodyAgentTransform;
 
-        protected AIEnemyContext(EntityType entityType, uint totalHealth, float radius, 
-            float height, Transform headAgentTransform, Transform bodyAgentTransform)
+        protected AIEnemyContext(EntityType entityType, uint totalHealth, float radius, float height, 
+            Transform headAgentTransform, Transform bodyAgentTransform)
         {
             _entityType = entityType;
             _totalHealth = totalHealth;
