@@ -678,6 +678,11 @@ namespace ECS.Entities.AI.Combat
             return _longArmsBaseIdFunc();
         }
 
+        protected override void PreDeath()
+        {
+            _update = () => { };
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();

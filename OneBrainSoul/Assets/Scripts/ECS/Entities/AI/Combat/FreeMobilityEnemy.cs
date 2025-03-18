@@ -261,6 +261,11 @@ namespace ECS.Entities.AI.Combat
             RemoveNavMeshEntity();
         }
 
+        protected override void PreDeath()
+        {
+            RemoveNavMeshEntity();
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
