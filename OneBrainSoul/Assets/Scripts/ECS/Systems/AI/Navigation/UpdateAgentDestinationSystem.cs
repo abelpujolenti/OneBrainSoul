@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using ECS.Entities.AI.Navigation;
+using UnityEngine;
 
 namespace ECS.Systems.AI.Navigation
 {
@@ -11,7 +12,7 @@ namespace ECS.Systems.AI.Navigation
         {
             List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, aStarPath.origin, 
                 aStarPath.destination);
-
+            
             if (newPath.Count == 0)
             {
                 return;

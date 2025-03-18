@@ -26,6 +26,8 @@ namespace AI.Combat.Area
         private void Awake()
         {
             CombatManager.Instance.AddCombatArea(this, _combatAreaNumber);
+            _targetEntitiesInsideArea.Add(EntityType.PLAYER, new HashSet<uint>());
+            _targetEntitiesSightedInsideArea.Add(EntityType.PLAYER, new HashSet<uint>());
         }
 
         private void Start()
