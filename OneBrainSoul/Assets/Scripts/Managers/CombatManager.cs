@@ -161,7 +161,7 @@ namespace Managers
             
             combatArea.AddEnemy(enemyId, enemyEntityType);
 
-            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            for (EntityType i = EntityType.PLAYER; i < EntityType.ENUM_SIZE; i = (EntityType)((int)i << 1))
             {
                 if ((target & i) == 0)
                 {
@@ -181,7 +181,7 @@ namespace Managers
         {
             HashSet<uint> targets = new HashSet<uint>();
 
-            for (EntityType i = (EntityType)1; i < EntityType.ENUM_SIZE; i++)
+            for (EntityType i = EntityType.PLAYER; i < EntityType.ENUM_SIZE; i = (EntityType)((int)i << 1))
             {
                 if ((target & i) == 0)
                 {
@@ -221,7 +221,7 @@ namespace Managers
         {
             HashSet<uint> visibleTargets = new HashSet<uint>();
 
-            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            for (EntityType i = EntityType.PLAYER; i < EntityType.ENUM_SIZE; i = (EntityType)((int)i << 1))
             {
                 if ((target & i) == 0 || !targetsInsideVisionArea.ContainsKey(i))
                 {
@@ -250,7 +250,6 @@ namespace Managers
                     }
                     
                     visibleTargets.Add(targetId);
-                    _combatAreas[areaNumber].AddSightedTarget(i, targetId);
                 }
             }
 
@@ -375,11 +374,21 @@ namespace Managers
             return enemies;
         }
 
+        public void CheckIfVisibleToCombatArea(uint areaNumber, EntityType entityType, uint targetId)
+        {
+            if (!_combatAreas[areaNumber].GetEntityTypeTargets(entityType).Contains(targetId))
+            {
+                return;
+            }
+            
+            _combatAreas[areaNumber].AddSightedTarget(entityType, targetId);
+        }
+
         public HashSet<uint> ReturnSightedTargetsAgentEntity(EntityType target, uint areaNumber)
         {
             HashSet<uint> sightedTargetAgents = new HashSet<uint>();
 
-            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            for (EntityType i = EntityType.PLAYER; i < EntityType.ENUM_SIZE; i = (EntityType)((int)i << 1))
             {
                 if ((target & i) == 0)
                 {
