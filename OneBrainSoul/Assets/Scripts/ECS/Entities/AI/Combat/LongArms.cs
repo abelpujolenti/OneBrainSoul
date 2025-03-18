@@ -49,7 +49,7 @@ namespace ECS.Entities.AI.Combat
 
         private bool _isSettingNewDirectionToRotate;
 
-        private Action _onFlee;
+        private Action _onFlee = () => { };
         private Func<uint> _longArmsBaseIdFunc;
 
         private Action _update = () => { };
