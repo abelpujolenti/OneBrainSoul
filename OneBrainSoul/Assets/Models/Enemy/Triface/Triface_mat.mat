@@ -154,7 +154,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 0, b: 0, a: 1}
+    - _Color: {r: 0.6886792, g: 0.14618193, b: 0.14618193, a: 1}
     - _Color_1: {r: 1, g: 1, b: 1, a: 0}
     - _DamageColor: {r: 1, g: 1, b: 1, a: 1}
     - _DamageTint: {r: 0.4382722, g: 0.2197294, b: 0.9169811, a: 1}
