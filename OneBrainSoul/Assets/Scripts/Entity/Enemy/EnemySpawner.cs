@@ -32,7 +32,18 @@ public class EnemySpawner : MonoBehaviour
         {
             if (spawnedEntities[i] == null)
             {
-                Debug.Log("remove");
+                spawnedEntities.RemoveAt(i);
+            }
+        }
+    }
+
+    public void ClearEntities()
+    {
+        for (int i = spawnedEntities.Count - 1; i >= 0; i--)
+        {
+            if (spawnedEntities[i] != null)
+            {
+                Destroy(spawnedEntities[i].gameObject);
                 spawnedEntities.RemoveAt(i);
             }
         }
@@ -43,7 +54,7 @@ public class EnemySpawner : MonoBehaviour
         if (!canSpawn) return;
         canSpawn = false;
         var spawnedAgent = Instantiate(agentEntity.transform, agentEntity.transform.position, agentEntity.transform.rotation);
-        spawnedAgent.localScale = agentEntity.transform.localScale;
+        spawnedAgent.localScale = agentEntity.transform.lossyScale;
         spawnedAgent.gameObject.SetActive(true);
         spawnedEntities.Add(spawnedAgent.GetComponent<AgentEntity>());
     }

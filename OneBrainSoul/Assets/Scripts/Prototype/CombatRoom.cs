@@ -97,6 +97,7 @@ public class CombatRoom : MonoBehaviour
 
         for (int i = 0; i < spawners.Count; i++)
         {
+            spawners[i].ClearEntities();
             spawners[i].canSpawn = true;
         }
     }
