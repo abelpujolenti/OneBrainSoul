@@ -15,6 +15,13 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 1
   typesAffectedByTheAbility: 1
+  executeAbilitySound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   abilityCast:
     canCancelCast: 0
     timeToCast: 0.5
@@ -72,6 +79,13 @@ MonoBehaviour:
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 0
+  abilityAoESound:
+    Guid:
+      Data1: -212257591
+      Data2: 1327603634
+      Data3: 1078269363
+      Data4: -853705233
+    Path: event:/SFX/Alpha/Teleport
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0

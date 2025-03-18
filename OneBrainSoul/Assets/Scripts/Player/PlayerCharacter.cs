@@ -150,6 +150,8 @@ namespace Player
                 }
                 Destroy(FindObjectOfType<Corpse>().gameObject);
                 RecoverBody();
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
             }
         }
 
@@ -161,6 +163,9 @@ namespace Player
             _ghostTime = -1;
             SetEntityType(EntityType.PLAYER);
             PostProcessingManager.Instance.RecoverGhostEffect(.65f);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+
         }
 
         public void EnterCombatRoom(CombatRoom c)
@@ -203,6 +208,7 @@ namespace Player
         public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
         }
 
         public override void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition)

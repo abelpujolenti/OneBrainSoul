@@ -14,6 +14,7 @@ namespace Menus.Main
             }
             
             _animator.SetBool("HasPressedAKey", true);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiMainMenuPressAny, transform.position);
         }
 
         public void LabelDisappear()

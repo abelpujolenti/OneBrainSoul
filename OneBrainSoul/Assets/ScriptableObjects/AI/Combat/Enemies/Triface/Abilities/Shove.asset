@@ -15,6 +15,13 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 3
   typesAffectedByTheAbility: 3
+  executeAbilitySound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   abilityCast:
     canCancelCast: 0
     timeToCast: 0
@@ -72,6 +79,13 @@ MonoBehaviour:
     forceStrength: 1000
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 0
+  abilityAoESound:
+    Guid:
+      Data1: -983295065
+      Data2: 1210616701
+      Data3: 1932514214
+      Data4: -934583960
+    Path: event:/SFX/Alpha/AtaqueBarrido
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0

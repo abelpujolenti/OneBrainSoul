@@ -1,5 +1,6 @@
 ﻿using AI.Combat.AbilitySpecs;
 using AI.Combat.ScriptableObjects;
+using FMODUnity;
 
 namespace ECS.Components.AI.Combat.Abilities
 {
@@ -8,6 +9,8 @@ namespace ECS.Components.AI.Combat.Abilities
         private readonly bool _doesItTriggerOnTriggerEnter;
         
         private readonly bool _doesItTriggerOnTriggerExit;
+
+        private readonly EventReference _abilityAoESound;
 
         private readonly AbilityAoEType _abilityAoEType;
         private readonly AbilityAoE _abilityAoE;
@@ -19,6 +22,8 @@ namespace ECS.Components.AI.Combat.Abilities
             _doesItTriggerOnTriggerEnter = areaAbilityProperties.doesItTriggerOnTriggerEnter;
             
             _doesItTriggerOnTriggerExit = areaAbilityProperties.doesItTriggerOnTriggerExit;
+
+            _abilityAoESound = areaAbilityProperties.abilityAoESound;
 
             _abilityAoEType = areaAbilityProperties.abilityAoEType;
             _abilityAoE = areaAbilityProperties.abilityAoE;
@@ -33,6 +38,11 @@ namespace ECS.Components.AI.Combat.Abilities
         public bool DoesItTriggerOnTriggerExit()
         {
             return _doesItTriggerOnTriggerExit;
+        }
+
+        public EventReference GetAbilityAoESound()
+        {
+            return _abilityAoESound;
         }
 
         public AbilityAoEType GetAoEType()

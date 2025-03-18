@@ -19,6 +19,17 @@ namespace Editor.Enemies
         private bool isAbilityAoEFoldoutOpen = true;
         private bool isAbilityMovementFoldoutOpen = true;
 
+        private SerializedProperty executeAbilitySound;
+        private SerializedProperty abilityAoESound;
+        private SerializedProperty projectileSound;
+
+        private void OnEnable()
+        {
+            executeAbilitySound = serializedObject.FindProperty("executeAbilitySound");
+            abilityAoESound = serializedObject.FindProperty("abilityAoESound");
+            projectileSound = serializedObject.FindProperty("projectileSound");
+        }
+
         public override void OnInspectorGUI()
         {
             InitializeStyles();
@@ -26,6 +37,8 @@ namespace Editor.Enemies
             ProjectileAbilityProperties projectileAbilityProperties = (ProjectileAbilityProperties)target;
             
             AbilityTarget(projectileAbilityProperties);
+            
+            AbilitySound();
 
             AbilityCast(projectileAbilityProperties);
 
@@ -63,6 +76,16 @@ namespace Editor.Enemies
             EnumFlagsField<EntityType>(ref projectileAbilityProperties.typesAffectedByTheAbility, "Types Affected By The Ability");
 
             EditorGUI.indentLevel--;
+        }
+
+        private void AbilitySound()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(executeAbilitySound, new GUIContent("Execute Ability Sound"));
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void AbilityCast(ProjectileAbilityProperties projectileAbilityProperties)
@@ -367,6 +390,10 @@ namespace Editor.Enemies
                 return;
             }
             
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(projectileSound, new GUIContent("Projectile Sound"));
+            serializedObject.ApplyModifiedProperties();
+            
             Vector3Field(ref abilityProjectile.relativePositionToCaster, "Relative Position To Caster");
             ObjectField<GameObject>(ref abilityProjectile.projectilePrefab, "Projectile Prefab");
             ObjectField(ref abilityProjectile.objectWithParticleSystem, "Object With Trail Particle System");
@@ -403,6 +430,10 @@ namespace Editor.Enemies
             }
 
             abilityAoE.isAttachedToCaster = false;
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(abilityAoESound, new GUIContent("Ability AoE Sound"));
+            serializedObject.ApplyModifiedProperties();
 
             Vector3Field(ref abilityAoE.relativePositionToCaster, "Relative Position To Projectile");
             

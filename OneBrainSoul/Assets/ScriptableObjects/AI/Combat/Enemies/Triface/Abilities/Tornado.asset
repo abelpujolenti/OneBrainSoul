@@ -15,10 +15,17 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 1
   typesAffectedByTheAbility: 1
+  executeAbilitySound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   abilityCast:
     canCancelCast: 0
     timeToCast: 0.5
-    cooldown: 4
+    cooldown: 5
     duration: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
@@ -72,6 +79,13 @@ MonoBehaviour:
     forceStrength: 600
     doesForceComesFromCenterOfTheArea: 1
     abilityEffectForceType: 3
+  abilityAoESound:
+    Guid:
+      Data1: -1464359295
+      Data2: 1290968917
+      Data3: -1180361832
+      Data4: 553223918
+    Path: event:/SFX/Alpha/Torbellino
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 1

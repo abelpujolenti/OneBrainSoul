@@ -15,6 +15,13 @@ MonoBehaviour:
   canAffectCaster: 0
   abilityTarget: 1
   typesAffectedByTheAbility: 1
+  executeAbilitySound:
+    Guid:
+      Data1: 1182609881
+      Data2: 1275102938
+      Data3: -1912076359
+      Data4: 626643745
+    Path: event:/SFX/Alpha/Throw
   abilityCast:
     canCancelCast: 1
     timeToCast: 2
@@ -72,6 +79,13 @@ MonoBehaviour:
     forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 0
+  abilityAoESound:
+    Guid:
+      Data1: -509436728
+      Data2: 1334824025
+      Data3: -584342377
+      Data4: 1249818607
+    Path: event:/SFX/Alpha/RockCollision
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
@@ -149,6 +163,13 @@ MonoBehaviour:
     timeBetweenPositions: []
   doesItTriggerOnTriggerEnter: 0
   doesItTriggerOnTriggerExit: 0
+  projectileSound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   abilityProjectile:
     projectilePrefab: {fileID: 5930364971465029039, guid: 61a7ac1bf6057534d8aab30f6f4b1fa1,
       type: 3}

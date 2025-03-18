@@ -98,6 +98,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayOneShot(EventReference sound, Vector3 worldPos)
     {
+        if (sound.IsNull) return;
         RuntimeManager.PlayOneShot(sound, worldPos);
     }
 

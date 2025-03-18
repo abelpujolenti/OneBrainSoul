@@ -11,6 +11,7 @@ namespace Menus.Main
                 return;
             }
 
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiGameStart, transform.position);
             LoadSceneManager.Instance.LoadNextScene();
         }
     }

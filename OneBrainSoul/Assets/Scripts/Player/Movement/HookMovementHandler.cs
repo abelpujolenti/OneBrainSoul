@@ -255,8 +255,11 @@ namespace Player.Movement
             smashParticle.Play();
 
             PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.slam, player.transform.position);
+            if (damaged)
+            {
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, player.transform.position);
+            }
 
             player.GetCamera().StopFovWarp();
             _hitstop.Add(damaged ? .2f : .12f);

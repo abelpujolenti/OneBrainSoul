@@ -110,6 +110,8 @@ namespace Player
         public bool _isHookUnlocked = false;
         public bool _isWallClimbUnlocked = false;
 
+        private bool _canMove = true;
+
         private void Start()
         {
             _camera.Setup();
@@ -154,8 +156,11 @@ namespace Player
             }
 
             CorrectRotation();
-        
-            _movementHandler.Move(this);
+
+            if (_canMove)
+            {
+                _movementHandler.Move(this);
+            }
             VoidReturn();
 
             SoundUpdate();
@@ -193,7 +198,27 @@ namespace Player
 
         public void Respawn()
         {
+            StartCoroutine(RespawnCoroutine(0.3f));
+        }
+
+        private IEnumerator RespawnCoroutine(float dur)
+        {
+            _canMove = false;
+            float t = 0f;
+            PostProcessingManager.Instance.BraincellSwitchTransition(dur);
             transform.position = _respawnPos;
+
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.teleportOut, transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.catDamage, transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+
+            while (t < dur)
+            {
+                transform.position = _respawnPos;
+                yield return new WaitForFixedUpdate();
+                t += Time.fixedDeltaTime;
+            }
+            _canMove = true;
         }
 
         public void SetRespawn(Vector3 newPos)
@@ -341,17 +366,31 @@ namespace Player
             if (_contactDamageTime <= 0f) return;
 
             RaycastHit hit;
-            Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
-            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;
-            if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius * 1.2f, _rigidbody.velocity.normalized, out hit, 0.9f,
+            /*Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
+            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;*/
+            //if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius * 1.3f, _rigidbody.velocity.normalized, out hit, 1f,
+            if (Physics.SphereCast(transform.position + Vector3.up, _capsuleCollider.radius * 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
                 GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
             {
                 AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
                 if (entity != null)
                 {
+                    AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
                     entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
                     GetComponent<Hitstop>().Add(_contactDamageHitstop);
                     _contactDamageTime = 0f;
+
+                    float bounceStrength = 100f;
+                    float bounceVerticalRatio = .45f;
+                    
+                    GetCamera().ScreenShake(.25f, 1.3f);
+                    _rigidbody.velocity = Vector3.zero;
+                    _rigidbody.AddForce(
+                    (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
+                    new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
+                        (bounceStrength * (1.4f)), ForceMode.Impulse);
+
+                    ChangeMovementHandlerToAirborne();
                 }
             }
 
