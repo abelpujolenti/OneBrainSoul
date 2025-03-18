@@ -30,7 +30,7 @@ public class EnemySpawner : MonoBehaviour
     {
         for (int i = spawnedEntities.Count - 1; i >= 0; i--)
         {
-            if (spawnedEntities[i] = null)
+            if (spawnedEntities[i] == null)
             {
                 spawnedEntities.RemoveAt(i);
             }
