@@ -34,7 +34,7 @@ public class PostProcessingManager : Singleton<PostProcessingManager>
 
     private void ToggleFog(Scene s, LoadSceneMode mode)
     {
-        if (s.name != "MainMenu")
+        if (s.name == "ControllerTest")
         {
             EnableFog();
         }
