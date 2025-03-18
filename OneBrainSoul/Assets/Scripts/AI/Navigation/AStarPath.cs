@@ -21,9 +21,10 @@ namespace AI.Navigation
 
         private Action<bool> _hasReachDestinationAction;
 
-        public AStarPath(IPosition destinationPosition)
+        public AStarPath(IPosition destinationPosition, NavMeshGraph navMeshGraph)
         {
             this.destinationPosition = destinationPosition;
+            this.navMeshGraph = navMeshGraph;
         }
 
         public void UpdateNavMeshGraphObstacles()

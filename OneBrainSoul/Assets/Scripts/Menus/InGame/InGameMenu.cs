@@ -32,13 +32,13 @@ namespace Menus.InGame
         public void MainMenu()
         {
             EventsManager.ReleaseEscape -= Resume;
-            GameManager.Instance.GoToMainMenu();
+            LoadSceneManager.Instance.GoToMainMenu();
         }
 
         public void Exit()
         {
             EventsManager.ReleaseEscape -= Resume;
-            GameManager.Instance.ExitGame();
+            LoadSceneManager.Instance.ExitGame();
         }
 
         private void OnDestroy()

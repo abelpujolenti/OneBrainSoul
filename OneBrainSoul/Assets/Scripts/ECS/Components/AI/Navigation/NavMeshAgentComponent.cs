@@ -1,4 +1,5 @@
 using System;
+using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using Interfaces.AI.Navigation;
 using UnityEngine.AI;
@@ -16,12 +17,12 @@ namespace ECS.Components.AI.Navigation
         public bool isGoingBackwards;
 
         public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, TransformComponent transformComponent, 
-            Action rotateBody)
+            Action rotateBody, NavMeshGraph navMeshGraph)
         {
             _navMeshAgentSpecs = navMeshAgentSpecs;
             _agent = agent;
             _transformComponent = transformComponent;
-            _aStarPath = new AStarPath(_transformComponent);
+            _aStarPath = new AStarPath(_transformComponent, navMeshGraph);
             _rotateBody = rotateBody;
         }
 

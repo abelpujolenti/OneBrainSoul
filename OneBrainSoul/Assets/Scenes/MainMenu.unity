@@ -598,6 +598,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 458839862}
   m_CullTransparentMesh: 1
+--- !u!1 &466675920
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 466675922}
+  - component: {fileID: 466675921}
+  m_Layer: 0
+  m_Name: LoadSceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &466675921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466675920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec8b06ca69a54e099ab52e98c17bc14a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &466675922
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466675920}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 227.64037}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &546594048
 GameObject:
   m_ObjectHideFlags: 0
@@ -1870,7 +1914,7 @@ MonoBehaviour:
   _delayBeforeShowPressAnyKey: 0.5
   _autoScrollTime: 3
   _scrollRect: {fileID: 700788935}
-  _positionToScroll: 0
+  _positionToScroll: 296.8245
   _pressAnyKey: {fileID: 1687250206}
   _contentToScroll: {fileID: 1600718405}
   _buttons:
@@ -2688,3 +2732,4 @@ SceneRoots:
   - {fileID: 817091194}
   - {fileID: 1555637913}
   - {fileID: 1946689105}
+  - {fileID: 466675922}

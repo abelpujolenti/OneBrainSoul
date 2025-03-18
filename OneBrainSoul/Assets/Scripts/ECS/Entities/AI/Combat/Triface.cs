@@ -28,7 +28,9 @@ namespace ECS.Entities.AI.Combat
         private Func<bool> _cancelSlamFunc = () => false;
 
         private float _rotationSpeedWhenCastingSlam;
-        
+
+        private Action _update = () => { };
+
         private void Start()
         {
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
@@ -54,11 +56,12 @@ namespace ECS.Entities.AI.Combat
 
             if (_itGoesOnAutomatic)
             {
-                StartCoroutine(OnAutomatic());
+                _slamAbility.GetCast().ResetCastTime();
+                _update = () => OnAutomatic();
                 return;
             }
 
-            StartCoroutine(AILoop());
+            _update = () => AILoop();
         }
 
         protected override void InitiateDictionaries()
@@ -92,72 +95,65 @@ namespace ECS.Entities.AI.Combat
 
         #region AI LOOP
 
-        private IEnumerator OnAutomatic()
+        private void Update()
         {
-            _slamAbility.GetCast().ResetCastTime();
-            
-            while (true)
-            {
-                if (_slamAbility.GetCast().IsOnCooldown())
-                {
-                    yield return null;
-                    continue;
-                }
-                
-                Slam();
-                yield return null;
-            }
+            _update();
         }
 
-        private IEnumerator AILoop()
+        private void OnAutomatic()
         {
-            while (true)
+            if (_slamAbility.GetCast().IsOnCooldown())
             {
-                UpdateSightedTargetsInsideCombatArea();
-            
-                UpdateVisibleTargets();
-            
-                UpdateVectorToTargets();
-
-                if (_context.IsFSMBlocked())
-                {
-                    yield return null;
-                    continue;
-                }
-            
-                //RotateBody();
-            
-                //RotateHead();
-                
-                //LaunchRaycasts();
-            
-                CalculateBestAction();
-
-                if (!_context.HasATargetForSlam())
-                {
-                    yield return null;
-                    continue;
-                }
-            
-                Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
-                
-                //TODO AQUI AGENT SLOTS WHEN NEAR
-                AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
-                    .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
-
-                if (agentSlotPosition == null)
-                {
-                    StopNavigation();
-                    SetDirectionToRotateBody(vectorToTarget);
-                    ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
-                    yield return null;
-                    continue;
-                }
-            
-                _agentSlot = agentSlotPosition.agentSlot;
-                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
-                yield return null;
+                return;
             }
+                
+            Slam();
+        }
+
+        private void AILoop()
+        {
+            ShowDebugMessages("Holi");
+            
+            UpdateSightedTargetsInsideCombatArea();
+            
+            UpdateVisibleTargets();
+            
+            UpdateVectorToTargets();
+
+            if (_context.IsFSMBlocked())
+            {
+                return;
+            }
+            
+            //RotateBody();
+            
+            //RotateHead();
+                
+            //LaunchRaycasts();
+            
+            CalculateBestAction();
+
+            if (!_context.HasATargetForSlam())
+            {
+                return;
+            }
+            
+            Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
+                
+            //TODO AQUI AGENT SLOTS WHEN NEAR
+            AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
+                .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
+
+            if (agentSlotPosition == null)
+            {
+                StopNavigation();
+                SetDirectionToRotateBody(vectorToTarget);
+                ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), -vectorToTarget);
+                return;
+            }
+            
+            _agentSlot = agentSlotPosition.agentSlot;
+            ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
         }
 
         
