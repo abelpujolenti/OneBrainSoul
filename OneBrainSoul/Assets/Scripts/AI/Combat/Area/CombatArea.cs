@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace AI.Combat.Area
 {
+
     public class CombatArea : MonoBehaviour
     {
         [SerializeField] private uint _combatAreaNumber;
@@ -17,6 +18,8 @@ namespace AI.Combat.Area
 
         private Dictionary<EntityType, HashSet<uint>> _targetEntitiesInsideArea =
             new Dictionary<EntityType, HashSet<uint>>();
+
+        private Dictionary<uint, uint> _timesPreSightedAnEntity = new Dictionary<uint, uint>();
 
         private Dictionary<EntityType, HashSet<uint>> _targetEntitiesSightedInsideArea =
             new Dictionary<EntityType, HashSet<uint>>();
@@ -70,8 +73,9 @@ namespace AI.Combat.Area
             _enemiesInsideArea.Remove(enemyId);
 
             RemoveTarget(entityType, enemyId);
+            RemoveSightedTarget(entityType, enemyId);
 
-            List<EntityType> keysToRemove = new List<EntityType>();
+            /*List<EntityType> keysToRemove = new List<EntityType>();
 
             foreach (EntityType targetEntityType in _agentsTargets.Keys)
             {
@@ -93,7 +97,7 @@ namespace AI.Combat.Area
                 _agentsTargets.Remove(keyToRemove);
                 _targetEntitiesInsideArea.Remove(keyToRemove);
                 _targetEntitiesSightedInsideArea.Remove(keyToRemove);
-            }
+            }*/
         }
 
         public bool IsAreaEmpty()
@@ -159,6 +163,38 @@ namespace AI.Combat.Area
             _targetEntitiesInsideArea[entityType].Remove(targetId);
         }
 
+        public void AddPreSightedTarget(EntityType entityType, uint agentId)
+        {
+            if (_targetEntitiesInsideArea[entityType].Contains(agentId))
+            {
+                AddSightedTarget(entityType, agentId);
+            }
+            
+            if (_timesPreSightedAnEntity.ContainsKey(agentId))
+            {
+                _timesPreSightedAnEntity[agentId]++;
+                return;
+            }
+            
+            _timesPreSightedAnEntity.Add(agentId, 1);
+        }
+        
+        public void RemovePreSightedTarget(uint agentId)
+        {
+            if (!_timesPreSightedAnEntity.ContainsKey(agentId))
+            {
+                return;
+            }
+            
+            if (_timesPreSightedAnEntity[agentId] != 1)
+            {
+                _timesPreSightedAnEntity[agentId]--;
+                return;
+            }
+            
+            _timesPreSightedAnEntity.Remove(agentId);
+        }
+        
         public void AddSightedTarget(EntityType entityType, uint targetId)
         {
             _targetEntitiesSightedInsideArea[entityType].Add(targetId);
@@ -218,8 +254,17 @@ namespace AI.Combat.Area
             {
                 return;
             }
+
+            uint agentId = agentEntity.GetAgentID();
             
-            AddTarget(entityType, agentEntity.GetAgentID());
+            AddTarget(entityType, agentId);
+
+            if (!_timesPreSightedAnEntity.ContainsKey(agentId))
+            {
+                return;
+            }
+            
+            AddSightedTarget(entityType, agentId);
         }
 
         private void OnTriggerExit(Collider other)
@@ -232,11 +277,6 @@ namespace AI.Combat.Area
             }
 
             EntityType entityType = agentEntity.GetEntityType();
-
-            if (!_targetEntitiesInsideArea.ContainsKey(entityType))
-            {
-                return;
-            }
 
             uint agentId = agentEntity.GetAgentID();
             

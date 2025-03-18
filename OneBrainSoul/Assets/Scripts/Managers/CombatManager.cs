@@ -176,8 +176,7 @@ namespace Managers
 
         #region UBS
 
-        public HashSet<uint> ReturnPositionOfRelevantSightedTargetsInsideCombatArea(uint areaNumber, 
-            EntityType target)
+        public HashSet<uint> ReturnPositionOfRelevantSightedTargetsInsideCombatArea(uint areaNumber, EntityType target)
         {
             HashSet<uint> targets = new HashSet<uint>();
 
@@ -374,14 +373,14 @@ namespace Managers
             return enemies;
         }
 
-        public void CheckIfVisibleToCombatArea(uint areaNumber, EntityType entityType, uint targetId)
+        public void AddPreSightedTargetToCombatArea(uint areaNumber, EntityType entityType, uint targetId)
         {
-            if (!_combatAreas[areaNumber].GetEntityTypeTargets(entityType).Contains(targetId))
-            {
-                return;
-            }
-            
-            _combatAreas[areaNumber].AddSightedTarget(entityType, targetId);
+            _combatAreas[areaNumber].AddPreSightedTarget(entityType, targetId);
+        }
+
+        public void RemovePreSightedTargetToCombatArea(uint areaNumber, uint targetId)
+        {
+            _combatAreas[areaNumber].RemovePreSightedTarget(targetId);
         }
 
         public HashSet<uint> ReturnSightedTargetsAgentEntity(EntityType target, uint areaNumber)

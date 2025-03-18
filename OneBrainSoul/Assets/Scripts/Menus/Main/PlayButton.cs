@@ -1,5 +1,4 @@
 ﻿using Managers;
-using UnityEngine.SceneManagement;
 
 namespace Menus.Main
 {

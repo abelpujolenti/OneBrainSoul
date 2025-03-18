@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -9,7 +8,6 @@ using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
-using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -459,7 +457,6 @@ namespace Managers
 
         public void UpdateNavMeshAgentDestination(uint agentID, VectorComponent vectorComponent)
         {
-            Debug.Log("Vector");
             _navMeshAgentDestinations[agentID].GetAStarPath().destinationPosition = vectorComponent;
             _navMeshAgentDestinations[agentID].GetAStarPath().deviationVector = Vector3.zero;
         }

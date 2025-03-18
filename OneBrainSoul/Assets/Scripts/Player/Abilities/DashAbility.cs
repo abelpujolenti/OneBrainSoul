@@ -1,6 +1,6 @@
+using System.Collections;
 using Player.Movement;
 using UnityEngine;
-using System.Collections;
 
 namespace Player.Abilities
 {
