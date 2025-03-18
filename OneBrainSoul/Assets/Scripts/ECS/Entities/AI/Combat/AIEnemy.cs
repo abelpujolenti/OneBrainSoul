@@ -91,7 +91,7 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void CreateAbilities()
         {
-            for (EntityType i = 0; i < EntityType.ENUM_SIZE; i++)
+            for (EntityType i = EntityType.PLAYER; i < EntityType.ENUM_SIZE; i = (EntityType)((int)i << 1))
             {
                 if ((_targetEntities & i) == 0)
                 {
@@ -468,7 +468,11 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
             
+            Debug.Log("Add: " + entityType);
+            
             _targetsInsideVisionArea[entityType].Add(targetId);
+            
+            CombatManager.Instance.CheckIfVisibleToCombatArea(_areaNumber, entityType, targetId);
         }
 
         private void RemoveTargetInsideVisionArea(EntityType entityType, uint targetId)
@@ -477,6 +481,8 @@ namespace ECS.Entities.AI.Combat
             {
                 return;
             }
+            
+            Debug.Log("Remove: " + entityType);
             
             _targetsInsideVisionArea[entityType].Remove(targetId);
         }

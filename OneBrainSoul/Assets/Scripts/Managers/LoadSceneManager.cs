@@ -10,7 +10,7 @@ namespace Managers
 
         public static LoadSceneManager Instance => _instance;
 
-        private const int MAIN_MENU_SCENE_INDEX = 1;
+        private const int MAIN_MENU_SCENE_INDEX = 0;
 
         private void Awake()
         {
