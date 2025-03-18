@@ -2,6 +2,6 @@
 {
     public interface ISetDistanceToRival
     {
-        public void SetDistanceToRival(float distanceToRival);
+        public void SetDistanceToTarget(float distanceToTarget);
     }
 }

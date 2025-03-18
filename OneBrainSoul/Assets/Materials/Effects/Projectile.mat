@@ -52,7 +52,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Opacity: 1
-    - _Progress: 1
+    - _Progress: 0.081180155
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:

@@ -8,7 +8,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ProBuilder Default URP 5
-  m_Shader: {fileID: 4800000, guid: a5e1047f27bee462089b2bc3104f90fd, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 6824fd9943fa18f479da8c3c2e729e0b,
+    type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -57,6 +58,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_ae2b64b6bbf5449597c7e8f96892c261_Out_0_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 6344bf96fbda94141a525046d088fb23, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -78,6 +83,8 @@ Material:
     - _Cutoff: 0.5
     - _DstBlend: 0
     - _EnvironmentReflections: 1
+    - _Fade: 1
+    - _FloorThreshold: 37.5
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0

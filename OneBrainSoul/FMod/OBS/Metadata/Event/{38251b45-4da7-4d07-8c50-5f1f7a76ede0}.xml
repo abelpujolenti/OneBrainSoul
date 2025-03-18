@@ -5,10 +5,10 @@
 			<value>Dash</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
-			<destination>{34d8c880-bd5f-47ba-8f27-11a3d6696e3c}</destination>
+			<destination>{03ced9e9-3918-413d-ab7e-fbd6c718b651}</destination>
 		</relationship>
 		<relationship name="mixer">
 			<destination>{72a398ad-045d-4924-b277-cc7345cca927}</destination>
@@ -56,7 +56,7 @@
 			<destination>{54c3e2b6-b8b7-4ee5-9964-aa1083adaf8c}</destination>
 		</relationship>
 		<relationship name="output">
-			<destination>{00056e2a-17aa-43ac-a7a2-7af373ff9055}</destination>
+			<destination>{4a73dea8-5842-46c4-beeb-060476f70a11}</destination>
 		</relationship>
 	</object>
 	<object class="EventAutomatableProperties" id="{32884873-de64-404d-b3c2-94f188a0f252}" />
@@ -96,16 +96,46 @@
 	<object class="MixerBusEffectChain" id="{d8edeaaf-60cf-4dca-af39-90a3be369f07}">
 		<relationship name="effects">
 			<destination>{f881c16c-f1fe-4604-ba11-c826ab3f8d70}</destination>
-			<destination>{8d236ead-91c0-46d0-a7ce-b2f383609bc1}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{21e4523b-ffc9-4b52-b6ad-a81c6baf76c4}" />
 	<object class="SingleSound" id="{00148200-08e8-4e4c-a8ed-93755abe503c}">
+		<property name="volume">
+			<value>-9.5</value>
+		</property>
+		<property name="pitch">
+			<value>-1.20000005</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{82e1688a-5c23-44d8-b058-375a2b77b0a1}</destination>
+			<destination>{eab11877-00a1-45f7-9b0c-7c681887e164}</destination>
+		</relationship>
 		<relationship name="audioFile">
 			<destination>{0c4aa8ea-7fd4-4ee7-a000-041def42b366}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{a6c433f6-b43a-40ff-9214-c57c7c5855ee}" />
 	<object class="MixerBusFader" id="{f881c16c-f1fe-4604-ba11-c826ab3f8d70}" />
-	<object class="SpatialiserEffect" id="{8d236ead-91c0-46d0-a7ce-b2f383609bc1}" />
+	<object class="RandomizerModulator" id="{82e1688a-5c23-44d8-b058-375a2b77b0a1}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>pitch</value>
+		</property>
+		<property name="amount">
+			<value>5</value>
+		</property>
+	</object>
+	<object class="ADSRModulator" id="{eab11877-00a1-45f7-9b0c-7c681887e164}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>pitch</value>
+		</property>
+		<property name="attackTime">
+			<value>617.094116</value>
+		</property>
+		<property name="peakValue">
+			<value>24.4444504</value>
+		</property>
+		<property name="holdTime">
+			<value>955.128174</value>
+		</property>
+	</object>
 </objects>

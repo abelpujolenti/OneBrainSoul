@@ -14,22 +14,22 @@ TagManager:
   - UI
   - Ground
   - Interactable
-  - Ally
+  - Player
   - Enemy
-  - Ally Attack Area
+  - VisionArea
+  - DetectionArea
+  - CombatArea
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - Enemy Attack Area
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   - 
   - OverlayCamera
   - OverlayCamera2

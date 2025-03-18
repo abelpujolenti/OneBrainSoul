@@ -1,7 +1,7 @@
 using System;
+using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using Interfaces.AI.Navigation;
-using UnityEngine;
 using UnityEngine.AI;
 
 namespace ECS.Components.AI.Navigation
@@ -13,13 +13,17 @@ namespace ECS.Components.AI.Navigation
         private TransformComponent _transformComponent;
         private NavMeshAgent _agent;
         private AStarPath _aStarPath;
+        private Action _rotateBody;
+        public bool isGoingBackwards;
 
-        public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, Transform transform)
+        public NavMeshAgentComponent(NavMeshAgentSpecs navMeshAgentSpecs, NavMeshAgent agent, TransformComponent transformComponent, 
+            Action rotateBody, NavMeshGraph navMeshGraph)
         {
             _navMeshAgentSpecs = navMeshAgentSpecs;
             _agent = agent;
-            _transformComponent = new TransformComponent(transform);
-            _aStarPath = new AStarPath(_transformComponent);
+            _transformComponent = transformComponent;
+            _aStarPath = new AStarPath(_transformComponent, navMeshGraph);
+            _rotateBody = rotateBody;
         }
 
         public NavMeshAgent GetNavMeshAgent()
@@ -40,6 +44,11 @@ namespace ECS.Components.AI.Navigation
         public void SetAStarPathDestination(IPosition iPosition)
         {
             _aStarPath.destinationPosition = iPosition;
+        }
+
+        public void CallRotateBody()
+        {
+            _rotateBody();
         }
     }
 }

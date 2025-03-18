@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Managers
 {
@@ -8,12 +9,25 @@ namespace Managers
 
         public static GameManager Instance => _instance;
 
+        [Min(0f)] 
+        [SerializeField] private float _playerReceiveDamageCooldown;
+        
+        [Min(0f)] 
+        [SerializeField] private float _enemyReceiveDamageCooldown;
+        
+        [Min(0f)]
+        [SerializeField] private float _timeBetweenDamageTicks;
+        
+        [Min(0f)]
+        [SerializeField] private float _timeBetweenHealTicks;
+
+        [SerializeField] private uint _healPerDeath;
+
         private int GROUND_LAYER = 6;
         private int INTERACTABLE_LAYER = 7;
-        private int ALLY_LAYER = 8;
+        private int PLAYER_LAYER = 8;
         private int ENEMY_LAYER = 9;
-        private int ALLY_ATTACK_ZONE = 10;
-        private int ENEMY_ATTACK_ZONE = 11;
+        private int ENEMY_ATTACK_ZONE_LAYER = 10;
 
         private void Awake()
         {
@@ -29,43 +43,64 @@ namespace Managers
             Destroy(gameObject);
         }
 
-        public int GetInteractableLayer()
+        public float GetPlayerReceiveDamageCooldown()
         {
-            return INTERACTABLE_LAYER;
+            return _playerReceiveDamageCooldown;
         }
 
-        public int GetAllyLayer()
+        public float GetEnemyReceiveDamageCooldown()
         {
-            return ALLY_LAYER;
+            return _enemyReceiveDamageCooldown;
         }
 
-        public int GetEnemyLayer()
+        public float GetTimeBetweenDamageTicks()
         {
-            return ENEMY_LAYER;
+            return _timeBetweenDamageTicks;
+        }
+
+        public float GetTimeBetweenHealTicks()
+        {
+            return _timeBetweenHealTicks;
+        }
+
+        public uint GetHealPerDeath()
+        {
+            return _healPerDeath;
         }
 
         public int GetGroundLayer()
         {
-            return GROUND_LAYER;
+            return (int)Math.Pow(2, GROUND_LAYER);
         }
 
-        public int GetAllyAttackZoneLayer()
+        public int GetInteractableLayer()
         {
-            return ALLY_ATTACK_ZONE;
+            return (int)Math.Pow(2, INTERACTABLE_LAYER);
+        }
+
+        public int GetPlayerLayer()
+        {
+            return (int)Math.Pow(2, PLAYER_LAYER);
+        }
+
+        public int GetEnemyLayer()
+        {
+            return (int)Math.Pow(2, ENEMY_LAYER);
         }
 
         public int GetEnemyAttackZoneLayer()
         {
-            return ENEMY_ATTACK_ZONE;
+            return (int)Math.Pow(2, ENEMY_ATTACK_ZONE_LAYER);
         }
 
         public int GetRaycastLayers()
         {
-            return (int)(Mathf.Pow(2,GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetAllyLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
+            return GetInteractableLayer() + GetGroundLayer() + GetPlayerLayer() + GetEnemyLayer() + 1;
         }
+        
         public int GetRaycastLayersWithoutAlly()
         {
-            return (int)(Mathf.Pow(2, GetInteractableLayer()) + Mathf.Pow(2, GetGroundLayer()) + Mathf.Pow(2, GetEnemyLayer()) + 1);
+            return GetInteractableLayer() + GetGroundLayer() + GetEnemyLayer() + 1;
         }
     }
 }

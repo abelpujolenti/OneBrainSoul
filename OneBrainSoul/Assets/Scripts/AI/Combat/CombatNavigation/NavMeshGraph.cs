@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Interfaces.AI.Navigation;
 using MessagePack;
 using Serialize.NavMeshGraph;
 using UnityEngine;
@@ -8,9 +7,18 @@ using UnityEngine.AI;
 
 namespace AI.Combat.CombatNavigation
 {
-    public class NavMeshGraph : ICopy<NavMeshGraph>
+    public class NavMeshGraph
     {
         public Dictionary<uint, Node> nodes = new Dictionary<uint, Node>();
+
+        public NavMeshGraph()
+        {
+        }
+
+        private NavMeshGraph(Dictionary<uint, Node> nodes)
+        {
+            this.nodes = nodes;
+        }
 
         public void BuildGraph(NavMeshTriangulation navMeshTriangulation, float triangleSideLength)
         {
@@ -32,35 +40,40 @@ namespace AI.Combat.CombatNavigation
 
             Bounds bounds = mesh.bounds;
 
-            List<Vector3> planeVertices = new List<Vector3>();
+            List<RaycastHit[]> raycastHits = new List<RaycastHit[]>();
 
             for (float x = bounds.min.x; x < bounds.max.x; x += triangleSideLength)
             {
                 for (float z = bounds.min.z; z < bounds.max.z; z += triangleSideLength)
                 {
-                    planeVertices.Add(new Vector3(x, 0, z));
+                    raycastHits.Add(Physics.RaycastAll(new Vector3(x, bounds.max.y, z), Vector3.down));
                 }
             }
             
-            NavMeshHit hit;
+            NavMeshHit navMeshHit;
+
+            float radius = triangleSideLength;
             
-            foreach (Vector3 vertex in planeVertices)
+            foreach (RaycastHit[] hits in raycastHits)
             {
-                
-                if (!NavMesh.SamplePosition(vertex, out hit, Mathf.Infinity, NavMesh.AllAreas))
+                foreach (RaycastHit hit in hits)
                 {
-                    continue;
-                }
+                    if (!NavMesh.SamplePosition(hit.point, out navMeshHit, radius, NavMesh.AllAreas))
+                    {
+                        continue;
+                    }
 
-                uint index = (uint)nodes.Count;
+                    uint index = (uint)nodes.Count;
 
-                Node newNode = new Node
-                {
-                    index = index,
-                    position = hit.position
-                };
+                    Node newNode = new Node
+                    {
+                        index = index,
+                        position = navMeshHit.position,
+                        heightIndex = -1
+                    };
                     
-                nodes.Add(index, newNode);
+                    nodes.Add(index, newNode);
+                }
             }
 
             foreach (Node firstNode in nodes.Values)
@@ -77,7 +90,7 @@ namespace AI.Combat.CombatNavigation
                         continue;
                     }
                 
-                    if (NavMesh.Raycast(firstNode.position, secondNode.position, out hit, NavMesh.AllAreas))
+                    if (NavMesh.Raycast(firstNode.position, secondNode.position, out navMeshHit, NavMesh.AllAreas))
                     {
                         continue;
                     }
@@ -103,6 +116,7 @@ namespace AI.Combat.CombatNavigation
             {
                 fromNodeIndex = fromNode.index,
                 toNodeIndex = toNode.index,
+                isAJump = false,
                 cost = cost,
                 baseCostMultiplier = baseCostMultiplier
             });
@@ -111,6 +125,7 @@ namespace AI.Combat.CombatNavigation
             {
                 fromNodeIndex = toNode.index,
                 toNodeIndex = fromNode.index,
+                isAJump = false,
                 cost = cost,
                 baseCostMultiplier = baseCostMultiplier
             });
@@ -145,6 +160,11 @@ namespace AI.Combat.CombatNavigation
             {
                 foreach (Edge edge in node.edges)
                 {
+                    if (edge.isAJump)
+                    {
+                        continue;
+                    }
+                    
                     if (Vector3.Distance(nodes[edge.toNodeIndex].position, obstaclePosition) > radius)
                     {
                         continue;
@@ -154,7 +174,7 @@ namespace AI.Combat.CombatNavigation
                 }
             }
         }
-
+        
         public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
         {
             Vector3 closestNodePosition = GetClosestNode(obstaclePosition).position;
@@ -163,6 +183,11 @@ namespace AI.Combat.CombatNavigation
             {
                 foreach (Edge edge in node.edges)
                 {
+                    if (edge.isAJump)
+                    {
+                        continue;
+                    }
+                    
                     Node toNode = nodes[edge.toNodeIndex];
                     
                     if (Vector3.Distance(toNode.position, closestNodePosition) > radius)
@@ -190,23 +215,66 @@ namespace AI.Combat.CombatNavigation
             }
         }
 
-        public void ResetEdgesCost()
+        /*public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
         {
-            foreach (Node node in nodes.Values)
+            Node closestNode = GetClosestNode(obstaclePosition);
+            Vector3 closestNodePosition = closestNode.position;
+
+            Queue<Node> openSet = new Queue<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
+            
+            openSet.Enqueue(closestNode);
+
+            while (openSet.Count > 0)
             {
-                foreach (Edge edge in node.edges)
+                Node currentNode = openSet.Dequeue();
+
+                closedSet.Add(currentNode);
+
+                foreach (Edge edge in currentNode.edges)
                 {
-                    edge.ResetCost();
+                    Node toNode = nodes[edge.toNodeIndex];
+
+                    if (closedSet.Contains(toNode) || Vector3.Distance(toNode.position, closestNodePosition) > radius)
+                    {
+                        continue;
+                    }
+                    
+                    openSet.Enqueue(toNode);
+                    
+                    edge.MultiplyCost(weightMultiplier);
+
+                    foreach (Edge toNodeEdge in toNode.edges)
+                    {
+                        if (toNodeEdge.toNodeIndex != currentNode.index)
+                        {
+                            continue;
+                        }
+
+                        if (Vector3.Distance(nodes[toNodeEdge.toNodeIndex].position, closestNodePosition) < radius)
+                        {
+                            break;
+                        }
+                        
+                        toNodeEdge.MultiplyCost(weightMultiplier);
+                        
+                        break;
+                    }
                 }
             }
-        }
-
-        public void ResetNodesImportantInfo()
+        }*/
+        
+        public void ResetGraphImportantInfo()
         {
             foreach (Node node in nodes.Values)
             {
                 node.gCost = Mathf.Infinity;
                 node.parent = null;
+                
+                foreach (Edge edge in node.edges)
+                {
+                    edge.ResetCost();
+                }
             }
         }
 
@@ -220,7 +288,8 @@ namespace AI.Combat.CombatNavigation
                 SerializableNode serializableNode = new SerializableNode
                 {
                     index = node.index,
-                    position = node.position
+                    position = node.position,
+                    heightIndex = node.heightIndex
                 };
 
                 foreach (Edge edge in node.edges)
@@ -228,6 +297,7 @@ namespace AI.Combat.CombatNavigation
                     serializableNode.edges.Add(new SerializableEdge
                     {
                         toNodeIndex = edge.toNodeIndex,
+                        isAJump = edge.isAJump,
                         cost = edge.cost,
                         baseCostMultiplier = edge.baseCostMultiplier
                     });
@@ -269,7 +339,8 @@ namespace AI.Combat.CombatNavigation
                 Node node = new Node
                 {
                     index = index,
-                    position = serializableNode.position
+                    position = serializableNode.position,
+                    heightIndex = serializableNode.heightIndex
                 };
                 
                 nodes.Add(index, node);
@@ -287,6 +358,7 @@ namespace AI.Combat.CombatNavigation
                     {
                         fromNodeIndex = node.index,
                         toNodeIndex = toNode.index,
+                        isAJump = serializableEdge.isAJump,
                         distance = Vector3.Distance(nodes[node.index].position, nodes[toNode.index].position),
                         cost = serializableEdge.cost,
                         defaultCost = serializableEdge.cost,
@@ -301,19 +373,9 @@ namespace AI.Combat.CombatNavigation
             return Path.Combine(Application.streamingAssetsPath, "NavMeshGraph.json");
         }
 
-        public NavMeshGraph Copy()
+        public NavMeshGraph DeepCopy()
         {
-            Dictionary<uint, Node> copyNodes = new Dictionary<uint, Node>();
-            
-            foreach (Node node in nodes.Values)
-            {
-                copyNodes.Add(node.index, node);
-            }
-
-            return new NavMeshGraph
-            {
-                nodes = copyNodes
-            };
+            return new NavMeshGraph(nodes);
         }
     }
 }

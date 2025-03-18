@@ -5,10 +5,10 @@
 			<value>openselect</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
-			<destination>{34d8c880-bd5f-47ba-8f27-11a3d6696e3c}</destination>
+			<destination>{03ced9e9-3918-413d-ab7e-fbd6c718b651}</destination>
 		</relationship>
 		<relationship name="mixer">
 			<destination>{be147f38-be11-4f08-adea-77625f93c635}</destination>
@@ -56,7 +56,7 @@
 			<destination>{842e22f4-afb2-4839-87c5-62023f18837c}</destination>
 		</relationship>
 		<relationship name="output">
-			<destination>{00056e2a-17aa-43ac-a7a2-7af373ff9055}</destination>
+			<destination>{4a73dea8-5842-46c4-beeb-060476f70a11}</destination>
 		</relationship>
 	</object>
 	<object class="EventAutomatableProperties" id="{7a594564-147c-4558-bdb7-0fb771a1c797}" />
@@ -72,6 +72,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{d3fe7be7-dd20-469b-bf72-5e4649886ffc}">
+		<property name="volume">
+			<value>-3</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{49b4faab-4f8d-46cc-8b30-a99d40d7223a}</destination>
 		</relationship>
@@ -96,7 +99,6 @@
 	<object class="MixerBusEffectChain" id="{49b4faab-4f8d-46cc-8b30-a99d40d7223a}">
 		<relationship name="effects">
 			<destination>{3e15ef8b-a178-4ecd-960f-72589c5f898f}</destination>
-			<destination>{a60dfc47-70c9-4a5e-9c74-e17773ececdc}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{97c37262-e497-4db3-9955-44407239b549}" />
@@ -107,5 +109,4 @@
 	</object>
 	<object class="MixerBusFader" id="{3d5292b6-47d2-4ec5-b2ba-6055d7d28678}" />
 	<object class="MixerBusFader" id="{3e15ef8b-a178-4ecd-960f-72589c5f898f}" />
-	<object class="SpatialiserEffect" id="{a60dfc47-70c9-4a5e-9c74-e17773ececdc}" />
 </objects>

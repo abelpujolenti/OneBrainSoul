@@ -1,5 +1,7 @@
 using System;
-using ECS.Entities.AI.Combat;
+using System.Collections.Generic;
+using AI.Navigation;
+using ECS.Entities;
 
 namespace Managers
 {
@@ -18,6 +20,7 @@ namespace Managers
         public static Action StopMovingBackwards;
         public static Action StopMovingRight;
         public static Action ReleaseJump;
+        public static Action ReleaseEscape;
         
         #endregion
 
@@ -40,8 +43,16 @@ namespace Managers
 
         #endregion
 
-        public static Action<AIAlly> OnSwitch;
-        public static Action<uint> OnAgentDefeated;
+        public static Action OnDefeatEnemy;
+        public static Action<EntityType, uint> OnAgentDefeated;
+
+        #region Navigation
+
+        public static Action<uint> UpdatePositionAndDestination;
+        public static Action<uint> UpdateAgentPath;
+        public static Func<List<DynamicObstacleThreadSafe>> OnUpdateDynamicObstacle;
+
+        #endregion
 
     }
 }

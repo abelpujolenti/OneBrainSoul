@@ -1,36 +1,56 @@
+using System.Collections;
+using Player.Movement;
 using UnityEngine;
 
-public class DashAbility : MonoBehaviour
+namespace Player.Abilities
 {
-    [SerializeField] int airDashes = 1;
-    PlayerCharacterController player;
-    RaycastHit hit;
-    int timesDashed = 0;
-
-    private void Start()
+    public class DashAbility : MonoBehaviour
     {
-        player = GetComponent<PlayerCharacterController>();
+        [SerializeField] private int _airDashes = 1;
+        
+        private RaycastHit _hit;
+        private int _timesDashed = 0;
 
-    }
-    private void Update()
-    {
-        if (!player.braincell) return;
-
-        if (player.onGround)
+        public void CheckDash(PlayerCharacterController playerCharacterController, bool ability1Input)
         {
-            timesDashed = 0;
+            if (ability1Input && 
+                playerCharacterController.GetAbility1Time() == 0f && 
+                playerCharacterController.GetMovementHandler() is not HookMovementHandler && 
+                _timesDashed < _airDashes &&
+                playerCharacterController.GetCharges() > 0
+                )
+            {
+                Dash(playerCharacterController);
+            }
         }
 
-        if (player.ability1Input && player.ability1Time == 0f && timesDashed < airDashes)
+        public void Dash(PlayerCharacterController player)
         {
-            Quaternion r = player.orientation.rotation;
-            Vector3 dir = r * new Vector3(player.xInput, 0f, player.yInput).normalized;
-            dir = dir == Vector3.zero ? new Vector3(player.cam.transform.forward.x, 0f, player.cam.transform.forward.z).normalized : dir;
-            player.movementHandler = new DashMovementHandler(player, dir);
-            player.ability1Time = player.ability1Cooldown;
+            Vector3 forward = player.GetCamera().transform.forward;
+            
+            Quaternion r = player.GetOrientation().rotation;
+            Vector3 dir = r * new Vector3(player.GetXInput(), 0f, player.GetYInput()).normalized;
+            dir = dir == Vector3.zero ? new Vector3(forward.x, 0f, forward.z).normalized : dir;
+            player.ChangeMovementHandlerToDash(dir);
+            player.ResetAbility1Cooldown();
 
-            timesDashed++;
+            _timesDashed++;
+            player.ConsumeCharge();
+
             AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
+            StartCoroutine(AnimationCoroutine(player));
+            player.GetAnimator().SetBool("Dash", true);
+        }
+
+        private IEnumerator AnimationCoroutine(PlayerCharacterController player)
+        {
+            yield return new WaitForSeconds(player.GetAnimator().GetCurrentAnimatorStateInfo(0).length);
+            player.GetAnimator().SetBool("Dash", false);
+        }
+
+        public void ResetTimesDashed()
+        {
+            _timesDashed = 0;
         }
     }
 }

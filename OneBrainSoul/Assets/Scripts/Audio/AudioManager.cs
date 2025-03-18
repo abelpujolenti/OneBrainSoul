@@ -1,9 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using FMODUnity;
 using FMOD.Studio;
-using System;
+using FMODUnity;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class AudioManager : MonoBehaviour
 {
@@ -48,44 +49,64 @@ public class AudioManager : MonoBehaviour
         eventEmitters = new List<StudioEventEmitter>();
 
         masterBus = RuntimeManager.GetBus("bus:/");
-        /*musicBus = RuntimeManager.GetBus("bus:/Music");
+        musicBus = RuntimeManager.GetBus("bus:/Music");
         ambienceBus = RuntimeManager.GetBus("bus:/Ambience");
-        sfxBus = RuntimeManager.GetBus("bus:/SFX");*/
+        sfxBus = RuntimeManager.GetBus("bus:/SFX");
     }
 
     private void Start()
     {
-        /*InitializeAmbience();
-        InitializeMusic();
-        InitializeSnapshots();*/
+        //InitializeMusic();
+        //InitializeAmbience();
+        /*InitializeSnapshots();*/
+
+        SceneManager.sceneLoaded += OnSceneLoad;
+        OnSceneLoad(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+
+    private void OnSceneLoad(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "MainMenu")
+        {
+            InitializeAmbience();
+        }
+        else if (s.name == "ControllerTest")
+        {
+            InitializeMusic();
+        }
     }
 
     private void Update()
     {
         masterBus.setVolume(masterVolume);
-        /*musicBus.setVolume(musicVolume);
+        musicBus.setVolume(musicVolume);
         ambienceBus.setVolume(ambienceVolume);
-        sfxBus.setVolume(SFXVolume);*/
-    }
-/*
-    private void InitializeAmbience()
-    {
-        ambienceEventInstance = CreateInstance(FMODEvents.instance.ambience);
-        ambienceEventInstance.start();
-        ambienceAdditionsEventInstance = CreateInstance(FMODEvents.instance.ambienceAdditions);
-        ambienceAdditionsEventInstance.start();
+        sfxBus.setVolume(SFXVolume);
     }
 
+    public void InitializeAmbience()
+    {
+        PLAYBACK_STATE s;
+        ambienceEventInstance.getPlaybackState(out s);
+        if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
+        ambienceEventInstance = CreateInstance(FMODEvents.instance.ambient);
+        ambienceEventInstance.start();
+    }
+/*
     private void InitializeSnapshots()
     {
         insideSnapshotEventInstance = CreateInstance(FMODEvents.instance.insideSnapshot);
         insideSnapshotEventInstance.start();
-    }
-    private void InitializeMusic()
+    }*/
+    public void InitializeMusic()
     {
+        PLAYBACK_STATE s;
+        musicEventInstance.getPlaybackState(out s);
+        if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
+        Debug.Log("MUSICA---------------");
         musicEventInstance = CreateInstance(FMODEvents.instance.music);
         musicEventInstance.start();
-    }*/
+    }
 
     public void SetAmbienceParameter(string parameterName, float parameterValue)
     {
@@ -99,6 +120,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayOneShot(EventReference sound, Vector3 worldPos)
     {
+        if (sound.IsNull) return;
         RuntimeManager.PlayOneShot(sound, worldPos);
     }
 
@@ -122,7 +144,7 @@ public class AudioManager : MonoBehaviour
         // stop and release any created instances
         foreach (EventInstance eventInstance in eventInstances)
         {
-            eventInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            eventInstance.stop(STOP_MODE.IMMEDIATE);
             eventInstance.release();
         }
         // stop all of the event emitters, because if we don't they may hang around in other scenes

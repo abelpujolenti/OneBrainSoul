@@ -1,42 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using Interfaces.AI.Navigation;
+using Managers;
 using UnityEngine;
 
 namespace AI.Navigation
 {
     public class AStarPath : IPosition
     {
-        private NavMeshGraph _navMeshGraph;
+        public NavMeshGraph navMeshGraph;
         public IPosition destinationPosition;
         public Vector3 deviationVector;
         public List<Node> path = new List<Node>();
-        public List<DynamicObstacle> dynamicObstacles = new List<DynamicObstacle>();
+
+        private Action<Vector3, float> _onUpdateDynamicObstacle;
         
         public Vector3 origin;
         public Vector3 destination;
-        public List<Vector3> dynamicObstaclesPositions = new List<Vector3>();
 
-        private Mutex _mutex = new Mutex();
+        private Action<bool> _hasReachDestinationAction;
 
-        public AStarPath(IPosition destinationPosition)
+        public AStarPath(IPosition destinationPosition, NavMeshGraph navMeshGraph)
         {
-            _navMeshGraph = new NavMeshGraph();
-            _navMeshGraph.LoadGraph();
             this.destinationPosition = destinationPosition;
+            this.navMeshGraph = navMeshGraph;
         }
 
         public void UpdateNavMeshGraphObstacles()
         {
-            LockMutex();
-            
-            for (int i = 0; i < dynamicObstaclesPositions.Count; i++)
+            List<DynamicObstacleThreadSafe> dynamicObstacleAndRadius = EventsManager.OnUpdateDynamicObstacle();
+
+            foreach (DynamicObstacleThreadSafe positionAndRadius in dynamicObstacleAndRadius)
             {
-                _navMeshGraph.UpdateEdgeWeights(dynamicObstaclesPositions[i], dynamicObstacles[i].radius, 100);
+                navMeshGraph.UpdateEdgeWeights(positionAndRadius.GetPosition(), positionAndRadius.GetRadius(), 100);
             }
-            
-            ReleaseMutex();
         }
 
         public Vector3 GetPosition()
@@ -44,19 +42,19 @@ namespace AI.Navigation
             return destinationPosition.GetPosition();
         }
 
-        public NavMeshGraph GetNavMeshGraph()
+        public void SetOnReachDestination(Action<bool> hasReachDestinationAction)
         {
-            return _navMeshGraph;
+            _hasReachDestinationAction = hasReachDestinationAction;
         }
 
-        public void LockMutex()
+        public void OnSetNewDestination()
         {
-            _mutex.WaitOne();
+            _hasReachDestinationAction(false);
         }
 
-        public void ReleaseMutex()
+        public void OnReachDestination()
         {
-            _mutex.ReleaseMutex();
+            _hasReachDestinationAction(true);
         }
     }
 }
