@@ -42,6 +42,8 @@ namespace ECS.Entities.AI.Combat
 
         private GameObject _healEffect;
 
+        private float _damageEffectDuration = 0.4f;
+
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
 
@@ -335,7 +337,7 @@ namespace ECS.Entities.AI.Combat
             
             DamageEffect(hitPosition);
 
-            StartCoroutine(DamageEffectCoroutine(.4f));
+            StartCoroutine(DamageEffectCoroutine(_damageEffectDuration));
             
             SetHealth(_context.GetHealth() - damageValue);
 
@@ -345,8 +347,25 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
+            StartCoroutine(DelayDeath());
+        }
+
+        private IEnumerator DelayDeath()
+        {
+            float timer = 0;
+            
+            PreDeath();
+
+            while (timer < _damageEffectDuration)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
             Destroy(gameObject);
         }
+
+        protected abstract void PreDeath();
 
         private IEnumerator DamageEffectCoroutine(float duration)
         {

@@ -325,6 +325,12 @@ namespace ECS.Entities.AI.Combat
             base.OnReceiveDamage(damageValue, hitPosition, sourcePosition);
         }
 
+        protected override void PreDeath()
+        {
+            base.PreDeath();
+            _update = () => { };
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
