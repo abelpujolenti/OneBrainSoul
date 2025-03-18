@@ -1,5 +1,6 @@
 using Player.Movement;
 using UnityEngine;
+using System.Collections;
 
 namespace Player.Abilities
 {
@@ -23,20 +24,28 @@ namespace Player.Abilities
             }
         }
 
-        public void Dash(PlayerCharacterController playerCharacterController)
+        public void Dash(PlayerCharacterController player)
         {
-            Vector3 forward = playerCharacterController.GetCamera().transform.forward;
+            Vector3 forward = player.GetCamera().transform.forward;
             
-            Quaternion r = playerCharacterController.GetOrientation().rotation;
-            Vector3 dir = r * new Vector3(playerCharacterController.GetXInput(), 0f, playerCharacterController.GetYInput()).normalized;
+            Quaternion r = player.GetOrientation().rotation;
+            Vector3 dir = r * new Vector3(player.GetXInput(), 0f, player.GetYInput()).normalized;
             dir = dir == Vector3.zero ? new Vector3(forward.x, 0f, forward.z).normalized : dir;
-            playerCharacterController.ChangeMovementHandlerToDash(dir);
-            playerCharacterController.ResetAbility1Cooldown();
+            player.ChangeMovementHandlerToDash(dir);
+            player.ResetAbility1Cooldown();
 
             _timesDashed++;
-            playerCharacterController.ConsumeCharge();
+            player.ConsumeCharge();
 
             AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
+            StartCoroutine(AnimationCoroutine(player));
+            player.GetAnimator().SetBool("Dash", true);
+        }
+
+        private IEnumerator AnimationCoroutine(PlayerCharacterController player)
+        {
+            yield return new WaitForSeconds(player.GetAnimator().GetCurrentAnimatorStateInfo(0).length);
+            player.GetAnimator().SetBool("Dash", false);
         }
 
         public void ResetTimesDashed()

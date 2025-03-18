@@ -1188,6 +1188,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 8142020339586624469}
   _capsuleCollider: {fileID: 4948597310882790837}
   _camera: {fileID: 7644145240796908984}
+  _animator: {fileID: 1756432987455679197}
   _hand: {fileID: 301469152948751642}
   _display: {fileID: 4680270387884578829}
   _uiCanvas: {fileID: 4986101136898283551}
@@ -1225,7 +1226,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _weapons:
-  - {fileID: 4956135247688607953}
+  - {fileID: 5293005351795719311}
   _transitionDuration: 0.1
 --- !u!114 &8022381131504467490
 MonoBehaviour:
@@ -3459,6 +3460,12 @@ PrefabInstance:
       addedObject: {fileID: 7418498761765587192}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c46ccde48c8c2a04095c4af34ffc1b42, type: 3}
+--- !u!95 &1756432987455679197 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: c46ccde48c8c2a04095c4af34ffc1b42,
+    type: 3}
+  m_PrefabInstance: {fileID: 5263177268029708108}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5656581242266529959 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c46ccde48c8c2a04095c4af34ffc1b42,

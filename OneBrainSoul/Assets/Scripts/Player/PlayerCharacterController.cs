@@ -44,6 +44,7 @@ namespace Player
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private CapsuleCollider _capsuleCollider;
         [SerializeField] private FirstPersonCamera _camera;
+        [SerializeField] private Animator _animator;
         
         private bool _onGround;
         private float _xInput;
@@ -398,6 +399,11 @@ namespace Player
         public FirstPersonCamera GetCamera()
         {
             return _camera;
+        }
+
+        public Animator GetAnimator()
+        {
+            return _animator;
         }
 
         public float GetXInput()
