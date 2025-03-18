@@ -41,6 +41,8 @@ namespace ECS.Entities.AI.Combat
 
         protected int _raysTargetsLayerMask;
 
+        private Action _onEnableAction = () => { };
+
         protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, 
             EntityType entityType, EntityType targetEntities)
         {
@@ -49,9 +51,15 @@ namespace ECS.Entities.AI.Combat
             _raysTargetsLayerMask = GameManager.Instance.GetEnemyLayer() + GameManager.Instance.GetGroundLayer() + 1;
             
             _navMeshAgent.speed = _navMeshAgentSpecs.movementSpeed;
-            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent(), RotateBody);
-            
-            ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
+            _navMeshAgentComponent = new NavMeshAgentComponent(_navMeshAgentSpecs, _navMeshAgent, GetTransformComponent(), 
+                RotateBody, ECSNavigationManager.Instance.SetupNavMeshAgentEntity(GetAgentID()));
+
+            _onEnableAction = () =>
+            {
+                ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
+            };
+
+            _onEnableAction();
         }
 
         #region Steering
@@ -243,10 +251,25 @@ namespace ECS.Entities.AI.Combat
             //TODO SLOW FREE MOBILITY
         }
 
+        protected virtual void OnEnable()
+        {
+            _onEnableAction();
+        }
+
+        protected virtual void OnDisable()
+        {
+            RemoveNavMeshEntity();
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID(), true);
+            RemoveNavMeshEntity();
+        }
+
+        private void RemoveNavMeshEntity()
+        {
+            ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
         }
 
         protected override void OnDrawGizmos()
