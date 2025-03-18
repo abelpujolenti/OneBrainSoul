@@ -7,6 +7,8 @@ public class FMODEvents : MonoBehaviour
 
     [field: Header("Music")]
     [field: SerializeField] public EventReference music { get; private set; }
+    [field: Header("Ambient")]
+    [field: SerializeField] public EventReference ambient { get; private set; }
 
     [field: Header("SFX")]
     [field: SerializeField] public EventReference heal { get; private set; }
