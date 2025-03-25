@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 434564530538246798}
   - component: {fileID: 1730552683290138344}
   - component: {fileID: 1852244035418610840}
-  - component: {fileID: 8801970086914897586}
+  - component: {fileID: 1757776393721512870}
   m_Layer: 6
   m_Name: 6x6_wall_bricks
   m_TagString: Untagged
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8801970086914897586
-MeshCollider:
+--- !u!65 &1757776393721512870
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,7 +102,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2432090755550338912, guid: 8750ccaf7ca7d634d8015cad28c8901a, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 6, y: 6, z: 0.06}
+  m_Center: {x: -3, y: 3, z: 0.03}

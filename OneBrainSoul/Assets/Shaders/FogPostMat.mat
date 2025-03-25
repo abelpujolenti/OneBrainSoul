@@ -42,10 +42,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AdditiveDistance: 109
+    - _AdditiveDistance: 100
     - _AdditiveFactor: 0.15
     - _AdditivePower: 4
-    - _Distance: 100
+    - _Distance: 90
     - _EdgeWeight: 0.2
     - _Fade: 0.69
     - _FogFactor: 0.283

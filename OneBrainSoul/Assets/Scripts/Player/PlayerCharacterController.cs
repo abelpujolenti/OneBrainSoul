@@ -89,6 +89,7 @@ namespace Player
         [SerializeField] private ParticleSystem _trailParticle;
         [SerializeField] private ParticleSystem _smashParticle;
         [SerializeField] private Transform _handBone;
+        [SerializeField] private Transform[] _abilityRings;
         [SerializeField] HookUI _hookUI;
 
         [Range(1, 7)]
@@ -532,6 +533,7 @@ namespace Player
             _isDashUnlocked = true;
             _hookCanvas.gameObject.SetActive(true);
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Shift]</b> <color=white> <size=40>Dash", 0.5f, _dashMovementHandler));
+            UnlockRing(0);
         }
 
         public void UnlockCharge()
@@ -545,6 +547,12 @@ namespace Player
             _isHookUnlocked = true;
             _hookCanvas.gameObject.SetActive(true);
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Right Click]</b> <color=white> <size=40>Hook", 0.5f, _hookMovementHandler));
+            UnlockRing(1);
+        }
+
+        private void UnlockRing(int index)
+        {
+            _abilityRings[index].gameObject.SetActive(true);
         }
 
         private IEnumerator SetControlText(string text, float dur = 0.5f, IMovementHandler movementHandler = null)

@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 8587158819780960085}
   - component: {fileID: 2108375507248900147}
   - component: {fileID: 4651895406336567242}
-  - component: {fileID: 8172516463746151836}
+  - component: {fileID: -8544242509938450744}
+  - component: {fileID: -1626629837374600825}
   m_Layer: 6
   m_Name: 6x3_bordillo
   m_TagString: Untagged
@@ -84,8 +85,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8172516463746151836
-MeshCollider:
+--- !u!65 &-8544242509938450744
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496456359145076431}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5, y: 1, z: 6}
+  m_Center: {x: -0.25, y: 2.5, z: -3}
+--- !u!65 &-1626629837374600825
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,7 +124,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2432090755550338912, guid: 84dd7e8d96bdc2946a00f4015f2972ff, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 0.005, y: 3, z: 6}
+  m_Center: {x: -0.0025, y: 1.5, z: -3}

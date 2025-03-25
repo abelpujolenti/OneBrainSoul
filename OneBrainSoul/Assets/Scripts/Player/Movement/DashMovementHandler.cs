@@ -56,22 +56,6 @@ namespace Player.Movement
             rigidbody.AddForce(-horizontalVelocity * (player.IsOnTheGround() ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
 
             player.SetContactDamage(contactDamageDuration, damage);
-
-            /*RaycastHit hit;
-            CapsuleCollider playerCollider = player.GetCapsuleCollider();
-            Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * (-playerCollider.height * 0.5f);
-            Vector3 p2 = p1 + Vector3.up * playerCollider.height;
-            if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.GetRigidbody().velocity.normalized, out hit,
-                    player.GetRigidbody().velocity.magnitude * 0.1f, GameManager.Instance.GetRaycastLayersWithoutAlly(),
-                    QueryTriggerInteraction.Ignore))
-            {
-                AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
-                if (entity != null)
-                {
-                    entity.OnReceiveDamage(damage, hit.point, player.transform.position);
-                }
-                Exit(player);
-            }*/
         }
 
         private void Exit(PlayerCharacterController player)

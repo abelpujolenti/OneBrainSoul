@@ -22,7 +22,9 @@ namespace Player.Movement
         public static uint hookDamage = 1;
         public static uint smashDamage = 1;
 
-        public static float bounceStrength = 8f;
+        public static float slamBounceStrength = 8f;
+        public static float bounceStrength = 100f;
+        public static float bounceVerticalRatio = 1f;
 
         public static float delay = 0.2f;
         public static float delayHitImpact = 0.025f;
@@ -173,17 +175,25 @@ namespace Player.Movement
                     player.GetRigidbody().velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayersWithoutAlly(), 
                     QueryTriggerInteraction.Ignore))
             {
+                AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
+
                 if (smash)
                 {
                     Smash(player, hit);
                 }
-                else
+                else if (entity != null)
                 {
-                    AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
-                    if (entity != null)
-                    {
-                        entity.OnReceiveDamage(hookDamage, hit.point, player.transform.position);
-                    }
+                    entity.OnReceiveDamage(hookDamage, hit.point, player.transform.position);
+
+                    player.GetCamera().ScreenShake(.25f, 1.3f);
+                    player.GetRigidbody().velocity = Vector3.zero;
+                    player.GetRigidbody().AddForce(
+                    (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
+                    new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
+                        (bounceStrength * (1.4f)), ForceMode.Impulse);
+
+                    Exit(player, true);
+                    return;
                 }
 
                 Exit(player);
@@ -201,7 +211,7 @@ namespace Player.Movement
             }
         }
 
-        private void Exit(PlayerCharacterController player)
+        private void Exit(PlayerCharacterController player, bool forceAirborne = false)
         {
             line.enabled = false;
             hookParticleTransform.gameObject.SetActive(false);
@@ -210,7 +220,7 @@ namespace Player.Movement
             player.GetAnimator().speed = 1f;
             player.GetAnimator().SetBool("Hook", false);
 
-            if (!player.IsOnTheGround())
+            if (!player.IsOnTheGround() || forceAirborne)
             {
                 player.ChangeMovementHandlerToAirborne();
             }
@@ -268,7 +278,7 @@ namespace Player.Movement
             player.GetRigidbody().velocity = Vector3.zero;
             player.GetRigidbody().AddForce(
                 (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized *
-                bounceStrength * (damaged ? 1.4f : 1f)), ForceMode.VelocityChange);
+                slamBounceStrength * (damaged ? 1.4f : 1f)), ForceMode.VelocityChange);
         }
 
         public bool ShouldGravityApply(PlayerCharacterController player)

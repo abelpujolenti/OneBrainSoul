@@ -43,10 +43,10 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 1
     doesApplyAForce: 1
-    forceDirection: {x: 0, y: 1, z: 2}
-    forceStrength: 1200
-    doesForceComesFromCenterOfTheArea: 1
-    abilityEffectForceType: 0
+    forceDirection: {x: 0, y: -0.2, z: 1}
+    forceStrength: 300
+    doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 1
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -59,10 +59,10 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
-    forceDirection: {x: 0, y: 1, z: 2}
-    forceStrength: 1200
-    doesForceComesFromCenterOfTheArea: 1
-    abilityEffectForceType: 0
+    forceDirection: {x: 0, y: -0.2, z: 1}
+    forceStrength: 3
+    doesForceComesFromCenterOfTheArea: 0
+    abilityEffectForceType: 1
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
-    relativePositionToCaster: {x: 0, y: 0, z: 4}
+    relativePositionToCaster: {x: 0, y: 0.7, z: 4}
     duration: 3
     direction: {x: 0, y: 0, z: 1}
     height: 10
@@ -179,7 +179,7 @@ MonoBehaviour:
   abilityMovement:
     makesBezierCurves: 0
     positions:
-    - {x: 0, y: 0, z: 50}
+    - {x: 0, y: 0.7, z: 50}
     timeBetweenPositions:
     - 3
   doesItTriggerOnTriggerEnter: 1

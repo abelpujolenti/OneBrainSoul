@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4260295225202412613}
   - component: {fileID: 9063046516760986269}
   - component: {fileID: 3559672595539543184}
-  - component: {fileID: 7705287502893704855}
+  - component: {fileID: -7233458696622363309}
   m_Layer: 6
   m_Name: 3x12_wall_column
   m_TagString: Untagged
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7705287502893704855
-MeshCollider:
+--- !u!65 &-7233458696622363309
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,7 +102,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2432090755550338912, guid: 281dd759ce46baf4988d2c7adec28dfa, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 3, y: 12, z: 0.031931}
+  m_Center: {x: -1.5, y: 6, z: 0.0159655}
