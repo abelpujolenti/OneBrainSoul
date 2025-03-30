@@ -18,8 +18,6 @@ namespace ECS.Entities.AI.Combat
     {
         [SerializeField] private TrifaceProperties _trifaceProperties;
 
-        [SerializeField] private bool _itGoesOnAutomatic;
-
         private GameObject _endEffector;
 
         [SerializeField] private AbilityDetectionArea _slamAbilityDetectionArea;
@@ -28,8 +26,6 @@ namespace ECS.Entities.AI.Combat
         private Func<bool> _cancelSlamFunc = () => true;
 
         private float _rotationSpeedWhenCastingSlam;
-
-        private Action _update = () => { };
 
         private void Start()
         {
@@ -53,15 +49,6 @@ namespace ECS.Entities.AI.Combat
             CombatManager.Instance.AddEnemy(this);
 
             _startPosition = transform.position;
-
-            if (_itGoesOnAutomatic)
-            {
-                _slamAbility.GetCast().ResetCastTime();
-                _update = () => OnAutomatic();
-                return;
-            }
-
-            _update = () => AILoop();
         }
 
         protected override void InitiateDictionaries()
@@ -95,22 +82,7 @@ namespace ECS.Entities.AI.Combat
 
         #region AI LOOP
 
-        private void Update()
-        {
-            _update();
-        }
-
-        private void OnAutomatic()
-        {
-            if (_slamAbility.GetCast().IsOnCooldown())
-            {
-                return;
-            }
-                
-            Slam();
-        }
-
-        private void AILoop()
+        protected override void AILoop()
         {
             UpdateSightedTargetsInsideCombatArea();
             
@@ -154,8 +126,8 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
         }
 
-        
-        //TODO ERASE
+
+        //TODO ERASE WHEN PATROLLING
         private Vector3 _startPosition;
         //
 
@@ -313,21 +285,6 @@ namespace ECS.Entities.AI.Combat
         #endregion
 
         #endregion
-
-        public override void OnReceiveDamage(uint damageValue, Vector3 hitPosition, Vector3 sourcePosition)
-        {
-            if (_itGoesOnAutomatic)
-            {
-                return;
-            }
-            base.OnReceiveDamage(damageValue, hitPosition, sourcePosition);
-        }
-
-        protected override void PreDeath()
-        {
-            base.PreDeath();
-            _update = () => { };
-        }
 
         protected override void OnDestroy()
         {
