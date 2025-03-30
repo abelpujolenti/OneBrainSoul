@@ -18,8 +18,6 @@ namespace ECS.Entities.AI.Combat
     public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>
     {
         [SerializeField] private LongArmsProperties _longArmsProperties;
-        [SerializeField] private bool _itGoesOnAutomatic;
-        [SerializeField] private Vector3 _directionToShoot;
 
         [SerializeField] private AbilityDetectionArea _throwRockAbilityDetectionArea;
         private IProjectileAbility _throwRockAbility;
@@ -50,8 +48,6 @@ namespace ECS.Entities.AI.Combat
         private bool _isSettingNewDirectionToRotate;
 
         private Func<uint> _longArmsBaseIdFunc;
-
-        private Action _update = () => { };
         
         private void Start()
         {
@@ -101,16 +97,6 @@ namespace ECS.Entities.AI.Combat
 
             _currentBodyActive = _bodyIdle;
             _currentHeadActive = _headIdle;
-
-            if (_itGoesOnAutomatic)
-            {
-                _throwRockAbility.GoesOnAutomatic(true, transform.rotation * _directionToShoot);
-                _throwRockAbility.GetCast().ResetCastTime();
-                _update = () => OnAutomatic();
-                return;
-            }
-
-            _update = () => AILoop();
         }
 
         protected override void InitiateDictionaries()
@@ -152,21 +138,6 @@ namespace ECS.Entities.AI.Combat
         #region AI LOOP
 
         private void Update()
-        {
-            _update();
-        }
-
-        private void OnAutomatic()
-        {
-            if (_throwRockAbility.GetCast().IsOnCooldown())
-            {
-                return;
-            }
-                
-            ThrowRock();
-        }
-
-        private void AILoop()
         {
             UpdateSightedTargetsInsideCombatArea();
             
@@ -638,12 +609,6 @@ namespace ECS.Entities.AI.Combat
         public uint CallLongArmsBaseIdFunc()
         {
             return _longArmsBaseIdFunc();
-        }
-
-        protected override void PreDeath()
-        {
-            base.PreDeath();
-            _update = () => { };
         }
 
         protected override void OnDestroy()

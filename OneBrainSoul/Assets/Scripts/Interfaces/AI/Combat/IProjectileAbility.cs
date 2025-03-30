@@ -7,8 +7,6 @@ namespace Interfaces.AI.Combat
     {
         public void Activate();
 
-        public void GoesOnAutomatic(bool goesOnAutomatic, Vector3 direction);
-
         public AbilityCast GetCast();
 
         public bool FIREEEEEEEEEEEEEE();
