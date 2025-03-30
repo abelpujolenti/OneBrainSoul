@@ -8,7 +8,6 @@
         ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE,
         THROW_ROCK,
         CLAP_ABOVE,
-        FLEE,
         ENUM_SIZE
     }
 }

@@ -10,9 +10,8 @@ namespace ECS.Entities
         GHOST = 1 << 1,
         TRIFACE = 1 << 2,
         LONG_ARMS = 1 << 3,
-        LONG_ARMS_BASE = 1 << 4,
-        SENDATU = 1 << 5,
-        ENUM_SIZE = 1 << 6,
+        SENDATU = 1 << 4,
+        ENUM_SIZE = 1 << 5,
         ALL = ~0
     }
 }

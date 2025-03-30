@@ -236,11 +236,6 @@ namespace Managers
                 abilityTargets.Add(EntityType.LONG_ARMS);
             }
             
-            if ((targets & EntityType.LONG_ARMS_BASE) != 0)
-            {
-                abilityTargets.Add(EntityType.LONG_ARMS_BASE);
-            }
-            
             if ((targets & EntityType.SENDATU) != 0)
             {
                 abilityTargets.Add(EntityType.SENDATU);
