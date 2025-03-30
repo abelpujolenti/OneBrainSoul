@@ -16,8 +16,7 @@ namespace AI.Combat.Enemy.LongArms
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.THROW_ROCK),
-                new AICombatAgentAction<LongArmsAction>(LongArmsAction.CLAP_ABOVE),
-                new AICombatAgentAction<LongArmsAction>(LongArmsAction.FLEE)
+                new AICombatAgentAction<LongArmsAction>(LongArmsAction.CLAP_ABOVE)
             };
 
             actions[0].utilityScore = CalculateObservingUtility(context);
@@ -25,7 +24,6 @@ namespace AI.Combat.Enemy.LongArms
             actions[2].utilityScore = CalculateAcquireNewTargetForClapAboveUtility(context);
             actions[3].utilityScore = CalculateThrowRockUtility(context);
             actions[4].utilityScore = CalculateClapAboveUtility(context);
-            actions[5].utilityScore = CalculateFleeUtility(context);
 
             uint index = 0;
 
@@ -79,17 +77,6 @@ namespace AI.Combat.Enemy.LongArms
             }
 
             return Convert.ToInt16(longArmsClapAboveUtility.IsClapAboveTargetInsideDetectionArea()) * 0.9f;
-        }
-        
-        private static float CalculateFleeUtility(ILongArmsFleeUtility longArmsFleeUtility)  
-        {
-            if (longArmsFleeUtility.GetLongArmsBasesFree() == 0)
-            {
-                return 0;
-            }
-
-            return Convert.ToInt16(longArmsFleeUtility.GetDistanceToClosestTargetToFleeFrom() <=
-                                   longArmsFleeUtility.GetRadiusToFlee()) * 0.8f;
         }
     }
 }
