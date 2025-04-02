@@ -18,8 +18,6 @@ namespace ECS.Entities.AI.Combat
     public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>
     {
         [SerializeField] private LongArmsProperties _longArmsProperties;
-        [SerializeField] private bool _itGoesOnAutomatic;
-        [SerializeField] private Vector3 _directionToShoot;
 
         [SerializeField] private AbilityDetectionArea _throwRockAbilityDetectionArea;
         private IProjectileAbility _throwRockAbility;
@@ -49,10 +47,7 @@ namespace ECS.Entities.AI.Combat
 
         private bool _isSettingNewDirectionToRotate;
 
-        private Action _onFlee = () => { };
         private Func<uint> _longArmsBaseIdFunc;
-
-        private Action _update = () => { };
         
         private void Start()
         {
@@ -85,10 +80,6 @@ namespace ECS.Entities.AI.Combat
                 _longArmsProperties.radiusToFlee);
             
             SetDirectionToRotateBody(transform.forward);
-            
-            LongArmsBase longArmsBase = transform.parent.GetComponent<LongArmsBase>(); 
-            
-            longArmsBase.SetLongArms(this);
 
             _throwRockAbilityDetectionArea.Setup(_longArmsProperties.throwRockAbilityProperties.abilityTarget,
                 _context.AddTargetInsideThrowRockDetectionArea, _context.RemoveTargetInsideThrowRockDetectionArea);
@@ -106,16 +97,6 @@ namespace ECS.Entities.AI.Combat
 
             _currentBodyActive = _bodyIdle;
             _currentHeadActive = _headIdle;
-
-            if (_itGoesOnAutomatic)
-            {
-                _throwRockAbility.GoesOnAutomatic(true, transform.rotation * _directionToShoot);
-                _throwRockAbility.GetCast().ResetCastTime();
-                _update = () => OnAutomatic();
-                return;
-            }
-
-            _update = () => AILoop();
         }
 
         protected override void InitiateDictionaries()
@@ -127,8 +108,7 @@ namespace ECS.Entities.AI.Combat
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK , AcquireNewTargetForThrowRock },
                 { LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE , AcquireNewTargetForClapAbove },
                 { LongArmsAction.THROW_ROCK , ThrowRock },
-                { LongArmsAction.CLAP_ABOVE , ClapAbove },
-                { LongArmsAction.FLEE , Flee }
+                { LongArmsAction.CLAP_ABOVE , ClapAbove }
             };
         }
         
@@ -158,21 +138,6 @@ namespace ECS.Entities.AI.Combat
         #region AI LOOP
 
         private void Update()
-        {
-            _update();
-        }
-
-        private void OnAutomatic()
-        {
-            if (_throwRockAbility.GetCast().IsOnCooldown())
-            {
-                return;
-            }
-                
-            ThrowRock();
-        }
-
-        private void AILoop()
         {
             UpdateSightedTargetsInsideCombatArea();
             
@@ -458,28 +423,6 @@ namespace ECS.Entities.AI.Combat
             StartCastingClapAbove(_clapAboveAbility);
         }
 
-        private void Flee()
-        {
-            ShowDebugMessages("Long Arms " + GetAgentID() + " Fleeing");
-            
-            BlockFSM();
-            
-            //_animator.
-            
-            TeleportToAnotherLongArmsBase();
-        }
-
-        private void TeleportToAnotherLongArmsBase()
-        {
-            CombatManager.Instance.RequestFleeToAnotherLongArmsBase(this);
-            
-            UpdateDistancesToTargetsToFleeFrom();
-            
-            //_animator.
-            
-            UnblockFSM();
-        }
-
         #endregion
 
         public void IncrementLongArmsFreeBases()
@@ -658,16 +601,6 @@ namespace ECS.Entities.AI.Combat
 
         #endregion
 
-        public void SetOnFleeAction(Action onFlee)
-        {
-            _onFlee = onFlee;
-        }
-
-        public void CallOnFleeAction()
-        {
-            _onFlee();
-        }
-
         public void SetLongArmsBaseIdFunc(Func<uint> longArmsBaseIdFunc)
         {
             _longArmsBaseIdFunc = longArmsBaseIdFunc;
@@ -678,16 +611,9 @@ namespace ECS.Entities.AI.Combat
             return _longArmsBaseIdFunc();
         }
 
-        protected override void PreDeath()
-        {
-            base.PreDeath();
-            _update = () => { };
-        }
-
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _onFlee();
             CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
         }
 

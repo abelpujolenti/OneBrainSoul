@@ -43,6 +43,8 @@ namespace ECS.Entities.AI.Combat
 
         private Action _onEnableAction = () => { };
 
+        protected Action _update = () => { };
+
         protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, 
             EntityType entityType, EntityType targetEntities)
         {
@@ -60,6 +62,8 @@ namespace ECS.Entities.AI.Combat
             };
 
             _onEnableAction();
+
+            _update = AILoop;
         }
 
         #region Steering
@@ -211,6 +215,13 @@ namespace ECS.Entities.AI.Combat
         #endregion
 
         #region FSM
+
+        private void Update()
+        {
+            _update();
+        }
+
+        protected abstract void AILoop();
         
         protected void GoToDestination()
         {
@@ -264,6 +275,7 @@ namespace ECS.Entities.AI.Combat
         protected override void PreDeath()
         {
             base.PreDeath();
+            _update = () => { };
             RemoveNavMeshEntity();
         }
 

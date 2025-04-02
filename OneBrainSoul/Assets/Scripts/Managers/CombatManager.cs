@@ -21,7 +21,6 @@ namespace Managers
         private PlayerCharacter _playerCharacter;
         private Dictionary<uint, Triface> _trifaces = new Dictionary<uint, Triface>();
         private Dictionary<uint, LongArms> _longArms = new Dictionary<uint, LongArms>();
-        private Dictionary<uint, LongArmsBase> _longArmsBases = new Dictionary<uint, LongArmsBase>();
         private Dictionary<uint, Sendatu> _sendatus = new Dictionary<uint, Sendatu>();
 
         private HashSet<uint> _longArmsBasesFreeId = new HashSet<uint>();
@@ -37,9 +36,6 @@ namespace Managers
                 EntityType.LONG_ARMS, new Func<Dictionary<uint, LongArms>>(() => _instance._longArms)
             },
             {
-                EntityType.LONG_ARMS_BASE, new Func<Dictionary<uint, LongArmsBase>>(() => _instance._longArmsBases)
-            },
-            {
                 EntityType.SENDATU, new Func<Dictionary<uint, Sendatu>>(() => _instance._sendatus)
             }
         };
@@ -53,10 +49,6 @@ namespace Managers
             { 
                 EntityType.LONG_ARMS, new Func<List<LongArms>>(() => 
                 _instance.ReturnAllDictionaryValuesInAList<LongArms>(_instance._longArms)) 
-            },
-            { 
-                EntityType.LONG_ARMS_BASE, new Func<List<LongArmsBase>>(() => 
-                _instance.ReturnAllDictionaryValuesInAList<LongArmsBase>(_instance._longArmsBases)) 
             },
             { 
                 EntityType.SENDATU, new Func<List<Sendatu>>(() => 
@@ -113,27 +105,7 @@ namespace Managers
             _longArms.Add(agentID, longArms);
             _returnAgent.Add(agentID, () => _longArms[agentID]);
 
-            for (int i = 0; i < _longArmsBasesFreeId.Count; i++)
-            {
-                longArms.IncrementLongArmsFreeBases();
-            }
-
             AddEnemyToAreaNumber(longArms.GetAreaNumber(), agentID, EntityType.LONG_ARMS, longArms.GetTarget());
-        }
-
-        public void AddEnemy(LongArmsBase longArmsBase)
-        {
-            uint agentID = longArmsBase.GetAgentID();
-            
-            _longArmsBases.Add(agentID, longArmsBase);
-            _returnAgent.Add(agentID, () => _longArmsBases[agentID]);
-
-            if (!longArmsBase.IsFree())
-            {
-                return;
-            }
-            
-            IncrementLongArmsBasesFree(agentID);
         }
 
         public void AddEnemy(Sendatu sendatu)
@@ -346,12 +318,6 @@ namespace Managers
                 EntityType.LONG_ARMS);
         }
 
-        private List<LongArmsBase> ReturnAllLongArmsBases()
-        {
-            return ExecuteDelegate<List<LongArmsBase>, Dictionary<EntityType, Delegate>>(_returnTheSameAgentsType,
-                EntityType.LONG_ARMS_BASE);
-        }
-
         private List<Sendatu> RequestAllSendatus()
         {
             return ExecuteDelegate<List<Sendatu>, Dictionary<EntityType, Delegate>>(_returnTheSameAgentsType,
@@ -365,8 +331,6 @@ namespace Managers
             enemies.AddRange(ReturnAllTrifaces());
             
             enemies.AddRange(ReturnAllLongArms());
-            
-            enemies.AddRange(ReturnAllLongArmsBases());
             
             enemies.AddRange(RequestAllSendatus());
 
@@ -417,11 +381,6 @@ namespace Managers
             return ReturnClosestTargetAgent(position, targetsId, targetId => _returnAgent[targetId]());
         }
 
-        private LongArmsBase ReturnClosestLongArmsBase(Vector3 position, HashSet<uint> longArmsBasesId)
-        {
-            return ReturnClosestTargetAgent(position, longArmsBasesId, longArmsBaseId => _longArmsBases[longArmsBaseId]);
-        }
-
         private T ReturnClosestTargetAgent<T>(Vector3 position, HashSet<uint> targetsId, Func<uint, T> returnFunc)
             where T : AgentEntity
         {
@@ -459,19 +418,6 @@ namespace Managers
             return (_returnAgent[targetId]().GetTransformComponent().GetPosition() - position).magnitude;
         }
 
-        #region Long Arms
-
-        public void RequestFleeToAnotherLongArmsBase(LongArms longArms)
-        {
-            LongArmsBase longArmsBase = ReturnClosestLongArmsBase(longArms.transform.position, _longArmsBasesFreeId);
-            
-            longArms.CallOnFleeAction();
-            
-            longArmsBase.SetLongArms(longArms);
-        }
-
-        #endregion
-
         #endregion
 
         #region Combat Agents Events
@@ -490,19 +436,8 @@ namespace Managers
             uint longArmsId = longArms.GetAgentID();
             
             _combatAreas[areaNumber].RemoveEnemy(longArmsId, EntityType.LONG_ARMS);
-            
             _returnAgent.Remove(longArmsId);
             _longArms.Remove(longArmsId);
-            IncrementLongArmsBasesFree(longArms.CallLongArmsBaseIdFunc());
-        }
-
-        public void OnEnemyDefeated(LongArmsBase longArmsBase)
-        {
-            uint longArmsBaseId = longArmsBase.GetAgentID();
-            
-            _returnAgent.Remove(longArmsBaseId);
-            _longArms.Remove(longArmsBaseId);
-            DecrementLongArmsBasesFree(longArmsBase.GetAgentID());
         }
 
         public void OnEnemyDefeated(Sendatu sendatu, uint areaNumber)

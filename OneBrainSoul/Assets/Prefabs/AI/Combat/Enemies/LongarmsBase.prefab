@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 3688359362533921138}
   - component: {fileID: 3991754543414969433}
   - component: {fileID: 7518348376115011578}
-  - component: {fileID: 358602183896936899}
   m_Layer: 0
   m_Name: LongarmsBase
   m_TagString: Untagged
@@ -135,25 +134,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &358602183896936899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6107178882038326811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b910b7c8def49ef9d48a13c3112a132, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 7518348376115011578}
-  _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
-    type: 3}
-  _showMessages: 0
-  _material: {fileID: -3033667219593020291, guid: 3a2b0c60566495844862a7643f5ce286,
-    type: 3}
-  _totalHealth: 1
-  _radius: 2.5
-  _height: 2
-  _agentPositionRadius: 1
