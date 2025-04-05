@@ -32,6 +32,7 @@ namespace Managers
 
         public void GoToMainMenu()
         {
+            Destroy(CombatManager.Instance.gameObject);
             SceneManager.LoadScene(MAIN_MENU_SCENE_INDEX);
         }
 
