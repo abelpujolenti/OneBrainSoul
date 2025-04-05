@@ -12,6 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0011da166c275db42a47811fe2a2381e, type: 3}
   m_Name: Triface
   m_EditorClassIdentifier: 
-  radius: 1.089506
-  movementSpeed: 3.5
-  rotationSpeed: 2
+  movementSpeed: 4

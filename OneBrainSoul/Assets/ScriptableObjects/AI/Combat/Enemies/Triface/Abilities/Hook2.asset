@@ -24,8 +24,8 @@ MonoBehaviour:
     Path: 
   abilityCast:
     canCancelCast: 0
-    timeToCast: 1
-    cooldown: 2
+    timeToCast: 0.1
+    cooldown: 1.5
     duration: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
@@ -60,7 +60,7 @@ MonoBehaviour:
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
     forceDirection: {x: 0, y: 0, z: -1}
-    forceStrength: 20
+    forceStrength: 50
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnEnd: 0

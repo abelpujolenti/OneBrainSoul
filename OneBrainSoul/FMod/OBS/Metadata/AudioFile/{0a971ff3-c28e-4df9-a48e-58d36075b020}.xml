@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.02.00">
-	<object class="AudioFile" id="{d43228c0-77e6-41bb-9fd7-30cb7a1a23d7}">
+	<object class="AudioFile" id="{0a971ff3-c28e-4df9-a48e-58d36075b020}">
 		<property name="assetPath">
-			<value>Music/Eniah.mp3</value>
+			<value>Music/Catgame DRONE 0.mp3</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>
@@ -14,7 +14,7 @@
 			<value>2</value>
 		</property>
 		<property name="length">
-			<value>137.56081632653061</value>
+			<value>248.24163265306123</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{e382e244-a54e-4c64-ac94-4851fa907de0}</destination>

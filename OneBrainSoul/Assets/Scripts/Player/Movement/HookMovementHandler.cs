@@ -183,9 +183,10 @@ namespace Player.Movement
                 }
                 else if (entity != null)
                 {
-                    entity.OnReceiveDamage(hookDamage, hit.point, player.transform.position);
+                    //entity.OnReceiveDamage(hookDamage, hit.point, player.transform.position);
+                    entity.OnReceiveSlow(2711, 50, player.transform.position);
 
-                    player.GetCamera().ScreenShake(.25f, 1.3f);
+                    player.GetCamera().ScreenShake(.15f, .8f);
                     player.GetRigidbody().velocity = Vector3.zero;
                     player.GetRigidbody().AddForce(
                     (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +

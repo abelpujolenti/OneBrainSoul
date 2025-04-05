@@ -25,7 +25,7 @@ MonoBehaviour:
   abilityCast:
     canCancelCast: 0
     timeToCast: 0.5
-    cooldown: 5
+    cooldown: 8.5
     duration: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
@@ -60,7 +60,7 @@ MonoBehaviour:
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
     forceDirection: {x: 1, y: 0.5, z: -2}
-    forceStrength: 200
+    forceStrength: 85
     doesForceComesFromCenterOfTheArea: 1
     abilityEffectForceType: 2
   abilityEffectOnHealthTypeOnEnd: 0
@@ -90,12 +90,12 @@ MonoBehaviour:
   abilityAoE:
     isAttachedToCaster: 1
     relativePositionToCaster: {x: 0, y: 5, z: 0}
-    duration: 2
+    duration: 1.5
     direction: {x: 0, y: 0, z: 1}
     height: 2
     width: 2
     length: 7
-    radius: 10
+    radius: 8
     customMeshPrefab: {fileID: 0}
     scale: 0
     doesHeightChangeOverTheTime: 0
@@ -129,7 +129,7 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 10
+        value: 8
         inSlope: 11.897146
         outSlope: 11.897146
         tangentMode: 0

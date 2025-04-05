@@ -534,12 +534,14 @@ namespace Player
             _hookCanvas.gameObject.SetActive(true);
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Shift]</b> <color=white> <size=40>Dash", 0.5f, _dashMovementHandler));
             UnlockRing(0);
+            AudioManager.instance.SetMusicParameter("Abilities", 2);
         }
 
         public void UnlockCharge()
         {
             _isChargeUnlocked = true;
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Hook Downwards]</b> <color=white> <size=40>Smash", 0.5f, _hookMovementHandler));
+            AudioManager.instance.SetMusicParameter("Abilities", 4);
         }
 
         public void UnlockHook()
@@ -548,6 +550,7 @@ namespace Player
             _hookCanvas.gameObject.SetActive(true);
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Right Click]</b> <color=white> <size=40>Hook", 0.5f, _hookMovementHandler));
             UnlockRing(1);
+            AudioManager.instance.SetMusicParameter("Abilities", 3);
         }
 
         private void UnlockRing(int index)
@@ -644,6 +647,7 @@ namespace Player
         {
             _jumps = jumps;
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Space] Mid-air</b> <color=white> <size=40>Double Jump", 0.5f, _airborneMovementHandler));
+            AudioManager.instance.SetMusicParameter("Abilities", 1);
         }
 
         public void SetContactDamage(float t, int damage = -1)

@@ -103,19 +103,20 @@ public class AudioManager : MonoBehaviour
         PLAYBACK_STATE s;
         musicEventInstance.getPlaybackState(out s);
         if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
-        Debug.Log("MUSICA---------------");
         musicEventInstance = CreateInstance(FMODEvents.instance.music);
         musicEventInstance.start();
     }
 
-    public void SetAmbienceParameter(string parameterName, float parameterValue)
+    public void SetMusicParameter(string parameterName, float parameterValue)
     {
-        ambienceEventInstance.setParameterByName(parameterName, parameterValue);
+        musicEventInstance.setParameterByName(parameterName, parameterValue);
     }
-    
-    public void SetInsideState(int state)
+
+    public float GetMusicParameter(string parameterName)
     {
-        insideSnapshotEventInstance.setParameterByName("SnapshotState", (float) state);
+        float f;
+        musicEventInstance.getParameterByName(parameterName, out f);
+        return f;
     }
 
     public void PlayOneShot(EventReference sound, Vector3 worldPos)
