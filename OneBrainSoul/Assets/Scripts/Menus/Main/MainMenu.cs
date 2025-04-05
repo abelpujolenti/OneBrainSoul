@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using Managers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,11 +23,18 @@ namespace Menus.Main
 
         [SerializeField] private RectTransform _contentToScroll;
 
+        [SerializeField] private GameObject _buttonsPanel;
+        [SerializeField] private GameObject _settingsPanel;
+        [SerializeField] private Button _backButton;
+        
+        private GameObject _currentActivePanel;
+
         [SerializeField] private GameObject[] _buttons;
 
         private void Awake()
         {
             _instance = this;
+            _currentActivePanel = _buttonsPanel;
         }
 
         public void TitleAnimationFinished()
@@ -73,6 +82,38 @@ namespace Menus.Main
             {
                 button.SetActive(true);
             }
+        }
+
+        public void Play()
+        {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiGameStart, transform.position);
+            LoadSceneManager.Instance.LoadNextScene();
+        }
+
+        public void Settings()
+        {
+            //TODO SOUND
+            ChangeCurrentActivePanel(_settingsPanel);
+        }
+
+        public void Exit()
+        {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
+            LoadSceneManager.Instance.ExitGame();
+        }
+
+        private void ChangeCurrentActivePanel(GameObject panelToActive) 
+        {
+            _currentActivePanel.SetActive(false);
+            panelToActive.SetActive(true);
+            _currentActivePanel = panelToActive;
+            _backButton.gameObject.SetActive(_currentActivePanel != _buttonsPanel);
+        }
+
+        public void GoBack()
+        {
+            //TODO SOUND
+            ChangeCurrentActivePanel(_buttonsPanel);
         }
 
         private void OnDestroy()

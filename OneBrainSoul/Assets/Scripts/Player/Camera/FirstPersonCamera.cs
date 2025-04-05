@@ -1,4 +1,7 @@
+using System;
+using Managers;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Player.Camera
 {
@@ -45,6 +48,14 @@ namespace Player.Camera
             startPos = transform.localPosition;
             xRotation = orientation.rotation.eulerAngles.x;
             yRotation = orientation.rotation.eulerAngles.y;
+
+            EventsManager.OnChangeFov += UpdateFov;
+        }
+
+        private void UpdateFov(float fovValue)
+        {
+            fov = fovValue;
+            cam.fieldOfView = fov;
         }
 
         void Update()
@@ -162,6 +173,11 @@ namespace Player.Camera
             fovAnimationTimer = 0.1f;
             fovAnimationSpeed = 8f;
             fovAnimationScale = (fovAnimationCurve.Evaluate(fovAnimationTimer) - 1f) * fovAnimationScale + 1f;
+        }
+
+        private void OnDestroy()
+        {
+            EventsManager.OnChangeFov -= UpdateFov;
         }
     }
 }

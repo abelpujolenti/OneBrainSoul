@@ -1,13 +1,21 @@
 ﻿using Managers;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Menus.InGame
 {
     public class InGameMenu : MonoBehaviour
     {
+        [SerializeField] private GameObject _buttonsPanel;
+        [SerializeField] private GameObject _settingsPanel;
+        [SerializeField] private Button _backButton;
+
+        private GameObject _currentActivePanel;
+        
         private void Start()
         {
             EventsManager.ReleaseEscape += Pause;
+            _currentActivePanel = _buttonsPanel;
             gameObject.SetActive(false);
         }
 
@@ -20,7 +28,7 @@ namespace Menus.InGame
             Cursor.lockState = CursorLockMode.None;
         }
 
-        private void Resume()
+        public void Resume()
         {
             EventsManager.ReleaseEscape -= Resume;
             EventsManager.ReleaseEscape += Pause;
@@ -28,6 +36,12 @@ namespace Menus.InGame
             Time.timeScale = 1;
             gameObject.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        public void Settings()
+        {
+            //TODO SOUND
+            ChangeCurrentActivePanel(_settingsPanel);
         }
 
         public void MainMenu()
@@ -44,6 +58,20 @@ namespace Menus.InGame
             AudioManager.instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
             Time.timeScale = 1;
             LoadSceneManager.Instance.ExitGame();
+        }
+
+        private void ChangeCurrentActivePanel(GameObject panelToActive) 
+        {
+            _currentActivePanel.SetActive(false);
+            panelToActive.SetActive(true);
+            _currentActivePanel = panelToActive;
+            _backButton.gameObject.SetActive(_currentActivePanel != _buttonsPanel);
+        }
+
+        public void GoBack()
+        {
+            //TODO SOUND
+            ChangeCurrentActivePanel(_buttonsPanel);
         }
 
         private void OnDestroy()
