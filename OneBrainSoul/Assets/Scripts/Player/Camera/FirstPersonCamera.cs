@@ -48,6 +48,8 @@ namespace Player.Camera
             startPos = transform.localPosition;
             xRotation = orientation.rotation.eulerAngles.x;
             yRotation = orientation.rotation.eulerAngles.y;
+            
+            UpdateFov(SettingsManager.Instance.GetFOV());
 
             EventsManager.OnChangeFov += UpdateFov;
         }

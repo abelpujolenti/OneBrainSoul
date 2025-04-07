@@ -32,7 +32,7 @@ namespace Managers
                         player.SetMoveSpeedMultiplier(5f);
                         break;
                     case KeyCode.M:
-                        AudioManager.instance.masterVolume = 1f - AudioManager.instance.masterVolume;
+                        SettingsManager.Instance.SwitchMasterVolumeMute();
                         break;
                 }
             }

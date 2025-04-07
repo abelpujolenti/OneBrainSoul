@@ -1,10 +1,16 @@
 ﻿using Managers;
 using UnityEngine;
+using UnityEngine.UI;
 
-namespace Menus.InGame
+namespace Menus.Settings.View
 {
     public class FovSlider : MonoBehaviour
     {
+        private void Start()
+        {
+            GetComponent<Slider>().value = SettingsManager.Instance.GetFOV();
+        }
+
         public void SetFOV(float fovValue)
         {
             SettingsManager.Instance.SetFOV(fovValue);

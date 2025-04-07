@@ -32,7 +32,7 @@ namespace Menus.InGame
         {
             EventsManager.ReleaseEscape -= Resume;
             EventsManager.ReleaseEscape += Pause;
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
             Time.timeScale = 1;
             gameObject.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
@@ -47,7 +47,7 @@ namespace Menus.InGame
         public void MainMenu()
         {
             EventsManager.ReleaseEscape -= Resume;
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiSelect, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.uiSelect, transform.position);
             Time.timeScale = 1;
             LoadSceneManager.Instance.GoToMainMenu();
         }
@@ -55,7 +55,7 @@ namespace Menus.InGame
         public void Exit()
         {
             EventsManager.ReleaseEscape -= Resume;
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
             Time.timeScale = 1;
             LoadSceneManager.Instance.ExitGame();
         }

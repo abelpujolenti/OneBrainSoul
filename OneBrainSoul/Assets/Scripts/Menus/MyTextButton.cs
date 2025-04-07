@@ -4,13 +4,18 @@ using UnityEngine.EventSystems;
 
 namespace Menus
 {
-    public class MyButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
+    public class MyTextButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         [SerializeField] private TextMeshProUGUI _text;
 
         [SerializeField] private Color _textColorOnHover;
         [SerializeField] private Color _textColorOnPress;
         [SerializeField] private Color _textColorOnExitHover;
+
+        private void OnEnable()
+        {
+            _text.color = _textColorOnExitHover;
+        }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
@@ -19,7 +24,7 @@ namespace Menus
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            _text.color = _textColorOnExitHover;
+            OnEnable();
         }
 
         public void OnPointerDown(PointerEventData eventData)

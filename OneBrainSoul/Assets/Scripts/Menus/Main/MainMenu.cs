@@ -86,7 +86,7 @@ namespace Menus.Main
 
         public void Play()
         {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiGameStart, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.uiGameStart, transform.position);
             LoadSceneManager.Instance.LoadNextScene();
         }
 
@@ -98,7 +98,7 @@ namespace Menus.Main
 
         public void Exit()
         {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.uiExit, transform.position);
             LoadSceneManager.Instance.ExitGame();
         }
 

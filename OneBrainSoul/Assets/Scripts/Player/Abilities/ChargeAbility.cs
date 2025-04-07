@@ -10,7 +10,7 @@ namespace Player.Abilities
             {
                 playerCharacterController.ChangeMovementHandlerToCharge();
                 playerCharacterController.ResetAbility1Cooldown();
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
             }
         }
     }

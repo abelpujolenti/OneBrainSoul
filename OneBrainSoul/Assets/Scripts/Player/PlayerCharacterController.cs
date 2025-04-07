@@ -122,7 +122,7 @@ namespace Player
             _uiCanvas.gameObject.SetActive(true);
             _respawnPos = _startPos = transform.position;
 
-            _footstepSound = AudioManager.instance.CreateInstance(FMODEvents.instance.playerFootsteps);
+            _footstepSound = AudioManager.Instance.CreateInstance(FMODEvents.instance.playerFootsteps);
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
 
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
@@ -209,9 +209,9 @@ namespace Player
             PostProcessingManager.Instance.BraincellSwitchTransition(dur);
             transform.position = _respawnPos;
 
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.teleportOut, transform.position);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.catDamage, transform.position);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.teleportOut, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.catDamage, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
 
             while (t < dur)
             {
@@ -376,7 +376,7 @@ namespace Player
                 AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
                 if (entity != null)
                 {
-                    AudioManager.instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+                    AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
                     entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
                     GetComponent<Hitstop>().Add(_contactDamageHitstop);
                     _contactDamageTime = 0f;
@@ -534,14 +534,14 @@ namespace Player
             _hookCanvas.gameObject.SetActive(true);
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Shift]</b> <color=white> <size=40>Dash", 0.5f, _dashMovementHandler));
             UnlockRing(0);
-            AudioManager.instance.SetMusicParameter("Abilities", 2);
+            AudioManager.Instance.SetMusicParameter("Abilities", 2);
         }
 
         public void UnlockCharge()
         {
             _isChargeUnlocked = true;
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Hook Downwards]</b> <color=white> <size=40>Smash", 0.5f, _hookMovementHandler));
-            AudioManager.instance.SetMusicParameter("Abilities", 4);
+            AudioManager.Instance.SetMusicParameter("Abilities", 4);
         }
 
         public void UnlockHook()
@@ -550,7 +550,7 @@ namespace Player
             _hookCanvas.gameObject.SetActive(true);
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Right Click]</b> <color=white> <size=40>Hook", 0.5f, _hookMovementHandler));
             UnlockRing(1);
-            AudioManager.instance.SetMusicParameter("Abilities", 3);
+            AudioManager.Instance.SetMusicParameter("Abilities", 3);
         }
 
         private void UnlockRing(int index)
@@ -647,7 +647,7 @@ namespace Player
         {
             _jumps = jumps;
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Space] Mid-air</b> <color=white> <size=40>Double Jump", 0.5f, _airborneMovementHandler));
-            AudioManager.instance.SetMusicParameter("Abilities", 1);
+            AudioManager.Instance.SetMusicParameter("Abilities", 1);
         }
 
         public void SetContactDamage(float t, int damage = -1)

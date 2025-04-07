@@ -210,7 +210,7 @@ namespace ECS.Entities.AI.Combat
                 }
             }
             
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyAttack, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemyAttack, transform.position);
             
             areaAbility.Activate();
             
