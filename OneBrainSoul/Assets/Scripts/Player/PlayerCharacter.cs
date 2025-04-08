@@ -76,8 +76,8 @@ namespace Player
                 }
             }
 
-            AudioManager.instance.SetMusicParameter("Health", (float)_health / _maxHealth);
-            AudioManager.instance.SetMusicParameter("Combo", (float)combo / maxCombo);
+            AudioManager.Instance.SetMusicParameter("Health", (float)_health / _maxHealth);
+            AudioManager.Instance.SetMusicParameter("Combo", (float)combo / maxCombo);
 
             _currentTimeBetweenTicks += Time.deltaTime;
 
@@ -99,7 +99,7 @@ namespace Player
         {
             _hitstop.Add(killHitstop);
             _hitstop.AddAftershock(killHitstop * 1.5f);
-            AudioManager.instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.instance.GetMusicParameter("Progress") + 0.035f));
+            AudioManager.Instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.Instance.GetMusicParameter("Progress") + 0.035f));
 
             combo = Mathf.Min(maxCombo, combo + 1);
             comboT = 0f;
@@ -143,11 +143,14 @@ namespace Player
             DamageEffect(hitPosition);
             
             float power = 4f;
-            Vector3 v = (new Vector3(transform.position.x, 0f, transform.position.z) - new Vector3(sourcePosition.x, 0f, sourcePosition.z)).normalized;
-            Debug.Log(v);
-            float angle = Vector3.Angle(_playerCharacterController.GetOrientation().forward, v);
+            Vector3 v = (new Vector3(sourcePosition.x, 0f, sourcePosition.z) - new Vector3(transform.position.x, 0f, transform.position.z)).normalized;
+            Quaternion q = Quaternion.LookRotation(v, Vector3.up);
+            Quaternion qplayer = Quaternion.LookRotation(_playerCharacterController.GetOrientation().forward, Vector3.up);
+            q *= qplayer;
+            Vector3 angles = q.eulerAngles;
+            Debug.Log(angles);
 
-            PostProcessingManager.Instance.DamageEffect(_damageEffectDuration, power, angle);
+            PostProcessingManager.Instance.DamageEffect(_damageEffectDuration, power, angles.y + 270f);
             _camera.ScreenShake(_damageEffectDuration * 0.65f, .9f);
             _hitstop.Add(onDamageHitstop);
             
@@ -176,8 +179,8 @@ namespace Player
                 }
                 Destroy(FindObjectOfType<Corpse>().gameObject);
                 RecoverBody();
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
             }
         }
 
@@ -189,8 +192,8 @@ namespace Player
             _ghostTime = -1;
             SetEntityType(EntityType.PLAYER);
             PostProcessingManager.Instance.RecoverGhostEffect(.65f);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
 
         }
 
@@ -234,7 +237,7 @@ namespace Player
         public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
         }
 
         public override void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition)
