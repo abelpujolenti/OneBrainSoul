@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
@@ -22,6 +23,10 @@ public class PostProcessingManager : Singleton<PostProcessingManager>
     Coroutine ghostCoroutine;
     bool switchMode = false;
 
+    [SerializeField] private GameObject _brightnessVolumePrefab;
+    private Volume _brightnessVolume; 
+    private ColorAdjustments _colorAdjustments;
+
     private void Start()
     {
         GetFullscreenPasses();
@@ -30,6 +35,18 @@ public class PostProcessingManager : Singleton<PostProcessingManager>
 
         SceneManager.sceneLoaded += ToggleFog;
         ToggleFog(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+        
+
+        GameObject brightnessVolume = Instantiate(_brightnessVolumePrefab);
+        _brightnessVolume = brightnessVolume.GetComponent<Volume>();
+        _brightnessVolume.profile.TryGet(out _colorAdjustments);
+        
+        DontDestroyOnLoad(brightnessVolume);
+    }
+
+    public void SetBrightness(float brightnessValue)
+    {
+        _colorAdjustments.postExposure.value = brightnessValue;
     }
 
     private void ToggleFog(Scene s, LoadSceneMode mode)

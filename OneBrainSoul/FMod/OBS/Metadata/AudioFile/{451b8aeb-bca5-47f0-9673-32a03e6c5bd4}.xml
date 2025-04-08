@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{451b8aeb-bca5-47f0-9673-32a03e6c5bd4}">
+		<property name="assetPath">
+			<value>SFX/Beta/EnemySpawn.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.1351979166666666</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e382e244-a54e-4c64-ac94-4851fa907de0}</destination>
+		</relationship>
+	</object>
+</objects>

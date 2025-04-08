@@ -43,6 +43,12 @@ namespace Managers
 
         #endregion
 
+        #region SettingsEvents
+
+        public static Action<float> OnChangeFov;
+
+        #endregion
+
         public static Action OnDefeatEnemy;
         public static Action<EntityType, uint> OnAgentDefeated;
 
@@ -53,6 +59,5 @@ namespace Managers
         public static Func<List<DynamicObstacleThreadSafe>> OnUpdateDynamicObstacle;
 
         #endregion
-
     }
 }

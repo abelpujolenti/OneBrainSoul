@@ -36,6 +36,8 @@ namespace ECS.Entities.AI
         protected float _timeBetweenDamageTicks;
         protected float _timeBetweenHealTicks;
 
+        protected bool _isDying;
+
         protected void Setup(float agentsPositionRadius, EntityType entityType)
         {
             _entityType = entityType;
@@ -53,6 +55,11 @@ namespace ECS.Entities.AI
 
             _timeBetweenDamageTicks = GameManager.Instance.GetTimeBetweenDamageTicks();
             _timeBetweenHealTicks = GameManager.Instance.GetTimeBetweenHealTicks();
+        }
+
+        public bool IsDying()
+        {
+            return _isDying;
         }
 
         public uint GetAgentID()
@@ -89,7 +96,7 @@ namespace ECS.Entities.AI
             _damageParticle.transform.position = hitPosition;
             _damageParticle.gameObject.SetActive(true);
             _damageParticle.Play();
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
         }
 
         public abstract void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition);

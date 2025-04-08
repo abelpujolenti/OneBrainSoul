@@ -86,7 +86,7 @@ namespace Player.Abilities
                 player.ChangeMovementHandlerToHook(startPos, endPos, ledgeFound ? ledgeHit.point: _hit.point, ledgeFound, smash);
                 player.ResetAbility2Cooldown();
 
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.hookThrow, transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.hookThrow, transform.position);
 
                 player.ConsumeCharge();
             }

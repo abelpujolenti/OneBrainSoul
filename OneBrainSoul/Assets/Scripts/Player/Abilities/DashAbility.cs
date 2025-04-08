@@ -37,7 +37,7 @@ namespace Player.Abilities
             _timesDashed++;
             player.ConsumeCharge();
 
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
             StartCoroutine(AnimationCoroutine(player));
             player.GetAnimator().SetBool("Dash", true);
         }
