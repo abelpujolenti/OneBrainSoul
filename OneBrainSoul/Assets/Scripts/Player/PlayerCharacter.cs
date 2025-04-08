@@ -119,7 +119,7 @@ namespace Player
             
             ShowDebugMessages("Player Damage : " + damageValue);
 
-            _health = (uint)Mathf.Max(0f, _health - damageValue);
+            //_health = (uint)Mathf.Max(0f, _health - damageValue);
 
             if (_health == 0)
             {
@@ -142,7 +142,12 @@ namespace Player
             
             DamageEffect(hitPosition);
             
-            PostProcessingManager.Instance.DamageEffect(_damageEffectDuration);
+            float power = 4f;
+            Vector3 v = (new Vector3(transform.position.x, 0f, transform.position.z) - new Vector3(sourcePosition.x, 0f, sourcePosition.z)).normalized;
+            Debug.Log(v);
+            float angle = Vector3.Angle(_playerCharacterController.GetOrientation().forward, v);
+
+            PostProcessingManager.Instance.DamageEffect(_damageEffectDuration, power, angle);
             _camera.ScreenShake(_damageEffectDuration * 0.65f, .9f);
             _hitstop.Add(onDamageHitstop);
             

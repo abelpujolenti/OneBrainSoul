@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: DamagePost
-  m_Shader: {fileID: -6465566751694194690, guid: 18e5ddc689ac70a47962e5cf71ff4b5f,
+  m_Shader: {fileID: -6465566751694194690, guid: d7698e4af4c70b244baa9532e5541700,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -46,10 +46,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _DamageAngle: 0
+    - _DamageAnglePower: 16.1
     - _EdgeWeight: 0.83
     - _Fade: 0.9
     - _Power: 1.2
-    - _Progress: 0.9182936
+    - _Progress: 0
     - _Speed: 1.5
     m_Colors:
     - _BackgroundColor: {r: 0.8627451, g: 0, b: 0.17791049, a: 0}
