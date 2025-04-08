@@ -10,7 +10,7 @@ namespace Combat
         protected override void AttackCommand()
         {
             base.AttackCommand();
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.whipAttack, player.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.whipAttack, player.transform.position);
         }
 
         protected override void AttackUpdate()

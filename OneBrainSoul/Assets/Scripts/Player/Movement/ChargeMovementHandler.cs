@@ -106,8 +106,8 @@ namespace Player.Movement
         private void Collide(PlayerCharacterController player, Rigidbody rigidbody, Vector3 normal, bool damaged)
         {
             PostProcessingManager.Instance.ChargeCollideEffect((damaged ? .12f : .065f) + .3f);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.hammerAttack, player.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemyDamage, player.transform.position);
 
             player.GetCamera().StopFovWarp();
             _hitstop.Add(damaged ? .2f : .12f);

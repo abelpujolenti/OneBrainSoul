@@ -370,7 +370,7 @@ namespace AI.Combat.CombatNavigation
 
         private string GetFilePath()
         {
-            return Path.Combine(Application.streamingAssetsPath, "NavMeshGraph.json");
+            return Path.Combine(Application.streamingAssetsPath, "JSON/NavMeshGraph.json");
         }
 
         public NavMeshGraph DeepCopy()

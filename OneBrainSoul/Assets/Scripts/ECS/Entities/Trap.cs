@@ -48,7 +48,7 @@ namespace ECS.Entities
                 yield return null;
             }
             
-            AudioManager.instance.PlayOneShot(_trapProperties.trapAbilityProperties.executeAbilitySound, transform.position);
+            AudioManager.Instance.PlayOneShot(_trapProperties.trapAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
 

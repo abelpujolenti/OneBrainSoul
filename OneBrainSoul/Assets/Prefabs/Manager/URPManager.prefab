@@ -318,3 +318,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _brightnessVolumePrefab: {fileID: 7345024204863989639, guid: 17e4180c064ed8f43b1ed3e7f7524c45,
+    type: 3}

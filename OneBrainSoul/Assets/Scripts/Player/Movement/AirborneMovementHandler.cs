@@ -67,7 +67,7 @@ namespace Player.Movement
                     groundedTimer > 0.1f && player.GetRigidbody().velocity.y < 0.01f || 
                     groundedTimer > 0.3f)
                 {
-                    AudioManager.instance.PlayOneShot(FMODEvents.instance.land, player.transform.position);
+                    AudioManager.Instance.PlayOneShot(FMODEvents.instance.land, player.transform.position);
                     player.ChangeMovementHandlerToGrounded();
                 }            
             }
@@ -90,7 +90,7 @@ namespace Player.Movement
                 doubleJumps++;
                 canDoubleJump = false;
                 player.GetCamera().FovWarp(2.8f, .35f);
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.dash, player.transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.dash, player.transform.position);
             }
 
             if (!canDoubleJump && !player.HasPressedJump() && jumpTimer <= 0f)

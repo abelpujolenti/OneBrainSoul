@@ -89,7 +89,7 @@ namespace ECS.Entities.AI
             _damageParticle.transform.position = hitPosition;
             _damageParticle.gameObject.SetActive(true);
             _damageParticle.Play();
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemyDamage, transform.position);
         }
 
         public abstract void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition);

@@ -1,23 +1,12 @@
 using System.Collections.Generic;
 using FMOD.Studio;
 using FMODUnity;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 public class AudioManager : MonoBehaviour
 {
-    [Header("Volume")]
-    [Range(0, 1)]
-    public float masterVolume = 1;
-    [Range(0, 1)]
-    public float musicVolume = 1;
-    [Range(0, 1)]
-    public float ambienceVolume = 1;
-    [Range(0, 1)]
-    public float SFXVolume = 1;
-
     private Bus masterBus;
     private Bus musicBus;
     private Bus ambienceBus;
@@ -31,13 +20,13 @@ public class AudioManager : MonoBehaviour
     private EventInstance musicEventInstance;
     private EventInstance insideSnapshotEventInstance;
 
-    public static AudioManager instance { get; private set; }
+    public static AudioManager Instance { get; private set; }
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
         }
         else
         {
@@ -76,12 +65,24 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void Update()
+    public void SetMasterVolume(float masterVolume)
     {
         masterBus.setVolume(masterVolume);
-        musicBus.setVolume(musicVolume);
+    }
+
+    public void SetAmbienceVolume(float ambienceVolume)
+    {
         ambienceBus.setVolume(ambienceVolume);
-        sfxBus.setVolume(SFXVolume);
+    }
+
+    public void SetSFXVolume(float sfxVolume)
+    {
+        sfxBus.setVolume(sfxVolume);
+    }
+
+    public void SetMusicVolume(float musicVolume)
+    {
+        musicBus.setVolume(musicVolume);
     }
 
     public void InitializeAmbience()
