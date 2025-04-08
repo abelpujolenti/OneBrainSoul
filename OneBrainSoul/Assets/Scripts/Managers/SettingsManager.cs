@@ -240,7 +240,7 @@ namespace Managers
 
         private string GetFilePath()
         {
-            return Application.streamingAssetsPath + "/JSON/Settings.json";
+            return Application.streamingAssetsPath + "/Settings.json";
         }
     }
 }
