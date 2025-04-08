@@ -77,8 +77,8 @@ namespace Player
                 }
             }
 
-            AudioManager.instance.SetMusicParameter("Health", (float)_health / _maxHealth);
-            AudioManager.instance.SetMusicParameter("Combo", (float)combo / maxCombo);
+            AudioManager.Instance.SetMusicParameter("Health", (float)_health / _maxHealth);
+            AudioManager.Instance.SetMusicParameter("Combo", (float)combo / maxCombo);
 
             _currentTimeBetweenTicks += Time.deltaTime;
 
@@ -100,7 +100,7 @@ namespace Player
         {
             _hitstop.Add(killHitstop);
             _hitstop.AddAftershock(killHitstop * 1.5f);
-            AudioManager.instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.instance.GetMusicParameter("Progress") + 0.05f));
+            AudioManager.Instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.Instance.GetMusicParameter("Progress") + 0.05f));
 
             combo = Mathf.Min(maxCombo, combo + 1);
             comboT = 0f;
@@ -172,8 +172,8 @@ namespace Player
                 }
                 Destroy(FindObjectOfType<Corpse>().gameObject);
                 RecoverBody();
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
             }
         }
 
@@ -185,8 +185,8 @@ namespace Player
             _ghostTime = -1;
             SetEntityType(EntityType.PLAYER);
             PostProcessingManager.Instance.RecoverGhostEffect(.65f);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
 
         }
 
@@ -230,7 +230,7 @@ namespace Player
         public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
         }
 
         public override void OnReceiveHealOverTime(uint healValue, float duration, Vector3 sourcePosition)

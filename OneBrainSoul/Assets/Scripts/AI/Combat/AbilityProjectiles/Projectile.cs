@@ -52,7 +52,7 @@ namespace AI.Combat.AbilityProjectiles
 
         public void FIREEEEEEEEEEEE(Vector3 forceVector)
         {
-            AudioManager.instance.PlayOneShot(_projectileSound, transform.position);
+            AudioManager.Instance.PlayOneShot(_projectileSound, transform.position);
             _onFireAction();
             transform.rotation = Quaternion.LookRotation(forceVector.normalized);
             gameObject.SetActive(true);

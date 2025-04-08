@@ -273,7 +273,7 @@ namespace ECS.Entities.AI.Combat
             
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
             
-            AudioManager.instance.PlayOneShot(_trifaceProperties.slamAbilityProperties.executeAbilitySound, transform.position);
+            AudioManager.Instance.PlayOneShot(_trifaceProperties.slamAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
             

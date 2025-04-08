@@ -78,7 +78,7 @@ namespace Player.Abilities
 
             _currentWeapon = id;
 
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.swap, transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.swap, transform.position);
         }
     }
 }

@@ -447,7 +447,7 @@ namespace AI.Combat.AbilityAoEColliders
             _parentRotation = _parentTransform.rotation;
             Rotate();
             
-            AudioManager.instance.PlayOneShot(_abilityAoESound, transform.position);
+            AudioManager.Instance.PlayOneShot(_abilityAoESound, transform.position);
             
             _actionAttaching();
             

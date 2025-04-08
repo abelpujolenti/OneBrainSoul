@@ -48,7 +48,7 @@ namespace Combat
             wandProjectile.Shoot(player.IsOnTheGround(), player.GetCamera().transform.forward);
             _counter = (_counter + 1) % _maxProjectiles; 
         
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.wandAttack, player.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, player.transform.position);
         }
     }
 }
