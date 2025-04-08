@@ -60,6 +60,8 @@ namespace ECS.Entities.AI.Combat
         
         protected bool _isRotating;
 
+        private bool _isDying;
+
         protected virtual void EnemySetup(float radius, TEnemyProperties aiEnemyProperties, EntityType entityType, 
             EntityType targetEntities)
         {
@@ -368,6 +370,8 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void PreDeath()
         {
+            _isDying = true;
+            
             if (EventsManager.OnDefeatEnemy != null)
             {
                 EventsManager.OnDefeatEnemy();
@@ -522,6 +526,11 @@ namespace ECS.Entities.AI.Combat
         public uint GetAreaNumber()
         {
             return _areaNumber;
+        }
+
+        public bool IsDying()
+        {
+            return _isDying;
         }
 
         /////////////////////////DEBUG
