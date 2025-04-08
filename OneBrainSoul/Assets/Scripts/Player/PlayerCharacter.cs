@@ -43,7 +43,7 @@ namespace Player
 
         private int combo = 0;
         private int maxCombo = 5;
-        private float comboFalloffTime = 1f;
+        private float comboFalloffTime = 3f;
         private float comboT = 0f;
 
         private void Start()
@@ -68,7 +68,6 @@ namespace Player
         private void Update()
         {
             if (combo > 0) {
-                Debug.Log(combo);
                 comboT += Time.deltaTime;
                 if (comboT > comboFalloffTime)
                 {
@@ -100,7 +99,7 @@ namespace Player
         {
             _hitstop.Add(killHitstop);
             _hitstop.AddAftershock(killHitstop * 1.5f);
-            AudioManager.instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.instance.GetMusicParameter("Progress") + 0.05f));
+            AudioManager.instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.instance.GetMusicParameter("Progress") + 0.035f));
 
             combo = Mathf.Min(maxCombo, combo + 1);
             comboT = 0f;

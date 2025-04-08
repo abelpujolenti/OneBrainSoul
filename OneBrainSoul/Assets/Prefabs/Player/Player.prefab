@@ -24527,6 +24527,8 @@ MonoBehaviour:
   _moveSpeedMultiplier: 1.1
   _ability1Cooldown: 0.3
   _ability2Cooldown: 0.5
+  _contactHitboxRadius: 1.5
+  _contactDamageHitboxRadius: 1.5
   _gravityStrength: 32
   _hoverHeight: 1.2
   _hoverStrength: 500
