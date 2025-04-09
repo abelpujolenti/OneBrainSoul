@@ -31,6 +31,10 @@ namespace Player
         [SerializeField] private float _ability1Cooldown;
         [SerializeField] private float _ability2Cooldown;
 
+        [Header("Collisions")]
+        [SerializeField] private float _contactHitboxRadius = 1.5f;
+        [SerializeField] private float _contactDamageHitboxRadius = 1.5f;
+        
         [Header("Vertical Forces")]
         [SerializeField] private float _gravityStrength;
         [SerializeField] private float _hoverHeight;
@@ -364,38 +368,75 @@ namespace Player
 
         private void CheckContactDamage()
         {
-            if (_contactDamageTime <= 0f) return;
 
-            RaycastHit hit;
-            /*Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
-            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;*/
-            //if (Physics.CapsuleCast(p1, p2, _capsuleCollider.radius * 1.3f, _rigidbody.velocity.normalized, out hit, 1f,
-            if (Physics.SphereCast(transform.position + Vector3.up, _capsuleCollider.radius * 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
-                GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
+            Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * (-_capsuleCollider.height * 0.5f);
+            Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;
+
+            if (_contactDamageTime <= 0f)
             {
-                AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
-                if (entity != null)
+                var colliders = Physics.OverlapCapsule(p1, p2, _contactHitboxRadius, GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore);
+                if (colliders.Length > 0)
                 {
-                    AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
-                    entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
-                    GetComponent<Hitstop>().Add(_contactDamageHitstop);
-                    _contactDamageTime = 0f;
+                    foreach (Collider collider in colliders)
+                    {
+                        AgentEntity entity = collider.GetComponent<AgentEntity>();
+                        if (entity != null && !entity.IsDying())
+                        {
+                            AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+                            if (_contactDamageTime > 0)
+                            {
+                                entity.OnReceiveDamage(_contactDamageAmount, transform.position, transform.position);
+                                GetComponent<Hitstop>().Add(_contactDamageHitstop);
+                                GetCamera().ScreenShake(.25f, 1.3f);
+                            }
 
-                    float bounceStrength = 100f;
-                    float bounceVerticalRatio = .45f;
-                    
-                    GetCamera().ScreenShake(.25f, 1.3f);
-                    _rigidbody.velocity = Vector3.zero;
-                    _rigidbody.AddForce(
-                    (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
-                    new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
-                        (bounceStrength * (1.4f)), ForceMode.Impulse);
+                            float bounceStrength = 20f;
+                            float bounceVerticalRatio = .15f;
 
-                    ChangeMovementHandlerToAirborne();
+                            _rigidbody.velocity = Vector3.zero;
+                            Vector3 normal = transform.position - entity.transform.position;
+                            normal.y = 0f;
+                            normal = normal == Vector3.zero ? transform.forward : normal.normalized;
+                            _rigidbody.AddForce(
+                            (new Vector3(normal.x, Mathf.Max(0f, normal.y), normal.z).normalized +
+                            new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
+                                (bounceStrength * (1.4f)), ForceMode.Impulse);
+
+                            ChangeMovementHandlerToAirborne();
+                        }
+                    }
                 }
             }
+            else
+            {
+                RaycastHit hit;
+                if (Physics.CapsuleCast(p1, p2, _contactDamageHitboxRadius, _rigidbody.velocity.normalized, out hit, 1f,
+                    //if (Physics.SphereCast(transform.position + Vector3.up, 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
+                    GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
+                {
+                    AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
+                    if (entity != null && !entity.IsDying())
+                    {
+                        AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+                        entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
+                        GetComponent<Hitstop>().Add(_contactDamageHitstop);
+                        _contactDamageTime = 0f;
 
-            _contactDamageTime = Mathf.Max(0f, _contactDamageTime - Time.deltaTime);
+                        float bounceStrength = 100f;
+                        float bounceVerticalRatio = .45f;
+
+                        GetCamera().ScreenShake(.25f, 1.3f);
+                        _rigidbody.velocity = Vector3.zero;
+                        _rigidbody.AddForce(
+                        (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
+                        new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
+                            (bounceStrength * (1.4f)), ForceMode.Impulse);
+
+                        ChangeMovementHandlerToAirborne();
+                    }
+                }
+                _contactDamageTime = Mathf.Max(0f, _contactDamageTime - Time.deltaTime);
+            }
         }
 
         private void SoundUpdate()

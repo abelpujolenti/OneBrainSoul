@@ -84,9 +84,11 @@ public class PostProcessingManager : Singleton<PostProcessingManager>
         StartCoroutine(EffectCoroutine(pass, t, recoverGhostCurve));
     }
 
-    public void DamageEffect(float t)
+    public void DamageEffect(float t, float power = 0f, float angle = 0f)
     {
         var pass = fullscreenPasses["Damage"];
+        pass.passMaterial.SetFloat("_DamageAngle", angle);
+        pass.passMaterial.SetFloat("_DamageAnglePower", power);
         StartCoroutine(EffectCoroutine(pass, t, damageCurve));
     }
 
