@@ -119,7 +119,7 @@ namespace Player
             
             ShowDebugMessages("Player Damage : " + damageValue);
 
-            //_health = (uint)Mathf.Max(0f, _health - damageValue);
+            _health = (uint)Mathf.Max(0f, _health - damageValue);
 
             if (_health == 0)
             {
