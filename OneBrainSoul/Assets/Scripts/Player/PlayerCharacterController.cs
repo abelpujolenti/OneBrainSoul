@@ -146,6 +146,7 @@ namespace Player
             CalculateCooldowns();
             UpdateCharges();
             CheckContactDamage();
+            AnimationUpdate();
         }
 
         private void FixedUpdate()
@@ -456,6 +457,13 @@ namespace Player
             {
                 _footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
             }
+        }
+
+        private void AnimationUpdate()
+        {
+            float v = Mathf.Clamp01(_rigidbody.velocity.magnitude / 10f);
+            GetAnimator().SetFloat("Velocity", _xInput != 0f || _yInput != 0f ? v : 0f);
+            GetAnimator().SetBool("IsFalling", !_onGround);
         }
 
         public void SetCrosshairColor(Color color)
