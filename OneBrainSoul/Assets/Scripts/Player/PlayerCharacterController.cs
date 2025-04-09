@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using ECS.Entities.AI;
 using FMOD.Studio;
 using FMODUnity;
@@ -8,6 +6,8 @@ using Player.Abilities;
 using Player.Camera;
 using Player.Effects;
 using Player.Movement;
+using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
@@ -383,14 +383,6 @@ namespace Player
                         AgentEntity entity = collider.GetComponent<AgentEntity>();
                         if (entity != null && !entity.IsDying())
                         {
-                            AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
-                            if (_contactDamageTime > 0)
-                            {
-                                entity.OnReceiveDamage(_contactDamageAmount, transform.position, transform.position);
-                                GetComponent<Hitstop>().Add(_contactDamageHitstop);
-                                GetCamera().ScreenShake(.25f, 1.3f);
-                            }
-
                             float bounceStrength = 20f;
                             float bounceVerticalRatio = .15f;
 
@@ -415,6 +407,7 @@ namespace Player
                     //if (Physics.SphereCast(transform.position + Vector3.up, 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
                     GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
                 {
+                    Debug.Log(hit.collider.name);
                     AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
                     if (entity != null && !entity.IsDying())
                     {
@@ -423,8 +416,8 @@ namespace Player
                         GetComponent<Hitstop>().Add(_contactDamageHitstop);
                         _contactDamageTime = 0f;
 
-                        float bounceStrength = 100f;
-                        float bounceVerticalRatio = .45f;
+                        float bounceStrength = 120f;
+                        float bounceVerticalRatio = .2f;
 
                         GetCamera().ScreenShake(.25f, 1.3f);
                         _rigidbody.velocity = Vector3.zero;
