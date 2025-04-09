@@ -43,7 +43,7 @@ namespace Player
 
         private int combo = 0;
         private int maxCombo = 5;
-        private float comboFalloffTime = 1f;
+        private float comboFalloffTime = 3f;
         private float comboT = 0f;
 
         private void Start()
@@ -68,7 +68,6 @@ namespace Player
         private void Update()
         {
             if (combo > 0) {
-                Debug.Log(combo);
                 comboT += Time.deltaTime;
                 if (comboT > comboFalloffTime)
                 {
@@ -100,7 +99,7 @@ namespace Player
         {
             _hitstop.Add(killHitstop);
             _hitstop.AddAftershock(killHitstop * 1.5f);
-            AudioManager.Instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.Instance.GetMusicParameter("Progress") + 0.05f));
+            AudioManager.Instance.SetMusicParameter("Progress", Mathf.Clamp01(AudioManager.Instance.GetMusicParameter("Progress") + 0.035f));
 
             combo = Mathf.Min(maxCombo, combo + 1);
             comboT = 0f;
@@ -120,7 +119,7 @@ namespace Player
             
             ShowDebugMessages("Player Damage : " + damageValue);
 
-            _health = (uint)Mathf.Max(0f, _health - damageValue);
+            //_health = (uint)Mathf.Max(0f, _health - damageValue);
 
             if (_health == 0)
             {
@@ -143,7 +142,15 @@ namespace Player
             
             DamageEffect(hitPosition);
             
-            PostProcessingManager.Instance.DamageEffect(_damageEffectDuration);
+            float power = 4f;
+            Vector3 v = (new Vector3(sourcePosition.x, 0f, sourcePosition.z) - new Vector3(transform.position.x, 0f, transform.position.z)).normalized;
+            Quaternion q = Quaternion.LookRotation(v, Vector3.up);
+            Quaternion qplayer = Quaternion.LookRotation(_playerCharacterController.GetOrientation().forward, Vector3.up);
+            q *= qplayer;
+            Vector3 angles = q.eulerAngles;
+            Debug.Log(angles);
+
+            PostProcessingManager.Instance.DamageEffect(_damageEffectDuration, power, angles.y + 270f);
             _camera.ScreenShake(_damageEffectDuration * 0.65f, .9f);
             _hitstop.Add(onDamageHitstop);
             

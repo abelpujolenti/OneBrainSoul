@@ -11,7 +11,7 @@ namespace Player.Movement
         public static float horizontalAirDrag = 25f;
         public static float bobbingStrength = 0.6f;
         public static float duration = .09f;
-        public static float contactDamageDuration = .8f;
+        public static float contactDamageDuration = .78f;
         public static int damage = 1;
 
         private float chargeTime = 0f;

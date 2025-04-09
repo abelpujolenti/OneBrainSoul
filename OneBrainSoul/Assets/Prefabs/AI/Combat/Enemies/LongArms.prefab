@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4295160491330456219}
   - component: {fileID: 2663029220272172238}
   - component: {fileID: 4775325480699302113}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ThrowRockDetectionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,7 +75,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6595242589544272454}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AbilityDetection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 822068792021846984}
   - component: {fileID: 1623227125617860863}
   - component: {fileID: 4289085419597533957}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_headFather_longarms_head_2_GrabRockAndPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 8810993464684247542}
   - component: {fileID: 7329697106141931807}
   - component: {fileID: 4458886088744258254}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: LongArms
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,8 +357,6 @@ MonoBehaviour:
   _fovColor: {r: 0, g: 0, b: 0, a: 0}
   _longArmsProperties: {fileID: 11400000, guid: c0469f80574bd164b9ca3eefc35f50e8,
     type: 2}
-  _itGoesOnAutomatic: 0
-  _directionToShoot: {x: 0, y: 0, z: 0}
   _throwRockAbilityDetectionArea: {fileID: 4775325480699302113}
   _clapAboveAbilityDetectionArea: {fileID: 8611604470099716991}
   _bodyIdle: {fileID: 3816759990376718867}
@@ -388,7 +386,7 @@ GameObject:
   - component: {fileID: 7545642526431238456}
   - component: {fileID: 7044303036499185310}
   - component: {fileID: 5124668390434004208}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: SphericalVisionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -454,7 +452,7 @@ GameObject:
   - component: {fileID: 869637227351383962}
   - component: {fileID: 2631647039490707786}
   - component: {fileID: 1409586356044977782}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_headFather_longarms_head_1_alerta
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -537,7 +535,7 @@ GameObject:
   - component: {fileID: 2480673615680509158}
   - component: {fileID: 557538223482861860}
   - component: {fileID: 2683699275094404896}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_headFather_longarms_head_4_ThrowRock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -620,7 +618,7 @@ GameObject:
   - component: {fileID: 2423872351373769078}
   - component: {fileID: 4516051773089846165}
   - component: {fileID: 2399012294416908334}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_body_0_idle_longarms_bodyFather
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -703,7 +701,7 @@ GameObject:
   - component: {fileID: 7534493507196798994}
   - component: {fileID: 3530920325923366525}
   - component: {fileID: 4281030501988739752}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -789,7 +787,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6214735660023537671}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Areas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -824,7 +822,7 @@ GameObject:
   - component: {fileID: 4355340216467629463}
   - component: {fileID: 2578811427128114348}
   - component: {fileID: 5053294577680622814}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: RectangularVisionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -890,7 +888,7 @@ GameObject:
   - component: {fileID: 8614669322646233812}
   - component: {fileID: 9000072591399200510}
   - component: {fileID: 9197946019365480457}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_headFather_longarms_head_3_LiftRockAndPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -971,7 +969,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6016425395629307271}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Vision
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1006,7 +1004,7 @@ GameObject:
   - component: {fileID: 4636330269341254889}
   - component: {fileID: 5125950048582838950}
   - component: {fileID: 8611604470099716991}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ClapAboveDetectionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1072,7 +1070,7 @@ GameObject:
   - component: {fileID: 1322315864494610322}
   - component: {fileID: 8579819326959784461}
   - component: {fileID: 578673108562966197}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_head_0_idle_longarms_headFather
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1155,7 +1153,7 @@ GameObject:
   - component: {fileID: 6205125949388507269}
   - component: {fileID: 5383619111386668705}
   - component: {fileID: 6547951704734371036}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_bodyFather_longarms_body_2_GrabRockAndPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1238,7 +1236,7 @@ GameObject:
   - component: {fileID: 3736181140180682719}
   - component: {fileID: 8927877852156205892}
   - component: {fileID: 4060119585023560875}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_bodyFather_longarms_body_4_ThrowRock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1321,7 +1319,7 @@ GameObject:
   - component: {fileID: 4663772800425735727}
   - component: {fileID: 5623838600147215608}
   - component: {fileID: 1996016156270406409}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_bodyFather_longarms_body_1_alerta
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1404,7 +1402,7 @@ GameObject:
   - component: {fileID: 1294717405214626192}
   - component: {fileID: 5768753616375110843}
   - component: {fileID: 4288868916483592383}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: longarms_bodyFather_longarms_body_3_LiftRockAndPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1488,6 +1486,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LongarmsBase
+      objectReference: {fileID: 0}
+    - target: {fileID: 6107178882038326811, guid: 80c6b608e1dee6049b90d49c90e7f58e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8828866899445502426, guid: 80c6b608e1dee6049b90d49c90e7f58e,
         type: 3}

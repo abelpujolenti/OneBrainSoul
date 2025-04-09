@@ -51,12 +51,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Active: 1
+    - _Active: 0
     - _Collapsed: 0
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Scale: 0.12
+    - _Speed: 0.1
     m_Colors:
-    - _ActivatedColor: {r: 4.8699083, g: 4.3938775, b: 7.392874, a: 1}
-    - _Color: {r: 0, g: 0.50752556, b: 0.8490566, a: 0.5019608}
-    - _EmissiveColor: {r: 0.4699907, g: 0.35207537, b: 0.5999999, a: 1}
+    - _ActivatedColor: {r: 0.3934064, g: 0.24731769, b: 0.74901956, a: 1}
+    - _Color: {r: 0.36278385, g: 0.5410882, b: 0.7660377, a: 0.5019608}
+    - _EmissiveColor: {r: 0.24674262, g: 0.25245577, b: 0.5471698, a: 1}
   m_BuildTextureStacks: []

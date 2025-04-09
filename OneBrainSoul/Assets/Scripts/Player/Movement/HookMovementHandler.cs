@@ -68,8 +68,15 @@ namespace Player.Movement
             hookParticleTransform.position = lineStartPos;
             hookParticleTransform.gameObject.SetActive(true);
             hookParticleTransform.GetComponent<ParticleSystem>().Play();
-            player.GetAnimator().SetBool("Hook", true);
-            player.GetAnimator().speed = 0.95f;
+            if (smash)
+            {
+                player.GetAnimator().SetTrigger("Smash");
+            }
+            else
+            {
+                player.GetAnimator().SetTrigger("Hook");
+            }
+
         }
 
         private Vector3 GetLineStartPos(PlayerCharacterController player)
@@ -134,8 +141,6 @@ namespace Player.Movement
                 delayTime += Time.fixedDeltaTime;
                 return;
             }
-
-            player.GetAnimator().speed = 0f;
 
             float progress = 1f - Mathf.Min(1f, distanceToTarget / hookDistance);
             float speedWithFalloff = speed - Mathf.Pow(progress, 1f / speedFalloffPower) * speedFalloff;
@@ -218,8 +223,7 @@ namespace Player.Movement
             hookParticleTransform.gameObject.SetActive(false);
             hookParticleTransform.position = GetLineStartPos(player);
 
-            player.GetAnimator().speed = 1f;
-            player.GetAnimator().SetBool("Hook", false);
+            player.GetAnimator().SetTrigger("Collision");
 
             if (!player.IsOnTheGround() || forceAirborne)
             {

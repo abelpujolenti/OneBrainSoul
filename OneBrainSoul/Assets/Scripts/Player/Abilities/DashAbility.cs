@@ -39,13 +39,12 @@ namespace Player.Abilities
 
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.dash, transform.position);
             StartCoroutine(AnimationCoroutine(player));
-            player.GetAnimator().SetBool("Dash", true);
+            player.GetAnimator().SetTrigger("Dash");
         }
 
         private IEnumerator AnimationCoroutine(PlayerCharacterController player)
         {
             yield return new WaitForSeconds(player.GetAnimator().GetCurrentAnimatorStateInfo(0).length);
-            player.GetAnimator().SetBool("Dash", false);
         }
 
         public void ResetTimesDashed()

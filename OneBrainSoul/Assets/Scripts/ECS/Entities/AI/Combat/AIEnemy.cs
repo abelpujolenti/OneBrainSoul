@@ -368,6 +368,8 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void PreDeath()
         {
+            _isDying = true;
+            
             if (EventsManager.OnDefeatEnemy != null)
             {
                 EventsManager.OnDefeatEnemy();

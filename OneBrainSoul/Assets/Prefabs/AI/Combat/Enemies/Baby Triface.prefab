@@ -258,7 +258,6 @@ MonoBehaviour:
   _navMeshAgent: {fileID: 4363023524190419784}
   _pointsToPatrol: []
   _trifaceProperties: {fileID: 11400000, guid: 1dc903e7e219eb4439de4613a464523d, type: 2}
-  _itGoesOnAutomatic: 0
   _slamAbilityDetectionArea: {fileID: 3750270232014085122}
   _showDetectionAreaOfSlam: 0
   _colorOfDetectionAreaOfSlam: {r: 0, g: 0, b: 0, a: 0}
@@ -380,7 +379,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 14, y: 17, z: 35}
+  m_Size: {x: 20, y: 17, z: 35}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7891950643085633312
 MonoBehaviour:
