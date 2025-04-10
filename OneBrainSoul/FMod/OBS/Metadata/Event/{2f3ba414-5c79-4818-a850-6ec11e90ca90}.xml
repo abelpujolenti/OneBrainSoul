@@ -5,7 +5,7 @@
 			<value>CombatDoor_Ambient</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{51c6366b-e66c-4b79-aa85-5ec352f48813}</destination>
@@ -96,7 +96,10 @@
 	<object class="MixerBusPanner" id="{98f75e43-249e-4af8-afb0-56a58c174cd3}" />
 	<object class="SingleSound" id="{f1bf4f39-50a2-4343-98f8-ea4d27a8f990}">
 		<property name="length">
-			<value>48.813333333333333</value>
+			<value>46.813333333333333</value>
+		</property>
+		<property name="timelockedOffset">
+			<value>2</value>
 		</property>
 		<property name="looping">
 			<value>true</value>
@@ -121,7 +124,7 @@
 	</object>
 	<object class="LoopRegion" id="{288193ef-2866-44d0-adac-f1615032863b}">
 		<property name="position">
-			<value>2</value>
+			<value>0</value>
 		</property>
 		<property name="length">
 			<value>38.787988505747123</value>
@@ -143,9 +146,11 @@
 	<object class="MixerBusEffectChain" id="{74f61c2e-9c24-4317-8492-8eddb591bc4c}">
 		<relationship name="effects">
 			<destination>{cb0a216e-f749-4e67-b87b-37e29012845f}</destination>
+			<destination>{0298ce81-aba5-47ea-9323-153b26e70b9b}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{0a82d8cb-126a-406b-8fe4-ff44f6f2ee19}" />
 	<object class="MixerBusFader" id="{d199e191-51df-45f0-911a-3ef3a1c08cfc}" />
 	<object class="MixerBusFader" id="{cb0a216e-f749-4e67-b87b-37e29012845f}" />
+	<object class="SpatialiserEffect" id="{0298ce81-aba5-47ea-9323-153b26e70b9b}" />
 </objects>

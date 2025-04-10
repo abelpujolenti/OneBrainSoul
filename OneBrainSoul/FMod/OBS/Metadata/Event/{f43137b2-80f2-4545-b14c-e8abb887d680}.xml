@@ -28,9 +28,6 @@
 		<relationship name="timeline">
 			<destination>{bcc551d6-206a-4f58-8ef5-65f67c68b759}</destination>
 		</relationship>
-		<relationship name="parameters">
-			<destination>{d39fb111-2b09-41cc-800e-87aee369bdcf}</destination>
-		</relationship>
 		<relationship name="banks">
 			<destination>{a3f8341f-e5ec-4810-81a3-79fd6013a2da}</destination>
 		</relationship>
@@ -42,7 +39,7 @@
 	</object>
 	<object class="MasterTrack" id="{da12fd80-d76b-4b53-902e-184cb0831bd4}">
 		<relationship name="modules">
-			<destination>{693eccc0-a661-435b-bd33-4a56b10e698a}</destination>
+			<destination>{3a70a779-ae41-4ae9-a320-647ca9068504}</destination>
 		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{8b367800-cfc8-4835-aada-bae0a22ca84c}</destination>
@@ -62,16 +59,17 @@
 	<object class="EventAutomatableProperties" id="{6cd7a3e5-932f-4c3a-86d4-86d694346b83}" />
 	<object class="MarkerTrack" id="{1e3b79d0-f32e-4001-a9e3-283412672ada}" />
 	<object class="Timeline" id="{bcc551d6-206a-4f58-8ef5-65f67c68b759}">
-		<property name="isProxyEnabled">
-			<value>false</value>
-		</property>
-	</object>
-	<object class="ActionSheet" id="{d39fb111-2b09-41cc-800e-87aee369bdcf}">
 		<relationship name="modules">
-			<destination>{693eccc0-a661-435b-bd33-4a56b10e698a}</destination>
+			<destination>{3a70a779-ae41-4ae9-a320-647ca9068504}</destination>
+		</relationship>
+		<relationship name="markers">
+			<destination>{2f1a1f14-3da9-4dc9-a1d3-4cefb78151fd}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{8b367800-cfc8-4835-aada-bae0a22ca84c}">
+		<property name="volume">
+			<value>1.5</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{3cf18d93-ea11-4edd-9062-14bfab747107}</destination>
 		</relationship>
@@ -82,9 +80,15 @@
 			<destination>{66dbbacd-1749-4a2e-8b43-d947acf5a71d}</destination>
 		</relationship>
 	</object>
-	<object class="MultiSound" id="{693eccc0-a661-435b-bd33-4a56b10e698a}">
-		<relationship name="sounds">
-			<destination>{3fb7c89a-a312-424c-81f5-f918c9cb34b5}</destination>
+	<object class="SingleSound" id="{3a70a779-ae41-4ae9-a320-647ca9068504}">
+		<property name="length">
+			<value>0.70065759637188196</value>
+		</property>
+		<property name="timelockedOffset">
+			<value>0.14000000000000001</value>
+		</property>
+		<relationship name="audioFile">
+			<destination>{10482fe8-e8e3-4c3c-ad2f-8540a1178d1e}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusEffectChain" id="{1a2a92c2-d1a2-412d-b309-5bf2e0d59ef8}">
@@ -93,17 +97,35 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{44865e58-ce5c-4d94-8313-b99454a819cc}" />
+	<object class="LoopRegion" id="{2f1a1f14-3da9-4dc9-a1d3-4cefb78151fd}">
+		<property name="position">
+			<value>0</value>
+		</property>
+		<property name="length">
+			<value>0.46999999999999997</value>
+		</property>
+		<relationship name="timeline">
+			<destination>{bcc551d6-206a-4f58-8ef5-65f67c68b759}</destination>
+		</relationship>
+		<relationship name="markerTrack">
+			<destination>{1e3b79d0-f32e-4001-a9e3-283412672ada}</destination>
+		</relationship>
+	</object>
 	<object class="MixerBusEffectChain" id="{3cf18d93-ea11-4edd-9062-14bfab747107}">
 		<relationship name="effects">
 			<destination>{399c31e3-2ee7-4ca3-813f-eaf36b145fc2}</destination>
+			<destination>{eb146b2d-0159-4341-9430-3d666a38ebb9}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{ece3c49d-8189-470c-b45d-1f41dd159416}" />
-	<object class="SingleSound" id="{3fb7c89a-a312-424c-81f5-f918c9cb34b5}">
-		<relationship name="audioFile">
-			<destination>{10482fe8-e8e3-4c3c-ad2f-8540a1178d1e}</destination>
-		</relationship>
-	</object>
 	<object class="MixerBusFader" id="{cca06645-a636-47b0-9457-3b7f539de07a}" />
 	<object class="MixerBusFader" id="{399c31e3-2ee7-4ca3-813f-eaf36b145fc2}" />
+	<object class="MultibandEqEffect" id="{eb146b2d-0159-4341-9430-3d666a38ebb9}">
+		<property name="frequencyA">
+			<value>1793.24646</value>
+		</property>
+		<property name="qualityA">
+			<value>0.644206941</value>
+		</property>
+	</object>
 </objects>

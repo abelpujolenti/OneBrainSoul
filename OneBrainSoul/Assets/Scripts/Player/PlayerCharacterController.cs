@@ -83,6 +83,7 @@ namespace Player
         private Vector3 _startPos;
         private Vector3 _respawnPos;
         private EventInstance _footstepSound;
+        private EventInstance _slideSound;
 
         [SerializeField] private DashAbility _dashAbility;
         [SerializeField] private ChargeAbility _chargeAbility;
@@ -128,6 +129,8 @@ namespace Player
 
             _footstepSound = AudioManager.Instance.CreateInstance(FMODEvents.instance.playerFootsteps);
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            _slideSound = AudioManager.Instance.CreateInstance(FMODEvents.instance.slide);
+            _slideSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
 
             _chargeMovementHandler = new ChargeMovementHandler(GetComponent<Hitstop>());
             _hookMovementHandler = new HookMovementHandler(_hookLineRenderer, _smashParticle, _hookParticleTransform, GetComponent<Hitstop>());
@@ -449,6 +452,24 @@ namespace Player
             else if (playbackState.Equals(PLAYBACK_STATE.PLAYING))
             {
                 _footstepSound.stop(STOP_MODE.ALLOWFADEOUT);
+            }
+        }
+
+        public void SlideSound(bool isSliding)
+        {
+            _slideSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            PLAYBACK_STATE playbackState;
+            _slideSound.getPlaybackState(out playbackState);
+            if (isSliding)
+            {
+                if (playbackState.Equals(PLAYBACK_STATE.STOPPED))
+                {
+                    _slideSound.start();
+                }
+            }
+            else if (playbackState.Equals(PLAYBACK_STATE.PLAYING))
+            {
+                _slideSound.stop(STOP_MODE.ALLOWFADEOUT);
             }
         }
 

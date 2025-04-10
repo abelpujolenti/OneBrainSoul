@@ -51,6 +51,7 @@ public class CombatRoom : MonoBehaviour
 
     public void Enter(PlayerCharacterController player)
     {
+        AudioManager.Instance.PlayOneShot(FMODEvents.instance.combatDoor_Through, player.transform.position);
         if (active || beat) return;
         active = true;
         this.player = player;
@@ -65,6 +66,7 @@ public class CombatRoom : MonoBehaviour
             ActivateWall(walls[i]);
         }
         yield return new WaitForSeconds(t);
+        AudioManager.Instance.PlayOneShot(FMODEvents.instance.combatDoor_Closed, player.transform.position);
         for (int i = 0; i < enemies.Count; i++)
         {
             yield return new WaitForSeconds(enemyDelay);
@@ -82,6 +84,7 @@ public class CombatRoom : MonoBehaviour
             DeactivateWall(walls[i]);
         }
         player.GetComponent<PlayerCharacter>().DefeatCombatRoom();
+        AudioManager.Instance.PlayOneShot(FMODEvents.instance.combatDoor_Open, player.transform.position);
     }
 
     public void ResetRoom()

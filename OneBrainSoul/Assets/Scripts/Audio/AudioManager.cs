@@ -20,6 +20,9 @@ public class AudioManager : MonoBehaviour
     private EventInstance musicEventInstance;
     private EventInstance insideSnapshotEventInstance;
 
+    private EventInstance lowHealthEventInstance;
+    private EventInstance ghostModeEventInstance;
+
     public static AudioManager Instance { get; private set; }
 
     private void Awake()
@@ -51,6 +54,9 @@ public class AudioManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoad;
         OnSceneLoad(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+
+        InitializeGhostMode();
+        InitializeLowHealth();
     }
 
     private void OnSceneLoad(Scene s, LoadSceneMode mode)
@@ -106,6 +112,44 @@ public class AudioManager : MonoBehaviour
         if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
         musicEventInstance = CreateInstance(FMODEvents.instance.music);
         musicEventInstance.start();
+    }
+
+    public void InitializeLowHealth()
+    {
+        PLAYBACK_STATE s;
+        lowHealthEventInstance.getPlaybackState(out s);
+        if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
+        lowHealthEventInstance = CreateInstance(FMODEvents.instance.lowHealth);
+        lowHealthEventInstance.start();
+        StopLowHealth();
+    }
+
+    public void InitializeGhostMode()
+    {
+        PLAYBACK_STATE s;
+        ghostModeEventInstance.getPlaybackState(out s);
+        if (s == PLAYBACK_STATE.STARTING || s == PLAYBACK_STATE.PLAYING) return;
+        ghostModeEventInstance = CreateInstance(FMODEvents.instance.ghostMode);
+        ghostModeEventInstance.start();
+        StopGhostMode();
+    }
+
+    public void PlayLowHealth()
+    {
+        lowHealthEventInstance.setPaused(false);
+    }
+    public void StopLowHealth()
+    {
+        lowHealthEventInstance.setPaused(true);
+    }
+
+    public void PlayGhostMode()
+    {
+        ghostModeEventInstance.setPaused(false);
+    }
+    public void StopGhostMode()
+    {
+        ghostModeEventInstance.setPaused(true);
     }
 
     public void SetMusicParameter(string parameterName, float parameterValue)

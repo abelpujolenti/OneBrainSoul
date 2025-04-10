@@ -1,5 +1,8 @@
+using FMOD.Studio;
+using FMODUnity;
 using Managers;
 using UnityEngine;
+using UnityEngine.Windows;
 
 namespace Player.Movement
 {
@@ -99,12 +102,15 @@ namespace Player.Movement
             }
 
             // Slide down steep slopes
+            bool sliding = false;
             RaycastHit groundHit = player.GetGroundHit();
             
             if (groundHit.distance < slideDistance && Vector3.Angle(groundHit.normal, Vector3.up) > slideAngle)
             {
                 player.GetRigidbody().AddForce(Vector3.down * slideSpeed, ForceMode.Acceleration);
+                sliding = true;
             }
+            player.SlideSound(sliding);
 
             //Cap velocity
             if (player.GetRigidbody().velocity.magnitude > maxVelocity)

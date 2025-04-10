@@ -379,6 +379,8 @@ namespace ECS.Entities.AI.Combat
             {
                 EventsManager.OnAgentDefeated(GetEntityType(), GetAgentID());
             }
+
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemyDeath, transform.position);
         }
 
         private IEnumerator DamageEffectCoroutine(float duration)

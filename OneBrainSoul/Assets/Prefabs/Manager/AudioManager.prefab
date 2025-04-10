@@ -45,10 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46025e82205032d47b7b9d6bb0bdc2c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  masterVolume: 0.5
-  musicVolume: 1
-  ambienceVolume: 0.65
-  SFXVolume: 0.75
 --- !u!114 &7495049487779558572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,3 +281,108 @@ MonoBehaviour:
       Data3: -1353118557
       Data4: 1030141585
     Path: event:/SFX/Alpha/LongarmsSpin
+  <brasero>k__BackingField:
+    Guid:
+      Data1: 1776080226
+      Data2: 1088862889
+      Data3: 1922504592
+      Data4: 1626310570
+    Path: event:/SFX/Beta/Brasero
+  <catIdle>k__BackingField:
+    Guid:
+      Data1: -2122492524
+      Data2: 1329817148
+      Data3: -1349421381
+      Data4: 668603236
+    Path: event:/SFX/Beta/CatIdle
+  <combatDoor_Ambient>k__BackingField:
+    Guid:
+      Data1: 792437780
+      Data2: 1209556089
+      Data3: -1049735000
+      Data4: -1865773026
+    Path: event:/SFX/Beta/CombatDoor_Ambient
+  <combatDoor_Closed>k__BackingField:
+    Guid:
+      Data1: 1996879066
+      Data2: 1221805836
+      Data3: 1970995328
+      Data4: -2013795079
+    Path: event:/SFX/Beta/CombatDoor_Closed
+  <combatDoor_Open>k__BackingField:
+    Guid:
+      Data1: 890117529
+      Data2: 1197989502
+      Data3: -1955320649
+      Data4: 71897714
+    Path: event:/SFX/Beta/CombatDoor_Open
+  <combatDoor_Through>k__BackingField:
+    Guid:
+      Data1: -754872901
+      Data2: 1212010999
+      Data3: 2027459729
+      Data4: 1984095572
+    Path: event:/SFX/Beta/CombatDoor_Through
+  <enemyAlert>k__BackingField:
+    Guid:
+      Data1: 1683635628
+      Data2: 1139168748
+      Data3: -1541383545
+      Data4: -197306532
+    Path: event:/SFX/Beta/EnemyAlert
+  <enemyDeath>k__BackingField:
+    Guid:
+      Data1: 9137226
+      Data2: 1329075537
+      Data3: -2127503457
+      Data4: -122234333
+    Path: event:/SFX/Beta/EnemyDeath
+  <enemySpawn>k__BackingField:
+    Guid:
+      Data1: -1780810021
+      Data2: 1233523617
+      Data3: 1939613879
+      Data4: -889820616
+    Path: event:/SFX/Beta/EnemySpawn
+  <floatingLanterns>k__BackingField:
+    Guid:
+      Data1: -628753869
+      Data2: 1106155324
+      Data3: 1473063343
+      Data4: 2046013394
+    Path: event:/SFX/Beta/FloatingLanterns
+  <ghostMode>k__BackingField:
+    Guid:
+      Data1: -1061953676
+      Data2: 1262861981
+      Data3: 1891142539
+      Data4: -1241325388
+    Path: event:/SFX/Beta/GhostMode
+  <lowHealth>k__BackingField:
+    Guid:
+      Data1: 434025235
+      Data2: 1317899865
+      Data3: 1155190666
+      Data4: 462937208
+    Path: event:/SFX/Beta/LowHealth
+  <slide>k__BackingField:
+    Guid:
+      Data1: -198101070
+      Data2: 1162182898
+      Data3: -1410839375
+      Data4: -2133424200
+    Path: event:/SFX/Beta/Slide
+  <thunder>k__BackingField:
+    Guid:
+      Data1: -554212575
+      Data2: 1113289907
+      Data3: -1695422798
+      Data4: -625499498
+    Path: event:/SFX/Beta/Thunder
+  <toxicFog>k__BackingField:
+    Guid:
+      Data1: -460781496
+      Data2: 1327085123
+      Data3: 1865712825
+      Data4: -2022768780
+    Path: event:/SFX/Beta/ToxicFog

@@ -5,7 +5,7 @@
 			<value>ToxicFog</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{51c6366b-e66c-4b79-aa85-5ec352f48813}</destination>
@@ -70,9 +70,6 @@
 		<relationship name="modules">
 			<destination>{babbaca8-c30c-4891-a106-051e71cd3ba5}</destination>
 		</relationship>
-		<relationship name="markers">
-			<destination>{f64da536-dd54-4543-a861-977b64c3229e}</destination>
-		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{00126e5f-e261-40d7-8823-e87c9ab80c94}">
 		<property name="volume">
@@ -125,24 +122,9 @@
 			<destination>{00126e5f-e261-40d7-8823-e87c9ab80c94}</destination>
 		</relationship>
 	</object>
-	<object class="LoopRegion" id="{f64da536-dd54-4543-a861-977b64c3229e}">
-		<property name="position">
-			<value>0</value>
-		</property>
-		<property name="length">
-			<value>1.6200000000000001</value>
-		</property>
-		<relationship name="timeline">
-			<destination>{4261afaa-0674-4e14-9482-3657d70157f4}</destination>
-		</relationship>
-		<relationship name="markerTrack">
-			<destination>{75cf5ea2-fcda-42bc-84c9-230be0172c29}</destination>
-		</relationship>
-	</object>
 	<object class="MixerBusEffectChain" id="{3733a58f-8609-4753-b88c-23e11980d052}">
 		<relationship name="effects">
 			<destination>{dc48f453-5bb5-4b9b-a654-87a86224205e}</destination>
-			<destination>{69c23ee1-15b4-4e23-91e0-5d27b995886b}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{1cdd4fd6-00c5-432d-96a3-584d4d83e82c}" />
@@ -159,14 +141,6 @@
 	</object>
 	<object class="MixerBusPanner" id="{0e04f287-be86-463b-a592-9f79b3ce8e1a}" />
 	<object class="MixerBusFader" id="{dc48f453-5bb5-4b9b-a654-87a86224205e}" />
-	<object class="SpatialiserEffect" id="{69c23ee1-15b4-4e23-91e0-5d27b995886b}">
-		<property name="extentMode">
-			<value>1</value>
-		</property>
-		<property name="soundSize">
-			<value>10.5</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{b09520a2-feb9-4730-8785-a5961271ce5a}" />
 	<object class="SFXReverbEffect" id="{00bc1070-05ce-4d16-a7c0-04acbf9bd294}">
 		<property name="decayTime">

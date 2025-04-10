@@ -57,6 +57,7 @@ public class EnemySpawner : MonoBehaviour
         spawnedAgent.localScale = agentEntity.transform.lossyScale;
         spawnedAgent.gameObject.SetActive(true);
         spawnedEntities.Add(spawnedAgent.GetComponent<AgentEntity>());
+        AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemySpawn, transform.position);
     }
 
     private void OnTriggerEnter(Collider other)

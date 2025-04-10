@@ -121,6 +121,11 @@ namespace Player
 
             _health = (uint)Mathf.Max(0f, _health - damageValue);
 
+            if (_health < _maxHealth * 0.2f)
+            {
+                AudioManager.Instance.PlayLowHealth();
+            }
+
             if (_health == 0)
             {
                 //Player Die
@@ -137,6 +142,8 @@ namespace Player
                 {
                     currCombatRoom.ResetRoom();
                 }
+                AudioManager.Instance.StopLowHealth();
+                AudioManager.Instance.PlayGhostMode();
                 return;
             }
             
@@ -181,6 +188,7 @@ namespace Player
                 RecoverBody();
                 AudioManager.Instance.PlayOneShot(FMODEvents.instance.heal, transform.position);
                 AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
+                AudioManager.Instance.StopGhostMode();
             }
         }
 
@@ -194,7 +202,7 @@ namespace Player
             PostProcessingManager.Instance.RecoverGhostEffect(.65f);
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
-
+            AudioManager.Instance.StopGhostMode();
         }
 
         public void EnterCombatRoom(CombatRoom c)
@@ -237,6 +245,12 @@ namespace Player
         public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
             _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
+
+            if (_health >= _maxHealth * 0.2f)
+            {
+                AudioManager.Instance.StopLowHealth();
+            }
+
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
         }
 
