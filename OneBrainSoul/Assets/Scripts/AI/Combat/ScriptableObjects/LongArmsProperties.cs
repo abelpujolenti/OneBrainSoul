@@ -19,9 +19,6 @@ namespace AI.Combat.ScriptableObjects
         public uint minimumTimesSettingNewDirectionToTurnAround;
         public uint maximumTimesSettingNewDirectionToTurnAround;
         
-        public float radiusToFlee;
-        public EntityType entitiesToFleeFrom;
-        
         public ProjectileAbilityProperties throwRockAbilityProperties;
         public float bodyNotationSpeedWhileCastingThrowRock;
         

@@ -33,7 +33,7 @@ namespace ECS.Entities.AI.Combat
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
 
             _context = new SendatuContext(_sendatuProperties.totalHealth, radius, capsuleCollider.height, _headTransform, 
-                _bodyTransform, _sendatuProperties.radiusToFlee);
+                _bodyTransform, 5);
             
             SetDirectionToRotateBody(transform.forward);
             

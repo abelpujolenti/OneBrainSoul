@@ -70,6 +70,11 @@ namespace AI.Combat.AbilityCasts
             _projectilesPool.Enqueue(_currentProjectile);
         }
 
+        public void Cancel()
+        {
+            _currentProjectile.gameObject.SetActive(false);
+        }
+
         public AbilityCast GetCast()
         {
             return _abilityCast;

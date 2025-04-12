@@ -410,7 +410,7 @@ namespace Player
                     //if (Physics.SphereCast(transform.position + Vector3.up, 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
                     GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
                 {
-                    Debug.Log(hit.collider.name);
+                    //Debug.Log(hit.collider.name);
                     AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
                     if (entity != null && !entity.IsDying())
                     {

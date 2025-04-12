@@ -29,8 +29,6 @@ namespace ECS.Entities.AI.Combat
         private HashSet<uint> _visibleTargetsForClapAbove;
         private Func<bool> _cancelClapAboveFunc = () => true;
 
-        private HashSet<uint> _sightedTargetsToFleeFrom;
-
         private float _bodyRotationSpeedWhenAcquiringATarget;
         private float _bodyRotationSpeedWhileCastingThrowRock;
         private float _bodyRotationSpeedWhenTurningAround;
@@ -76,8 +74,7 @@ namespace ECS.Entities.AI.Combat
             _maximumTimesSettingNewDirectionToTurnAround = _longArmsProperties.maximumTimesSettingNewDirectionToTurnAround;
 
             _context = new LongArmsContext(_longArmsProperties.totalHealth, radius, capsuleCollider.height, 
-                _headTransform, _bodyTransform, _throwRockAbility.GetCast(), _clapAboveAbility.GetCast(), 
-                _longArmsProperties.radiusToFlee);
+                _headTransform, _bodyTransform, _throwRockAbility.GetCast(), _clapAboveAbility.GetCast());
             
             SetDirectionToRotateBody(transform.forward);
 
@@ -219,15 +216,6 @@ namespace ECS.Entities.AI.Combat
                     _longArmsProperties.clapAboveAbilityProperties.abilityTarget, position, _targetsInsideVisionArea, _areaNumber);
             
             _context.SetIsSeeingATargetForClapAbove(_visibleTargetsForClapAbove.Count != 0);
-
-            _sightedTargetsToFleeFrom = CombatManager.Instance.ReturnSightedTargetsAgentEntity(_longArmsProperties.entitiesToFleeFrom, 
-                _areaNumber);
-        }
-
-        private void UpdateDistancesToTargetsToFleeFrom()
-        {
-            _context.SetDistanceToClosestTargetToFleeFrom(CombatManager.Instance.ReturnClosestDistanceToSightedTarget(
-                transform.position, _sightedTargetsToFleeFrom));
         }
 
         private void UpdateVectorsToTargets()
@@ -237,8 +225,6 @@ namespace ECS.Entities.AI.Combat
             Vector3 targetPosition;
             Vector3 targetVelocity;
             Vector3 vectorToTarget;
-            
-            UpdateDistancesToTargetsToFleeFrom();
 
             if (_context.HasATargetForClapAbove())
             {
@@ -543,6 +529,7 @@ namespace ECS.Entities.AI.Combat
                 
                 if (!_cancelThrowRockFunc())
                 {
+                    projectileAbility.Cancel();
                     abilityCast.ResetCastTime();
                     UnblockFSM();
                     yield break;
@@ -631,18 +618,5 @@ namespace ECS.Entities.AI.Combat
         [SerializeField] private Color _colorOfDetectionAreaOfThrowRock;
         [SerializeField] private bool _showDetectionAreaOfClapAbove;
         [SerializeField] private Color _colorOfDetectionAreaOfClapAbove;
-        [SerializeField] private bool _showDetectionAreaOfFlee;
-        [SerializeField] private Color _colorOfDetectionAreaOfFlee;
-        
-        private new void OnDrawGizmos()
-        {
-            base.OnDrawGizmos();
-
-            if (_showDetectionAreaOfFlee)
-            {
-                Gizmos.color = _colorOfDetectionAreaOfFlee;
-                Gizmos.DrawSphere(_bodyTransform.position, _context.GetRadiusToFlee());
-            }
-        }
     }
 }
