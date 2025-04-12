@@ -624,6 +624,7 @@ GameObject:
   - component: {fileID: 146608878}
   - component: {fileID: 146608877}
   - component: {fileID: 146608876}
+  - component: {fileID: 146608879}
   m_Layer: 5
   m_Name: ViewButton
   m_TagString: Untagged
@@ -670,7 +671,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 0.1254902, g: 0.11764706, b: 0.18039216, a: 1}
     m_HighlightedColor: {r: 0.21176471, g: 0.19215687, b: 0.34117648, a: 1}
@@ -745,6 +746,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 146608874}
   m_CullTransparentMesh: 1
+--- !u!114 &146608879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 146608874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231fb6b0051243ff8c3b48643273748a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _text: {fileID: 1346800984}
+  _normalTextColor: {r: 0.1254902, g: 0.11764706, b: 0.18039216, a: 1}
+  _hoverTextColor: {r: 0.21176471, g: 0.19215687, b: 0.34117648, a: 1}
+  _pressingTextColor: {r: 0.18431373, g: 0.34117648, b: 0.48235294, a: 1}
+  _selectedTextColor: {r: 0.25490198, g: 0.78431374, b: 0.83137256, a: 1}
 --- !u!1 &170245195
 GameObject:
   m_ObjectHideFlags: 0
@@ -1355,9 +1373,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 1963021678}
-  _textColorOnHover: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
-  _textColorOnPress: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
-  _textColorOnExitHover: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
+  _normalTextColor: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
+  _hoverTextColor: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
+  _pressingTextColor: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
+  _selectedTextColor: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
 --- !u!1 &419615141
 GameObject:
   m_ObjectHideFlags: 0
@@ -1727,9 +1746,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 1877452289}
-  _textColorOnHover: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
-  _textColorOnPress: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
-  _textColorOnExitHover: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
+  _normalTextColor: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
+  _hoverTextColor: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
+  _pressingTextColor: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
+  _selectedTextColor: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
 --- !u!1 &432622146
 GameObject:
   m_ObjectHideFlags: 0
@@ -2218,6 +2238,7 @@ GameObject:
   - component: {fileID: 546594051}
   - component: {fileID: 546594050}
   - component: {fileID: 546594052}
+  - component: {fileID: 546594053}
   m_Layer: 5
   m_Name: cat ears
   m_TagString: Untagged
@@ -2303,6 +2324,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &546594053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546594048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28a95a4f597424880780d410fcba3a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &566136785
 GameObject:
   m_ObjectHideFlags: 0
@@ -3398,6 +3431,9 @@ MonoBehaviour:
   _soundSettingsPanel: {fileID: 566136785}
   _viewSettingsPanel: {fileID: 1653396025}
   _controlSettingsPanel: {fileID: 826543984}
+  _soundSettingsButton: {fileID: 1127233056}
+  _viewSettingsButton: {fileID: 146608879}
+  _controlSettingsButton: {fileID: 1093751407}
 --- !u!1 &800566296
 GameObject:
   m_ObjectHideFlags: 0
@@ -4240,6 +4276,7 @@ GameObject:
   - component: {fileID: 1093751406}
   - component: {fileID: 1093751405}
   - component: {fileID: 1093751404}
+  - component: {fileID: 1093751407}
   m_Layer: 5
   m_Name: ControlButton
   m_TagString: Untagged
@@ -4286,7 +4323,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 0.1254902, g: 0.11764706, b: 0.18039216, a: 1}
     m_HighlightedColor: {r: 0.21176471, g: 0.19215687, b: 0.34117648, a: 1}
@@ -4361,6 +4398,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1093751402}
   m_CullTransparentMesh: 1
+--- !u!114 &1093751407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093751402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231fb6b0051243ff8c3b48643273748a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _text: {fileID: 66268387}
+  _normalTextColor: {r: 0.1254902, g: 0.11764706, b: 0.18039216, a: 1}
+  _hoverTextColor: {r: 0.21176471, g: 0.19215687, b: 0.34117648, a: 1}
+  _pressingTextColor: {r: 0.18431373, g: 0.34117648, b: 0.48235294, a: 1}
+  _selectedTextColor: {r: 0.25490198, g: 0.78431374, b: 0.83137256, a: 1}
 --- !u!1 &1107011630
 GameObject:
   m_ObjectHideFlags: 0
@@ -4508,6 +4562,7 @@ GameObject:
   - component: {fileID: 1127233055}
   - component: {fileID: 1127233054}
   - component: {fileID: 1127233053}
+  - component: {fileID: 1127233056}
   m_Layer: 5
   m_Name: SoundButton
   m_TagString: Untagged
@@ -4548,13 +4603,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 0.12521805, g: 0.119215034, b: 0.1792453, a: 1}
     m_HighlightedColor: {r: 0.21327871, g: 0.1938412, b: 0.33962262, a: 1}
@@ -4629,6 +4684,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127233051}
   m_CullTransparentMesh: 1
+--- !u!114 &1127233056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127233051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231fb6b0051243ff8c3b48643273748a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _text: {fileID: 1033296504}
+  _normalTextColor: {r: 0.1254902, g: 0.11764706, b: 0.18039216, a: 1}
+  _hoverTextColor: {r: 0.21176471, g: 0.19215687, b: 0.34117648, a: 1}
+  _pressingTextColor: {r: 0.18431373, g: 0.34117648, b: 0.48235294, a: 1}
+  _selectedTextColor: {r: 0.25490198, g: 0.78431374, b: 0.83137256, a: 1}
 --- !u!1 &1128410408
 GameObject:
   m_ObjectHideFlags: 0
@@ -6644,9 +6716,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 458839864}
-  _textColorOnHover: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
-  _textColorOnPress: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
-  _textColorOnExitHover: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
+  _normalTextColor: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
+  _hoverTextColor: {r: 0.22352941, g: 0.7058824, b: 0.7254902, a: 1}
+  _pressingTextColor: {r: 0.08627451, g: 0.10980392, b: 0.52156866, a: 1}
+  _selectedTextColor: {r: 0.5372549, g: 0.972549, b: 0.9529412, a: 1}
 --- !u!1 &1653396025
 GameObject:
   m_ObjectHideFlags: 0
