@@ -52,18 +52,6 @@ namespace Editor.Enemies
             
             EditorGUILayout.Space();
             
-            LabelField("Flee");
-
-            EditorGUI.indentLevel++;
-            
-            EnumFlagsField(ref longArmsProperties.entitiesToFleeFrom, "Entities To Flee From");
-            
-            FloatField(ref longArmsProperties.radiusToFlee, 0, "Radius To Flee");
-
-            EditorGUI.indentLevel--;
-            
-            EditorGUILayout.Space();
-            
             LabelField("Abilities");
 
             EditorGUI.indentLevel++;

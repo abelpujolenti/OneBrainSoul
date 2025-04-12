@@ -155,7 +155,7 @@ namespace Player
             Quaternion qplayer = Quaternion.LookRotation(_playerCharacterController.GetOrientation().forward, Vector3.up);
             q *= qplayer;
             Vector3 angles = q.eulerAngles;
-            Debug.Log(angles);
+            //Debug.Log(angles);
 
             PostProcessingManager.Instance.DamageEffect(_damageEffectDuration, power, angles.y + 270f);
             _camera.ScreenShake(_damageEffectDuration * 0.65f, .9f);

@@ -74,30 +74,6 @@ namespace AI.Combat.Area
 
             RemoveTarget(entityType, enemyId);
             RemoveSightedTarget(entityType, enemyId);
-
-            /*List<EntityType> keysToRemove = new List<EntityType>();
-
-            foreach (EntityType targetEntityType in _agentsTargets.Keys)
-            {
-                if (!_agentsTargets[targetEntityType].Remove(enemyId))
-                {
-                    continue;
-                }
-
-                if (_agentsTargets[targetEntityType].Count != 0)
-                {
-                    continue;
-                }
-                
-                keysToRemove.Add(targetEntityType);
-            }
-
-            foreach (EntityType keyToRemove in keysToRemove)
-            {
-                _agentsTargets.Remove(keyToRemove);
-                _targetEntitiesInsideArea.Remove(keyToRemove);
-                _targetEntitiesSightedInsideArea.Remove(keyToRemove);
-            }*/
         }
 
         public bool IsAreaEmpty()

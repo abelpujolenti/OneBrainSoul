@@ -7,6 +7,8 @@ namespace Interfaces.AI.Combat
     {
         public void Activate();
 
+        public void Cancel();
+
         public AbilityCast GetCast();
 
         public bool FIREEEEEEEEEEEEEE();

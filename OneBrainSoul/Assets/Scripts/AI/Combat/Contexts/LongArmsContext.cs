@@ -9,11 +9,10 @@ using UnityEngine;
 namespace AI.Combat.Contexts
 {
     public class LongArmsContext : TeleportMobilityEnemyContext, ILongArmsIdleUtility, ILongArmsAcquireNewTargetForThrowRockUtility, 
-        ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsThrowRockUtility, ILongArmsClapAboveUtility, ILongArmsFleeUtility
+        ILongArmsAcquireNewTargetForClapAboveUtility, ILongArmsThrowRockUtility, ILongArmsClapAboveUtility
     {        
         private float _distanceToClosestTargetToFleeFrom;
         private uint _longArmsBasesFree;
-        private float _radiusToFlee;
 
         private bool _isSeeingATargetForThrowRock;
         private bool _throwRockAbilityHasATarget;
@@ -28,7 +27,7 @@ namespace AI.Combat.Contexts
         private TargetContext _clapAboveTarget = new TargetContext();
         
         public LongArmsContext(uint totalHealth, float radius, float height, Transform headAgentTransform, 
-            Transform bodyAgentTransform, AbilityCast throwRockCast, AbilityCast clapAboveCast, float radiusToFlee) 
+            Transform bodyAgentTransform, AbilityCast throwRockCast, AbilityCast clapAboveCast) 
             : base(EntityType.LONG_ARMS, totalHealth, radius, height, headAgentTransform, bodyAgentTransform)
         {
             _repeatableActions = new List<uint>
@@ -40,7 +39,6 @@ namespace AI.Combat.Contexts
 
             _throwRockCast = throwRockCast;
             _clapAboveCast = clapAboveCast;
-            _radiusToFlee = radiusToFlee;
         }
 
         public void SetIsSeeingATargetForThrowRock(bool isSeeingATarget)
@@ -176,11 +174,6 @@ namespace AI.Combat.Contexts
         public void SetDistanceToClosestTargetToFleeFrom(float distance)
         {
             _distanceToClosestTargetToFleeFrom = distance;
-        }
-
-        public float GetRadiusToFlee()
-        {
-            return _radiusToFlee;
         }
 
         public override bool IsSeeingATarget()
