@@ -219,7 +219,15 @@ namespace Managers
 
             destinationPosition += aStarPath.deviationVector;
 
-            aStarPath.destination = destinationPosition;
+            RaycastHit hit;
+
+            if (!Physics.Raycast(destinationPosition, Vector3.down, out hit, Mathf.Infinity, 
+                    GameManager.Instance.GetGroundLayer()))
+            {
+                return;
+            }
+
+            aStarPath.destination = hit.point;
         }
 
         private void UpdateDynamicObstaclesPositionsAndRadii()
@@ -316,8 +324,6 @@ namespace Managers
                 {
                     return;
                 }
-
-                //EventsManager.UpdatePositionAndDestination(selectedAgentID);
                     
                 AStarPath aStarPath = _navMeshAgentDestinations[selectedAgentID].GetAStarPath();
 
@@ -331,8 +337,6 @@ namespace Managers
                 _updateAgentDestinationSystem.UpdateAgentDestination(aStarPath, _triangleSideLength);
                     
                 aStarPath.navMeshGraph.ResetGraphImportantInfo();
-
-                //EventsManager.UpdateAgentPath(selectedAgentID);
             }
         }
 
