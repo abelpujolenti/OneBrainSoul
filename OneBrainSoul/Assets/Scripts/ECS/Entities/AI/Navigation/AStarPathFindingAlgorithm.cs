@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AI.Combat.CombatNavigation;
+using Managers;
+using Threads;
 using UnityEngine;
 using Utilities;
 using Edge = AI.Combat.CombatNavigation.Edge;
@@ -152,15 +155,14 @@ namespace ECS.Entities.AI.Navigation
                 return path;
             }
 
-            return RemoveNonCorners(path);
-            /*path = RemoveNonCorners(path);
+            path = RemoveNonCorners(path);
 
             if (path.Count < 3)
             {
                 return path;
             }
             
-            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength);*/
+            return RemoveUnnecessaryCorners(path, origin, nodes, triangleSideLength);
         }
 
         private static List<Node> RemoveNonCorners(List<Node> path)
@@ -190,11 +192,6 @@ namespace ECS.Entities.AI.Navigation
         private static List<Node> RemoveUnnecessaryCorners(List<Node> path, Vector3 origin, 
             Dictionary<uint, Node> nodes, float triangleSideLength)
         {
-            path.Insert(0, new Node
-            {
-                position = origin
-            });
-            
             int counter = 0;
 
             Vector3 segmentStart;
@@ -214,13 +211,12 @@ namespace ECS.Entities.AI.Navigation
                 
                 Node endNode = path[counter + 2];
                 segmentStart = startNode.position;
-                segmentBetweenNodes = endNode.position - startNode.position;
+                segmentBetweenNodes = endNode.position - segmentStart;
                 
                 closestNodesToSegment = GetClosestNodesToSegment(startNode, nodes, segmentStart, segmentBetweenNodes, triangleSideLength);
 
                 if (!closestNodesToSegment.Contains(endNode) ||
-                    CheckHoles(closestNodesToSegment, segmentStart, segmentBetweenNodes, triangleSideLength) || 
-                    CheckEdgesCosts(closestNodesToSegment, segmentStart, segmentBetweenNodes))
+                    !AreEdgesCostsNormal(closestNodesToSegment, segmentStart, segmentBetweenNodes, nodes))
                 {
                     counter++;
                     continue;
@@ -236,43 +232,49 @@ namespace ECS.Entities.AI.Navigation
 
         private static bool IsAJumpEdge(Node startNode, uint nextNodeIndex)
         {
-            int i = 0;
-
-            for (; i < startNode.edges.Count; i++)
+            foreach (Edge edge in startNode.edges)
             {
-                if (startNode.edges[i].toNodeIndex != nextNodeIndex)
+                if (edge.toNodeIndex != nextNodeIndex)
                 {
                     continue;
                 }
-                break;
+
+                return edge.isAJump;
             }
 
-            return startNode.edges[i].isAJump;
+            return false;
         }
 
         private static List<Node> GetClosestNodesToSegment(Node startNode, Dictionary<uint, Node> nodes, 
             Vector3 segmentStart, Vector3 segmentBetweenNodes, float maximumDistance)
         {
-            float distanceSquared = segmentBetweenNodes.magnitude;
+            float distanceSquared = segmentBetweenNodes.sqrMagnitude;
+            
+            if (distanceSquared == 0)
+            {
+                return new List<Node>();
+            }
 
             float closestPointNormalized;
 
             List<Node> closestNodesToSegment = new List<Node>();
-            PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+            Queue<Node> openSet = new Queue<Node>();
             HashSet<Node> closedSet = new HashSet<Node>();
             
-            openSet.Enqueue(startNode, 0);
+            openSet.Enqueue(startNode);
 
             Node currentNode;
 
             Vector3 pointVector;
-            Vector3 closestPoint;
 
             while (openSet.Count != 0)
             {
                 currentNode = openSet.Dequeue();
 
-                closedSet.Add(currentNode);
+                if (!closedSet.Add(currentNode))
+                {
+                    continue;
+                }
 
                 pointVector = currentNode.position - segmentStart;
 
@@ -283,17 +285,10 @@ namespace ECS.Entities.AI.Navigation
                     continue;
                 }
 
-                closestPoint = segmentStart + closestPointNormalized * segmentBetweenNodes;
-
-                if ((currentNode.position - closestPoint).sqrMagnitude >= maximumDistance * maximumDistance)
-                {
-                    continue;
-                }
-
                 foreach (Edge edge in currentNode.edges)
                 {
                     Node toNode = nodes[edge.toNodeIndex];
-                    openSet.Enqueue(toNode, (segmentStart - toNode.position).magnitude);
+                    openSet.Enqueue(toNode);
                 }
                 
                 closestNodesToSegment.Add(currentNode);
@@ -302,15 +297,55 @@ namespace ECS.Entities.AI.Navigation
             return closestNodesToSegment;
         }
 
-        private static bool CheckHoles(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes, 
-            float maximumDistance)
+        private static bool AreEdgesCostsNormal(List<Node> closestNodesToSegment, Vector3 segmentStart, Vector3 segmentBetweenNodes, 
+            Dictionary<uint, Node> nodes)
         {
+            HashSet<Node> leftSideNodes = new HashSet<Node>();
+            HashSet<Node> rightSideNodes = new HashSet<Node>();
+            
+            GetEachSideNodes(closestNodesToSegment, segmentStart, segmentBetweenNodes, ref leftSideNodes, ref rightSideNodes);
+
+            foreach (Node leftSideNode in leftSideNodes)
+            {
+                foreach (Edge edge in leftSideNode.edges)
+                {
+                    if (!rightSideNodes.Contains(nodes[edge.toNodeIndex]))
+                    {
+                        continue;
+                    }
+                    
+                    if (!Mathf.Approximately(edge.cost, edge.defaultCost))
+                    {
+                        return false;
+                    }
+                }
+            }
+            
             return true;
         }
 
-        private static bool CheckEdgesCosts(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes)
+        private static void GetEachSideNodes(List<Node> nodes, Vector3 segmentStart, Vector3 segmentBetweenNodes, 
+            ref HashSet<Node> leftSideNodes, ref HashSet<Node> rightSideNodes)
         {
-            return true;
+            Vector3 perpendicularVector = Vector3.Cross(segmentBetweenNodes, Vector3.up);
+            
+            Vector3 pointVector;
+
+            foreach (Node node in nodes)
+            {
+                pointVector = node.position - segmentStart;
+
+                float dotProduct = Vector3.Dot(perpendicularVector, pointVector);
+
+                if (dotProduct > 0)
+                {
+                    rightSideNodes.Add(node);
+                }
+                else if (dotProduct < 0)
+                {
+                    leftSideNodes.Add(node);
+                }
+            }
         }
     }
 }

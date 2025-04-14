@@ -16,7 +16,8 @@ namespace BULLSHIT
         private static void OnPlayModeChanged(PlayModeStateChange state)
         {
             if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("ControllerTest") && 
-                SceneManager.GetActiveScene() != SceneManager.GetSceneByName("ABEL_ControllerTest"))
+                SceneManager.GetActiveScene() != SceneManager.GetSceneByName("ABEL_ControllerTest") && 
+                SceneManager.GetActiveScene() != SceneManager.GetSceneByName("DemoScene"))
             {
                 return;
             }

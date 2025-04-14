@@ -51,6 +51,11 @@ namespace Player.Camera
             
             UpdateFov(SettingsManager.Instance.GetFOV());
 
+            if (fov == 0)
+            {
+                fov = 100;
+            }
+
             EventsManager.OnChangeFov += UpdateFov;
         }
 
