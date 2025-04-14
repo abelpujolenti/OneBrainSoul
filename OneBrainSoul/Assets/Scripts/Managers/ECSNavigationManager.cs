@@ -3,12 +3,9 @@ using System.Diagnostics;
 using System.Threading;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
-using DEBUG;
 using ECS.Components.AI.Navigation;
-using ECS.Entities.AI.Combat;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
-using Threads;
 using UnityEngine;
 using UnityEngine.AI;
 
