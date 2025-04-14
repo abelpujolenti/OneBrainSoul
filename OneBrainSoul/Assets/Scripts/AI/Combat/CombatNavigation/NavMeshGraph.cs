@@ -174,48 +174,8 @@ namespace AI.Combat.CombatNavigation
                 }
             }
         }
-        
+
         public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
-        {
-            Vector3 closestNodePosition = GetClosestNode(obstaclePosition).position;
-            
-            foreach (Node node in nodes.Values)
-            {
-                foreach (Edge edge in node.edges)
-                {
-                    if (edge.isAJump)
-                    {
-                        continue;
-                    }
-                    
-                    Node toNode = nodes[edge.toNodeIndex];
-                    
-                    if (Vector3.Distance(toNode.position, closestNodePosition) > radius)
-                    {
-                        continue;
-                    }
-                    
-                    edge.MultiplyCost(weightMultiplier);
-
-                    foreach (Edge toNodeEdge in toNode.edges)
-                    {
-                        if (toNodeEdge.toNodeIndex != node.index)
-                        {
-                            continue;
-                        }
-
-                        if (Vector3.Distance(nodes[toNodeEdge.toNodeIndex].position, closestNodePosition) < radius)
-                        {
-                            break;
-                        }
-                        
-                        toNodeEdge.MultiplyCost(weightMultiplier);
-                    }
-                }
-            }
-        }
-
-        /*public void UpdateEdgeWeights(Vector3 obstaclePosition, float radius, float weightMultiplier)
         {
             Node closestNode = GetClosestNode(obstaclePosition);
             Vector3 closestNodePosition = closestNode.position;
@@ -246,23 +206,21 @@ namespace AI.Combat.CombatNavigation
 
                     foreach (Edge toNodeEdge in toNode.edges)
                     {
-                        if (toNodeEdge.toNodeIndex != currentNode.index)
+                        if (toNodeEdge.toNodeIndex == currentNode.index)
                         {
                             continue;
                         }
 
-                        if (Vector3.Distance(nodes[toNodeEdge.toNodeIndex].position, closestNodePosition) < radius)
+                        if (Vector3.Distance(nodes[toNodeEdge.toNodeIndex].position, closestNodePosition) > radius)
                         {
-                            break;
+                            continue;
                         }
                         
                         toNodeEdge.MultiplyCost(weightMultiplier);
-                        
-                        break;
                     }
                 }
             }
-        }*/
+        }
         
         public void ResetGraphImportantInfo()
         {
