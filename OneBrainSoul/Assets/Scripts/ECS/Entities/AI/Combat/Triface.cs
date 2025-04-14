@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Area;
+using AI.Combat.CombatNavigation;
 using AI.Combat.Contexts;
 using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
@@ -98,8 +99,6 @@ namespace ECS.Entities.AI.Combat
             //RotateBody();
             
             //RotateHead();
-                
-            //LaunchRaycasts();
             
             CalculateBestAction();
 

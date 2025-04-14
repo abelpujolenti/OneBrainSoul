@@ -3,9 +3,12 @@ using System.Diagnostics;
 using System.Threading;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
+using DEBUG;
 using ECS.Components.AI.Navigation;
+using ECS.Entities.AI.Combat;
 using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
+using Threads;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -243,7 +246,7 @@ namespace Managers
             }
         }
 
-        public List<DynamicObstacleThreadSafe> ReturnDynamicObstacleThreadSafes()
+        private List<DynamicObstacleThreadSafe> ReturnDynamicObstacleThreadSafes()
         {
             List<DynamicObstacleThreadSafe> dynamicObstacleThreadSafes = new List<DynamicObstacleThreadSafe>();
 
@@ -368,7 +371,7 @@ namespace Managers
             DynamicObstacle dynamicObstacle = new DynamicObstacle
             {
                 iPosition = navMeshAgentComponent.GetTransformComponent(),
-                radius = radius + 4
+                radius = radius
             };
 
             _dynamicObstacles.Add(agentID, dynamicObstacle);

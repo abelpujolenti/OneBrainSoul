@@ -58,55 +58,13 @@ namespace ECS.Entities.AI.Combat
 
             _onEnableAction = () =>
             {
-                ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius);
+                ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius + freeMobilityEnemyProperties.agentsPositionRadius);
             };
 
             _onEnableAction();
 
             _update = AILoop;
         }
-
-        #region Steering
-
-        protected void SetRaysDirections()
-        {
-            _raysDirectionAndWeights = new DirectionWeights[_numberOfVicinityRays];
-            
-            float angle = -(_raysOpeningAngle / 2);
-            float angleStep = _raysOpeningAngle / _numberOfVicinityRays;
-
-            Transform ownTransform = transform;
-
-            for (int i = 0; i < _numberOfVicinityRays; i++)
-            {
-                Vector3 direction = Quaternion.Euler(0, angle, 0) * ownTransform.forward;
-                _raysDirectionAndWeights[i].direction = direction.normalized;
-                angle += angleStep;
-            }
-        }
-
-        protected void LaunchRaycasts()
-        {
-            SetRaysDirections();
-            
-            Vector3 position = transform.position;
-
-            RaycastHit hit;
-            
-            for (int i = 0; i < _numberOfVicinityRays; i++)
-            {
-                if (Physics.Raycast(position, _raysDirectionAndWeights[i].direction, out hit, _raysDistance, _raysTargetsLayerMask))
-                {
-                    _raysDirectionAndWeights[i].weight = MathUtil.Map(hit.distance, 0, 1, _raysDistance, 0);
-                    //Debug.Log(hit.collider.name);
-                    continue;
-                }
-
-                _raysDirectionAndWeights[i].weight = 0;
-            }
-        }
-
-        #endregion
 
         #region Navigation
         
