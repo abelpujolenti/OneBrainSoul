@@ -11,7 +11,7 @@ namespace Player.Movement
         public static float horizontalAirDrag = 25f;
         public static float bobbingStrength = 0.6f;
         public static float duration = .09f;
-        public static float contactDamageDuration = .78f;
+        public static float contactDamageDuration = .4f;
         public static int damage = 1;
 
         private float chargeTime = 0f;
@@ -22,6 +22,7 @@ namespace Player.Movement
         {
             this.dashDirection = dashDirection;
             playerCharacterController.GetCamera().FovWarp(.8f / duration, 1.22f);
+            playerCharacterController.SetContactDamage(contactDamageDuration, damage);
         }
 
         public void ResetValues()
@@ -54,8 +55,6 @@ namespace Player.Movement
             Vector3 horizontalVelocity = rigidbody.velocity;
             horizontalVelocity.y = 0;
             rigidbody.AddForce(-horizontalVelocity * (player.IsOnTheGround() ? horizontalDrag : horizontalAirDrag), ForceMode.Acceleration);
-
-            player.SetContactDamage(contactDamageDuration, damage);
         }
 
         private void Exit(PlayerCharacterController player)
