@@ -266,12 +266,16 @@ namespace Player
             {
                 return;
             }
-            
+
+            ResetDash();
+        }
+
+        public void ResetDash()
+        {
             if (_dashAbility != null)
             {
                 _dashAbility.ResetTimesDashed();
             }
-
         }
 
         private void CheckInput()
@@ -405,33 +409,40 @@ namespace Player
             }
             else
             {
-                RaycastHit hit;
-                if (Physics.CapsuleCast(p1, p2, _contactDamageHitboxRadius, _rigidbody.velocity.normalized, out hit, 1f,
-                    //if (Physics.SphereCast(transform.position + Vector3.up, 2f, _rigidbody.velocity.normalized, out hit, 1.5f,
-                    GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
+                var colliders = Physics.OverlapCapsule(p1 + _rigidbody.velocity.normalized, p2 + _rigidbody.velocity.normalized, _contactDamageHitboxRadius,
+                    GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore);
+                if (colliders.Length > 0)
                 {
-                    //Debug.Log(hit.collider.name);
-                    AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
-                    if (entity != null && !entity.IsDying())
+                    foreach (Collider collider in colliders)
                     {
-                        AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
-                        entity.OnReceiveDamage(_contactDamageAmount, hit.point, transform.position);
-                        GetComponent<Hitstop>().Add(_contactDamageHitstop);
-                        _contactDamageTime = 0f;
+                        AgentEntity entity = collider.GetComponent<AgentEntity>();
+                        if (entity != null && !entity.IsDying())
+                        {
+                            AudioManager.Instance.PlayOneShot(FMODEvents.instance.charge, transform.position);
+                            entity.OnReceiveDamage(_contactDamageAmount, entity.transform.position, transform.position);
+                            GetComponent<Hitstop>().Add(_contactDamageHitstop);
+                            _contactDamageTime = 0f;
 
-                        float bounceStrength = 120f;
-                        float bounceVerticalRatio = .2f;
+                            float bounceStrength = 120f;
+                            float bounceVerticalRatio = .2f;
 
-                        GetCamera().ScreenShake(.25f, 1.3f);
-                        _rigidbody.velocity = Vector3.zero;
-                        _rigidbody.AddForce(
-                        (new Vector3(hit.normal.x, Mathf.Max(0f, hit.normal.y), hit.normal.z).normalized +
-                        new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
-                            (bounceStrength * (1.4f)), ForceMode.Impulse);
+                            GetCamera().ScreenShake(.25f, 1.3f);
+                            _rigidbody.velocity = Vector3.zero;
+                            Vector3 normal = transform.position - entity.transform.position;
+                            normal.y = 0f;
+                            normal = normal == Vector3.zero ? transform.forward : normal.normalized;
+                            _rigidbody.AddForce(
+                            (new Vector3(normal.x, Mathf.Max(0f, normal.y), normal.z).normalized +
+                            new Vector3(0f, bounceVerticalRatio * 1.2f, 0f)).normalized *
+                                (bounceStrength * (1.4f)), ForceMode.Impulse);
 
-                        ChangeMovementHandlerToAirborne();
+                            ChangeMovementHandlerToAirborne();
+
+                            ResetDash();
+                        }
                     }
                 }
+
                 _contactDamageTime = Mathf.Max(0f, _contactDamageTime - Time.deltaTime);
             }
         }
