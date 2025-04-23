@@ -177,8 +177,7 @@ namespace Player.Movement
             Vector3 p1 = player.transform.position + playerCollider.center + Vector3.up * (-playerCollider.height * 0.5f);
             Vector3 p2 = p1 + Vector3.up * playerCollider.height;
             if (Physics.CapsuleCast(p1, p2, playerCollider.radius, player.GetRigidbody().velocity.normalized, out hit, 
-                    player.GetRigidbody().velocity.magnitude * 0.04f, GameManager.Instance.GetRaycastLayersWithoutAlly(), 
-                    QueryTriggerInteraction.Ignore))
+                    3.5f, GameManager.Instance.GetRaycastLayersWithoutAlly(), QueryTriggerInteraction.Ignore))
             {
                 AgentEntity entity = hit.collider.GetComponent<AgentEntity>();
 

@@ -24526,8 +24526,8 @@ MonoBehaviour:
     m_Bits: 64
   _jumps: 2
   _moveSpeedMultiplier: 1.1
-  _ability1Cooldown: 0.3
-  _ability2Cooldown: 0.5
+  _ability1Cooldown: 0.7
+  _ability2Cooldown: 1
   _contactHitboxRadius: 2
   _contactDamageHitboxRadius: 2.8
   _gravityStrength: 32

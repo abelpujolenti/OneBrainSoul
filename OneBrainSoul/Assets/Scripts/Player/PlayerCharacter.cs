@@ -244,7 +244,7 @@ namespace Player
 
         public override void OnReceiveHeal(uint healValue, Vector3 sourcePosition)
         {
-            _health = (uint)Mathf.Max(_maxHealth, _health + healValue);
+            _health = (uint)Mathf.Min(_maxHealth, _health + healValue);
 
             if (_health >= _maxHealth * 0.2f)
             {
