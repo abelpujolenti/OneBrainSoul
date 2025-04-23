@@ -28,7 +28,7 @@ MonoBehaviour:
     cooldown: 1
     duration: 0
   abilityTrigger:
-    hasAnEffectOnStart: 1
+    hasAnEffectOnStart: 0
     hasAnEffectOnTheDuration: 1
     hasAnEffectOnEnd: 0
   abilityEffectOnHealthTypeOnStart: 0
@@ -59,10 +59,10 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
-    forceDirection: {x: 0, y: -0.2, z: 1}
-    forceStrength: 3
+    forceDirection: {x: 0, y: -0.05, z: 1}
+    forceStrength: 1000
     doesForceComesFromCenterOfTheArea: 0
-    abilityEffectForceType: 1
+    abilityEffectForceType: 2
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
