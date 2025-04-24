@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{f9143a9d-59bd-4cb8-9fea-7c3396a90357}">
+		<property name="assetPath">
+			<value>422747-ESM-Boulder-Movement-1-Mobile-App-Game-FX-Sound-Magic-Fantasy-Touch-Accent-Stab-Transition-Movement-Whoosh.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>2</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e382e244-a54e-4c64-ac94-4851fa907de0}</destination>
+		</relationship>
+	</object>
+</objects>
