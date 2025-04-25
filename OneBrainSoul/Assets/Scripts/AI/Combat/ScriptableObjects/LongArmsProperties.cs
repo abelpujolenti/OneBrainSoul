@@ -1,4 +1,5 @@
 ﻿using ECS.Entities;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
@@ -23,5 +24,7 @@ namespace AI.Combat.ScriptableObjects
         public float bodyNotationSpeedWhileCastingThrowRock;
         
         public AreaAbilityProperties clapAboveAbilityProperties;
+        
+        public AnimatorController animatorController;
     }
 }

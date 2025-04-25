@@ -448,7 +448,6 @@ MonoBehaviour:
   _doesRestoreHealthOfPlayer: 1
   _doesRestoreAChargeOfPlayer: 1
   _areaNumber: 0
-  _headTransform: {fileID: 6000714678988991945}
   _bodyTransform: {fileID: 6000714678988991945}
   _showFov: 0
   _fovColor: {r: 0, g: 0, b: 0, a: 0}
