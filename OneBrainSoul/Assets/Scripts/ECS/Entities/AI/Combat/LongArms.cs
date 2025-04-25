@@ -558,7 +558,7 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingClapAbove(IAreaAbility areaAbility) 
         {
-            _animator.SetTrigger(ANIMATOR_ATTACK_TRIGGER);
+            _animator.SetTrigger(ANIMATOR_ATTACK2_TRIGGER);
             
             BlockFSM();
             
