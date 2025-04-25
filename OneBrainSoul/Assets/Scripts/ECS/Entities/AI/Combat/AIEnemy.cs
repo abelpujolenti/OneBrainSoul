@@ -16,9 +16,6 @@ namespace ECS.Entities.AI.Combat
         where TContext : AIEnemyContext
         where TAction : Enum
     {
-        protected const string ANIMATOR_ATTACK_TRIGGER = "Attack";
-        protected const string ANIMATOR_ATTACK2_TRIGGER = "Attack2";
-        
         protected TContext _context;
 
         protected IGetBestAction<TAction, TContext> _utilityFunction;

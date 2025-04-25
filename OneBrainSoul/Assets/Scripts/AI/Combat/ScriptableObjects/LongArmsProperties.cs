@@ -22,8 +22,12 @@ namespace AI.Combat.ScriptableObjects
         
         public ProjectileAbilityProperties throwRockAbilityProperties;
         public float bodyNotationSpeedWhileCastingThrowRock;
+
+        public string throwRockAbilityTriggerName;
         
         public AreaAbilityProperties clapAboveAbilityProperties;
+        
+        public string ClapAboveAbilityTriggerName;
         
         public AnimatorController animatorController;
     }

@@ -238,7 +238,7 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingSlam(IAreaAbility areaAbility) 
         {
-            _animator.SetTrigger(ANIMATOR_ATTACK_TRIGGER);
+            _animator.SetTrigger(_trifaceProperties.slamAbilityTriggerName);
             
             BlockFSM();
             
@@ -278,6 +278,8 @@ namespace ECS.Entities.AI.Combat
             AudioManager.Instance.PlayOneShot(_trifaceProperties.slamAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
+            
+            Debug.Log(areaAbility.GetCast().animationExtraTime);
 
             StartCoroutine(WaitAnimationExtraTime(areaAbility.GetCast().animationExtraTime));
             
