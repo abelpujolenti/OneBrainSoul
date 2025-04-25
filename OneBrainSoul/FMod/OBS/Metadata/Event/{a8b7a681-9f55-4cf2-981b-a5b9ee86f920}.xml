@@ -72,9 +72,6 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{4b5204a8-36ba-40e7-bc6a-c34a6e4263a8}">
-		<property name="volume">
-			<value>-6.5</value>
-		</property>
 		<relationship name="effectChain">
 			<destination>{808632f6-43d7-4bab-b61f-46210bb3ce1a}</destination>
 		</relationship>
@@ -98,6 +95,7 @@
 	<object class="MixerBusPanner" id="{5fac9bce-c347-497f-929e-99e0394830e7}" />
 	<object class="MixerBusEffectChain" id="{808632f6-43d7-4bab-b61f-46210bb3ce1a}">
 		<relationship name="effects">
+			<destination>{a62b273b-1e5b-43e5-95b2-4d4b293c4156}</destination>
 			<destination>{88392e4f-bae3-40b9-96a1-f750e819605f}</destination>
 			<destination>{18b2e1b2-8a83-4968-800d-fbf925e57135}</destination>
 			<destination>{8e007698-92d7-438c-8607-a8c9cfff78a8}</destination>
@@ -110,13 +108,27 @@
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{106e4b18-15ec-4365-ad62-910df711d8a8}" />
+	<object class="SFXReverbEffect" id="{a62b273b-1e5b-43e5-95b2-4d4b293c4156}">
+		<property name="decayTime">
+			<value>900</value>
+		</property>
+		<property name="highCut">
+			<value>1700</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{88392e4f-bae3-40b9-96a1-f750e819605f}" />
 	<object class="SpatialiserEffect" id="{18b2e1b2-8a83-4968-800d-fbf925e57135}">
 		<property name="maximumDistance">
-			<value>60</value>
+			<value>1800</value>
 		</property>
 		<property name="overrideRange">
 			<value>true</value>
+		</property>
+		<property name="extentMode">
+			<value>1</value>
+		</property>
+		<property name="soundSize">
+			<value>10000</value>
 		</property>
 	</object>
 	<object class="PitchShifterEffect" id="{8e007698-92d7-438c-8607-a8c9cfff78a8}">

@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{f9143a9d-59bd-4cb8-9fea-7c3396a90357}">
 		<property name="assetPath">
-			<value>422747-ESM-Boulder-Movement-1-Mobile-App-Game-FX-Sound-Magic-Fantasy-Touch-Accent-Stab-Transition-Movement-Whoosh.wav</value>
+			<value>secret_door.wav</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>96</value>
