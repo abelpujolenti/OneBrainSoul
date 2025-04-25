@@ -1,5 +1,6 @@
 ﻿using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AI.Combat.ScriptableObjects
 {
@@ -7,6 +8,8 @@ namespace AI.Combat.ScriptableObjects
     public class TrifaceProperties : FreeMobilityEnemyProperties
     {
         public AreaAbilityProperties slamAbilityProperties;
+
+        [FormerlySerializedAs("triggerName")] public string slamAbilityTriggerName;
 
         public float rotationSpeedWhileCastingSlam;
 

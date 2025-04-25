@@ -60,9 +60,13 @@ namespace Editor.Enemies
             
             FloatField(ref longArmsProperties.bodyNotationSpeedWhileCastingThrowRock, 0.1f, "Rotation Speed While Casting Throw Rock");
             
+            StringField(ref longArmsProperties.throwRockAbilityTriggerName, "Throw Rock Animation Trigger");
+            
             EditorGUILayout.Space();
             
             ObjectField(ref longArmsProperties.clapAboveAbilityProperties, "Clap Above Ability");
+            
+            StringField(ref longArmsProperties.ClapAboveAbilityTriggerName, "Clap Above Animation Trigger");
 
             EditorGUI.indentLevel--;
             

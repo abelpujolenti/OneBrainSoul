@@ -161,6 +161,11 @@ namespace Editor
             value = EditorGUI.Toggle(GetControlRect(), message, value);
         }
 
+        protected void StringField(ref string value, string message)
+        {
+            value = EditorGUI.TextField(GetControlRect(), message, value);
+        }
+
         protected void CurveField(ref AnimationCurve animationCurve, float initialValue, float maxTime, string message)
         {
             Keyframe[] keys = animationCurve.keys;
