@@ -351,7 +351,6 @@ MonoBehaviour:
   _doesRestoreHealthOfPlayer: 1
   _doesRestoreAChargeOfPlayer: 1
   _areaNumber: 0
-  _headTransform: {fileID: 1720201521735616698}
   _bodyTransform: {fileID: 1720201521735616698}
   _showFov: 0
   _fovColor: {r: 0, g: 0, b: 0, a: 0}
@@ -373,8 +372,6 @@ MonoBehaviour:
   _colorOfDetectionAreaOfThrowRock: {r: 0, g: 0, b: 0, a: 0}
   _showDetectionAreaOfClapAbove: 0
   _colorOfDetectionAreaOfClapAbove: {r: 0, g: 0, b: 0, a: 0}
-  _showDetectionAreaOfFlee: 0
-  _colorOfDetectionAreaOfFlee: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &2949363212924830507
 GameObject:
   m_ObjectHideFlags: 0
@@ -624,7 +621,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2423872351373769078
 Transform:
   m_ObjectHideFlags: 0
@@ -1076,7 +1073,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1322315864494610322
 Transform:
   m_ObjectHideFlags: 0
