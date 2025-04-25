@@ -25,3 +25,4 @@ MonoBehaviour:
   slamAbilityProperties: {fileID: 11400000, guid: 85537e7caa4d50f4cbb5d2b823d55410,
     type: 2}
   rotationSpeedWhileCastingSlam: 0
+  animatorController: {fileID: 9100000, guid: a59becab2ab926243ae430a75994354e, type: 2}

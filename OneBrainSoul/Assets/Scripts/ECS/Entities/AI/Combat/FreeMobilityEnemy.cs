@@ -20,6 +20,8 @@ namespace ECS.Entities.AI.Combat
         where TContext : FreeMobilityEnemyContext
         where TAction : Enum
     {
+        private const string ANIMATOR_VELOCITY_FLOAT = "Velocity";
+        
         [SerializeField] protected NavMeshAgentSpecs _navMeshAgentSpecs;
 
         [SerializeField] protected NavMeshAgent _navMeshAgent;
@@ -70,14 +72,27 @@ namespace ECS.Entities.AI.Combat
         
         protected void ContinueNavigation()
         {
+            _animator.SetFloat(ANIMATOR_VELOCITY_FLOAT, MathUtil.Map(_navMeshAgent.speed, 0, _navMeshAgentSpecs.movementSpeed, 0, 1));
             _navMeshAgent.isStopped = false;
             _context.SetHasStopped(false);
         }
 
         protected void StopNavigation()
         {
+            _animator.SetFloat(ANIMATOR_VELOCITY_FLOAT, 0);
             _navMeshAgent.isStopped = true;
             _context.SetHasStopped(true);
+        }
+
+        protected override IEnumerator WaitAnimationExtraTime(float animationExtraTime)
+        {
+            float tempNavMeshAgentSpeed = _navMeshAgent.speed;
+
+            _navMeshAgent.speed = 0;
+
+            yield return base.WaitAnimationExtraTime(animationExtraTime);
+
+            _navMeshAgent.speed = tempNavMeshAgentSpeed;
         }
 
         protected void RotateInSitu()

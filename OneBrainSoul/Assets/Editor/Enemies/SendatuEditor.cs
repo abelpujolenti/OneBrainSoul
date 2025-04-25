@@ -46,6 +46,14 @@ namespace Editor.Enemies
             Vector3Field(ref sendatuProperties.healRelativeScale, "Heal Scale");
 
             EditorGUI.indentLevel--;
+            
+            LabelField("Animation");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref sendatuProperties.animatorController, "Animator Controller");
+            
+            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

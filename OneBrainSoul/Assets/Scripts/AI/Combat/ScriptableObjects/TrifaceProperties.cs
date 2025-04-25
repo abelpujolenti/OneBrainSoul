@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Animations;
+using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
 {
@@ -8,5 +9,7 @@ namespace AI.Combat.ScriptableObjects
         public AreaAbilityProperties slamAbilityProperties;
 
         public float rotationSpeedWhileCastingSlam;
+
+        public AnimatorController animatorController;
     }
 }

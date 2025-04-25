@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Area;
-using AI.Combat.CombatNavigation;
 using AI.Combat.Contexts;
 using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
@@ -46,6 +45,8 @@ namespace ECS.Entities.AI.Combat
             
             _slamAbilityDetectionArea.Setup(_trifaceProperties.slamAbilityProperties.abilityTarget, 
                 _context.AddTargetInsideSlamDetectionArea, _context.RemoveTargetInsideSlamDetectionArea);
+
+            _animator.runtimeAnimatorController = _trifaceProperties.animatorController;
             
             CombatManager.Instance.AddEnemy(this);
 
@@ -78,7 +79,7 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
-            _cancelSlamFunc = () => _context.IsSlamTargetInsideDetectionArea();
+            _cancelSlamFunc = () => _isDying || _context.IsSlamTargetInsideDetectionArea();
         }
 
         #region AI LOOP
@@ -237,6 +238,8 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingSlam(IAreaAbility areaAbility) 
         {
+            _animator.SetTrigger(ANIMATOR_ATTACK_TRIGGER);
+            
             BlockFSM();
             
             StopNavigation();
@@ -275,6 +278,8 @@ namespace ECS.Entities.AI.Combat
             AudioManager.Instance.PlayOneShot(_trifaceProperties.slamAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
+
+            StartCoroutine(WaitAnimationExtraTime(areaAbility.GetCast().animationExtraTime));
             
             ContinueNavigation();
             
