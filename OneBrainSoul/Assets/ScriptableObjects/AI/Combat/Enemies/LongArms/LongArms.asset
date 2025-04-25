@@ -30,10 +30,9 @@ MonoBehaviour:
   bodyRotationSpeedWhenAcquiringATarget: 50
   minimumTimesSettingNewDirectionToTurnAround: 3
   maximumTimesSettingNewDirectionToTurnAround: 5
-  radiusToFlee: 10
-  entitiesToFleeFrom: 1
   throwRockAbilityProperties: {fileID: 11400000, guid: fb231cca83e6ed247a19a07c0fd85909,
     type: 2}
   bodyNotationSpeedWhileCastingThrowRock: 200
   clapAboveAbilityProperties: {fileID: 11400000, guid: 5f32477bb97c515479f1a389fe3b17f9,
     type: 2}
+  animatorController: {fileID: 9100000, guid: a59becab2ab926243ae430a75994354e, type: 2}

@@ -10,7 +10,7 @@ namespace AI.Combat.AbilitySpecs
         {}
 
         public AbilityCast(bool canCancelCast, float timeToCast, float currentTimeToFinishCast, float cooldown, 
-            float currentCooldown, float duration)
+            float currentCooldown, float duration, float animationExtraTime)
         {
             this.canCancelCast = canCancelCast;
             this.timeToCast = timeToCast;
@@ -18,6 +18,7 @@ namespace AI.Combat.AbilitySpecs
             this.cooldown = cooldown;
             _currentCooldown = currentCooldown;
             this.duration = duration;
+            this.animationExtraTime = animationExtraTime;
         }
 
         public bool canCancelCast;
@@ -29,6 +30,7 @@ namespace AI.Combat.AbilitySpecs
         private float _currentCooldown;
         
         public float duration;
+        public float animationExtraTime;
     
         public void StartCastTime()
         {
@@ -67,7 +69,8 @@ namespace AI.Combat.AbilitySpecs
 
         public AbilityCast DeepCopy()
         {
-            return new AbilityCast(canCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown, duration);
+            return new AbilityCast(canCancelCast, timeToCast, _currentTimeToFinishCast, cooldown, _currentCooldown, 
+                duration, animationExtraTime);
         }
     }
 }

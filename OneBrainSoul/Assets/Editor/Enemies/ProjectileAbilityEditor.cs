@@ -99,6 +99,7 @@ namespace Editor.Enemies
             if (isAbilityCastFoldoutOpen)
             {
                 FloatField(ref projectileAbilityProperties.abilityCast.timeToCast, 0, "Time To Cast");
+                FloatField(ref projectileAbilityProperties.abilityCast.animationExtraTime, 0, "Animation Extra Time");
                 FloatField(ref projectileAbilityProperties.abilityCast.cooldown, 0, "Cooldown");
 
                 if (projectileAbilityProperties.abilityCast.timeToCast != 0)

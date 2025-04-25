@@ -79,6 +79,14 @@ namespace Editor.Enemies
             Vector3Field(ref longArmsProperties.healRelativeScale, "Heal Scale");
 
             EditorGUI.indentLevel--;
+            
+            LabelField("Animation");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref longArmsProperties.animatorController, "Animator Controller");
+            
+            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

@@ -24,9 +24,10 @@ MonoBehaviour:
     Path: 
   abilityCast:
     canCancelCast: 0
-    timeToCast: 0.2
+    timeToCast: 0.5
     cooldown: 2
     duration: 0
+    animationExtraTime: 1
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 0
@@ -42,11 +43,11 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 1
-    doesApplyAForce: 0
-    forceDirection: {x: 0, y: 0, z: 0}
-    forceStrength: 0
+    doesApplyAForce: 1
+    forceDirection: {x: 0, y: 0.2, z: 1}
+    forceStrength: 350
     doesForceComesFromCenterOfTheArea: 0
-    abilityEffectForceType: 0
+    abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnTheDuration: 1
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -156,7 +157,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     objectWithParticleSystem: {fileID: 2725686302870647448, guid: bb73f5ad1bea0e74f8b7d350d1ff6624,
       type: 3}
-    relativePositionForParticles: {x: 0, y: 0, z: 0}
+    relativePositionForParticles: {x: 0, y: -1, z: 0}
   abilityMovement:
     makesBezierCurves: 0
     positions: []

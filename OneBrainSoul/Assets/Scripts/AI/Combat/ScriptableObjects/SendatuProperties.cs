@@ -1,4 +1,5 @@
 ﻿using ECS.Entities;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
@@ -8,5 +9,7 @@ namespace AI.Combat.ScriptableObjects
     {
         public float radiusToFlee;
         public EntityType entitiesToFleeFrom;
+        
+        public AnimatorController animatorController;
     }
 }
