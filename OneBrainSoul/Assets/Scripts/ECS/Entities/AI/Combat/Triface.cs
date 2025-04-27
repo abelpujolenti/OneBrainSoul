@@ -278,8 +278,6 @@ namespace ECS.Entities.AI.Combat
             AudioManager.Instance.PlayOneShot(_trifaceProperties.slamAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
-            
-            Debug.Log(areaAbility.GetCast().animationExtraTime);
 
             StartCoroutine(WaitAnimationExtraTime(areaAbility.GetCast().animationExtraTime));
             
