@@ -24,9 +24,10 @@ MonoBehaviour:
     Path: 
   abilityCast:
     canCancelCast: 0
-    timeToCast: 0.1
+    timeToCast: 0.7
     cooldown: 1.5
     duration: 0
+    animationExtraTime: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 1

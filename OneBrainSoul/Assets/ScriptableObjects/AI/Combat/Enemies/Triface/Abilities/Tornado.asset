@@ -27,6 +27,7 @@ MonoBehaviour:
     timeToCast: 0.5
     cooldown: 8.5
     duration: 0
+    animationExtraTime: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 1
@@ -59,7 +60,7 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
-    forceDirection: {x: 1, y: 0.5, z: -2}
+    forceDirection: {x: -1, y: 0.5, z: -2}
     forceStrength: 85
     doesForceComesFromCenterOfTheArea: 1
     abilityEffectForceType: 2
@@ -75,7 +76,7 @@ MonoBehaviour:
     slowDuration: 0
     isSlowAttachedToEntity: 0
     doesApplyAForce: 1
-    forceDirection: {x: 1, y: 0.5, z: 0}
+    forceDirection: {x: -1, y: 0.5, z: 0}
     forceStrength: 600
     doesForceComesFromCenterOfTheArea: 1
     abilityEffectForceType: 3
