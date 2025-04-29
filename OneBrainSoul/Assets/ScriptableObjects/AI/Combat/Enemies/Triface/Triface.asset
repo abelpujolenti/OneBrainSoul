@@ -24,4 +24,6 @@ MonoBehaviour:
   healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 3935a9b85f5fe7f4098c1ad70144227e,
     type: 2}
+  slamAbilityTriggerName: Smash
   rotationSpeedWhileCastingSlam: 0
+  animatorController: {fileID: 9100000, guid: cbf8150eddefcab419ddc5327884d8fc, type: 2}

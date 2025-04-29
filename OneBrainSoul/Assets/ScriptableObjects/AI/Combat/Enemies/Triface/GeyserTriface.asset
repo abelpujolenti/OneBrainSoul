@@ -24,4 +24,6 @@ MonoBehaviour:
   healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 85537e7caa4d50f4cbb5d2b823d55410,
     type: 2}
+  slamAbilityTriggerName: Geyser
   rotationSpeedWhileCastingSlam: 0
+  animatorController: {fileID: 9100000, guid: cbf8150eddefcab419ddc5327884d8fc, type: 2}

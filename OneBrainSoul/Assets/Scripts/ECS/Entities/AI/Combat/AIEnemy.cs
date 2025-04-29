@@ -32,7 +32,7 @@ namespace ECS.Entities.AI.Combat
         protected HashSet<uint> _targetsSightedInsideCombatArea = new HashSet<uint>();
         
         [SerializeField] protected Material _material;
-
+        
         [SerializeField] protected Animator _animator;
 
         [SerializeField] private bool _doesRestoreHealthOfPlayer;
@@ -47,7 +47,7 @@ namespace ECS.Entities.AI.Combat
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
 
-        [SerializeField] protected Transform _headTransform; 
+        protected Transform _headTransform; 
         [SerializeField] protected Transform _bodyTransform;
 
         protected float _bodyNormalRotationSpeed;
@@ -276,6 +276,23 @@ namespace ECS.Entities.AI.Combat
         #region Abilities Managing
 
         #region Own Abilities
+
+        protected virtual IEnumerator WaitAnimationExtraTime(float animationExtraTime)
+        {
+            float timer = 0;
+
+            float tempBodyCurrentRotationSpeed = _bodyCurrentRotationSpeed;
+
+            _bodyCurrentRotationSpeed = 0;
+
+            while (timer < animationExtraTime)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            _bodyCurrentRotationSpeed = tempBodyCurrentRotationSpeed;
+        }
 
         protected IEnumerator StartCooldownCoroutine(AbilityCast abilityCast)
         {

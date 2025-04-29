@@ -412,7 +412,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 1.1540337
-  m_Speed: 3.5
+  m_Speed: 4
   m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 1000
@@ -448,7 +448,6 @@ MonoBehaviour:
   _doesRestoreHealthOfPlayer: 1
   _doesRestoreAChargeOfPlayer: 1
   _areaNumber: 0
-  _headTransform: {fileID: 6000714678988991945}
   _bodyTransform: {fileID: 6000714678988991945}
   _showFov: 0
   _fovColor: {r: 0, g: 0, b: 0, a: 0}

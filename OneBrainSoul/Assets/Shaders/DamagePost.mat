@@ -46,7 +46,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DamageAngle: 412.23132
+    - _DamageAngle: 571.022
     - _DamageAnglePower: 4
     - _EdgeWeight: 0.83
     - _Fade: 0.9

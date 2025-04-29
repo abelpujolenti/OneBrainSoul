@@ -92,6 +92,7 @@ namespace Editor.Enemies
             if (isAbilityCastFoldoutOpen)
             {
                 FloatField(ref basicAbilityProperties.abilityCast.timeToCast, 0, "Time To Cast");
+                FloatField(ref basicAbilityProperties.abilityCast.animationExtraTime, 0, "Animation Extra Time");
                 FloatField(ref basicAbilityProperties.abilityCast.cooldown, 0, "Cooldown");
                 FloatField(ref basicAbilityProperties.abilityCast.duration, "Duration");
 

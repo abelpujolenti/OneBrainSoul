@@ -83,6 +83,8 @@ namespace ECS.Entities.AI.Combat
 
             _clapAboveAbilityDetectionArea.Setup(_longArmsProperties.clapAboveAbilityProperties.abilityTarget, 
                 _context.AddTargetInsideClapAboveDetectionArea, _context.RemoveTargetInsideClapAboveDetectionArea);
+
+            _animator.runtimeAnimatorController = _longArmsProperties.animatorController;
             
             CombatManager.Instance.AddEnemy(this);
             
@@ -118,7 +120,7 @@ namespace ECS.Entities.AI.Combat
 
             if (_throwRockAbility.GetCast().canCancelCast)
             {
-                _cancelThrowRockFunc = () => _context.IsThrowRockTargetInsideDetectionArea();
+                _cancelThrowRockFunc = () => _isDying || _context.IsThrowRockTargetInsideDetectionArea();
             }
             
             _clapAboveAbility = AbilityManager.Instance.ReturnAreaAbility(_longArmsProperties.clapAboveAbilityProperties,
@@ -129,7 +131,7 @@ namespace ECS.Entities.AI.Combat
                 return;
             }
 
-            _cancelClapAboveFunc = () => _context.IsClapAboveTargetInsideDetectionArea();
+            _cancelClapAboveFunc = () => _isDying || _context.IsClapAboveTargetInsideDetectionArea();
         }
 
         #region AI LOOP
@@ -504,6 +506,8 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingThrowRock(IProjectileAbility projectileAbility)
         {
+            _animator.SetTrigger(_longArmsProperties.throwRockAbilityTriggerName);
+            
             _bodyCurrentRotationSpeed = _bodyRotationSpeedWhileCastingThrowRock;
             
             BlockFSM();
@@ -542,6 +546,9 @@ namespace ECS.Entities.AI.Combat
                 UnblockFSM();
                 yield break;
             }
+                
+            StartCoroutine(WaitAnimationExtraTime(projectileAbility.GetCast().animationExtraTime));
+            
             StartCoroutine(StartCooldownCoroutine(projectileAbility.GetCast()));
         }
 
@@ -551,6 +558,8 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingClapAbove(IAreaAbility areaAbility) 
         {
+            _animator.SetTrigger(_longArmsProperties.ClapAboveAbilityTriggerName);
+            
             BlockFSM();
             
             StartCoroutine(StartClapAboveCastTimeCoroutine(areaAbility));
@@ -580,6 +589,8 @@ namespace ECS.Entities.AI.Combat
             AudioManager.Instance.PlayOneShot(_longArmsProperties.clapAboveAbilityProperties.executeAbilitySound, transform.position);
             
             areaAbility.Activate();
+
+            StartCoroutine(WaitAnimationExtraTime(areaAbility.GetCast().animationExtraTime));
             
             StartCoroutine(StartCooldownCoroutine(areaAbility.GetCast()));
         }

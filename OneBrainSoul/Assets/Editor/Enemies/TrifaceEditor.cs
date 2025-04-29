@@ -30,6 +30,8 @@ namespace Editor.Enemies
             ObjectField(ref trifaceProperties.slamAbilityProperties, "Slam Ability");
             
             FloatField(ref trifaceProperties.rotationSpeedWhileCastingSlam, 0, "Rotation Speed While Casting Slam");
+            
+            StringField(ref trifaceProperties.slamAbilityTriggerName, "Slam Animation Trigger");
 
             EditorGUI.indentLevel--;
             
@@ -45,6 +47,14 @@ namespace Editor.Enemies
             Vector3Field(ref trifaceProperties.healRelativeRotation, "Heal Rotation");
             Vector3Field(ref trifaceProperties.healRelativeScale, "Heal Scale");
 
+            EditorGUI.indentLevel--;
+            
+            LabelField("Animation");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref trifaceProperties.animatorController, "Animator Controller");
+            
             EditorGUI.indentLevel--;
 
             if (!GUI.changed)

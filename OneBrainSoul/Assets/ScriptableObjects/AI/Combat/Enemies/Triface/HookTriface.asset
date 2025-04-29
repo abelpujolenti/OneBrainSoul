@@ -24,4 +24,6 @@ MonoBehaviour:
   healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 645d62defe1275a47922e69eba7a5022,
     type: 2}
+  slamAbilityTriggerName: Hook
   rotationSpeedWhileCastingSlam: 446.25
+  animatorController: {fileID: 9100000, guid: cbf8150eddefcab419ddc5327884d8fc, type: 2}

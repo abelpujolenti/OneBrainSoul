@@ -24,4 +24,6 @@ MonoBehaviour:
   healRelativeScale: {x: 0, y: 0, z: 0}
   slamAbilityProperties: {fileID: 11400000, guid: 4faafba7ee80f514ea23b2713fbcf68a,
     type: 2}
+  slamAbilityTriggerName: Tornado
   rotationSpeedWhileCastingSlam: 0
+  animatorController: {fileID: 9100000, guid: cbf8150eddefcab419ddc5327884d8fc, type: 2}

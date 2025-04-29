@@ -60,9 +60,13 @@ namespace Editor.Enemies
             
             FloatField(ref longArmsProperties.bodyNotationSpeedWhileCastingThrowRock, 0.1f, "Rotation Speed While Casting Throw Rock");
             
+            StringField(ref longArmsProperties.throwRockAbilityTriggerName, "Throw Rock Animation Trigger");
+            
             EditorGUILayout.Space();
             
             ObjectField(ref longArmsProperties.clapAboveAbilityProperties, "Clap Above Ability");
+            
+            StringField(ref longArmsProperties.ClapAboveAbilityTriggerName, "Clap Above Animation Trigger");
 
             EditorGUI.indentLevel--;
             
@@ -78,6 +82,14 @@ namespace Editor.Enemies
             Vector3Field(ref longArmsProperties.healRelativeRotation, "Heal Rotation");
             Vector3Field(ref longArmsProperties.healRelativeScale, "Heal Scale");
 
+            EditorGUI.indentLevel--;
+            
+            LabelField("Animation");
+
+            EditorGUI.indentLevel++;
+            
+            ObjectField(ref longArmsProperties.animatorController, "Animator Controller");
+            
             EditorGUI.indentLevel--;
 
             if (!GUI.changed)
