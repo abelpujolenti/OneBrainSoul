@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="Event" id="{f35934c9-9fb2-4f21-b315-4540ef7d1dcd}">
 		<property name="name">
-			<value>Teleport</value>
+			<value>Geiser</value>
 		</property>
 		<property name="outputFormat">
 			<value>2</value>
@@ -73,7 +73,7 @@
 	</object>
 	<object class="EventMixerMaster" id="{bbb43aa1-31ea-449b-9792-a986ad4718b5}">
 		<property name="volume">
-			<value>-11</value>
+			<value>-2</value>
 		</property>
 		<relationship name="effectChain">
 			<destination>{5c5fac36-4e8b-4816-a754-f9e1569402a0}</destination>
@@ -112,8 +112,23 @@
 	<object class="MixerBusFader" id="{c1eba12d-271d-4cdb-aabd-9bf212eca6b8}" />
 	<object class="MixerBusFader" id="{d371a82f-2169-4ad8-8aac-42d41a5dfb06}" />
 	<object class="SpatialiserEffect" id="{ab26706f-392a-41a0-a0ba-ce4c21c2bc35}">
+		<property name="maximumDistance">
+			<value>1800</value>
+		</property>
 		<property name="overrideRange">
 			<value>true</value>
+		</property>
+		<property name="extentMode">
+			<value>1</value>
+		</property>
+		<property name="soundSize">
+			<value>2000</value>
+		</property>
+		<property name="minimumExtent">
+			<value>360</value>
+		</property>
+		<property name="userStereoSeparation">
+			<value>66</value>
 		</property>
 	</object>
 	<object class="PitchShifterEffect" id="{94277d81-f2f4-4dc1-a8cc-049b11e30b4d}">
@@ -129,7 +144,7 @@
 			<value>pitch</value>
 		</property>
 		<property name="amount">
-			<value>15</value>
+			<value>5</value>
 		</property>
 	</object>
 </objects>

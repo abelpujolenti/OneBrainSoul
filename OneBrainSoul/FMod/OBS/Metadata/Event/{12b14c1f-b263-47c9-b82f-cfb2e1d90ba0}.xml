@@ -72,6 +72,12 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{f79231c6-9232-44d1-bb41-239b162ff7fc}">
+		<property name="volume">
+			<value>-7</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{6991977c-f23a-4756-be68-5c5fa4bb9e87}</destination>
+		</relationship>
 		<relationship name="effectChain">
 			<destination>{480d35f5-1128-4aed-9732-2f13679fb420}</destination>
 		</relationship>
@@ -93,9 +99,19 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{6dd3f106-f6dc-4a7d-ae0b-0ecad4c2519a}" />
+	<object class="RandomizerModulator" id="{6991977c-f23a-4756-be68-5c5fa4bb9e87}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="amount">
+			<value>3.5</value>
+		</property>
+	</object>
 	<object class="MixerBusEffectChain" id="{480d35f5-1128-4aed-9732-2f13679fb420}">
 		<relationship name="effects">
+			<destination>{feebb2d6-fc7e-4745-be0e-2845ebd4720a}</destination>
 			<destination>{51fdbb15-b4fb-42d2-94a4-b81ae262b308}</destination>
+			<destination>{51c5f4a5-68e6-43d3-bd35-cc28b47438be}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{69fb821f-15e5-4bc0-98b7-2e51c87ee498}" />
@@ -108,5 +124,32 @@
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{ca500426-7d04-48f4-bb83-b4f3200249fb}" />
+	<object class="SFXReverbEffect" id="{feebb2d6-fc7e-4745-be0e-2845ebd4720a}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
+		<property name="decayTime">
+			<value>1000</value>
+		</property>
+		<property name="lateDelay">
+			<value>47</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{51fdbb15-b4fb-42d2-94a4-b81ae262b308}" />
+	<object class="PitchShifterEffect" id="{51c5f4a5-68e6-43d3-bd35-cc28b47438be}">
+		<property name="pitch">
+			<value>1</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{2327dbcc-a3bb-4121-8eaf-e71a141f8f72}</destination>
+		</relationship>
+	</object>
+	<object class="RandomizerModulator" id="{2327dbcc-a3bb-4121-8eaf-e71a141f8f72}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>pitch</value>
+		</property>
+		<property name="amount">
+			<value>10.5</value>
+		</property>
+	</object>
 </objects>

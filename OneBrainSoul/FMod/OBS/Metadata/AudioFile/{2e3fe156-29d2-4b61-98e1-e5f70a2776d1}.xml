@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{2e3fe156-29d2-4b61-98e1-e5f70a2776d1}">
 		<property name="assetPath">
-			<value>SFX/Alpha/teleport.wav</value>
+			<value>SFX/Alpha/geiser.wav</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>44.0999985</value>
