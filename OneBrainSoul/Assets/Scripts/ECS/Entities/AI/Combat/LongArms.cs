@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,7 +120,11 @@ namespace ECS.Entities.AI.Combat
 
             if (_throwRockAbility.GetCast().canCancelCast)
             {
-                _cancelThrowRockFunc = () => _isDying || _context.IsThrowRockTargetInsideDetectionArea();
+                _cancelThrowRockFunc = () => !_isDying;
+            }
+            else
+            {
+                _cancelThrowRockFunc = () => !_isDying || _context.IsThrowRockTargetInsideDetectionArea();
             }
             
             _clapAboveAbility = AbilityManager.Instance.ReturnAreaAbility(_longArmsProperties.clapAboveAbilityProperties,
@@ -128,10 +132,11 @@ namespace ECS.Entities.AI.Combat
 
             if (!_clapAboveAbility.GetCast().canCancelCast)
             {
+                _cancelThrowRockFunc = () => !_isDying;
                 return;
             }
 
-            _cancelClapAboveFunc = () => _isDying || _context.IsClapAboveTargetInsideDetectionArea();
+            _cancelClapAboveFunc = () => !_isDying || _context.IsClapAboveTargetInsideDetectionArea();
         }
 
         #region AI LOOP

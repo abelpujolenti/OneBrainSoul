@@ -185,7 +185,7 @@ namespace ECS.Entities.AI
                 return;
             }
             
-            Debug.Log(message);
+            Debug.Log(GetAgentID() + " " + message);
         }
         ///////////////
     }
