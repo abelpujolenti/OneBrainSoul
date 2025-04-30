@@ -196,6 +196,7 @@ GameObject:
   - component: {fileID: 8810993464684247542}
   - component: {fileID: 7329697106141931807}
   - component: {fileID: 4458886088744258254}
+  - component: {fileID: 6524661488395832634}
   m_Layer: 9
   m_Name: LongArms
   m_TagString: Untagged
@@ -295,7 +296,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 2
+  m_Radius: 1.25
   m_Height: 5.01
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -347,7 +348,7 @@ MonoBehaviour:
   - {fileID: 5124668390434004208}
   _material: {fileID: -3033667219593020291, guid: 27552b240b2ca954684eae7f798ddd3e,
     type: 3}
-  _animator: {fileID: 0}
+  _animator: {fileID: 6524661488395832634}
   _doesRestoreHealthOfPlayer: 1
   _doesRestoreAChargeOfPlayer: 1
   _areaNumber: 0
@@ -372,6 +373,27 @@ MonoBehaviour:
   _colorOfDetectionAreaOfThrowRock: {r: 0, g: 0, b: 0, a: 0}
   _showDetectionAreaOfClapAbove: 0
   _colorOfDetectionAreaOfClapAbove: {r: 0, g: 0, b: 0, a: 0}
+--- !u!95 &6524661488395832634
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2297831228963153474}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2949363212924830507
 GameObject:
   m_ObjectHideFlags: 0

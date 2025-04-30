@@ -1,5 +1,4 @@
-﻿using UnityEditor.Animations;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace AI.Combat.ScriptableObjects
@@ -13,6 +12,6 @@ namespace AI.Combat.ScriptableObjects
 
         public float rotationSpeedWhileCastingSlam;
 
-        public AnimatorController animatorController;
+        public RuntimeAnimatorController animatorController;
     }
 }

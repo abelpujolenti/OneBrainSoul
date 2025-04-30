@@ -119,7 +119,7 @@ MonoBehaviour:
       Data2: 1327603634
       Data3: 1078269363
       Data4: -853705233
-    Path: event:/SFX/Alpha/Teleport
+    Path: event:/SFX/Alpha/Geiser
   <teleportOut>k__BackingField:
     Guid:
       Data1: 1863267644
@@ -169,13 +169,6 @@ MonoBehaviour:
       Data3: 471719358
       Data4: 1958118136
     Path: event:/SFX/Alpha/UI_Select
-  <fog>k__BackingField:
-    Guid:
-      Data1: -1462057494
-      Data2: 1223665487
-      Data3: -152748612
-      Data4: -1402227001
-    Path: event:/SFX/Alpha/Fog
   <hookThrow>k__BackingField:
     Guid:
       Data1: -2114840081

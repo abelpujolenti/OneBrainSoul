@@ -1,5 +1,4 @@
 ﻿using ECS.Entities;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace AI.Combat.ScriptableObjects
@@ -29,6 +28,6 @@ namespace AI.Combat.ScriptableObjects
         
         public string ClapAboveAbilityTriggerName;
         
-        public AnimatorController animatorController;
+        public RuntimeAnimatorController animatorController;
     }
 }
