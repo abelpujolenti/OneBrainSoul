@@ -66,7 +66,7 @@ namespace Editor.Enemies
             
             ObjectField(ref longArmsProperties.clapAboveAbilityProperties, "Clap Above Ability");
             
-            StringField(ref longArmsProperties.ClapAboveAbilityTriggerName, "Clap Above Animation Trigger");
+            StringField(ref longArmsProperties.clapAboveAbilityTriggerName, "Clap Above Animation Trigger");
 
             EditorGUI.indentLevel--;
             
@@ -82,14 +82,6 @@ namespace Editor.Enemies
             Vector3Field(ref longArmsProperties.healRelativeRotation, "Heal Rotation");
             Vector3Field(ref longArmsProperties.healRelativeScale, "Heal Scale");
 
-            EditorGUI.indentLevel--;
-            
-            LabelField("Animation");
-
-            EditorGUI.indentLevel++;
-            
-            ObjectField(ref longArmsProperties.animatorController, "Animator Controller");
-            
             EditorGUI.indentLevel--;
 
             if (!GUI.changed)

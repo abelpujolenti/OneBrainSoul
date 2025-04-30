@@ -83,8 +83,6 @@ namespace ECS.Entities.AI.Combat
 
             _clapAboveAbilityDetectionArea.Setup(_longArmsProperties.clapAboveAbilityProperties.abilityTarget, 
                 _context.AddTargetInsideClapAboveDetectionArea, _context.RemoveTargetInsideClapAboveDetectionArea);
-
-            _animator.runtimeAnimatorController = _longArmsProperties.animatorController;
             
             CombatManager.Instance.AddEnemy(this);
             
@@ -563,7 +561,7 @@ namespace ECS.Entities.AI.Combat
 
         private void StartCastingClapAbove(IAreaAbility areaAbility) 
         {
-            _animator.SetTrigger(_longArmsProperties.ClapAboveAbilityTriggerName);
+            _animator.SetTrigger(_longArmsProperties.clapAboveAbilityTriggerName);
             
             BlockFSM();
             

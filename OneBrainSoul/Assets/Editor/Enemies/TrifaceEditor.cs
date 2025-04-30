@@ -48,14 +48,6 @@ namespace Editor.Enemies
             Vector3Field(ref trifaceProperties.healRelativeScale, "Heal Scale");
 
             EditorGUI.indentLevel--;
-            
-            LabelField("Animation");
-
-            EditorGUI.indentLevel++;
-            
-            ObjectField(ref trifaceProperties.animatorController, "Animator Controller");
-            
-            EditorGUI.indentLevel--;
 
             if (!GUI.changed)
             {

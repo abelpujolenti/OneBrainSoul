@@ -45,8 +45,6 @@ namespace ECS.Entities.AI.Combat
             
             _slamAbilityDetectionArea.Setup(_trifaceProperties.slamAbilityProperties.abilityTarget, 
                 _context.AddTargetInsideSlamDetectionArea, _context.RemoveTargetInsideSlamDetectionArea);
-
-            _animator.runtimeAnimatorController = _trifaceProperties.animatorController;
             
             CombatManager.Instance.AddEnemy(this);
 
