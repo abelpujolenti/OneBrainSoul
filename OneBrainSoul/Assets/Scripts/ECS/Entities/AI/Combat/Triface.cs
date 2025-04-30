@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
@@ -76,10 +76,11 @@ namespace ECS.Entities.AI.Combat
 
             if (!_slamAbility.GetCast().canCancelCast)
             {
+                _cancelSlamFunc = () => !_isDying;
                 return;
             }
 
-            _cancelSlamFunc = () => _isDying || _context.IsSlamTargetInsideDetectionArea();
+            _cancelSlamFunc = () => !_isDying || _context.IsSlamTargetInsideDetectionArea();
         }
 
         #region AI LOOP
