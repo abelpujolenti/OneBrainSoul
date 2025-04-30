@@ -8,10 +8,8 @@ namespace AI.Combat.ScriptableObjects
     {
         public AreaAbilityProperties slamAbilityProperties;
 
-        [FormerlySerializedAs("triggerName")] public string slamAbilityTriggerName;
+        public string slamAbilityTriggerName;
 
         public float rotationSpeedWhileCastingSlam;
-
-        public RuntimeAnimatorController animatorController;
     }
 }

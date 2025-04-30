@@ -1,5 +1,6 @@
 ﻿using ECS.Entities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AI.Combat.ScriptableObjects
 {
@@ -26,8 +27,6 @@ namespace AI.Combat.ScriptableObjects
         
         public AreaAbilityProperties clapAboveAbilityProperties;
         
-        public string ClapAboveAbilityTriggerName;
-        
-        public RuntimeAnimatorController animatorController;
+        public string clapAboveAbilityTriggerName;
     }
 }
