@@ -190,6 +190,13 @@ MonoBehaviour:
       Data3: 526340236
       Data4: -521308550
     Path: event:/SFX/Dash
+  <doubleJump>k__BackingField:
+    Guid:
+      Data1: 1964112837
+      Data2: 1145522079
+      Data3: 607450529
+      Data4: -826756434
+    Path: event:/SFX/DoubleJump
   <enemyAttack>k__BackingField:
     Guid:
       Data1: -2130849430
@@ -379,3 +386,10 @@ MonoBehaviour:
       Data3: 1865712825
       Data4: -2022768780
     Path: event:/SFX/Beta/ToxicFog
+  <secretDoor>k__BackingField:
+    Guid:
+      Data1: -1762539276
+      Data2: 1107267281
+      Data3: 738265500
+      Data4: 2093619734
+    Path: event:/SFX/Beta/SecretDoor

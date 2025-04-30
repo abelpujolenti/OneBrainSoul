@@ -28,6 +28,7 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference hookThrow { get; private set; }
     [field: SerializeField] public EventReference charge { get; private set; }
     [field: SerializeField] public EventReference dash { get; private set; }
+    [field: SerializeField] public EventReference doubleJump { get; private set; }
     [field: SerializeField] public EventReference enemyAttack { get; private set; }
     [field: SerializeField] public EventReference enemyDamage { get; private set; }
     [field: SerializeField] public EventReference whipAttack { get; private set; }
@@ -55,6 +56,7 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference slide { get; private set; }
     [field: SerializeField] public EventReference thunder { get; private set; }
     [field: SerializeField] public EventReference toxicFog { get; private set; }
+    [field: SerializeField] public EventReference secretDoor { get; private set; }
 
     public static FMODEvents instance { get; private set; }
 

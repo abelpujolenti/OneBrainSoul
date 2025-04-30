@@ -20,7 +20,7 @@ namespace Player.Movement
         public static float smashRadius = 5f;
         public static float smashRadiusTerrainDestroyed = 11f;
         public static uint hookDamage = 1;
-        public static uint smashDamage = 1;
+        public static uint smashDamage = 2;
 
         public static float slamBounceStrength = 8f;
         public static float bounceStrength = 100f;

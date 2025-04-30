@@ -203,6 +203,7 @@ namespace Player
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.healed, transform.position);
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
             AudioManager.Instance.StopGhostMode();
+            AudioManager.Instance.StopLowHealth();
         }
 
         public void EnterCombatRoom(CombatRoom c)

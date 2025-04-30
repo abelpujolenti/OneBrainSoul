@@ -93,7 +93,7 @@ namespace Player.Movement
                 doubleJumps++;
                 canDoubleJump = false;
                 player.GetCamera().FovWarp(2.8f, .35f);
-                AudioManager.Instance.PlayOneShot(FMODEvents.instance.dash, player.transform.position);
+                AudioManager.Instance.PlayOneShot(FMODEvents.instance.doubleJump, player.transform.position);
             }
 
             if (!canDoubleJump && !player.HasPressedJump() && jumpTimer <= 0f)

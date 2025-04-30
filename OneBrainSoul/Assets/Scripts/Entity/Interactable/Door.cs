@@ -19,6 +19,7 @@ public class Door : MonoBehaviour
     {
         open = true;
         openT = openDuration;
+        AudioManager.Instance.PlayOneShot(FMODEvents.instance.secretDoor, transform.position);
     }
 
     private void FixedUpdate()
