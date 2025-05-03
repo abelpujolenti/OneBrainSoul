@@ -4,12 +4,14 @@ using AI.Combat.AbilityAoEColliders;
 using AI.Combat.AbilityCasts;
 using AI.Combat.AbilityProjectiles;
 using AI.Combat.AbilitySpecs;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.AbilityProperties;
 using ECS.Components.AI.Combat.Abilities;
 using ECS.Entities;
+using ECS.Entities.AI;
 using FMODUnity;
 using Interfaces.AI.Combat;
 using UnityEngine;
+using Utilities;
 
 namespace Managers
 {
@@ -168,7 +170,21 @@ namespace Managers
             }
 
             return new ProjectileAbility(basicAbilityComponent.GetCast(), projectiles, parentTransform, 
-                abilityProjectile.relativePositionToCaster, abilityProjectile.dispersionRatePer1Meter, abilityProjectile.makesParabola);
+                abilityProjectile.relativePositionToCaster);
+        }
+
+        public Vector3 CalculateLinearShot(Projectile projectile, uint targetId, float dispersionRatePer1Meter)
+        {
+            AgentEntity target = CombatManager.Instance.ReturnAgentEntity(targetId);
+            return MathUtil.CalculateLinearForceVector(target.GetTransformComponent().GetPosition(), target.GetVelocity(), 
+                projectile.transform.position, projectile.GetSpeed(), dispersionRatePer1Meter);
+        }
+
+        public Vector3 CalculateParabolicShot(Projectile projectile, uint targetId)
+        {
+            AgentEntity target = CombatManager.Instance.ReturnAgentEntity(targetId);
+            return MathUtil.CalculateParabolicForceVector(target.GetTransformComponent().GetPosition(),
+                target.GetVelocity(), projectile.transform.position, projectile.GetSpeed(), 9.8f);
         }
 
         #endregion
@@ -183,7 +199,10 @@ namespace Managers
         {
             GameObject projectileObject = Instantiate(projectilePrefab);
 
-            Instantiate(particleObjectPrefab, projectileObject.transform);
+            if (particleObjectPrefab)
+            {
+                Instantiate(particleObjectPrefab, projectileObject.transform);    
+            }
             
             Projectile projectile = projectileObject.GetComponent<Projectile>();
 

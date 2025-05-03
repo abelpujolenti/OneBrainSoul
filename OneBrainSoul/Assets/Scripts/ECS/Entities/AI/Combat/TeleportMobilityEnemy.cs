@@ -1,6 +1,6 @@
 ﻿using System;
 using AI.Combat.Contexts;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.Enemies;
 using UnityEngine;
 
 namespace ECS.Entities.AI.Combat

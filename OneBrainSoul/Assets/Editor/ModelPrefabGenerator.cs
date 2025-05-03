@@ -26,7 +26,7 @@ public class ModelPrefabGenerator : UnityEditor.Editor
         return allTextures;
     }
 
-    public static List<T> GetAssets<T>(string[] foldersToSearch, string filter) where T : UnityEngine.Object
+    public static List<T> GetAssets<T>(string[] foldersToSearch, string filter) where T : Object
     {
         string[] guids = AssetDatabase.FindAssets(filter, foldersToSearch);
         var assets = new List<T>();

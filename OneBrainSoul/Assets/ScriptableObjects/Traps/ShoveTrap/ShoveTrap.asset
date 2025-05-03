@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d84278578fa8492eacfda378be64724a, type: 3}
+  m_Script: {fileID: 11500000, guid: 47c137bd31274b708a72a3bb4aee7a54, type: 3}
   m_Name: ShoveTrap
   m_EditorClassIdentifier: 
-  trapAbilityProperties: {fileID: 11400000, guid: cb975cae35e0c0f4c8bf0456fc04e759,
+  projectileAbilityProperties: {fileID: 11400000, guid: 354f965778765994788565b38acf9660,
     type: 2}

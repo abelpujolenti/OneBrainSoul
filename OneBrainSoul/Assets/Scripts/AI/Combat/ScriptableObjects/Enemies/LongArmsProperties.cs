@@ -1,8 +1,7 @@
-﻿using ECS.Entities;
+﻿using AI.Combat.ScriptableObjects.AbilityProperties;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace AI.Combat.ScriptableObjects
+namespace AI.Combat.ScriptableObjects.Enemies
 {
     [CreateAssetMenu(fileName = "Long Arms Properties", menuName = "ScriptableObjects/AI/Combat/Entities/Long Arms Properties", order = 1)]
     public class LongArmsProperties : TeleportMobilityEnemyProperties

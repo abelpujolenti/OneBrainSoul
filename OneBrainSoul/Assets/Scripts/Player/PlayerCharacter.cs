@@ -6,7 +6,6 @@ using Managers;
 using Player.Camera;
 using Player.Effects;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Player
 {

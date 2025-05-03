@@ -1,7 +1,6 @@
 ﻿using AI.Combat.AbilitySpecs;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.AbilityProperties;
 using ECS.Entities;
-using FMODUnity;
 
 namespace ECS.Components.AI.Combat.Abilities
 {

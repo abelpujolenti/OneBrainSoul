@@ -1,4 +1,4 @@
-﻿using AI.Combat.ScriptableObjects;
+﻿using AI.Combat.ScriptableObjects.Enemies;
 using UnityEditor;
 using UnityEngine;
 

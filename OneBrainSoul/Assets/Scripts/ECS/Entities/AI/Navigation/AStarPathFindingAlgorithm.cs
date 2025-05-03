@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using AI.Combat.CombatNavigation;
-using Managers;
-using Threads;
 using UnityEngine;
 using Utilities;
 using Edge = AI.Combat.CombatNavigation.Edge;

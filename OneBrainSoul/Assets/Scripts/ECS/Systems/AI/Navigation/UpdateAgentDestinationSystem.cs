@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Navigation;
 using ECS.Entities.AI.Navigation;
-using Managers;
-using Threads;
 
 namespace ECS.Systems.AI.Navigation
 {

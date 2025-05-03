@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a211132dbc8a4efbaa02677f950039b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2234727f8a9e4c4e84f55a4d8df693f9, type: 3}
   m_Name: Shove
   m_EditorClassIdentifier: 
   canAffectCaster: 0
@@ -27,27 +27,28 @@ MonoBehaviour:
     timeToCast: 0
     cooldown: 1
     duration: 0
+    animationExtraTime: 0
   abilityTrigger:
-    hasAnEffectOnStart: 0
-    hasAnEffectOnTheDuration: 1
+    hasAnEffectOnStart: 1
+    hasAnEffectOnTheDuration: 0
     hasAnEffectOnEnd: 0
   abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
     hasAnEffectOnHealth: 0
-    healthModificationValue: 10
+    healthModificationValue: 0
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
     doesDecreaseOverTime: 0
     slowPercent: 0
     slowDuration: 0
-    isSlowAttachedToEntity: 1
+    isSlowAttachedToEntity: 0
     doesApplyAForce: 1
-    forceDirection: {x: 0, y: -0.2, z: 1}
-    forceStrength: 300
+    forceDirection: {x: 0, y: 0.6, z: 0}
+    forceStrength: 100
     doesForceComesFromCenterOfTheArea: 0
-    abilityEffectForceType: 1
-  abilityEffectOnHealthTypeOnTheDuration: 1
+    abilityEffectForceType: 3
+  abilityEffectOnHealthTypeOnTheDuration: 0
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
     healthModificationValue: 0
@@ -55,14 +56,14 @@ MonoBehaviour:
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
     doesDecreaseOverTime: 0
-    slowPercent: 10
+    slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 0
-    doesApplyAForce: 1
-    forceDirection: {x: 0, y: 0.6, z: 1}
-    forceStrength: 100
+    doesApplyAForce: 0
+    forceDirection: {x: 0, y: 0, z: 0}
+    forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
-    abilityEffectForceType: 3
+    abilityEffectForceType: 0
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 0
@@ -74,9 +75,9 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 0
-    doesApplyAForce: 1
-    forceDirection: {x: 1, y: 0, z: 0}
-    forceStrength: 1000
+    doesApplyAForce: 0
+    forceDirection: {x: 0, y: 0, z: 0}
+    forceStrength: 0
     doesForceComesFromCenterOfTheArea: 0
     abilityEffectForceType: 0
   abilityAoESound:
@@ -89,15 +90,14 @@ MonoBehaviour:
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 0
-    relativePositionToCaster: {x: 0, y: 0.7, z: 4}
-    duration: 3
+    relativePositionToCaster: {x: 0, y: 0, z: 0}
+    duration: 0
     direction: {x: 0, y: 0, z: 1}
-    height: 10
-    width: 7
-    length: 7
+    height: 0
+    width: 0
+    length: 0
     radius: 3.5
-    customMeshPrefab: {fileID: 2430207424799574835, guid: ee99914edafad8846b21e7289cfef22e,
-      type: 3}
+    customMeshPrefab: {fileID: 0}
     scale: 0
     doesHeightChangeOverTheTime: 0
     doesWidthChangeOverTheTime: 0
@@ -109,25 +109,7 @@ MonoBehaviour:
     doesZScaleChangeOverTheTime: 0
     heightChangeOverTime:
       serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 5
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -173,14 +155,33 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    objectWithParticleSystem: {fileID: 8694282191879408708, guid: fc097e3d0acc25c4a930effbcde94e7c,
-      type: 3}
+    objectWithParticleSystem: {fileID: 0}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
   abilityMovement:
     makesBezierCurves: 0
-    positions:
-    - {x: 0, y: 0.7, z: 50}
-    timeBetweenPositions:
-    - 3
-  doesItTriggerOnTriggerEnter: 1
+    positions: []
+    timeBetweenPositions: []
+  doesItTriggerOnTriggerEnter: 0
   doesItTriggerOnTriggerExit: 0
+  projectileSound:
+    Guid:
+      Data1: -983295065
+      Data2: 1210616701
+      Data3: 1932514214
+      Data4: -934583960
+    Path: event:/SFX/Alpha/AtaqueBarrido
+  abilityProjectile:
+    projectilePrefab: {fileID: 3231615774265243880, guid: 5a6b2a1566a781e49b4ded8ff981a7a9,
+      type: 3}
+    relativePositionToCaster: {x: 0, y: 0.7, z: 0}
+    makesParabola: 0
+    projectileSpeed: 20
+    instances: 3
+    dispersionRatePer1Meter: 0
+    objectWithParticleSystem: {fileID: 8694282191879408708, guid: fc097e3d0acc25c4a930effbcde94e7c,
+      type: 3}
+    relativePositionForParticles: {x: 0, y: 0, z: 0}
+    doesVanishOnImpact: 0
+    doesVanishOverTime: 0
+    timeToVanish: 0
+    doesExplodeOnVanishOverTime: 0

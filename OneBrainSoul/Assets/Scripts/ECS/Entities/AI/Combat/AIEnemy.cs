@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Area;
 using AI.Combat.Contexts;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.Enemies;
 using Interfaces.AI.UBS.BaseInterfaces.Get;
 using Managers;
 using UnityEngine;

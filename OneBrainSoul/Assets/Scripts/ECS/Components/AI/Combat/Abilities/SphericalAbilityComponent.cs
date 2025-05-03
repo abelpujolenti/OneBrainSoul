@@ -1,4 +1,4 @@
-﻿using AI.Combat.ScriptableObjects;
+﻿using AI.Combat.ScriptableObjects.AbilityProperties;
 
 namespace ECS.Components.AI.Combat.Abilities
 {

@@ -3,7 +3,7 @@ using ECS.Entities;
 using FMODUnity;
 using UnityEngine;
 
-namespace AI.Combat.ScriptableObjects
+namespace AI.Combat.ScriptableObjects.AbilityProperties
 {
     [CreateAssetMenu(fileName = "Direct Ability Properties", menuName = "ScriptableObjects/AI/Combat/Abilities/Direct Ability Properties", order = 0)]
     public class BasicAbilityProperties : ScriptableObject
