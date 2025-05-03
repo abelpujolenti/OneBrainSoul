@@ -7,6 +7,7 @@ namespace AI.Combat.AbilityProjectiles
 {
     public class Projectile: MonoBehaviour
     {
+        [SerializeField] private Collider _collider;
         [SerializeField] private Rigidbody _rigidbody;
 
         private EventReference _projectileSound;
@@ -41,6 +42,8 @@ namespace AI.Combat.AbilityProjectiles
         public void ResetProjectile(Transform parentTransform, Vector3 relativePosition)
         {
             _onCollideAction();
+
+            _collider.enabled = false;
             _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
             
@@ -57,7 +60,8 @@ namespace AI.Combat.AbilityProjectiles
             transform.rotation = Quaternion.LookRotation(forceVector.normalized);
             gameObject.SetActive(true);
             transform.parent = null;
-            _rigidbody.AddForce(forceVector, ForceMode.Impulse);
+            _rigidbody.AddForce(forceVector, ForceMode.VelocityChange);
+            _collider.enabled = true;
         }
 
         private void BOOOOOOM()
