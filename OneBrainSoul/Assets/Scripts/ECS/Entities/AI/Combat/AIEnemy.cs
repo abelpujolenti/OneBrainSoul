@@ -402,7 +402,7 @@ namespace ECS.Entities.AI.Combat
 
         private IEnumerator DamageEffectCoroutine(float duration)
         {
-            Material matInstance = GetComponent<MeshRenderer>().material;
+            /*Material matInstance = GetComponent<MeshRenderer>().material;
 
             float t = 0f;
             while (t < duration)
@@ -412,7 +412,8 @@ namespace ECS.Entities.AI.Combat
                 yield return new WaitForFixedUpdate();
                 t += Time.fixedDeltaTime;
             }
-            matInstance.SetFloat("_DamageT", 0f);
+            matInstance.SetFloat("_DamageT", 0f);*/
+            yield break;
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)
@@ -476,7 +477,6 @@ namespace ECS.Entities.AI.Combat
 
         protected virtual void OnDestroy()
         {
-
             if (_doesRestoreAChargeOfPlayer)
             {
                 CombatManager.Instance.RechargeAChargeOfPlayer();

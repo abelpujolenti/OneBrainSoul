@@ -12,6 +12,7 @@ public class EnemySpawner : MonoBehaviour
     public bool canSpawn = true;
     public AgentEntity agentEntity { get; private set; }
     private List<AgentEntity> spawnedEntities = new List<AgentEntity>();
+    
     private void Awake()
     {
         agentEntity = transform.GetChild(0).GetComponent<AgentEntity>();

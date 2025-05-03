@@ -21,6 +21,8 @@ namespace ECS.Entities.AI.Combat
 
         [SerializeField] private LongArmsProperties _longArmsProperties;
 
+        [SerializeField] private GameObject _throwRockProjectileOffset;
+
         [SerializeField] private AbilityDetectionArea _throwRockAbilityDetectionArea;
         private IProjectileAbility _throwRockAbility;
         private HashSet<uint> _visibleTargetsForThrowRock;
@@ -110,7 +112,7 @@ namespace ECS.Entities.AI.Combat
             base.CreateAbilities();
             
             _throwRockAbility = AbilityManager.Instance.ReturnProjectileAbility(_longArmsProperties.throwRockAbilityProperties,
-                transform);
+                _throwRockProjectileOffset.transform);
 
             if (_throwRockAbility.GetCast().canCancelCast)
             {
@@ -530,6 +532,7 @@ namespace ECS.Entities.AI.Combat
         {
             base.OnDestroy();
             CombatManager.Instance.OnEnemyDefeated(this, _areaNumber);
+            Destroy(transform.parent.gameObject);
         }
 
         public override void OnReceivePushFromCenter(Vector3 centerPosition, Vector3 forceDirection, float forceStrength, 

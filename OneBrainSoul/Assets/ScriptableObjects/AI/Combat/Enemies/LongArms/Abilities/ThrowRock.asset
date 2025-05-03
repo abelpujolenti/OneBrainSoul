@@ -174,7 +174,7 @@ MonoBehaviour:
   abilityProjectile:
     projectilePrefab: {fileID: 5930364971465029039, guid: 61a7ac1bf6057534d8aab30f6f4b1fa1,
       type: 3}
-    relativePositionToCaster: {x: 2.3, y: 2.6, z: 1}
+    relativePositionToCaster: {x: 0, y: 0, z: 0}
     makesParabola: 0
     projectileSpeed: 60
     instances: 30

@@ -222,6 +222,7 @@ MonoBehaviour:
   _fovColor: {r: 0, g: 0, b: 0, a: 0}
   _longArmsProperties: {fileID: 11400000, guid: c0469f80574bd164b9ca3eefc35f50e8,
     type: 2}
+  _throwRockProjectileOffset: {fileID: 7750462749602003736}
   _throwRockAbilityDetectionArea: {fileID: 2242597467098066894}
   _clapAboveAbilityDetectionArea: {fileID: 1519594591475723577}
   _showDetectionAreaOfThrowRock: 0
