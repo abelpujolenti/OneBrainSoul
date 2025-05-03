@@ -179,7 +179,7 @@ MonoBehaviour:
     projectileSpeed: 60
     instances: 30
     dispersionRatePer1Meter: 0
-    objectWithParticleSystem: {fileID: 3800350742969002482, guid: ec71cec977754184db3209642af2f048,
+    objectWithParticleSystem: {fileID: 2756335791634673234, guid: 82a1fd22e4e7f7347a817c7d824ea64d,
       type: 3}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
     doesVanishOnImpact: 0
