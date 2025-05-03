@@ -17,6 +17,8 @@ namespace ECS.Entities.AI.Combat
 {
     public class LongArms : TeleportMobilityEnemy<LongArmsContext, LongArmsAction>
     {
+        private const string ANIMATION_TARGET_THROW_ROCK = "AllyTarget";
+
         [SerializeField] private LongArmsProperties _longArmsProperties;
 
         [SerializeField] private AbilityDetectionArea _throwRockAbilityDetectionArea;
@@ -88,12 +90,6 @@ namespace ECS.Entities.AI.Combat
             
             _timesSettingNewDirection = (uint)Random.Range(_minimumTimesSettingNewDirectionToTurnAround,
                 _maximumTimesSettingNewDirectionToTurnAround);
-            
-            _bodyIdle.SetActive(true);
-            _headIdle.SetActive(true);
-
-            _currentBodyActive = _bodyIdle;
-            _currentHeadActive = _headIdle;
         }
 
         protected override void InitiateDictionaries()
@@ -174,18 +170,10 @@ namespace ECS.Entities.AI.Combat
             {
                 return;
             }
-
-            //TODO: Aixo s'anira a la merda  -Abel
-            if (_animationCoroutine != null)
-            {
-                StopCoroutine(_animationCoroutine);
-            }
-
-            _animationCoroutine = null;
-            
-            ActivateNew(_bodyIdle, _headIdle);
             
             _context.LoseThrowRockTarget();
+
+            _animator.SetBool(ANIMATION_TARGET_THROW_ROCK, false);
         }
 
         private void RemoveClapAboveTargetIfWasLost(uint targetIdToCheck)
@@ -367,9 +355,7 @@ namespace ECS.Entities.AI.Combat
         }
 
         private void AcquireNewTargetForThrowRock()
-        {
-            ActivateNew(_bodyAlert, _headAlert);
-            
+        { 
             ShowDebugMessages("Long Arms " + GetAgentID() + " Acquiring New Target For Throw Rock");
             
             Vector3 position = transform.position;
@@ -382,6 +368,8 @@ namespace ECS.Entities.AI.Combat
             _context.SetThrowRockTargetProperties(target.GetAgentID(), target.GetRadius(), target.GetHeight());
             
             _throwRockAbility.SetTargetId(target.GetAgentID());
+
+            _animator.SetBool(ANIMATION_TARGET_THROW_ROCK, true);
         }
 
         private void AcquireNewTargetForClapAbove()
@@ -435,78 +423,6 @@ namespace ECS.Entities.AI.Combat
 
         #region Throw Rock
         
-        //////////////TODO ERASE
-        [SerializeField] private GameObject _bodyIdle;
-        [SerializeField] private GameObject _headIdle;
-
-        [SerializeField] private GameObject _bodyAlert;
-        [SerializeField] private GameObject _headAlert;
-
-        [SerializeField] private GameObject _bodyGrabRock;
-        [SerializeField] private GameObject _headGrabRock;
-
-        [SerializeField] private GameObject _bodyLiftRock;
-        [SerializeField] private GameObject _headLiftRock;
-
-        [SerializeField] private GameObject _bodyThrowRock;
-        [SerializeField] private GameObject _headThrowRock;
-
-        private GameObject _currentBodyActive;
-        private GameObject _currentHeadActive;
-
-        private void ActivateNew(GameObject body, GameObject head)
-        {
-            _currentBodyActive.SetActive(false);
-            body.SetActive(true);
-            _currentBodyActive = body;
-            
-            _currentHeadActive.SetActive(false);
-            head.SetActive(true);
-            _currentHeadActive = head;
-        }
-
-        private IEnumerator OINK_OINK_CHAMA_OOGA_BOOGA_ANIMATION()
-        {
-            float timer = 0;
-
-            while (timer < _longArmsProperties.throwRockAbilityProperties.abilityCast.timeToCast)
-            {
-                timer += Time.deltaTime;
-
-                //ACTIVA LANZAR
-                if (timer > (_longArmsProperties.throwRockAbilityProperties.abilityCast.timeToCast / 3) * 3)
-                {
-                    ActivateNew(_bodyThrowRock, _headThrowRock);
-                    yield return null;
-                    continue;
-                }
-
-                //ACTIVA LEVANTAR
-                if (timer > (_longArmsProperties.throwRockAbilityProperties.abilityCast.timeToCast / 3) * 2)
-                {
-                    ActivateNew(_bodyLiftRock, _headLiftRock);
-                    yield return null;
-                    continue;
-                }
-
-                //ACTIVA COGER
-                if (timer > _longArmsProperties.throwRockAbilityProperties.abilityCast.timeToCast / 3)
-                {
-                    ActivateNew(_bodyGrabRock, _headGrabRock);
-                    yield return null;
-                    continue;
-                }
-                 
-                //ACTIVA ALERTA
-                ActivateNew(_bodyAlert, _headAlert);
-                yield return null;
-            }
-        }
-
-        private Coroutine _animationCoroutine;
-
-        //////////////////////
-
         private void StartCastingThrowRock(IProjectileAbility projectileAbility)
         {
             _animator.SetTrigger(_longArmsProperties.throwRockAbilityTriggerName);
@@ -518,8 +434,6 @@ namespace ECS.Entities.AI.Combat
             projectileAbility.Activate();
             
             StartCoroutine(StartThrowRockCastTimeCoroutine(projectileAbility));
-
-            _animationCoroutine = StartCoroutine(OINK_OINK_CHAMA_OOGA_BOOGA_ANIMATION());
         }
 
         private IEnumerator StartThrowRockCastTimeCoroutine(IProjectileAbility projectileAbility)

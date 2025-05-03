@@ -23,10 +23,11 @@ MonoBehaviour:
       Data4: 626643745
     Path: event:/SFX/Alpha/Throw
   abilityCast:
-    canCancelCast: 1
-    timeToCast: 2
+    canCancelCast: 0
+    timeToCast: 0.5
     cooldown: 2
     duration: 0
+    animationExtraTime: 0
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 0
