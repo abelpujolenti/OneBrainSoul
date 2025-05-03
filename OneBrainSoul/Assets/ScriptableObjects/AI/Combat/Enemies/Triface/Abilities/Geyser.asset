@@ -27,6 +27,7 @@ MonoBehaviour:
     timeToCast: 0.5
     cooldown: 4
     duration: 0
+    animationExtraTime: 0
   abilityTrigger:
     hasAnEffectOnStart: 0
     hasAnEffectOnTheDuration: 1
@@ -154,7 +155,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    objectWithParticleSystem: {fileID: 4218669516899327888, guid: c71dedb22a4bd334da3a2d3077ae6f3a,
+    objectWithParticleSystem: {fileID: 4218669516899327888, guid: bd64d35b7133feb47a592ec23f92fc3c,
       type: 3}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
   abilityMovement:
