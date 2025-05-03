@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using AI.Combat.CombatNavigation;
 using AI.Combat.Contexts;
 using AI.Combat.Position;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.Enemies;
 using AI.Combat.Steering;
 using AI.Navigation;
 using ECS.Components.AI.Navigation;

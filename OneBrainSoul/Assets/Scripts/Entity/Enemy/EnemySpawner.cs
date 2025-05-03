@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using ECS.Entities.AI;
-using Managers;
 using Player;
+using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {

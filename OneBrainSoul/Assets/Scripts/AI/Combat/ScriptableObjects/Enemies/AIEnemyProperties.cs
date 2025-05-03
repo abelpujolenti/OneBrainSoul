@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AI.Combat.ScriptableObjects
+namespace AI.Combat.ScriptableObjects.Enemies
 {
     public abstract class AIEnemyProperties : ScriptableObject
     {

@@ -2,7 +2,7 @@
 using FMODUnity;
 using UnityEngine;
 
-namespace AI.Combat.ScriptableObjects
+namespace AI.Combat.ScriptableObjects.AbilityProperties
 {
     [CreateAssetMenu(fileName = "Area Ability Properties", menuName = "ScriptableObjects/AI/Combat/Abilities/Area Ability Properties", order = 1)]
     public class AreaAbilityProperties : BasicAbilityProperties

@@ -6,7 +6,7 @@ using AI.Combat.Area;
 using AI.Combat.Contexts;
 using AI.Combat.Enemy.Triface;
 using AI.Combat.Position;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.Enemies;
 using ECS.Components.AI.Navigation;
 using Interfaces.AI.Combat;
 using Managers;
@@ -221,7 +221,7 @@ namespace ECS.Entities.AI.Combat
         {
             ShowDebugMessages("Triface " + GetAgentID() + " Slaming");
             
-            StartCastingSlam(_slamAbility);
+            StartCoroutine(StartSlamCastTimeCoroutine());
         }
 
         #endregion
@@ -235,7 +235,7 @@ namespace ECS.Entities.AI.Combat
 
         #region Slam
 
-        private void StartCastingSlam(IAreaAbility areaAbility) 
+        private IEnumerator StartSlamCastTimeCoroutine()
         {
             _animator.SetTrigger(_trifaceProperties.slamAbilityTriggerName);
             
@@ -247,12 +247,7 @@ namespace ECS.Entities.AI.Combat
             
             SetDirectionToRotateBody(_context.GetSlamTargetContext().GetVectorToTarget());
             
-            StartCoroutine(StartSlamCastTimeCoroutine(areaAbility));
-        }
-
-        private IEnumerator StartSlamCastTimeCoroutine(IAreaAbility areaAbility)
-        {
-            AbilityCast abilityCast = areaAbility.GetCast(); 
+            AbilityCast abilityCast = _slamAbility.GetCast(); 
             
             abilityCast.StartCastTime();
 
@@ -276,13 +271,13 @@ namespace ECS.Entities.AI.Combat
             
             AudioManager.Instance.PlayOneShot(_trifaceProperties.slamAbilityProperties.executeAbilitySound, transform.position);
             
-            areaAbility.Activate();
+            _slamAbility.Activate();
 
-            StartCoroutine(WaitAnimationExtraTime(areaAbility.GetCast().animationExtraTime));
+            StartCoroutine(WaitAnimationExtraTime(_slamAbility.GetCast().animationExtraTime));
             
             ContinueNavigation();
             
-            StartCoroutine(StartCooldownCoroutine(areaAbility.GetCast()));
+            StartCoroutine(StartCooldownCoroutine(_slamAbility.GetCast()));
         }
 
         #endregion

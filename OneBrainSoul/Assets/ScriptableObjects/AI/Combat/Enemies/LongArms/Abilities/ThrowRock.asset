@@ -172,15 +172,14 @@ MonoBehaviour:
       Data4: 0
     Path: 
   abilityProjectile:
-    projectilePrefab: {fileID: 5930364971465029039, guid: 61a7ac1bf6057534d8aab30f6f4b1fa1,
+    projectilePrefab: {fileID: 1227480721610403239, guid: 5a7b64fab9a790049a942a4eac7238aa,
       type: 3}
     relativePositionToCaster: {x: 0, y: 0, z: 0}
     makesParabola: 0
     projectileSpeed: 60
     instances: 30
     dispersionRatePer1Meter: 0
-    objectWithParticleSystem: {fileID: 2756335791634673234, guid: 82a1fd22e4e7f7347a817c7d824ea64d,
-      type: 3}
+    objectWithParticleSystem: {fileID: 0}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
     doesVanishOnImpact: 0
     doesVanishOverTime: 0

@@ -1,6 +1,5 @@
-﻿using System;
-using AI.Combat.AbilitySpecs;
-using AI.Combat.ScriptableObjects;
+﻿using AI.Combat.AbilitySpecs;
+using AI.Combat.ScriptableObjects.AbilityProperties;
 using ECS.Entities;
 using UnityEditor;
 using UnityEngine;

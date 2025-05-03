@@ -1,43 +1,43 @@
 ﻿using System.Collections;
 using AI.Combat.AbilitySpecs;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.Traps;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
 
-namespace ECS.Entities
+namespace ECS.Entities.Trap
 {
-    public class Trap : MonoBehaviour
+    public class AreaTrap : MonoBehaviour
     {
-        [SerializeField] private TrapProperties _trapProperties;
+        [SerializeField] private AreaTrapProperties _areaTrapProperties;
 
-        private IAreaAbility _trapAbility;
+        private IAreaAbility _areaAbility;
 
         private void Start()
         {
             CreateAbility();
             
-            _trapAbility.GetCast().ResetCastTime();
+            _areaAbility.GetCast().ResetCastTime();
         }
 
         private void CreateAbility()
         {
-            _trapAbility = AbilityManager.Instance.ReturnAreaAbility(_trapProperties.trapAbilityProperties, transform);
+            _areaAbility = AbilityManager.Instance.ReturnAreaAbility(_areaTrapProperties.areaAbilityProperties, transform);
         }
 
         private void Update()
         {
-            if (_trapAbility.GetCast().IsOnCooldown())
+            if (_areaAbility.GetCast().IsOnCooldown())
             {
                 return;
             }
 
-            StartCoroutine(StartCastingAbility(_trapAbility));
+            StartCoroutine(StartCastingAreaAbility());
         }
 
-        private IEnumerator StartCastingAbility(IAreaAbility areaAbility)
+        private IEnumerator StartCastingAreaAbility()
         {
-            AbilityCast abilityCast = areaAbility.GetCast();
+            AbilityCast abilityCast = _areaAbility.GetCast();
             
             abilityCast.StartCastTime();
 
@@ -48,11 +48,11 @@ namespace ECS.Entities
                 yield return null;
             }
             
-            AudioManager.Instance.PlayOneShot(_trapProperties.trapAbilityProperties.executeAbilitySound, transform.position);
+            AudioManager.Instance.PlayOneShot(_areaTrapProperties.areaAbilityProperties.executeAbilitySound, transform.position);
             
-            areaAbility.Activate();
+            _areaAbility.Activate();
 
-            StartCoroutine(StartCooldownCoroutine(areaAbility.GetCast()));
+            StartCoroutine(StartCooldownCoroutine(_areaAbility.GetCast()));
         }
 
         private IEnumerator StartCooldownCoroutine(AbilityCast abilityCast)

@@ -72,9 +72,12 @@ namespace AI.Combat.AbilityAoEColliders
             
             _relativePosition = abilityAoE.relativePositionToCaster;
 
-            _childWithParticleSystem = Instantiate(abilityAoE.objectWithParticleSystem, transform);
+            if (abilityAoE.objectWithParticleSystem)
+            {
+                _childWithParticleSystem = Instantiate(abilityAoE.objectWithParticleSystem, transform);
 
-            _childWithParticleSystem.transform.localPosition = abilityAoE.relativePositionForParticles;
+                _childWithParticleSystem.transform.localPosition = abilityAoE.relativePositionForParticles;
+            }
             
             _typesAffectedByTheAbility = typesAffectedByTheAbility;
 

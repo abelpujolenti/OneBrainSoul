@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Contexts;
 using AI.Combat.Enemy.Sendatu;
-using AI.Combat.ScriptableObjects;
+using AI.Combat.ScriptableObjects.Enemies;
 using Interfaces.AI.Combat;
 using Managers;
 using UnityEngine;
@@ -171,12 +171,12 @@ namespace ECS.Entities.AI.Combat
 
             _bodyCurrentRotationSpeed = _bodyNormalRotationSpeed;
 
-            if (!projectileAbility.FIREEEEEEEEEEEEEE())
+            /*if (!projectileAbility.FIREEEEEEEEEEEEEE())
             {
                 UnblockFSM();
                 yield break;
             }
-            StartCoroutine(StartCooldownCoroutine(projectileAbility.GetCast()));
+            StartCoroutine(StartCooldownCoroutine(projectileAbility.GetCast()));*/
         }
 
         #endregion

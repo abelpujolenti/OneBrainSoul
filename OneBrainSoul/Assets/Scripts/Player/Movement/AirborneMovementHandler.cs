@@ -1,8 +1,5 @@
-using FMOD.Studio;
-using FMODUnity;
 using Managers;
 using UnityEngine;
-using UnityEngine.Windows;
 
 namespace Player.Movement
 {

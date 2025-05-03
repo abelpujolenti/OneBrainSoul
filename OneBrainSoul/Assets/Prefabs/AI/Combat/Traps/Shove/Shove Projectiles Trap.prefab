@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 4231735849328312706}
   - component: {fileID: 7458789747599900891}
   - component: {fileID: 4780802252998814360}
-  - component: {fileID: 816348602358235940}
+  - component: {fileID: 2971867360052481534}
   m_Layer: 9
-  m_Name: Shove Projectiles Trap 1
+  m_Name: Shove Projectiles Trap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -130,7 +130,7 @@ CapsuleCollider:
   m_Height: 5.251216
   m_Direction: 1
   m_Center: {x: 0.000012516978, y: 2.625763, z: 0}
---- !u!114 &816348602358235940
+--- !u!114 &2971867360052481534
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,7 +139,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6344730308556633971}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95b77e3f70b34dd0989d34c5adf87538, type: 3}
+  m_Script: {fileID: 11500000, guid: 82b6597a03024c41abd7693cff299dd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _trapProperties: {fileID: 11400000, guid: 6303e7de5511d8c42ab54e73b2748803, type: 2}
+  _projectileTrapProperties: {fileID: 11400000, guid: 2a6a7c9d467efa545a9ac8d0a35604ec,
+    type: 2}
+  _projectileDirection: {x: 0, y: 0, z: 1}
