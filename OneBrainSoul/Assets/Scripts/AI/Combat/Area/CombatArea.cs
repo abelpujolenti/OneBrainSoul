@@ -74,6 +74,13 @@ namespace AI.Combat.Area
 
             RemoveTarget(entityType, enemyId);
             RemoveSightedTarget(entityType, enemyId);
+
+            if (_enemiesInsideArea.Count != 0)
+            {
+                return;
+            }
+            
+            CombatManager.Instance.OnLosePlayerDetection();
         }
 
         public bool IsAreaEmpty()
@@ -173,7 +180,10 @@ namespace AI.Combat.Area
         
         public void AddSightedTarget(EntityType entityType, uint targetId)
         {
-            _targetEntitiesSightedInsideArea[entityType].Add(targetId);
+            if (!_targetEntitiesSightedInsideArea[entityType].Add(targetId))
+            {
+                return;
+            }
 
             if (targetId != _playerId)
             {

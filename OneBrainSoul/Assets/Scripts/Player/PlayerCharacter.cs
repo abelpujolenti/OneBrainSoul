@@ -406,20 +406,18 @@ namespace Player
 
         public void WhenDetected()
         {
-            _playerCharacterController.SetInCombat(true);
+            _playerCharacterController.SetIsInCombat(true);
             _areasDetecting++;
         }
 
         public void WhenDetectionLost()
         {
-            _areasDetecting--;
-
-            if (_areasDetecting != 0)
+            if (--_areasDetecting != 0)
             {
                 return;
             }
-
-            _playerCharacterController.SetInCombat(false);
+            
+            _playerCharacterController.SetIsInCombat(false);
         }
 
         public override float GetHeight()
