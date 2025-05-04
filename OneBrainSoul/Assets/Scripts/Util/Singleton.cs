@@ -16,7 +16,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            Debug.Log($"[Singleton<{typeof(T)}>] An instance is needed in the scene and no existing instances were found, so a new instance will be created.");
+            //Debug.Log($"[Singleton<{typeof(T)}>] An instance is needed in the scene and no existing instances were found, so a new instance will be created.");
 
             return _instance = new GameObject($"(Singleton){typeof(T)}").AddComponent<T>();
         }
@@ -26,7 +26,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         if (_instance != null)
         {
-            Debug.Log($"[Singleton<{typeof(T)}>] There should never be more than one Singleton of type {typeof(T)} in the scene. This redundant instance will be destroyed.");
+            //Debug.Log($"[Singleton<{typeof(T)}>] There should never be more than one Singleton of type {typeof(T)} in the scene. This redundant instance will be destroyed.");
             Destroy(gameObject);
             return;
         }

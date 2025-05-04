@@ -56,7 +56,7 @@ namespace Player
         private bool _jumpInput;
         private bool _ability1Input;
         private bool _ability2Input;
-        private bool _inCombat;
+        private bool _isInCombat;
         private bool _canBeDisplaced = false;
 
         private float _ability1Time;
@@ -356,9 +356,9 @@ namespace Player
 
         private void UpdateCharges()
         {
-            if (IsInCombat() &&
+            if (_isInCombat &&
                 _rechargeTime > _inCombatRechargeDuration ||
-                !IsInCombat() &&
+                !_isInCombat &&
                 _rechargeTime > _outOfCombatRechargeDuration)
             {
                 _hookCharges++;
@@ -366,7 +366,7 @@ namespace Player
             }
 
             _hookUI.UpdateUI(_hookCharges, _rechargeTime,
-                IsInCombat() ? _inCombatRechargeDuration : _outOfCombatRechargeDuration);
+                _isInCombat ? _inCombatRechargeDuration : _outOfCombatRechargeDuration);
 
             if (_hookCharges < _maxHookCharges)
             {
@@ -593,13 +593,9 @@ namespace Player
             _ability2Time = _ability2Cooldown;
         }
 
-        public void SetInCombat(bool c)
+        public void SetIsInCombat(bool isInCombat)
         {
-            _inCombat = c;
-        }
-        public bool IsInCombat()
-        {
-            return _inCombat;
+            _isInCombat = isInCombat;
         }
 
         public void UnlockDash()
@@ -748,7 +744,7 @@ namespace Player
             _moveSpeedMultiplier = moveSpeedMultiplier;
         }
 
-        public void SetDisplaceability(bool d)
+        public void SetDisplaceAbility(bool d)
         {
             _canBeDisplaced = d;
         }
