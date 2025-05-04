@@ -8,7 +8,6 @@ using UnityEngine;
 public class CombatRoom : MonoBehaviour
 {
     List<EnemySpawner> spawners = new List<EnemySpawner>();
-    List<AgentEntity> enemies = new List<AgentEntity>();
     [SerializeField] GameObject[] walls;
     [SerializeField] float delay = .5f;
     [SerializeField] float enemyDelay = .12f;
@@ -21,10 +20,6 @@ public class CombatRoom : MonoBehaviour
     void Start()
     {
         spawners = GetComponentsInChildren<EnemySpawner>().ToList();
-        for (int i = 0; i < spawners.Count; i++)
-        {
-            enemies.Add(spawners[i].agentEntity);
-        }
         for (int i = 0; i < walls.Length; i++)
         {
             DeactivateWall(walls[i]);
@@ -67,7 +62,7 @@ public class CombatRoom : MonoBehaviour
         }
         yield return new WaitForSeconds(t);
         AudioManager.Instance.PlayOneShot(FMODEvents.instance.combatDoor_Closed, player.transform.position);
-        for (int i = 0; i < enemies.Count; i++)
+        for (int i = 0; i < spawners.Count; i++)
         {
             yield return new WaitForSeconds(enemyDelay);
             spawners[i].Spawn();
