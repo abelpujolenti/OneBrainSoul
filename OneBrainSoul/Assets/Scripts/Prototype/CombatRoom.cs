@@ -8,6 +8,7 @@ using UnityEngine;
 public class CombatRoom : MonoBehaviour
 {
     List<EnemySpawner> spawners = new List<EnemySpawner>();
+    RisingFog risingFog;
     [SerializeField] GameObject[] walls;
     [SerializeField] float delay = .5f;
     [SerializeField] float enemyDelay = .12f;
@@ -20,6 +21,7 @@ public class CombatRoom : MonoBehaviour
     void Start()
     {
         spawners = GetComponentsInChildren<EnemySpawner>().ToList();
+        risingFog = GetComponentInChildren<RisingFog>();
         for (int i = 0; i < walls.Length; i++)
         {
             DeactivateWall(walls[i]);
@@ -51,7 +53,12 @@ public class CombatRoom : MonoBehaviour
         active = true;
         this.player = player;
         StartCoroutine(EnterCoroutine(delay, enemyDelay));
-        player.GetComponent<PlayerCharacter>().EnterCombatRoom(this);
+        player.EnterCombatRoom(this);
+
+        if (risingFog != null)
+        {
+            risingFog.BeginRising();
+        }
     }
 
     private IEnumerator EnterCoroutine(float t, float enemyDelay)
@@ -78,7 +85,7 @@ public class CombatRoom : MonoBehaviour
         {
             DeactivateWall(walls[i]);
         }
-        player.GetComponent<PlayerCharacter>().DefeatCombatRoom();
+        player.DefeatCombatRoom();
         AudioManager.Instance.PlayOneShot(FMODEvents.instance.combatDoor_Open, player.transform.position);
     }
 
@@ -97,6 +104,11 @@ public class CombatRoom : MonoBehaviour
         {
             spawners[i].ClearEntities();
             spawners[i].canSpawn = true;
+        }
+
+        if (risingFog != null)
+        {
+            risingFog.ResetPosition();
         }
     }
 

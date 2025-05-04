@@ -28,7 +28,6 @@ namespace Player
         private Coroutine ghostTimerCoroutine;
         private bool _hasBody = true;
         [SerializeField] Transform corpsePrefab;
-        private CombatRoom currCombatRoom;
 
         private uint _areasDetecting = 0;
 
@@ -137,10 +136,7 @@ namespace Player
                 ghostTimerCoroutine = StartCoroutine(GhostTimerCoroutine());
                 PostProcessingManager.Instance.GhostEffect(ghostDuration);
                 _hitstop.Add(0.5f);
-                if (currCombatRoom != null)
-                {
-                    currCombatRoom.ResetRoom();
-                }
+
                 AudioManager.Instance.StopLowHealth();
                 AudioManager.Instance.PlayGhostMode();
                 return;
@@ -203,16 +199,6 @@ namespace Player
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
             AudioManager.Instance.StopGhostMode();
             AudioManager.Instance.StopLowHealth();
-        }
-
-        public void EnterCombatRoom(CombatRoom c)
-        {
-            currCombatRoom = c;
-        }
-
-        public void DefeatCombatRoom()
-        {
-            currCombatRoom = null;
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)

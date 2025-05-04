@@ -118,6 +118,8 @@ namespace Player
 
         private bool _canMove = true;
 
+        private CombatRoom currCombatRoom;
+
         private void Start()
         {
             _camera.Setup();
@@ -207,6 +209,10 @@ namespace Player
 
         public void Respawn()
         {
+            if (currCombatRoom != null)
+            {
+                currCombatRoom.ResetRoom();
+            }
             StartCoroutine(RespawnCoroutine(0.3f));
         }
 
@@ -482,6 +488,16 @@ namespace Player
             {
                 _slideSound.stop(STOP_MODE.ALLOWFADEOUT);
             }
+        }
+
+        public void EnterCombatRoom(CombatRoom c)
+        {
+            currCombatRoom = c;
+        }
+
+        public void DefeatCombatRoom()
+        {
+            currCombatRoom = null;
         }
 
         private void AnimationUpdate()
