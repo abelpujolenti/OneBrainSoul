@@ -13,7 +13,11 @@ public class EnemySpawner : MonoBehaviour
     
     private void Awake()
     {
-        agentEntity = transform.GetChild(0).GetComponent<AgentEntity>();
+        agentEntity = transform.GetComponentInChildren<AgentEntity>();
+        if (agentEntity == null)
+        {
+            agentEntity = transform.GetChild(0).GetComponentInChildren<AgentEntity>();
+        }
         agentEntity.gameObject.SetActive(false);
     }
 
