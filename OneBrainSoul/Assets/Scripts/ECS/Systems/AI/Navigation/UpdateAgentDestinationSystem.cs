@@ -9,15 +9,15 @@ namespace ECS.Systems.AI.Navigation
     {
         public void UpdateAgentDestination(AStarPath aStarPath, float triangleSideLength)
         {
-            List<Node> newPath = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, aStarPath.origin, 
+            aStarPath.path = AStarPathFindingAlgorithm.FindPath(aStarPath.navMeshGraph, aStarPath.origin, 
                 aStarPath.destination);
             
-            if (newPath.Count == 0)
+            if (aStarPath.path.Count == 0)
             {
                 return;
             }
 
-            aStarPath.path = AStarPathFindingAlgorithm.OptimizePath(newPath, aStarPath.origin,
+            aStarPath.path = AStarPathFindingAlgorithm.OptimizePath(aStarPath.path, aStarPath.origin,
                 aStarPath.navMeshGraph.nodes, triangleSideLength);
         }
     }

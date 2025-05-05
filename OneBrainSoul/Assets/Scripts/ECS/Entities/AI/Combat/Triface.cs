@@ -27,6 +27,8 @@ namespace ECS.Entities.AI.Combat
 
         private float _rotationSpeedWhenCastingSlam;
 
+        private bool _isGhostInsideSlamArea;
+
         private void Start()
         {
             CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
@@ -41,14 +43,30 @@ namespace ECS.Entities.AI.Combat
             _context = new TrifaceContext(_trifaceProperties.totalHealth, radius, capsuleCollider.height, _headTransform, 
                 _bodyTransform, _slamAbility.GetCast());
             
-            GetNavMeshAgentComponent().GetAStarPath().SetOnReachDestination(_context.SetHasReachedDestination);
-            
-            _slamAbilityDetectionArea.Setup(_trifaceProperties.slamAbilityProperties.abilityTarget, 
-                _context.AddTargetInsideSlamDetectionArea, _context.RemoveTargetInsideSlamDetectionArea);
+            SetupSlamDetectionArea();
             
             CombatManager.Instance.AddEnemy(this);
+        }
 
-            _startPosition = transform.position;
+        protected override void ResetPlayerInsideAreas()
+        {
+            base.ResetPlayerInsideAreas();
+            
+            _context.RemoveTargetInsideSlamDetectionArea(CombatManager.Instance.ReturnPlayer().GetAgentID());
+        }
+
+        protected override void SwitchPlayerInsideAreas()
+        {
+            base.SwitchPlayerInsideAreas();
+
+            if (!_isGhostInsideSlamArea)
+            {
+                return;
+            }
+            
+            uint playerId = CombatManager.Instance.ReturnPlayer().GetAgentID();
+            
+            _context.AddTargetInsideSlamDetectionArea(playerId);
         }
 
         protected override void InitiateDictionaries()
@@ -81,6 +99,50 @@ namespace ECS.Entities.AI.Combat
             _cancelSlamFunc = () => !_isDying || _context.IsSlamTargetInsideDetectionArea();
         }
 
+        private void SetupSlamDetectionArea()
+        {
+            _slamAbilityDetectionArea.Setup(
+                (agentEntity) =>
+                {
+                    EntityType targets = _trifaceProperties.slamAbilityProperties.abilityTarget; 
+                    
+                    EntityType entityType = agentEntity.GetEntityType();
+                    
+                    if ((targets & entityType) == 0)
+                    {
+                        if ((targets & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                        {
+                            return;
+                        }
+
+                        _isGhostInsideSlamArea = true;
+                        
+                        return;
+                    }
+                    
+                    _context.AddTargetInsideSlamDetectionArea(agentEntity.GetAgentID());
+                }, 
+                (agentEntity) =>
+                {
+                    EntityType targets = _trifaceProperties.slamAbilityProperties.abilityTarget; 
+                    
+                    EntityType entityType = agentEntity.GetEntityType();
+                    
+                    if ((targets & entityType) == 0)
+                    {
+                        if ((targets & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                        {
+                            return;
+                        }
+
+                        _isGhostInsideSlamArea = false;
+                        
+                        return;
+                    }
+                    _context.RemoveTargetInsideSlamDetectionArea(agentEntity.GetAgentID());
+                });
+        }
+
         #region AI LOOP
 
         protected override void AILoop()
@@ -109,7 +171,6 @@ namespace ECS.Entities.AI.Combat
             
             Vector3 vectorToTarget = _context.GetSlamTargetContext().GetVectorToTarget();
                 
-            //TODO AQUI AGENT SLOTS WHEN NEAR
             AgentSlotPosition agentSlotPosition = CombatManager.Instance.ReturnAgentEntity(_slamAbility.GetTargetId())
                 .GetAgentSlotPosition(vectorToTarget, _context.GetRadius());
 
@@ -124,11 +185,6 @@ namespace ECS.Entities.AI.Combat
             _agentSlot = agentSlotPosition.agentSlot;
             ECSNavigationManager.Instance.UpdateAStarDeviationVector(GetAgentID(), agentSlotPosition.deviationVector);
         }
-
-
-        //TODO ERASE WHEN PATROLLING
-        private Vector3 _startPosition;
-        //
 
         protected override void UpdateSightedTargetsInsideCombatArea()
         {

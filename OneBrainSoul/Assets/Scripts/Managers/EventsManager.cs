@@ -51,6 +51,8 @@ namespace Managers
 
         public static Action OnDefeatEnemy;
         public static Action<EntityType, uint> OnAgentDefeated;
+        public static Action OnPlayerDie;
+        public static Action OnPlayerRevive;
 
         #region Navigation
 

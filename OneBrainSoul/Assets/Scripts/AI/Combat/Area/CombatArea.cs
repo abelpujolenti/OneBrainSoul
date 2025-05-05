@@ -29,8 +29,12 @@ namespace AI.Combat.Area
         private void Awake()
         {
             CombatManager.Instance.AddCombatArea(this, _combatAreaNumber);
+            
             _targetEntitiesInsideArea.Add(EntityType.PLAYER, new HashSet<uint>());
             _targetEntitiesSightedInsideArea.Add(EntityType.PLAYER, new HashSet<uint>());
+            
+            _targetEntitiesInsideArea.Add(EntityType.GHOST, new HashSet<uint>());
+            _targetEntitiesSightedInsideArea.Add(EntityType.GHOST, new HashSet<uint>());
         }
 
         private void Start()
@@ -46,8 +50,12 @@ namespace AI.Combat.Area
 
         public bool HasPlayerInside()
         {
-            return _targetEntitiesInsideArea.ContainsKey(EntityType.PLAYER) &&
-                   _targetEntitiesInsideArea[EntityType.PLAYER].Contains(_playerId);
+            return _targetEntitiesInsideArea[EntityType.PLAYER].Contains(_playerId);
+        }
+
+        public bool HasGhostInside()
+        {
+            return _targetEntitiesInsideArea[EntityType.GHOST].Contains(_playerId);
         }
 
         public uint GetCombatAreaNumber()
@@ -131,12 +139,17 @@ namespace AI.Combat.Area
             }
         }
 
-        private void AddTarget(EntityType entityType, uint targetId)
+        public void AddTarget(EntityType entityType, uint targetId)
         {
+            if (!_targetEntitiesInsideArea.ContainsKey(entityType))
+            {
+                return;
+            }
+            
             _targetEntitiesInsideArea[entityType].Add(targetId);
         }
 
-        private void RemoveTarget(EntityType entityType, uint targetId)
+        public void RemoveTarget(EntityType entityType, uint targetId)
         {
             if (!_targetEntitiesInsideArea.ContainsKey(entityType))
             {
@@ -180,12 +193,9 @@ namespace AI.Combat.Area
         
         public void AddSightedTarget(EntityType entityType, uint targetId)
         {
-            if (!_targetEntitiesSightedInsideArea[entityType].Add(targetId))
-            {
-                return;
-            }
-
-            if (targetId != _playerId)
+            if (!_targetEntitiesSightedInsideArea.ContainsKey(entityType) ||
+                !_targetEntitiesSightedInsideArea[entityType].Add(targetId) || 
+                targetId != _playerId)
             {
                 return;
             }
@@ -195,14 +205,9 @@ namespace AI.Combat.Area
 
         private void RemoveSightedTarget(EntityType entityType, uint targetId)
         {
-            if (!_targetEntitiesSightedInsideArea.ContainsKey(entityType))
-            {
-                return;
-            }
-            
-            _targetEntitiesSightedInsideArea[entityType].Remove(targetId);
-
-            if (targetId != _playerId)
+            if (!_targetEntitiesSightedInsideArea.ContainsKey(entityType) ||
+                _targetEntitiesSightedInsideArea[entityType].Remove(targetId) || 
+                targetId != _playerId)
             {
                 return;
             }
@@ -235,11 +240,6 @@ namespace AI.Combat.Area
             }
 
             EntityType entityType = agentEntity.GetEntityType();
-
-            if (!_targetEntitiesInsideArea.ContainsKey(entityType))
-            {
-                return;
-            }
 
             uint agentId = agentEntity.GetAgentID();
             

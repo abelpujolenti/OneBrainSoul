@@ -15,11 +15,6 @@ namespace ECS.Entities.AI.Combat
             base.EnemySetup(radius, teleportMobilityEnemyProperties, entityType, targetEntities);
         }
 
-        protected override void GoToArea(Vector3 estimatedPosition)
-        {
-            
-        }
-
         protected override void OnEndInvestigation()
         {
             base.OnEndInvestigation();

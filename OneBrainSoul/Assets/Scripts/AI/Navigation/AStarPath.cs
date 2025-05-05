@@ -42,7 +42,7 @@ namespace AI.Navigation
             return destinationPosition.GetPosition();
         }
 
-        public void SetOnReachDestination(Action<bool> hasReachDestinationAction)
+        public void HasReachDestination(Action<bool> hasReachDestinationAction)
         {
             _hasReachDestinationAction = hasReachDestinationAction;
         }

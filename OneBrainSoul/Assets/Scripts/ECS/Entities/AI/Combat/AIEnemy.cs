@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AI.Combat.AbilitySpecs;
 using AI.Combat.Area;
 using AI.Combat.Contexts;
@@ -30,6 +31,8 @@ namespace ECS.Entities.AI.Combat
             new Dictionary<EntityType, HashSet<uint>>();
 
         protected HashSet<uint> _targetsSightedInsideCombatArea = new HashSet<uint>();
+
+        protected bool _hasSeenAGhost;
         
         [SerializeField] protected Material _material;
         
@@ -89,6 +92,35 @@ namespace ECS.Entities.AI.Combat
             {
                 visionArea.Setup(AddTargetInsideVisionArea, RemoveTargetInsideVisionArea);
             }
+
+            EventsManager.OnPlayerDie += ResetPlayerInsideAreas;
+            EventsManager.OnPlayerRevive += SwitchPlayerInsideAreas;
+        }
+
+        protected virtual void ResetPlayerInsideAreas()
+        {
+            if (_targetsInsideVisionArea[EntityType.PLAYER].Count == 0)
+            {
+                return;
+            }
+
+            _targetsSightedInsideCombatArea.Remove(_targetsInsideVisionArea[EntityType.PLAYER].First());
+            _targetsInsideVisionArea[EntityType.PLAYER].Clear();
+        }
+
+        protected virtual void SwitchPlayerInsideAreas()
+        {
+            if (!_hasSeenAGhost)
+            {
+                return;
+            }
+
+            _hasSeenAGhost = false;
+
+            uint playerId = CombatManager.Instance.ReturnPlayer().GetAgentID();
+            
+            AddEntityInsideVisionArea(EntityType.PLAYER, playerId);
+            _targetsSightedInsideCombatArea.Add(playerId);
         }
 
         protected virtual void CreateAbilities()
@@ -98,7 +130,7 @@ namespace ECS.Entities.AI.Combat
                 if ((_targetEntities & i) == 0)
                 {
                     continue;
-                }   
+                }
                 
                 _targetsInsideVisionArea.Add(i, new HashSet<uint>());
             }
@@ -257,8 +289,6 @@ namespace ECS.Entities.AI.Combat
             
             OnEndInvestigation();
         }
-
-        protected abstract void GoToArea(Vector3 estimatedPosition);
 
         protected virtual void OnEndInvestigation()
         {
@@ -475,8 +505,15 @@ namespace ECS.Entities.AI.Combat
             yield break;
         }
 
+        #endregion
+
+        #endregion
+
         protected virtual void OnDestroy()
         {
+            EventsManager.OnPlayerDie -= ResetPlayerInsideAreas;
+            EventsManager.OnPlayerRevive -= SwitchPlayerInsideAreas;
+            
             if (_doesRestoreAChargeOfPlayer)
             {
                 CombatManager.Instance.RechargeAChargeOfPlayer();
@@ -489,10 +526,6 @@ namespace ECS.Entities.AI.Combat
             
             CombatManager.Instance.HealPlayer();
         }
-
-        #endregion
-
-        #endregion
 
         public EntityType GetTarget()
         {
@@ -508,24 +541,48 @@ namespace ECS.Entities.AI.Combat
         {
             if (!IsADesiredTargetEntity(entityType))
             {
+                if ((_targetEntities & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                {
+                    return;
+                }
+
+                ShowDebugMessages("Ghost Seen");
+                _hasSeenAGhost = true;
                 return;
             }
             
-            _targetsInsideVisionArea[entityType].Add(targetId);
+            AddEntityInsideVisionArea(entityType, targetId);
             
             CombatManager.Instance.AddPreSightedTargetToCombatArea(_areaNumber, entityType, targetId);
+        }
+
+        private void AddEntityInsideVisionArea(EntityType entityType, uint targetId)
+        {
+            _targetsInsideVisionArea[entityType].Add(targetId);
         }
 
         private void RemoveTargetInsideVisionArea(EntityType entityType, uint targetId)
         {
             if (!IsADesiredTargetEntity(entityType))
             {
+                if ((_targetEntities & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                {
+                    return;
+                }
+
+                ShowDebugMessages("Ghost Gone");
+                _hasSeenAGhost = false;
                 return;
             }
             
-            _targetsInsideVisionArea[entityType].Remove(targetId);
+            RemoveEntityInsideVisionArea(entityType, targetId);
             
             CombatManager.Instance.RemovePreSightedTargetToCombatArea(_areaNumber, targetId);
+        }
+
+        private void RemoveEntityInsideVisionArea(EntityType entityType, uint targetId)
+        {
+            _targetsInsideVisionArea[entityType].Remove(targetId);
         }
 
         protected abstract void RemoveATargetIfWasLost(uint targetIdToCheck);

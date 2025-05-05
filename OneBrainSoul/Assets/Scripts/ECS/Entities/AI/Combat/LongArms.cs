@@ -51,6 +51,9 @@ namespace ECS.Entities.AI.Combat
         private bool _isSettingNewDirectionToRotate;
 
         private Func<uint> _longArmsBaseIdFunc;
+
+        private bool _isGhostInsideThrowRockArea;
+        private bool _isGhostInsideClapAboveArea;
         
         private void Start()
         {
@@ -83,16 +86,43 @@ namespace ECS.Entities.AI.Combat
             
             SetDirectionToRotateBody(transform.forward);
 
-            _throwRockAbilityDetectionArea.Setup(_longArmsProperties.throwRockAbilityProperties.abilityTarget,
-                _context.AddTargetInsideThrowRockDetectionArea, _context.RemoveTargetInsideThrowRockDetectionArea);
+            SetupThrowRockDetectionArea();
 
-            _clapAboveAbilityDetectionArea.Setup(_longArmsProperties.clapAboveAbilityProperties.abilityTarget, 
-                _context.AddTargetInsideClapAboveDetectionArea, _context.RemoveTargetInsideClapAboveDetectionArea);
+            SetupClapAboveDetectionArea();
             
             CombatManager.Instance.AddEnemy(this);
             
             _timesSettingNewDirection = (uint)Random.Range(_minimumTimesSettingNewDirectionToTurnAround,
                 _maximumTimesSettingNewDirectionToTurnAround);
+        }
+
+        protected override void ResetPlayerInsideAreas()
+        {
+            base.ResetPlayerInsideAreas();
+
+            uint playerId = CombatManager.Instance.ReturnPlayer().GetAgentID();
+            
+            _context.RemoveTargetInsideClapAboveDetectionArea(playerId);
+            _context.RemoveTargetInsideThrowRockDetectionArea(playerId);
+        }
+
+        protected override void SwitchPlayerInsideAreas()
+        {
+            base.SwitchPlayerInsideAreas();
+
+            uint playerId = CombatManager.Instance.ReturnPlayer().GetAgentID();
+
+            if (_isGhostInsideThrowRockArea)
+            {
+                _context.AddTargetInsideThrowRockDetectionArea(playerId);
+            }
+
+            if (!_isGhostInsideClapAboveArea)
+            {
+                return;
+            }
+            
+            _context.AddTargetInsideClapAboveDetectionArea(playerId);
         }
 
         protected override void InitiateDictionaries()
@@ -134,6 +164,95 @@ namespace ECS.Entities.AI.Combat
             }
 
             _cancelClapAboveFunc = () => !_isDying || _context.IsClapAboveTargetInsideDetectionArea();
+        }
+
+        private void SetupThrowRockDetectionArea()
+        {
+            _throwRockAbilityDetectionArea.Setup(
+                (agentEntity) =>
+                {
+                    EntityType targets = _longArmsProperties.throwRockAbilityProperties.abilityTarget;
+
+                    EntityType entityType = agentEntity.GetEntityType();
+
+                    if ((targets & entityType) == 0)
+                    {
+                        if ((targets & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                        {
+                            return;
+                        }
+
+                        _isGhostInsideThrowRockArea = true;
+                        
+                        return;
+                    }
+                    
+                    _context.AddTargetInsideThrowRockDetectionArea(agentEntity.GetAgentID());
+                },
+                (agentEntity) =>
+                {
+                    EntityType targets = _longArmsProperties.throwRockAbilityProperties.abilityTarget;
+
+                    EntityType entityType = agentEntity.GetEntityType();
+
+                    if ((targets & entityType) == 0)
+                    {
+                        if ((targets & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                        {
+                            return;
+                        }
+
+                        _isGhostInsideThrowRockArea = false;
+                        
+                        return;
+                    }
+                    
+                    _context.RemoveTargetInsideThrowRockDetectionArea(agentEntity.GetAgentID());
+                });
+        }
+
+        private void SetupClapAboveDetectionArea()
+        {
+            _clapAboveAbilityDetectionArea.Setup((agentEntity) =>
+                {
+                    EntityType targets = _longArmsProperties.clapAboveAbilityProperties.abilityTarget;
+
+                    EntityType entityType = agentEntity.GetEntityType();
+
+                    if ((targets & entityType) == 0)
+                    {
+                        if ((targets & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                        {
+                            return;
+                        }
+
+                        _isGhostInsideClapAboveArea = true;
+                        
+                        return;
+                    }
+                    
+                    _context.AddTargetInsideClapAboveDetectionArea(agentEntity.GetAgentID());
+                },
+                (agentEntity) =>
+                {
+                    EntityType targets = _longArmsProperties.clapAboveAbilityProperties.abilityTarget;
+
+                    EntityType entityType = agentEntity.GetEntityType();
+
+                    if ((targets & entityType) == 0)
+                    {
+                        if ((targets & EntityType.PLAYER) == 0 || entityType != EntityType.GHOST)
+                        {
+                            return;
+                        }
+
+                        _isGhostInsideClapAboveArea = false;
+                        
+                        return;
+                    }
+                    
+                    _context.RemoveTargetInsideClapAboveDetectionArea(agentEntity.GetAgentID());
+                });
         }
 
         #region AI LOOP
