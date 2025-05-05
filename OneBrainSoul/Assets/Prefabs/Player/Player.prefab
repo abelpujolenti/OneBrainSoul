@@ -12118,7 +12118,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -60.566895}
+  m_AnchoredPosition: {x: 0, y: -85.8}
   m_SizeDelta: {x: 1000, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7328321589735318513
@@ -12185,7 +12185,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -12851,10 +12851,10 @@ MonoBehaviour:
     m_Bits: 64
   _jumps: 2
   _moveSpeedMultiplier: 1.1
-  _ability1Cooldown: 0.7
+  _ability1Cooldown: 0.4
   _ability2Cooldown: 1
-  _contactHitboxRadius: 2
-  _contactDamageHitboxRadius: 2.8
+  _contactHitboxRadius: 1.4
+  _contactDamageHitboxRadius: 2.6
   _gravityStrength: 32
   _hoverHeight: 1.2
   _hoverStrength: 500
