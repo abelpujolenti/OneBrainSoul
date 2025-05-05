@@ -59,10 +59,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <music>k__BackingField:
     Guid:
-      Data1: -1844430463
-      Data2: 1158157235
-      Data3: 1574955151
-      Data4: -1232983447
+      Data1: -841117242
+      Data2: 1111897833
+      Data3: 768577430
+      Data4: 1135947306
     Path: event:/Music/Music
   <ambient>k__BackingField:
     Guid:
