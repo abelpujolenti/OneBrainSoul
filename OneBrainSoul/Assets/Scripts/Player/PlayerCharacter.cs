@@ -140,6 +140,13 @@ namespace Player
 
                 AudioManager.Instance.StopLowHealth();
                 AudioManager.Instance.PlayGhostMode();
+
+                if (EventsManager.OnPlayerDie == null)
+                {
+                    return;
+                }
+                
+                EventsManager.OnPlayerDie();
                 return;
             }
             
@@ -200,6 +207,13 @@ namespace Player
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.wandAttack, transform.position);
             AudioManager.Instance.StopGhostMode();
             AudioManager.Instance.StopLowHealth();
+
+            if (EventsManager.OnPlayerRevive == null)
+            {
+                return;
+            }
+
+            EventsManager.OnPlayerRevive();
         }
 
         public override void OnReceiveDamageOverTime(uint damageValue, float duration, Vector3 sourcePosition)

@@ -47,6 +47,11 @@ namespace ECS.Entities.AI.Combat
 
         protected Action _update = () => { };
 
+
+        //TODO ERASE WHEN PATROLLING
+        protected Vector3 _startPosition;
+        //
+
         protected override void EnemySetup(float radius, FreeMobilityEnemyProperties freeMobilityEnemyProperties, 
             EntityType entityType, EntityType targetEntities)
         {
@@ -60,28 +65,51 @@ namespace ECS.Entities.AI.Combat
 
             _onEnableAction = () =>
             {
-                ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), radius + freeMobilityEnemyProperties.agentsPositionRadius);
+                ECSNavigationManager.Instance.AddNavMeshAgentEntity(GetAgentID(), GetNavMeshAgentComponent(), 
+                    radius + freeMobilityEnemyProperties.agentsPositionRadius);
             };
 
             _onEnableAction();
 
-            _update = AILoop;
+            _update = () =>
+            {
+                _animator.SetFloat(ANIMATOR_VELOCITY_FLOAT, 
+                    MathUtil.Map(_navMeshAgent.velocity.magnitude, 0, _navMeshAgentSpecs.movementSpeed, 0, 1));
+                
+                AILoop();
+            };
+            
+            _navMeshAgentComponent.GetAStarPath().HasReachDestination((hasReached) =>
+            {
+                ShowDebugMessages("Has Reached: " + hasReached);
+                if (hasReached)
+                {
+                    StopNavigation();
+                    return;
+                }
+                
+                ContinueNavigation();
+            });
+
+            _startPosition = transform.position;
         }
 
         #region Navigation
         
         protected void ContinueNavigation()
         {
-            _animator.SetFloat(ANIMATOR_VELOCITY_FLOAT, MathUtil.Map(_navMeshAgent.speed, 0, _navMeshAgentSpecs.movementSpeed, 0, 1));
+            ShowDebugMessages("Continue Navigation");
             _navMeshAgent.isStopped = false;
             _context.SetHasStopped(false);
+            _context.SetHasReachedDestination(false);
         }
 
         protected void StopNavigation()
         {
-            _animator.SetFloat(ANIMATOR_VELOCITY_FLOAT, 0);
+            ShowDebugMessages("Stop Navigation");
             _navMeshAgent.isStopped = true;
             _context.SetHasStopped(true);
+            _context.SetHasReachedDestination(true);
         }
 
         protected override IEnumerator WaitAnimationExtraTime(float animationExtraTime)
@@ -97,6 +125,8 @@ namespace ECS.Entities.AI.Combat
 
         protected void RotateInSitu()
         {
+            ShowDebugMessages("Rotate In Situ");
+            
             Vector3 position = transform.position;
 
             List<Node> nodes = _navMeshAgentComponent.GetAStarPath().path;
@@ -153,11 +183,6 @@ namespace ECS.Entities.AI.Combat
 
             sampledPosition = Vector3.zero;
             return false;
-        }
-
-        protected override void GoToArea(Vector3 estimatedPosition)
-        {
-            SetDestination(new VectorComponent(estimatedPosition));
         }
 
         protected override void OnEndInvestigation()
@@ -263,8 +288,15 @@ namespace ECS.Entities.AI.Combat
             ECSNavigationManager.Instance.RemoveNavMeshAgentEntity(GetAgentID());
         }
 
+        [SerializeField] protected bool _showPath;
+
         protected override void OnDrawGizmos()
         {
+            if (!_showPath)
+            {
+                return;
+            }
+            
             if (ECSNavigationManager.Instance == null)
             {
                 return;

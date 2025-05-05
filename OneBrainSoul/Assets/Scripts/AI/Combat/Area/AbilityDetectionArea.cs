@@ -9,12 +9,11 @@ namespace AI.Combat.Area
     {
         private EntityType _target;
         
-        private Action<uint> _addAction;
-        private Action<uint> _removeAction;
+        private Action<AgentEntity> _addAction;
+        private Action<AgentEntity> _removeAction;
         
-        public void Setup(EntityType target, Action<uint> addAction, Action<uint> removeAction)
+        public void Setup(Action<AgentEntity> addAction, Action<AgentEntity> removeAction)
         {
-            _target = target;
             _addAction = addAction;
             _removeAction = removeAction;
         }
@@ -28,12 +27,7 @@ namespace AI.Combat.Area
                 return;
             }
 
-            if ((_target & agentEntity.GetEntityType()) == 0)
-            {
-                return;
-            }
-
-            _addAction(agentEntity.GetAgentID());
+            _addAction(agentEntity);
         }
 
         private void OnTriggerExit(Collider other)
@@ -45,12 +39,7 @@ namespace AI.Combat.Area
                 return;
             }
 
-            if ((_target & agentEntity.GetEntityType()) == 0)
-            {
-                return;
-            }
-
-            _removeAction(agentEntity.GetAgentID());
+            _removeAction(agentEntity);
         }
     }
 }

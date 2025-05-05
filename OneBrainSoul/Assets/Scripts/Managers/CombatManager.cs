@@ -66,6 +66,9 @@ namespace Managers
                 
                 LoadManager.Instance.ManagerLoaded();
 
+                EventsManager.OnPlayerDie += ErasePlayerInCombatAreas;
+                EventsManager.OnPlayerRevive += UpdatePlayerStateInCombatAreas;
+
                 return;
             }
 
@@ -141,6 +144,29 @@ namespace Managers
                 }
                 
                 combatArea.AddTargetEntityType(i, enemyId);
+            }
+        }
+
+        private void ErasePlayerInCombatAreas()
+        {
+            foreach (CombatArea combatArea in _combatAreas.Values)
+            {
+                combatArea.RemoveTarget(EntityType.PLAYER, _playerCharacter.GetAgentID());
+            }
+        }
+
+        private void UpdatePlayerStateInCombatAreas()
+        {
+            foreach (CombatArea combatArea in _combatAreas.Values)
+            {
+                if (!combatArea.HasGhostInside())
+                {
+                    continue;
+                }
+                
+                combatArea.RemoveTarget(EntityType.GHOST, _playerCharacter.GetAgentID());
+                combatArea.AddTarget(EntityType.PLAYER, _playerCharacter.GetAgentID());
+                combatArea.AddSightedTarget(EntityType.PLAYER, _playerCharacter.GetAgentID());
             }
         }
 
@@ -559,5 +585,11 @@ namespace Managers
         }
 
         #endregion
+
+        private void OnDestroy()
+        {
+            /*EventsManager.OnPlayerDie -= ErasePlayerInCombatAreas;
+            EventsManager.OnPlayerRevive -= UpdatePlayerStateInCombatAreas;*/
+        }
     }
 }

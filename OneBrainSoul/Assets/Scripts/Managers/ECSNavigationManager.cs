@@ -8,6 +8,7 @@ using ECS.Systems.AI.Navigation;
 using Interfaces.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 namespace Managers
 {
@@ -174,6 +175,8 @@ namespace Managers
                 
                 List<Node> path = aStarPath.path;
                 
+                NavMeshAgent navMeshAgent = navMeshAgentComponent.GetNavMeshAgent();
+                
                 if (path.Count == 0)
                 {
                     navMeshAgentComponent.GetAStarPath().OnReachDestination();
@@ -182,27 +185,8 @@ namespace Managers
                 
                 CleanPreviousWayPoints(aStarPath.origin, path);
 
-                Vector3 firstPathPosition = path[0].position;
-
-                Vector3 position = navMeshAgentComponent.GetTransformComponent().GetPosition();
-
-                float distanceToNextPoint = (position - firstPathPosition).sqrMagnitude;
-
-                while (path.Count > 1 && distanceToNextPoint < 4f * 4f)
-                {
-                    path[^1].gCost -= path[0].gCost;
-                
-                    path.RemoveAt(0);
-
-                    firstPathPosition = path[0].position;
-                    
-                    distanceToNextPoint = (position - firstPathPosition).sqrMagnitude;
-                }
-
-                NavMeshAgent navMeshAgent = navMeshAgentComponent.GetNavMeshAgent();
-
                 navMeshAgent.updateRotation = true;
-                navMeshAgent.SetDestination(firstPathPosition);
+                navMeshAgent.SetDestination(path[0].position);
             }
         }
 
