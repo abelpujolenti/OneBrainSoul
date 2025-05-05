@@ -3275,6 +3275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walls:
   - {fileID: 3635105299800021026}
+  - {fileID: 3226998518056689612}
   delay: 0.5
   enemyDelay: 0.12
 --- !u!1 &3134138737165327366
@@ -11388,7 +11389,7 @@ Transform:
   m_GameObject: {fileID: 8707387578542428416}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 19.5, y: -18.000051, z: -37}
+  m_LocalPosition: {x: 19.5, y: -18.000051, z: -34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
