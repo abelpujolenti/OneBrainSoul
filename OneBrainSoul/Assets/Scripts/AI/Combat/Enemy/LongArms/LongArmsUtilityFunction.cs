@@ -15,14 +15,14 @@ namespace AI.Combat.Enemy.LongArms
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_THROW_ROCK),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.ACQUIRE_NEW_TARGET_FOR_CLAP_ABOVE),
                 new AICombatAgentAction<LongArmsAction>(LongArmsAction.THROW_ROCK),
-                new AICombatAgentAction<LongArmsAction>(LongArmsAction.CLAP_ABOVE)
+                //new AICombatAgentAction<LongArmsAction>(LongArmsAction.CLAP_ABOVE)
             };
 
             actions[0].utilityScore = CalculateObservingUtility(context);
             actions[1].utilityScore = CalculateAcquireNewTargetForThrowRockUtility(context);
             actions[2].utilityScore = CalculateAcquireNewTargetForClapAboveUtility(context);
             actions[3].utilityScore = CalculateThrowRockUtility(context);
-            actions[4].utilityScore = CalculateClapAboveUtility(context);
+            //actions[4].utilityScore = CalculateClapAboveUtility(context);
 
             uint index = 0;
 

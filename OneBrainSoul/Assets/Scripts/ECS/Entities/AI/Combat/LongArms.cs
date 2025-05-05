@@ -439,7 +439,7 @@ namespace ECS.Entities.AI.Combat
             AbilityCast abilityCast = _throwRockAbility.GetCast();
             
             abilityCast.StartCastTime();
-
+            
             while (abilityCast.IsCasting())
             {
                 abilityCast.DecreaseCurrentCastTime();
