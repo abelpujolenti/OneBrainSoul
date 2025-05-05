@@ -8,17 +8,14 @@ public class EnemySpawner : MonoBehaviour
     public bool spawnOnStart = true;
     public bool spawnOnEnterTrigger = false;
     public bool canSpawn = true;
-    public AgentEntity agentEntity { get; private set; }
-    private List<AgentEntity> spawnedEntities = new List<AgentEntity>();
+    public Transform transformToSpawn { get; private set; }
+
+    private List<GameObject> spawnedEntities = new List<GameObject>();
     
     private void Awake()
     {
-        agentEntity = transform.GetComponentInChildren<AgentEntity>();
-        if (agentEntity == null)
-        {
-            agentEntity = transform.GetChild(0).GetComponentInChildren<AgentEntity>();
-        }
-        agentEntity.gameObject.SetActive(false);
+        transformToSpawn = transform.GetChild(0);
+        transformToSpawn.gameObject.SetActive(false);
     }
 
     private void Start()
@@ -56,10 +53,10 @@ public class EnemySpawner : MonoBehaviour
     {
         if (!canSpawn) return;
         canSpawn = false;
-        var spawnedAgent = Instantiate(agentEntity.transform, agentEntity.transform.position, agentEntity.transform.rotation);
-        spawnedAgent.localScale = agentEntity.transform.lossyScale;
+        Transform spawnedAgent = Instantiate(transformToSpawn, transformToSpawn.position, transformToSpawn.rotation);
+        spawnedAgent.localScale = transformToSpawn.lossyScale;
         spawnedAgent.gameObject.SetActive(true);
-        spawnedEntities.Add(spawnedAgent.GetComponent<AgentEntity>());
+        spawnedEntities.Add(spawnedAgent.gameObject);
         AudioManager.Instance.PlayOneShot(FMODEvents.instance.enemySpawn, transform.position);
     }
 

@@ -67,7 +67,7 @@ MonoBehaviour:
   abilityEffectOnHealthTypeOnEnd: 0
   abilityEffectOnEnd:
     hasAnEffectOnHealth: 1
-    healthModificationValue: 5
+    healthModificationValue: 8
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0

@@ -117,6 +117,11 @@ namespace Player
         public bool _isWallClimbUnlocked = false;
 
         private bool _canMove = true;
+        private bool _deathMessageTutorialShown = false;
+        private bool _doubleJumpMessageTutorialShown = false;
+        private bool _showDoubleJumpTutorial = false;
+
+        private CombatRoom currCombatRoom;
 
         private void Start()
         {
@@ -209,6 +214,11 @@ namespace Player
 
         public void Respawn()
         {
+            if (currCombatRoom != null)
+            {
+                currCombatRoom.ResetRoom();
+            }
+
             StartCoroutine(RespawnCoroutine(0.3f));
         }
 
@@ -234,6 +244,7 @@ namespace Player
 
         public void SetRespawn(Vector3 newPos)
         {
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Checkpoint Reached!]</b>", 1f));
             _respawnPos = newPos;
         }
 
@@ -260,13 +271,21 @@ namespace Player
             
             _onGround = Physics.Raycast(transform.position + Vector3.up * (raycastMargin + 0.05f), Vector3.down,
                 out _groundHit, _hoverHeight * 5.0f, _groundMask);
-            
+
             if (!_onGround) _groundHit.distance = float.PositiveInfinity;
             _onGround &= _groundHit.distance < _hoverHeight + raycastMargin && Vector3.Angle(_groundHit.normal, Vector3.up) < 37.5f;
 
             if (!_onGround)
             {
+                _showDoubleJumpTutorial = true;
                 return;
+            }
+
+            if (!_doubleJumpMessageTutorialShown && _showDoubleJumpTutorial && _movementHandler is GroundedMovementHandler)
+            {
+                StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Space while airborne]</b> <color=white> <size=40>Double Jump", 2f, _airborneMovementHandler));
+                _showDoubleJumpTutorial = false;
+                _doubleJumpMessageTutorialShown = true;
             }
 
             ResetDash();
@@ -630,6 +649,17 @@ namespace Player
             _abilityRings[index].gameObject.SetActive(true);
         }
 
+        public void DeathMessage()
+        {
+            if (!_deathMessageTutorialShown)
+            {
+                StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Recover your soul!]\n\n<color=white><size=40>If you don't reach it in time the corruption will escape, and <size=43>enemies will respawn.", 1.3f));
+                _deathMessageTutorialShown = true;
+                return;
+            }
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Recover your soul!]<color=white>", .75f));
+        }
+
         private IEnumerator SetControlText(string text, float dur = 0.5f, IMovementHandler movementHandler = null)
         {
             _controlPrompt.text = text;
@@ -729,6 +759,16 @@ namespace Player
             {
                 _contactDamageAmount = (uint)damage;
             }
+        }
+
+        public void EnterCombatRoom(CombatRoom c)
+        {
+            currCombatRoom = c;
+        }
+
+        public void DefeatCombatRoom()
+        {
+            currCombatRoom = null;
         }
 
         public int GetCharges()
