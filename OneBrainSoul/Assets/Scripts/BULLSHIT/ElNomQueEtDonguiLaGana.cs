@@ -1,10 +1,14 @@
 using Managers;
 using UnityEngine;
+using Player;
 
 public class ElNomQueEtDonguiLaGana : MonoBehaviour
 {
     private void OnTriggerEnter(Collider collider)
     {
-        LoadSceneManager.Instance.LoadNextScene();
+        if (collider.GetComponent<PlayerCharacterController>() != null) {
+            LoadSceneManager.Instance.LoadNextScene();
+        }
+
     }
 }
