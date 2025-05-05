@@ -138,6 +138,8 @@ namespace Player
 
             _hookCharges = _maxHookCharges;
             _hookUI.SetMaxCharges(_maxHookCharges);
+
+            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[WASD]</b> <color=white> <size=40>Move   <color=#77f0d8><size=43><b>[Space]</b> <color=white> <size=40>Jump", 0.5f, _airborneMovementHandler));
         }
 
         private void Update()
