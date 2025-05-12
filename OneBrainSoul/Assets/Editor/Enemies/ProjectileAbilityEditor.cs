@@ -401,6 +401,13 @@ namespace Editor.Enemies
             Vector3Field(ref abilityProjectile.relativePositionForParticles, "Relative Position To Projectile");
             //ToggleField(ref abilityProjectile.makesParabola, "Makes a Parabola");
             FloatField(ref abilityProjectile.projectileSpeed, 0, "Projectile Speed");
+            FloatField(ref abilityProjectile.timeToVanish, 0, "Time To Vanish");
+
+            if (abilityProjectile.timeToVanish != 0)
+            {
+                ToggleField(ref abilityProjectile.doesExplodeOnVanishOverTime, "Does Explode On Vanish");
+            }
+            
             UintField(ref abilityProjectile.instances, 1, "Projectile Instances");
             FloatField(ref abilityProjectile.dispersionRatePer1Meter, 0, "Dispersion Rate Per 1 Meter");
             /*ToggleField(ref abilityProjectile.doesVanishOnImpact, "Does It Vanish On Impact");
