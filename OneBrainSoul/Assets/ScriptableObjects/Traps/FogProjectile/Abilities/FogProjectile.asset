@@ -91,7 +91,7 @@ MonoBehaviour:
   abilityAoE:
     isAttachedToCaster: 0
     relativePositionToCaster: {x: 0, y: 0, z: 0}
-    duration: 1
+    duration: 0
     direction: {x: 0, y: 1, z: 0}
     height: 0
     width: 0
@@ -201,14 +201,11 @@ MonoBehaviour:
     projectilePrefab: {fileID: 3231615774265243880, guid: 4b3bb60c8bf71ae489a2e338355624a2,
       type: 3}
     relativePositionToCaster: {x: 0, y: 1, z: 0}
-    makesParabola: 0
     projectileSpeed: 20
+    timeToVanish: 3
+    doesExplodeOnVanishOverTime: 0
     instances: 3
     dispersionRatePer1Meter: 0
     objectWithParticleSystem: {fileID: 8694282191879408708, guid: 974c335c0495e404f82e55da28939437,
       type: 3}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
-    doesVanishOnImpact: 0
-    doesVanishOverTime: 0
-    timeToVanish: 0
-    doesExplodeOnVanishOverTime: 0

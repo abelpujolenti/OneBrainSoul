@@ -29,7 +29,24 @@ namespace Managers
                         player.UnlockCharge();
                         break;
                     case KeyCode.F2:
-                        player.SetMoveSpeedMultiplier(5f);
+                        player = FindObjectOfType<PlayerCharacterController>();
+                        player.SetRespawn(new Vector3(-28, -9, 355));
+                        player.Respawn();
+                        break;
+                    case KeyCode.F3:
+                        player = FindObjectOfType<PlayerCharacterController>();
+                        player.SetRespawn(new Vector3(-5, 23, 359));
+                        player.Respawn();
+                        break;
+                    case KeyCode.F4:
+                        player = FindObjectOfType<PlayerCharacterController>();
+                        player.SetRespawn(new Vector3(-79, -39, 414));
+                        player.Respawn();
+                        break;
+                    case KeyCode.F5:
+                        player = FindObjectOfType<PlayerCharacterController>();
+                        player.SetRespawn(new Vector3(-212, -15, 300));
+                        player.Respawn();
                         break;
                     case KeyCode.M:
                         SettingsManager.Instance.SwitchMasterVolumeMute();
