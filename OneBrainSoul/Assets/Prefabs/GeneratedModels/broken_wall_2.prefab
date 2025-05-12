@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3537736601402836274}
   - component: {fileID: 5260880082222919984}
   - component: {fileID: 5745365810389849363}
-  - component: {fileID: -8315178014075892972}
+  - component: {fileID: -385338878591028767}
   m_Layer: 0
   m_Name: broken_wall_2
   m_TagString: Untagged
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &-8315178014075892972
-BoxCollider:
+--- !u!64 &-385338878591028767
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,6 +102,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 5.142159, y: 13.99999, z: 6.878676}
-  m_Center: {x: -2.4289205, y: 7.000005, z: 3.439338}
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2432090755550338912, guid: 9d88925749ed1374d9ece3f9209a5091, type: 3}
