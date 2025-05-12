@@ -28,7 +28,7 @@ namespace AI.Combat.AbilityProjectiles
             
             _speed = projectileSpeed;
 
-            if (_timeToVanish == 0)
+            if (timeToVanish == 0)
             {
                 return;
             }
@@ -87,6 +87,8 @@ namespace AI.Combat.AbilityProjectiles
                 timer += Time.deltaTime;
                 yield return null;
             }
+
+            gameObject.SetActive(false);
 
             _onVanishAction();
         }
