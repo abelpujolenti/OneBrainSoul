@@ -166,7 +166,8 @@ namespace Managers
             {
                 projectiles.Add(InstantiateProjectile<TAreaAbilityComponent, TAbilityCollider>(basicAbilityComponent, 
                     areaAbilityComponent, abilityProjectile.projectileSpeed, abilityProjectile.projectilePrefab, 
-                    abilityProjectile.objectWithParticleSystem, abilityProjectile.makesParabola, projectileSound));
+                    abilityProjectile.objectWithParticleSystem, abilityProjectile.timeToVanish, 
+                    abilityProjectile.doesExplodeOnVanishOverTime, projectileSound));
             }
 
             return new ProjectileAbility(basicAbilityComponent.GetCast(), projectiles, parentTransform, 
@@ -193,7 +194,7 @@ namespace Managers
 
         private Projectile InstantiateProjectile<TAreaAbilityComponent, TAbilityCollider>
             (BasicAbilityComponent basicAbilityComponent, TAreaAbilityComponent areaAbilityComponent, float projectileSpeed, 
-                GameObject projectilePrefab, GameObject particleObjectPrefab, bool makesAParabola, EventReference projectileSound)
+                GameObject projectilePrefab, GameObject particleObjectPrefab, float timeToVanish, bool doesExplodeOnVanish, EventReference projectileSound)
                 where TAbilityCollider : AbilityAoECollider<TAreaAbilityComponent>
                 where TAreaAbilityComponent : AreaAbilityComponent
         {
@@ -206,7 +207,7 @@ namespace Managers
             
             Projectile projectile = projectileObject.GetComponent<Projectile>();
 
-            projectile.SetProjectileSpecs(projectileSpeed, makesAParabola, projectileSound);
+            projectile.SetProjectileSpecs(projectileSpeed, timeToVanish, doesExplodeOnVanish, projectileSound);
             
             projectilePrefab.SetActive(false);
 

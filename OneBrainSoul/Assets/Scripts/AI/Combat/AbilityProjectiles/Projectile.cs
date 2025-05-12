@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FMODUnity;
 using Interfaces.AI.Combat;
 using UnityEngine;
@@ -14,24 +15,33 @@ namespace AI.Combat.AbilityProjectiles
         
         private float _speed;
 
+        private float _timeToVanish;
+
         private Action _onFireAction = () => { };
-        private Action _onCollideAction = () => { };
+        private Action _onVanishAction = () => { };
         
         private IAbilityCollider _abilityCollider;
 
-        public void SetProjectileSpecs(float projectileSpeed, bool makesAParabola, EventReference projectileSound)
+        public void SetProjectileSpecs(float projectileSpeed, float timeToVanish, bool doesExplodeOnVanish, EventReference projectileSound)
         {
             _projectileSound = projectileSound;
             
             _speed = projectileSpeed;
 
-            if (!makesAParabola)
+            if (_timeToVanish == 0)
+            {
+                return;
+            }
+            
+            _timeToVanish = timeToVanish;
+            _onFireAction = () => StartCoroutine(VanishTimeCoroutine());
+
+            if (!doesExplodeOnVanish)
             {
                 return;
             }
 
-            _onFireAction = () => _rigidbody.useGravity = true;
-            _onCollideAction = () => _rigidbody.useGravity = false;
+            _onVanishAction = BOOOOOOM;
         }
 
         public void SetAbilityCollider(IAbilityCollider abilityColliderCollider)
@@ -41,8 +51,6 @@ namespace AI.Combat.AbilityProjectiles
 
         public void ResetProjectile(Transform parentTransform, Vector3 relativePosition)
         {
-            _onCollideAction();
-
             _collider.enabled = false;
             _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
@@ -56,18 +64,31 @@ namespace AI.Combat.AbilityProjectiles
         public void FIREEEEEEEEEEEE(Vector3 forceVector)
         {
             AudioManager.Instance.PlayOneShot(_projectileSound, transform.position);
-            _onFireAction();
             transform.rotation = Quaternion.LookRotation(forceVector.normalized);
             gameObject.SetActive(true);
             transform.parent = null;
             _rigidbody.AddForce(forceVector, ForceMode.VelocityChange);
             _collider.enabled = true;
+            _onFireAction();
         }
 
         private void BOOOOOOM()
         {
             _abilityCollider.Activate();
             gameObject.SetActive(false);
+        }
+
+        private IEnumerator VanishTimeCoroutine()
+        {
+            float timer = 0;
+
+            while (timer < _timeToVanish)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            _onVanishAction();
         }
 
         private void OnCollisionEnter(Collision other)
