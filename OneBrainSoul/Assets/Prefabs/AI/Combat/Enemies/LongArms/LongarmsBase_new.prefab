@@ -45,10 +45,10 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 0.80235195, g: 0, b: 1, a: 1}
-  m_Intensity: 100
-  m_Range: 10
-  m_SpotAngle: 78.543594
-  m_InnerSpotAngle: 70.34567
+  m_Intensity: 120
+  m_Range: 15
+  m_SpotAngle: 52.503975
+  m_InnerSpotAngle: 44.306053
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
