@@ -41,13 +41,20 @@ namespace Managers
 
         private void LoadSettingFile()
         {
-            if (!File.Exists(GetFilePath()))
+            string filePath = GetFilePath();
+            
+            if (!File.Exists(filePath))
             {
-                Debug.LogError("Missing Settings File");
-                return;
+                filePath = GetDefaultFilePath();
+
+                if (!File.Exists(filePath))
+                {
+                    Debug.LogError("Missing Settings File");
+                    return;
+                }
             }
 
-            byte[] data = File.ReadAllBytes(GetFilePath());
+            byte[] data = File.ReadAllBytes(filePath);
 
             SerializableSettings serializableSettings = MessagePackSerializer.Deserialize<SerializableSettings>(data);
 
@@ -240,6 +247,11 @@ namespace Managers
         private string GetFilePath()
         {
             return Application.streamingAssetsPath + "/Settings.json";
+        }
+
+        private string GetDefaultFilePath()
+        {
+            return Application.streamingAssetsPath + "/DefaultSettings.json";
         }
     }
 }
