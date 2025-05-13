@@ -23,10 +23,11 @@ MonoBehaviour:
       Data4: 0
     Path: 
   abilityCast:
-    canCancelCast: 0
-    timeToCast: 0
-    cooldown: 0
+    canCancelCast: 1
+    timeToCast: 1
+    cooldown: 0.5
     duration: 0
+    animationExtraTime: 0.5
   abilityTrigger:
     hasAnEffectOnStart: 1
     hasAnEffectOnTheDuration: 0
@@ -34,7 +35,7 @@ MonoBehaviour:
   abilityEffectOnHealthTypeOnStart: 0
   abilityEffectOnStart:
     hasAnEffectOnHealth: 1
-    healthModificationValue: 6
+    healthModificationValue: 8
     effectOnHealthDuration: 0
     isEffectOnHealthAttachedToEntity: 0
     doesSlow: 0
@@ -42,11 +43,11 @@ MonoBehaviour:
     slowPercent: 0
     slowDuration: 0
     isSlowAttachedToEntity: 1
-    doesApplyAForce: 0
-    forceDirection: {x: 0, y: 0, z: 0}
-    forceStrength: 0
+    doesApplyAForce: 1
+    forceDirection: {x: 0, y: 0.2, z: 1}
+    forceStrength: 500
     doesForceComesFromCenterOfTheArea: 0
-    abilityEffectForceType: 0
+    abilityEffectForceType: 3
   abilityEffectOnHealthTypeOnTheDuration: 0
   abilityEffectOnTheDuration:
     hasAnEffectOnHealth: 0
@@ -89,13 +90,13 @@ MonoBehaviour:
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 1
-    relativePositionToCaster: {x: 0, y: 5, z: 0}
+    relativePositionToCaster: {x: 0, y: 2, z: 0}
     duration: 0
     direction: {x: 0, y: 0, z: 0}
     height: 0
     width: 0
     length: 0
-    radius: 5
+    radius: 10
     customMeshPrefab: {fileID: 0}
     scale: 0
     doesHeightChangeOverTheTime: 0
