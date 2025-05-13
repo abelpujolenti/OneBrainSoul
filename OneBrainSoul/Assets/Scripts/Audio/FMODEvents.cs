@@ -57,6 +57,7 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference thunder { get; private set; }
     [field: SerializeField] public EventReference toxicFog { get; private set; }
     [field: SerializeField] public EventReference secretDoor { get; private set; }
+    [field: SerializeField] public EventReference longArmsSmashAttack { get; private set; }
 
     public static FMODEvents instance { get; private set; }
 

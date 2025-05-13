@@ -82,11 +82,11 @@ MonoBehaviour:
     abilityEffectForceType: 0
   abilityAoESound:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: -466734487
+      Data2: 1095922861
+      Data3: -1841475453
+      Data4: 100472155
+    Path: event:/SFX/Beta/LongarmsSmashAttack
   abilityAoEType: 1
   abilityAoE:
     isAttachedToCaster: 1

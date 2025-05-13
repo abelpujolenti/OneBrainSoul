@@ -393,3 +393,10 @@ MonoBehaviour:
       Data3: 738265500
       Data4: 2093619734
     Path: event:/SFX/Beta/SecretDoor
+  <longArmsSmashAttack>k__BackingField:
+    Guid:
+      Data1: -466734487
+      Data2: 1095922861
+      Data3: -1841475453
+      Data4: 100472155
+    Path: event:/SFX/Beta/LongarmsSmashAttack
