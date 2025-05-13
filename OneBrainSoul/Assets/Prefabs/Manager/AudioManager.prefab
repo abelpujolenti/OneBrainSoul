@@ -71,6 +71,13 @@ MonoBehaviour:
       Data3: -1355864145
       Data4: 1721711815
     Path: event:/Ambient/DungeonAmbient
+  <cutscene>k__BackingField:
+    Guid:
+      Data1: 816319249
+      Data2: 1301053784
+      Data3: -1325487427
+      Data4: -774528123
+    Path: event:/Ambient/Cutscene
   <heal>k__BackingField:
     Guid:
       Data1: 1014361787

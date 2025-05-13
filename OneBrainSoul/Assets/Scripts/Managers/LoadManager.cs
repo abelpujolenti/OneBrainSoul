@@ -21,6 +21,7 @@ namespace Managers
         {
             _instance = this;
             _videoPlayer.loopPointReached += OnVideoEnd;
+            AudioManager.Instance.PlayOneShot(FMODEvents.instance.cutscene, transform.position);
         }
 
         public void ManagerLoaded()
