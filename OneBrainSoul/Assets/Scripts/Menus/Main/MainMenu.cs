@@ -24,6 +24,7 @@ namespace Menus.Main
 
         [SerializeField] private GameObject _buttonsPanel;
         [SerializeField] private GameObject _settingsPanel;
+        [SerializeField] private GameObject _creditsPanel;
         [SerializeField] private Button _backButton;
         
         private GameObject _currentActivePanel;
@@ -93,6 +94,12 @@ namespace Menus.Main
         {
             //TODO SOUND
             ChangeCurrentActivePanel(_settingsPanel);
+        }
+
+        public void Credits()
+        {
+            //TODO SOUND
+            ChangeCurrentActivePanel(_creditsPanel);
         }
 
         public void Exit()
