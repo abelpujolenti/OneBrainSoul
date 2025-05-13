@@ -87,6 +87,8 @@ namespace AI.Combat.AbilityProjectiles
                 timer += Time.deltaTime;
                 yield return null;
             }
+            
+            gameObject.SetActive(false);
 
             gameObject.SetActive(false);
 

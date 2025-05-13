@@ -175,13 +175,10 @@ MonoBehaviour:
     projectilePrefab: {fileID: 1227480721610403239, guid: 5a7b64fab9a790049a942a4eac7238aa,
       type: 3}
     relativePositionToCaster: {x: 0, y: 0, z: 0}
-    makesParabola: 0
     projectileSpeed: 60
+    timeToVanish: 0
+    doesExplodeOnVanishOverTime: 0
     instances: 30
     dispersionRatePer1Meter: 0
     objectWithParticleSystem: {fileID: 0}
     relativePositionForParticles: {x: 0, y: 0, z: 0}
-    doesVanishOnImpact: 0
-    doesVanishOverTime: 0
-    timeToVanish: 0
-    doesExplodeOnVanishOverTime: 0
