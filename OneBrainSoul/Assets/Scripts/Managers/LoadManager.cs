@@ -39,7 +39,7 @@ namespace Managers
 
         private void CheckConditions()
         {
-            if (_currentManagersToLoaded != _managersToLoad || !_hasVideoEnded)
+            if (_currentManagersToLoaded != _managersToLoad || (!_hasVideoEnded && _videoPlayer.targetTexture != null))
             {
                 return;
             }
