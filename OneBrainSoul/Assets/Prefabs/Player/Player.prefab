@@ -12651,6 +12651,7 @@ GameObject:
   - component: {fileID: 8879438813995703225}
   - component: {fileID: 5004512723018151163}
   - component: {fileID: 5298706460666842775}
+  - component: {fileID: 6340783117733766051}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -12996,6 +12997,19 @@ MonoBehaviour:
     type: 3}
   _healthLostPerTick: 0
   _timeBetweenTicks: 0
+--- !u!114 &6340783117733766051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2647467613226330651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5804384e39dc42c4996e5b7a2ae57770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frequency: 0.1
 --- !u!1 &4680270387884578829
 GameObject:
   m_ObjectHideFlags: 0
