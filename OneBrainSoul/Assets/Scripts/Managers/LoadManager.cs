@@ -1,4 +1,5 @@
-﻿using BULLSHIT;
+﻿using System;
+using BULLSHIT;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
@@ -17,11 +18,38 @@ namespace Managers
         private int _currentManagersToLoaded;
         private bool _hasVideoEnded;
 
+        private float _time;
+
+        private float _maxTime = 0.3f;
+
         private void Awake()
         {
             _instance = this;
             _videoPlayer.loopPointReached += OnVideoEnd;
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.cutscene, transform.position);
+        }
+
+        private void Update()
+        {
+            if (!Input.GetKey(KeyCode.Space))
+            {
+                Debug.Log("Not Pressing");
+                _time = 0;
+                return;
+            }
+
+            _time += Time.deltaTime;
+            
+            Debug.Log("Pressing");
+
+            if (_time < _maxTime)
+            {
+                return;
+            }
+            
+            Debug.Log("Finish");
+            
+            FinishVideo();
         }
 
         public void ManagerLoaded()
@@ -32,6 +60,11 @@ namespace Managers
         }
 
         private void OnVideoEnd(VideoPlayer videoPlayer)
+        {
+            FinishVideo();
+        }
+
+        private void FinishVideo()
         {
             _hasVideoEnded = true;
             
