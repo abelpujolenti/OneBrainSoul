@@ -30,22 +30,22 @@ namespace Managers
                         break;
                     case KeyCode.F2:
                         player = FindObjectOfType<PlayerCharacterController>();
-                        player.SetRespawn(new Vector3(-28, -9, 355));
+                        player.SetRespawn(new Vector3(-28, -9, 355), Quaternion.identity);
                         player.Respawn();
                         break;
                     case KeyCode.F3:
                         player = FindObjectOfType<PlayerCharacterController>();
-                        player.SetRespawn(new Vector3(-5, 23, 359));
+                        player.SetRespawn(new Vector3(-5, 23, 359), Quaternion.identity);
                         player.Respawn();
                         break;
                     case KeyCode.F4:
                         player = FindObjectOfType<PlayerCharacterController>();
-                        player.SetRespawn(new Vector3(-79, -39, 414));
+                        player.SetRespawn(new Vector3(-79, -39, 414), Quaternion.identity);
                         player.Respawn();
                         break;
                     case KeyCode.F5:
                         player = FindObjectOfType<PlayerCharacterController>();
-                        player.SetRespawn(new Vector3(-212, -15, 300));
+                        player.SetRespawn(new Vector3(-212, -15, 300), Quaternion.identity);
                         player.Respawn();
                         break;
                     case KeyCode.M:

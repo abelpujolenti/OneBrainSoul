@@ -82,6 +82,7 @@ namespace Player
         [SerializeField] private float _airTime;
         private Vector3 _startPos;
         private Vector3 _respawnPos;
+        private Quaternion _respawnRotation;
         private EventInstance _footstepSound;
         private EventInstance _slideSound;
 
@@ -129,6 +130,7 @@ namespace Player
             _uiCrosshairCanvas.gameObject.SetActive(true);
             _uiCanvas.gameObject.SetActive(true);
             _respawnPos = _startPos = transform.position;
+            _respawnRotation = _orientation.rotation;
 
             _footstepSound = AudioManager.Instance.CreateInstance(FMODEvents.instance.playerFootsteps);
             _footstepSound.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
@@ -226,6 +228,7 @@ namespace Player
             float t = 0f;
             PostProcessingManager.Instance.BraincellSwitchTransition(dur);
             transform.position = _respawnPos;
+            _camera.SmoothRotation(10f, _respawnRotation.y, 0f);
 
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.teleportOut, transform.position);
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.catDamage, transform.position);
@@ -240,10 +243,11 @@ namespace Player
             _canMove = true;
         }
 
-        public void SetRespawn(Vector3 newPos)
+        public void SetRespawn(Vector3 newPos, Quaternion newRotation)
         {
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Checkpoint Reached!]</b>", 1f));
             _respawnPos = newPos;
+            _respawnRotation = newRotation;
         }
 
         private void VoidReturn()
