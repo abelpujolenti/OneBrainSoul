@@ -207,6 +207,8 @@ MonoBehaviour:
   _rigidbody: {fileID: 1416006103880645204}
   _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
     type: 3}
+  _deathParticlePrefab: {fileID: 36062672730322895, guid: 4e6103fde3cec434699c7b3fecd9f85c,
+    type: 3}
   _showMessages: 0
   _visionAreas:
   - {fileID: 3140950319955485401}

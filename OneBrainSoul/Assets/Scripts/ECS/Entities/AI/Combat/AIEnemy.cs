@@ -45,7 +45,7 @@ namespace ECS.Entities.AI.Combat
 
         private GameObject _healEffect;
 
-        private float _damageEffectDuration = 0.4f;
+        private float _damageEffectDuration = 0.25f;
 
         private Vector3 _directionToRotateHead;
         private Vector3 _directionToRotateBody;
@@ -404,6 +404,8 @@ namespace ECS.Entities.AI.Combat
             
             PreDeath();
 
+            Instantiate(_deathParticlePrefab, transform.position, Quaternion.identity);
+
             while (timer < _damageEffectDuration)
             {
                 timer += Time.deltaTime;
@@ -432,17 +434,23 @@ namespace ECS.Entities.AI.Combat
 
         private IEnumerator DamageEffectCoroutine(float duration)
         {
-            /*Material matInstance = GetComponent<MeshRenderer>().material;
+            MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer>();
 
             float t = 0f;
             while (t < duration)
             {
                 float p = 1f - t / duration;
-                matInstance.SetFloat("_DamageT", Mathf.Pow(p, 0.75f));
+                foreach (var mesh in meshes)
+                {
+                    mesh.material.SetFloat("_DamageT", Mathf.Pow(p, 0.75f));
+                }
                 yield return new WaitForFixedUpdate();
                 t += Time.fixedDeltaTime;
             }
-            matInstance.SetFloat("_DamageT", 0f);*/
+            foreach (var mesh in meshes)
+            {
+                mesh.material.SetFloat("_DamageT", 0f);
+            }
             yield break;
         }
 

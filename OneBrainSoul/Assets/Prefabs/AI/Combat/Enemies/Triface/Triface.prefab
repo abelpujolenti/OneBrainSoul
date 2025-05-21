@@ -439,6 +439,8 @@ MonoBehaviour:
   _rigidbody: {fileID: 1215598187889308564}
   _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
     type: 3}
+  _deathParticlePrefab: {fileID: 36062672730322895, guid: 4e6103fde3cec434699c7b3fecd9f85c,
+    type: 3}
   _showMessages: 0
   _visionAreas:
   - {fileID: 7569773403801526068}
@@ -454,6 +456,7 @@ MonoBehaviour:
   _navMeshAgentSpecs: {fileID: 11400000, guid: d537537af89fa8145ac55661ac62efa7, type: 2}
   _navMeshAgent: {fileID: 4363023524190419784}
   _pointsToPatrol: []
+  _showPath: 0
   _trifaceProperties: {fileID: 11400000, guid: 1dc903e7e219eb4439de4613a464523d, type: 2}
   _slamAbilityDetectionArea: {fileID: 8298059863085958389}
   _showDetectionAreaOfSlam: 0

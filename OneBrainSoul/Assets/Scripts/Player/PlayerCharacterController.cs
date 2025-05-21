@@ -118,8 +118,6 @@ namespace Player
 
         private bool _canMove = true;
         private bool _deathMessageTutorialShown = false;
-        private bool _doubleJumpMessageTutorialShown = false;
-        private bool _showDoubleJumpTutorial = false;
 
         private CombatRoom currCombatRoom;
 
@@ -277,15 +275,7 @@ namespace Player
 
             if (!_onGround)
             {
-                _showDoubleJumpTutorial = true;
                 return;
-            }
-
-            if (!_doubleJumpMessageTutorialShown && _showDoubleJumpTutorial && _movementHandler is GroundedMovementHandler)
-            {
-                StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Space while airborne]</b> <color=white> <size=40>Double Jump", 2f, _airborneMovementHandler));
-                _showDoubleJumpTutorial = false;
-                _doubleJumpMessageTutorialShown = true;
             }
 
             ResetDash();
@@ -660,13 +650,13 @@ namespace Player
             StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Recover your soul!]<color=white>", .75f));
         }
 
-        private IEnumerator SetControlText(string text, float dur = 0.5f, IMovementHandler movementHandler = null)
+        public IEnumerator SetControlText(string text, float dur = 0.5f, IMovementHandler movementHandler = null)
         {
             _controlPrompt.text = text;
             _controlPrompt.color = new Color(1f, 1f, 1f, 1f);
             if (movementHandler != null)
             {
-                yield return new WaitUntil(() => _movementHandler == movementHandler);
+                yield return new WaitUntil(() => _movementHandler.GetType() == movementHandler.GetType());
             }
             else
             {
@@ -748,7 +738,6 @@ namespace Player
         public void SetJumpsAmount(int jumps)
         {
             _jumps = jumps;
-            StartCoroutine(SetControlText("<color=#77f0d8><size=43><b>[Space] Mid-air</b> <color=white> <size=40>Double Jump", 0.5f, _airborneMovementHandler));
             AudioManager.Instance.SetMusicParameter("Abilities", 1);
         }
 

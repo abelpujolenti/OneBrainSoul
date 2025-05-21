@@ -21,6 +21,7 @@ namespace ECS.Entities.AI
 
         [SerializeField] protected Rigidbody _rigidbody;
         [SerializeField] private GameObject _damageParticlePrefab;
+        [SerializeField] protected GameObject _deathParticlePrefab;
 
         protected List<float> _slowEffects;
         protected Dictionary<uint, int> _slowSubscriptions = new Dictionary<uint, int>();
