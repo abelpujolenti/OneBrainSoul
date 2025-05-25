@@ -1,5 +1,7 @@
 ﻿using System;
 using BULLSHIT;
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
@@ -22,11 +24,16 @@ namespace Managers
 
         private float _maxTime = 0.3f;
 
+        private EventInstance _cutsceneAmbient;
+
         private void Awake()
         {
             _instance = this;
             _videoPlayer.loopPointReached += OnVideoEnd;
-            AudioManager.Instance.PlayOneShot(FMODEvents.instance.cutscene, transform.position);
+
+            _cutsceneAmbient = AudioManager.Instance.CreateInstance(FMODEvents.instance.cutscene);
+            _cutsceneAmbient.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            _cutsceneAmbient.start();
         }
 
         private void Update()
@@ -67,6 +74,8 @@ namespace Managers
         private void FinishVideo()
         {
             _hasVideoEnded = true;
+
+            _cutsceneAmbient.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
             
             CheckConditions();
         }
