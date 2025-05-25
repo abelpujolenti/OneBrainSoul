@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfad4f2074841baa3cc122579190772, type: 3}
   m_Name: HookTriface
   m_EditorClassIdentifier: 
-  totalHealth: 1
+  totalHealth: 2
   agentsPositionRadius: 5
   minimumTimeInvestigatingArea: 5
   maximumTimeInvestigatingArea: 7
@@ -26,4 +26,3 @@ MonoBehaviour:
     type: 2}
   slamAbilityTriggerName: Hook
   rotationSpeedWhileCastingSlam: 446.25
-  animatorController: {fileID: 9100000, guid: cbf8150eddefcab419ddc5327884d8fc, type: 2}
