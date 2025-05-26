@@ -5,6 +5,8 @@ using UnityEngine;
 using Player;
 using Player.Movement;
 using System.Globalization;
+using Managers;
+
 public class PlayerMetrics : MonoBehaviour
 {
     [SerializeField] float frequency = 1f;
@@ -23,6 +25,8 @@ public class PlayerMetrics : MonoBehaviour
 #endif
         player = GetComponent<PlayerCharacterController>();
         CreateFile();
+
+        EventsManager.OnDefeatEnemy += DefeatAgent;
     }
 
     private void Update()
@@ -38,9 +42,23 @@ public class PlayerMetrics : MonoBehaviour
             player.transform.position.ToString() + " " + 
             player.GetCamera().transform.rotation.eulerAngles.ToString() + " " +
             player.GetMovementHandler().ToString() + " " +
+            (player.IsInCombat() ? "InCombat" : "OutOfCombat") + " " +
             (prevMovementHandler == player.GetMovementHandler() ? "" : player.GetMovementHandler() is GroundedMovementHandler ? "Grounded" : player.GetMovementHandler() is AirborneMovementHandler && prevMovementHandler is GroundedMovementHandler ? "Jumped" : "UsedAbility"));
 
         prevMovementHandler = player.GetMovementHandler();
+    }
+
+    public void DefeatAgent()
+    {
+#if UNITY_EDITOR
+        return;
+#endif
+        File.AppendAllTextAsync(filePath, "\n" + (Time.timeSinceLevelLoadAsDouble * 1000d).ToString(CultureInfo.InvariantCulture) + " " +
+        player.transform.position.ToString() + " " +
+        player.GetCamera().transform.rotation.eulerAngles.ToString() + " " +
+        player.GetMovementHandler().ToString() + " " +
+        (player.IsInCombat() ? "InCombat" : "OutOfCombat") + " " +
+        "Killed");
     }
 
     private void CreateFile()

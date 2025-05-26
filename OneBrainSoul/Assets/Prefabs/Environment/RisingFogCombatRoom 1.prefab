@@ -11414,7 +11414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   triggered: 0
-  height: 90
+  height: 150
   speed: 3
 --- !u!1 &8780788133019056886
 GameObject:

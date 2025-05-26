@@ -613,6 +613,11 @@ namespace Player
             _isInCombat = isInCombat;
         }
 
+        public bool IsInCombat()
+        {
+            return _isInCombat;
+        }
+
         public void UnlockDash()
         {
             _isDashUnlocked = true;

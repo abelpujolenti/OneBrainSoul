@@ -11,6 +11,11 @@ public class DeathFog : MonoBehaviour
         {
             AudioManager.Instance.PlayOneShot(FMODEvents.instance.toxicFog, transform.position);
             player.Respawn();
+            RisingFog risingFog = GetComponentInParent<RisingFog>();
+            if (risingFog != null)
+            {
+                risingFog.ResetPosition();
+            }
             return;
         }
         AgentEntity agentEntity = other.GetComponent<AgentEntity>();
