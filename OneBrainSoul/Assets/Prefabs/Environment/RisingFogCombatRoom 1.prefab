@@ -3031,6 +3031,8 @@ MonoBehaviour:
   _rigidbody: {fileID: 2180958301937037467}
   _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
     type: 3}
+  _deathParticlePrefab: {fileID: 36062672730322895, guid: 4e6103fde3cec434699c7b3fecd9f85c,
+    type: 3}
   _showMessages: 0
   _visionAreas:
   - {fileID: 766487368252255625}
@@ -11309,6 +11311,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 7753282418251402783}
   _damageParticlePrefab: {fileID: 8238923372935108368, guid: b72904ca9be593847ada8c89d569e75f,
+    type: 3}
+  _deathParticlePrefab: {fileID: 36062672730322895, guid: 4e6103fde3cec434699c7b3fecd9f85c,
     type: 3}
   _showMessages: 0
   _visionAreas:
